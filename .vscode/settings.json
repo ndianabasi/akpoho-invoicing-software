@@ -1,0 +1,10 @@
+{
+  "prettier.singleQuote": true,
+  "prettier.printWidth": 150,
+  "javascript.preferences.quoteStyle": "single",
+  "javascript.format.semicolons": "insert",
+  "javascript.suggest.completeFunctionCalls": true,
+  "prettier.arrowParens": "avoid",
+  "prettier.endOfLine": "auto",
+  "vetur.validation.template": false,
+}
