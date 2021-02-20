@@ -1,4 +1,4 @@
-declare type Field = (row: TableRow) => string | string;
+declare type FieldFn = (row: TableRow) => string;
 declare type Format = (value: string) => string;
 
 declare function SortStringFn(arg1: string, arg2: string): number;
@@ -10,7 +10,7 @@ export interface TableRow {
   align?: string;
   sortable?: boolean;
   sort?: typeof SortStringFn | typeof SortNumberFn;
-  field: string;
+  field: string | FieldFn;
   required?: boolean;
   format?: Format;
 }

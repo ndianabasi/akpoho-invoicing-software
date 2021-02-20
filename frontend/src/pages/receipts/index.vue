@@ -18,7 +18,7 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { ref } from 'vue';
+import { ref, defineComponent } from 'vue';
 
 import { TableRow } from '../../types/table';
 
@@ -162,7 +162,8 @@ const rows = [
   },
 ];
 
-export default {
+export default defineComponent({
+  name: 'Receipts',
   setup() {
     const selected = ref([]);
 
@@ -180,5 +181,5 @@ export default {
       },
     };
   },
-};
+});
 </script>

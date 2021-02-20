@@ -171,20 +171,7 @@
     </q-page-scroller>
 
     <q-page-sticky expand position="top" style="z-index: 10">
-      <q-toolbar class="bg-accent text-white">
-        <q-btn
-          @click="$router.go(-1)"
-          flat
-          round
-          dense
-          icon="arrow_back"
-          class="q-mr-sm"
-        />
-
-        <q-toolbar-title>Page Title</q-toolbar-title>
-
-        <breadcrumbs />
-      </q-toolbar>
+      <secondary-top-toolbar />
     </q-page-sticky>
 
     <q-page-sticky v-if="$q.screen.gt.sm" expand position="left">
@@ -207,7 +194,7 @@
       </div>
     </q-page-sticky>
 
-    <q-page-container class="AGIS__page-container q-mt-xl">
+    <q-page-container class="AGIS__page-container q-mt-xl q-mx-lg">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -218,18 +205,17 @@
 <script lang="ts">
 //import EssentialLink from '../components/EssentialLink.vue';
 import { useStore } from 'vuex';
-import { defineComponent, ref, onMounted, computed, reactive, Ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import Breadcrumbs from '../components/Breadcrumbs.vue';
+import { defineComponent, ref, onMounted, computed, Ref } from 'vue';
 import CreateMenu from '../components/CreateMenu.vue';
 import { debounce } from 'quasar';
+import SecondaryTopToolbar from '../components/SecondaryTopToolbar.vue';
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    Breadcrumbs,
     CreateMenu,
+    SecondaryTopToolbar,
   },
 
   setup() {
@@ -237,7 +223,6 @@ export default defineComponent({
     const leftDrawerOpen = ref(false);
     const search = ref('');
     const storage = ref(0.26);
-    const router = useRouter();
 
     let breadcrumbsRoutes;
     let scrollDirection: Ref<string> = ref('');

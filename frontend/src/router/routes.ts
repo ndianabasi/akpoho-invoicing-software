@@ -23,7 +23,7 @@ const routes: RouteRecordRaw[] = [
         },
         children: [
           {
-            path: ':id',
+            path: ':customerId',
             component: () => import('pages/customers/customer.vue'),
             props: true,
             name: 'Customer View',

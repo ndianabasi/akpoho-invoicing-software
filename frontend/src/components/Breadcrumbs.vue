@@ -8,7 +8,7 @@
       <q-icon size="1.2em" name="arrow_forward" color="secondary" />
     </template>
     <q-breadcrumbs-el
-      v-for="route in breadcrumbsRoutes"
+      v-for="route in routes"
       :key="'route:' + route.name"
       :label="route.meta.label"
       :icon="route.meta.icon"
@@ -18,28 +18,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'Breadcrumbs',
   props: {
-    /* routes: {
+    routes: {
       type: Array,
       required: true,
-    }, */
+    },
   },
   setup(/* props */) {
-    const route = useRoute();
-    return {
-      breadcrumbsRoutes: computed(() => {
-        return route.matched.map((route) => ({
-          meta: route.meta,
-          path: route.path,
-          name: route.name,
-        }));
-      }),
-    };
+    return {};
   },
 });
 </script>
