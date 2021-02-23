@@ -11,13 +11,6 @@
   >
     <q-menu>
       <q-list class="text-grey-8" style="min-width: 100px">
-        <q-item aria-hidden="true">
-          <q-item-section
-            class="text-uppercase text-grey-7"
-            style="font-size: 0.7rem"
-            >Create New</q-item-section
-          >
-        </q-item>
         <q-item
           v-for="menu in createMenu"
           :key="menu.title"
@@ -29,7 +22,7 @@
           <q-item-section avatar>
             <q-icon :name="menu.icon" />
           </q-item-section>
-          <q-item-section>{{ menu.title }}</q-item-section>
+          <q-item-section>New {{ menu.title }}</q-item-section>
         </q-item>
       </q-list>
     </q-menu>

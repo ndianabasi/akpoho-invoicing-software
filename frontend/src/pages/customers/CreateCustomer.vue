@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/v-slot-style -->
 <template>
   <q-page>
     <div class="q-pa-md q-gutter-sm">
@@ -49,6 +50,7 @@
               <template #hint> Field hint </template>
               <template #error> Sorry! Invalid input </template>
             </q-input>
+
             <q-input
               filled
               clearable
@@ -63,10 +65,53 @@
               </template>
 
               <template #hint> Field hint </template>
-              <template #error> Sorry! Invalid input </template>
             </q-input>
 
+            <q-input
+              filled
+              clearable
+              bottom-slots
+              v-model="form.phone_number"
+              label="Phone Number"
+              :dense="dense"
+              class="q-mb-md"
+              type="tel"
+            >
+              <template #before>
+                <q-icon name="smartphone" />
+              </template>
+            </q-input>
+
+            <q-input
+              filled
+              clearable
+              bottom-slots
+              v-model="form.email_address"
+              label="Email Address"
+              :dense="dense"
+              class="q-mb-md"
+              type="email"
+              :error="v$.email_address.$invalid"
+              error-message="Invalid email address"
+            >
+              <template #before>
+                <q-icon name="email" />
+              </template>
+
+              <template v-slot:error>Sorry! Invalid input</template>
+            </q-input>
+
+            <q-toggle
+              v-model="form.belongs_to_company"
+              checked-icon="check"
+              color="green"
+              unchecked-icon="clear"
+              label="Belongs to a company?"
+              class="q-ml-lg q-mb-md"
+            />
+
             <q-select
+              v-if="form.belongs_to_company"
               filled
               v-model="form.company"
               :options="companies"
@@ -85,7 +130,7 @@
             </q-select>
 
             <template
-              v-if="!form.company"
+              v-if="!form.company && form.belongs_to_company"
               transition-show="slide-down"
               transition-hide="slide-up"
             >
@@ -120,6 +165,42 @@
               >
                 <template #before>
                   <q-icon name="business" />
+                </template>
+
+                <template #hint> Field hint </template>
+                <template #error> Sorry! Invalid input </template>
+              </q-input>
+
+              <q-input
+                filled
+                clearable
+                bottom-slots
+                v-model="form.company_phone"
+                label="Company Phone Number"
+                :dense="dense"
+                class="q-mb-md"
+                type="tel"
+              >
+                <template #before>
+                  <q-icon name="smartphone" />
+                </template>
+
+                <template #hint> Field hint </template>
+                <template #error> Sorry! Invalid input </template>
+              </q-input>
+
+              <q-input
+                filled
+                clearable
+                bottom-slots
+                v-model="form.company_email_address"
+                label="Email Address"
+                :dense="dense"
+                class="q-mb-md"
+                type="email"
+              >
+                <template #before>
+                  <q-icon name="email" />
                 </template>
 
                 <template #hint> Field hint </template>
@@ -212,6 +293,227 @@
                 <template #error> <div>Sorry! Invalid input</div> </template>
               </q-select>
             </template>
+
+            <q-input
+              filled
+              clearable
+              bottom-slots
+              v-model="form.billing_address"
+              label="Billing Address"
+              :dense="dense"
+              type="textarea"
+              autogrow
+              class="q-mb-md"
+            >
+              <template #before>
+                <q-icon name="local_shipping" />
+              </template>
+
+              <template #hint> Field hint </template>
+              <template #error> Sorry! Invalid input </template>
+            </q-input>
+
+            <q-input
+              filled
+              clearable
+              bottom-slots
+              v-model="form.billing_lga"
+              label="Billing LGA/County"
+              :dense="dense"
+              class="q-mb-md"
+            >
+              <template #before>
+                <q-icon name="local_shipping" />
+              </template>
+
+              <template #hint> Field hint </template>
+              <template #error> Sorry! Invalid input </template>
+            </q-input>
+
+            <q-input
+              filled
+              clearable
+              bottom-slots
+              v-model="form.billing_postal_code"
+              label="Billing Postal Code"
+              :dense="dense"
+              type="textarea"
+              autogrow
+              class="q-mb-md"
+            >
+              <template #before>
+                <q-icon name="local_shipping" />
+              </template>
+
+              <template #hint> Field hint </template>
+              <template #error> Sorry! Invalid input </template>
+            </q-input>
+
+            <q-select
+              filled
+              v-model="form.billing_country"
+              :options="countriesList"
+              label="Billing Country"
+              clearable
+              bottom-slots
+              class="q-mb-md"
+              transition-show="scale"
+              transition-hide="scale"
+              @update:modelValue="processSelect('billing_country', $event)"
+              emit-value
+              map-options
+              ><template #before>
+                <q-icon name="local_shipping" />
+              </template>
+
+              <template #hint> Field hint </template>
+              <template #error> Sorry! Invalid input </template>
+            </q-select>
+
+            <q-select
+              filled
+              :disable="!form.billing_country"
+              :placeholder="
+                !form.billing_country ? 'Please select the country first' : ''
+              "
+              v-model="form.billing_state"
+              :options="
+                form.billing_country ? countries[`${form.billing_country}`] : []
+              "
+              label="Billing State"
+              clearable
+              bottom-slots
+              class="q-mb-md"
+              transition-show="scale"
+              transition-hide="scale"
+              @update:modelValue="processSelect('billing_state', $event)"
+              emit-value
+              map-options
+              ><template #before>
+                <q-icon name="local_shipping" />
+              </template>
+
+              <template #hint> Field hint </template>
+              <template #error><div>Sorry! Invalid input</div></template>
+            </q-select>
+
+            <q-toggle
+              v-model="form.is_billing_shipping_addresses_same"
+              checked-icon="check"
+              color="green"
+              unchecked-icon="clear"
+              label="Use billing address as delivery address?"
+              class="q-ml-lg q-mb-md"
+            />
+
+            <template v-if="!form.is_billing_shipping_addresses_same">
+              <q-input
+                filled
+                clearable
+                bottom-slots
+                v-model="form.shipping_address"
+                label="Shipping Address"
+                :dense="dense"
+                type="textarea"
+                autogrow
+                class="q-mb-md"
+              >
+                <template #before>
+                  <q-icon name="local_shipping" />
+                </template>
+
+                <template #hint> Field hint </template>
+                <template #error> Sorry! Invalid input </template>
+              </q-input>
+
+              <q-input
+                filled
+                clearable
+                bottom-slots
+                v-model="form.shipping_lga"
+                label="Shipping LGA/County"
+                :dense="dense"
+                class="q-mb-md"
+              >
+                <template #before>
+                  <q-icon name="local_shipping" />
+                </template>
+
+                <template #hint> Field hint </template>
+                <template #error> Sorry! Invalid input </template>
+              </q-input>
+
+              <q-input
+                filled
+                clearable
+                bottom-slots
+                v-model="form.shipping_postal_code"
+                label="Shipping Postal Code"
+                :dense="dense"
+                type="textarea"
+                autogrow
+                class="q-mb-md"
+              >
+                <template #before>
+                  <q-icon name="local_shipping" />
+                </template>
+
+                <template #hint> Field hint </template>
+                <template #error> Sorry! Invalid input </template>
+              </q-input>
+
+              <q-select
+                filled
+                v-model="form.shipping_country"
+                :options="countriesList"
+                label="Shipping Country"
+                clearable
+                bottom-slots
+                class="q-mb-md"
+                transition-show="scale"
+                transition-hide="scale"
+                @update:modelValue="processSelect('shipping_country', $event)"
+                emit-value
+                map-options
+                ><template #before>
+                  <q-icon name="local_shipping" />
+                </template>
+
+                <template #hint> Field hint </template>
+                <template #error> Sorry! Invalid input </template>
+              </q-select>
+
+              <q-select
+                filled
+                :disable="!form.shipping_country"
+                :placeholder="
+                  !form.shipping_country
+                    ? 'Please select the country first'
+                    : ''
+                "
+                v-model="form.shipping_state"
+                :options="
+                  form.shipping_country
+                    ? countries[`${form.shipping_country}`]
+                    : []
+                "
+                label="Shipping State"
+                clearable
+                bottom-slots
+                class="q-mb-md"
+                transition-show="scale"
+                transition-hide="scale"
+                @update:modelValue="processSelect('shipping_state', $event)"
+                emit-value
+                map-options
+                ><template #before>
+                  <q-icon name="local_shipping" />
+                </template>
+
+                <template #hint> Field hint </template>
+                <template #error><div>Sorry! Invalid input</div></template>
+              </q-select>
+            </template>
           </form>
         </div>
       </div>
@@ -240,6 +542,8 @@
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
 import { defineComponent, reactive, ref } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required, email } from '@vuelidate/validators';
 
 export default defineComponent({
   name: 'NewCustomer',
@@ -289,6 +593,7 @@ export default defineComponent({
       console.log(field, modelValue);
       if (!modelValue) {
         if (field === 'company_country') form.company_state = '';
+        if (field === 'shipping_country') form.shipping_state = '';
       }
     }
 
@@ -296,14 +601,38 @@ export default defineComponent({
       first_name: '',
       last_name: '',
       middle_name: '',
+      email_address: '',
+      phone_number: '',
+      belongs_to_company: false,
       company: null,
       company_name: '',
+      company_phone: '',
+      company_email_address: '',
       company_address: '',
       company_lga: '',
       company_postal_code: '',
       company_state: '',
       company_country: '',
+      shipping_address: '',
+      shipping_lga: '',
+      shipping_postal_code: '',
+      shipping_state: '',
+      shipping_country: '',
+      is_billing_shipping_addresses_same: true,
+      billing_address: '',
+      billing_lga: '',
+      billing_postal_code: '',
+      billing_state: '',
+      billing_country: '',
     });
+
+    const rules = {
+      first_name: { required },
+      last_name: { required },
+      email_address: { email },
+    };
+
+    const v$ = useVuelidate(rules, form);
 
     return {
       ph: ref(''),
@@ -316,6 +645,7 @@ export default defineComponent({
       companies,
       countries,
       countriesList,
+      v$,
     };
   },
 });
