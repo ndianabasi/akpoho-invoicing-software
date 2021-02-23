@@ -9,6 +9,7 @@ export interface MenusStateInterface {
   links2: Array<Menu>;
   links3: Array<Menu>;
   createMenu: Array<Menu>;
+  leftDrawerOpen: boolean;
 }
 
 function state(): MenusStateInterface {
@@ -20,20 +21,20 @@ function state(): MenusStateInterface {
       { icon: 'receipt', title: 'Receipts', link: 'receipts' },
     ],
     links2: [
-      { icon: 'archive', title: 'Archive' },
-      { icon: 'delete', title: 'Trash' },
+      /* { icon: 'archive', title: 'Archive' },
+      { icon: 'delete', title: 'Trash' }, */
     ],
     links3: [
       { icon: 'settings', title: 'Settings' },
       { icon: 'help', title: 'Help & Feedback' },
-      { icon: 'get_app', title: 'App Downloads' },
     ],
     createMenu: [
-      { icon: 'person_add_alt', title: 'Customer' },
-      { icon: 'request_page', title: 'Quotation' },
-      { icon: 'list_alt', title: 'Invoice' },
-      { icon: 'receipt', title: 'Receipt' },
+      { icon: 'person_add_alt', title: 'Customer', link: 'create_customer' },
+      { icon: 'request_page', title: 'Quotation', link: 'create_quotation' },
+      { icon: 'list_alt', title: 'Invoice', link: 'create_invoice' },
+      { icon: 'receipt', title: 'Receipt', link: 'create_receipt' },
     ],
+    leftDrawerOpen: false,
   };
 }
 

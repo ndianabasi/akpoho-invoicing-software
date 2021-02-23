@@ -1,18 +1,20 @@
 <template>
-  <q-toolbar inset class="bg-white text-primary">
-    <q-btn
-      @click="$router.go(-1)"
-      flat
-      round
-      dense
-      icon="arrow_back"
-      class="q-mr-sm"
-    />
+  <q-page-sticky expand position="top" style="z-index: 10">
+    <q-toolbar class="bg-white text-primary q-pl-lg">
+      <q-btn
+        @click="$router.go(-1)"
+        flat
+        round
+        dense
+        icon="arrow_back"
+        class="q-mr-sm"
+      />
 
-    <q-toolbar-title>{{ currentRouteLabel }}</q-toolbar-title>
+      <q-toolbar-title>{{ currentRouteLabel }}</q-toolbar-title>
 
-    <breadcrumbs :routes="breadcrumbsRoutes" />
-  </q-toolbar>
+      <breadcrumbs :routes="breadcrumbsRoutes" />
+    </q-toolbar>
+  </q-page-sticky>
 </template>
 
 <script lang="ts">
@@ -21,7 +23,7 @@ import { useRoute } from 'vue-router';
 import Breadcrumbs from './Breadcrumbs.vue';
 
 export default defineComponent({
-  name: 'SecondaryTopToolbar',
+  name: 'SecondaryToolbar',
   components: {
     Breadcrumbs,
   },

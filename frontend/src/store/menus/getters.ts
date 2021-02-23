@@ -12,6 +12,7 @@ const getters: MenusGetterInterface = {
   GET_LINKS1: (state: MenusStateInterface) => state.links1,
   GET_LINKS2: (state: MenusStateInterface) => state.links2,
   GET_LINKS3: (state: MenusStateInterface) => state.links3,
+  GET_LEFT_DRAWER_OPEN: (state: MenusStateInterface) => state.leftDrawerOpen,
 };
 
 export default getters;

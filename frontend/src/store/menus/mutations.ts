@@ -1,9 +1,11 @@
 import { MutationTree } from 'vuex';
 import { MenusStateInterface } from './state';
+//import { MutationPayload } from '../../types/store';
 
 const mutation: MutationTree<MenusStateInterface> = {
-  someMutation(/* state: MenusStateInterface */) {
-    // your code
+  TOGGLE_LEFT_DRAWER(state: MenusStateInterface) {
+    state.leftDrawerOpen = !state.leftDrawerOpen;
+    console.log(state.leftDrawerOpen);
   },
 };
 

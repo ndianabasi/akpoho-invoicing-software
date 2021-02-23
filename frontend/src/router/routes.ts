@@ -15,24 +15,31 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'customers',
         name: 'customers',
-        component: () => import('pages/customers/index.vue'),
+        component: () => import('pages/customers/Index.vue'),
         meta: {
           label: 'All Customers',
           icon: 'people',
           //canViewOrganisations: true,
         },
-        children: [
-          {
-            path: ':customerId',
-            component: () => import('pages/customers/customer.vue'),
-            props: true,
-            name: 'Customer View',
-            meta: {
-              label: 'View Customer',
-              //canViewOrganisations: true,
-            },
-          },
-        ],
+      },
+      {
+        path: '/customers/:customerId',
+        component: () => import('pages/customers/Customer.vue'),
+        props: true,
+        name: 'view_customer',
+        meta: {
+          label: 'View Customer',
+          //canViewOrganisations: true,
+        },
+      },
+      {
+        path: '/customers/new',
+        component: () => import('pages/customers/CreateCustomer.vue'),
+        name: 'create_customer',
+        meta: {
+          label: 'New Customer',
+          //canViewOrganisations: true,
+        },
       },
       {
         path: 'quotations',
@@ -41,6 +48,15 @@ const routes: RouteRecordRaw[] = [
         meta: {
           label: 'All Quotations',
           icon: 'request_page',
+          //canViewOrganisations: true,
+        },
+      },
+      {
+        path: '/quotations/new',
+        component: () => import('pages/quotations/CreateQuotation.vue'),
+        name: 'create_quotation',
+        meta: {
+          label: 'New Quotation',
           //canViewOrganisations: true,
         },
       },
@@ -55,12 +71,30 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: '/invoices/new',
+        component: () => import('pages/invoices/CreateInvoice.vue'),
+        name: 'create_invoice',
+        meta: {
+          label: 'New Invoice',
+          //canViewOrganisations: true,
+        },
+      },
+      {
         path: 'receipts',
         name: 'receipts',
         component: () => import('pages/receipts/index.vue'),
         meta: {
           label: 'All Receipts',
           icon: 'receipt',
+          //canViewOrganisations: true,
+        },
+      },
+      {
+        path: '/receipts/new',
+        component: () => import('pages/receipts/CreateReceipt.vue'),
+        name: 'create_receipt',
+        meta: {
+          label: 'New Receipt',
           //canViewOrganisations: true,
         },
       },

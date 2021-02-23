@@ -1,5 +1,6 @@
 <template>
   <q-page>
+    <router-view />
     <div class="q-pa-md">
       <q-table
         :rows="rows"

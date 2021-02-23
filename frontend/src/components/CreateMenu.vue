@@ -1,16 +1,15 @@
 <template>
   <q-btn
-    v-if="$q.screen.gt.xs"
     flat
     dense
     no-wrap
     color="primary"
     icon="add"
     no-caps
-    label="Create"
+    :label="$q.screen.gt.md ? 'Create' : ''"
     class="q-ml-sm q-px-md"
   >
-    <q-menu anchor="top end" self="top end">
+    <q-menu>
       <q-list class="text-grey-8" style="min-width: 100px">
         <q-item aria-hidden="true">
           <q-item-section
@@ -25,6 +24,7 @@
           clickable
           v-close-popup
           aria-hidden="true"
+          :to="{ name: menu.link }"
         >
           <q-item-section avatar>
             <q-icon :name="menu.icon" />
