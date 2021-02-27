@@ -1,6 +1,6 @@
 import Env from '@ioc:Adonis/Core/Env'
 import { v5 as uuidv5 } from 'uuid'
-import DateTime from 'luxon/src/datetime.js'
+import { DateTime } from 'luxon'
 
 import Hash from '@ioc:Adonis/Core/Hash'
 
@@ -27,14 +27,30 @@ const UserHook: UserHookContract = {
    * @return null
    */
   hashPassword: async (userInstance) => {
-    if (userInstance.$dirty.password) {
-      userInstance.password = await Hash.hash(userInstance.password)
+    try {
+      if (userInstance.$dirty.password) {
+        userInstance.password = await Hash.make(userInstance.password)
+      }
+    } catch (error) {
+      console.log(error)
     }
   },
 
-  preparePassword: async (value) => {
-    const hashed = await Hash.hash(value)
-    return hashed
+  preparePassword: (value) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        console.log('from preparePassword. before hashing: ', value)
+
+        const hashed = await Hash.make(value)
+        console.log('from preparePassword. after hashing: ', hashed)
+
+        resolve(hashed)
+      } catch (error) {
+        console.log(error)
+
+        reject(error)
+      }
+    })
   },
 
   generateUUID: (userInstance) => {
@@ -46,9 +62,7 @@ const UserHook: UserHookContract = {
 
   generateActivationCode: (userInstance) => {
     userInstance.activation_code = crypto.randomBytes(20).toString('hex')
-    userInstance.activation_code_expires_at = DateTime.now()
-      .plus({ days: 2 })
-      .toFormat('yyyy-LL-dd HH:mm:ss.SSS')
+    userInstance.activation_code_expires_at = DateTime.now().plus({ days: 2 })
   },
 }
 

@@ -7,7 +7,7 @@ export default class Users extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().index().unique().notNullable()
       table.string('email', 254).nullable().unique().index()
-      table.string('password', 60).nullable()
+      table.string('password', 254).nullable()
       table.uuid('role_id').nullable().index()
       table.integer('login_code', 6).nullable().index().unsigned()
       table.string('activation_code').nullable().index().unique()

@@ -17,7 +17,7 @@ export default class User extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
-  @column()
+  @column(/* { prepare: async (value: string) => await UserHook.preparePassword(value) } */)
   public password: string
 
   @column()
@@ -28,38 +28,55 @@ export default class User extends BaseModel {
 
   @column()
   public role_id: string
+
   @column()
   public login_code: number
+
   @column()
   public activation_code: string
+
   @column()
   public forgot_password_code: number
+
   @column()
   public login_status: boolean
+
   @column()
   public is_account_activated: boolean
+
   @column()
   public is_email_verified: boolean
+
   @column()
   public lifetime_login: number
+
   @column()
   public password_change_required: boolean
+
   @column()
   public remember_token: boolean
+
   @column()
   public last_login_time: DateTime
+
   @column()
   public account_activated_at: DateTime
+
   @column()
   public email_verified_at: DateTime
+
   @column()
   public forgot_password_code_expires_at: DateTime
-  @column()
+
+  @column({ prepare: (value) => value.toFormat('yyyy-LL-dd HH:mm:ss') })
   public activation_code_expires_at: DateTime
+
   @column()
   public login_code_expires_at: DateTime
+
   @column()
   public password_last_changed_at: DateTime
+
   @column()
   public password_change_secret: string
 
@@ -77,8 +94,8 @@ export default class User extends BaseModel {
   }
 
   @beforeSave()
-  public static hashPassword(user: User) {
-    UserHook.hashPassword(user)
+  public static async hashPassword(user: User) {
+    await UserHook.hashPassword(user)
   }
 
   @manyToMany(() => Company)
