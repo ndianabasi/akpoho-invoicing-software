@@ -74,31 +74,6 @@ export default defineComponent({
   components: {},
   setup() {
     const submitting = ref(false);
-    const companies = ['Google', 'Facebook', 'Twitter', 'Apple', 'Oracle'];
-    const titles = ['Mr', 'Mrs', 'Miss', 'Dr', 'Prof', 'Chief', 'Sir'];
-    const countriesList = ref([
-      { value: 'google', label: 'Google' },
-      { value: 'facebook', label: 'Facebook' },
-      { value: 'twitter', label: 'Twitter' },
-      { value: 'apple', label: 'Apple' },
-      { value: 'oracle', label: 'Oracle' },
-    ]);
-
-    const countries_ = {};
-    countriesList.value.forEach((country) => {
-      Object.defineProperty(countries_, country.value, {
-        value: [
-          { value: 'google', label: 'Google' },
-          { value: 'facebook', label: 'Facebook' },
-          { value: 'twitter', label: 'Twitter' },
-          { value: 'apple', label: 'Apple' },
-          { value: 'oracle', label: 'Oracle' },
-        ],
-        writable: true,
-      });
-    });
-
-    const countries = reactive(countries_);
 
     function submitForm() {
       submitting.value = true;
@@ -134,11 +109,7 @@ export default defineComponent({
       submitting,
       form,
       submitForm,
-      companies,
-      countries,
-      countriesList,
       v$,
-      titles,
     };
   },
 });
