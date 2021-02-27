@@ -2,22 +2,20 @@
 <template>
   <div class="row q-mx-auto justify-center items-center container">
     <div
-      class="q-gutter-y-md column q-mt-xl-xl q-mt-sm col-12 col-md-4 col-sm-10 col-xs-12 col-lg-4 col-xl-3"
+      class="q-gutter-y-md column q-mt-xl-xl q-mt-sm col-md-4 col-sm-12 col-xs-12 col-lg-4 col-xl-3"
     >
-      <q-card
-        class="my-card text-white"
-        style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%)"
-      >
+      <q-card class="login-card text-white q-pa-lg">
         <q-card-section>
           <form class="form validate-form">
             <span class="form-logo">
-              <q-img
-                :src="'https://placeimg.com/500/300/nature'"
+              <p class="text-center">Agboho Invoicing Software</p>
+              <!-- <q-img
+                :src="'https://placeimg.com/1000/800/nature'"
                 spinner-color="white"
                 style="height: 100px; max-width: 150px"
-              />
+              /> -->
             </span>
-            <span class="form-title q-mb-md q-pb-md"> Log in </span>
+            <span class="form-title q-mb-md q-pb-md"> Log In </span>
             <q-input
               dark
               bottom-slots
@@ -128,6 +126,7 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   padding: 15px;
+  background: url('https://placeimg.com/1920/1080/nature');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -143,13 +142,13 @@ export default defineComponent({
     height: 100%;
     top: 0;
     left: 0;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.5);
   }
 }
 
 .form-logo {
-  font-size: 60px;
-  color: #333333;
+  font-size: 30px;
+  color: white;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -157,16 +156,22 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 120px;
-  height: 120px;
+  text-transform: uppercase;
   margin: 0 auto;
 }
 
 .form-title {
-  font-size: 30px;
+  font-size: 20px;
   color: #fff;
   line-height: 1.2;
   text-align: center;
   display: block;
+}
+
+.login-card {
+  background: -webkit-linear-gradient(to top, #7579ff 10%, #b224ef 60%);
+  background: -o-linear-gradient(to top, #7579ff 10%, #b224ef 60%);
+  background: -moz-linear-gradient(to top, #7579ff 10%, #b224ef 60%);
+  background: linear-gradient(to top, #7579ff 10%, #b224ef 60%);
 }
 </style>
