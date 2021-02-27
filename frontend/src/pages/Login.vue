@@ -41,13 +41,17 @@
               <template v-slot:hint> Field hint </template>
             </q-input>
             <div class="q-gutter-sm q-mt-lg">
-              <q-checkbox v-model="form.remember_me" label="Remember me" />
+              <q-checkbox
+                v-model="form.remember_me"
+                color="green"
+                label="Remember me"
+              />
             </div>
             <div class="q-gutter-sm flex justify-center q-mt-md">
               <q-btn color="accent" icon-right="send" label="Submit" />
             </div>
 
-            <div class="text-center q-py-lg text-white">
+            <div class="text-center q-py-lg text-white form-footer">
               <router-link class="text-white" to="#"
                 >Forgot Password?
               </router-link>
@@ -173,5 +177,13 @@ export default defineComponent({
   background: -o-linear-gradient(to top, #7579ff 10%, #b224ef 60%);
   background: -moz-linear-gradient(to top, #7579ff 10%, #b224ef 60%);
   background: linear-gradient(to top, #7579ff 10%, #b224ef 60%);
+}
+
+.form-footer a {
+  text-decoration: none;
+  &:hover {
+    border-bottom: 1px dotted white;
+    padding-bottom: 2px;
+  }
 }
 </style>
