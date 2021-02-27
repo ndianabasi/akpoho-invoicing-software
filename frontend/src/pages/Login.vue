@@ -8,7 +8,7 @@
         <q-card-section>
           <form class="form validate-form">
             <span class="form-logo">
-              <p class="text-center">Agboho Invoicing Software</p>
+              <p class="text-center">Akpoho Invoicing Software</p>
               <!-- <q-img
                 :src="'https://placeimg.com/1000/800/nature'"
                 spinner-color="white"
@@ -24,6 +24,7 @@
               color="white"
               label-color="white"
               bg-color="transparent"
+              autofocus
             >
               <template v-slot:hint> Field hint </template>
             </q-input>

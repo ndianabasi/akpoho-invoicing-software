@@ -3,6 +3,8 @@ import { createStore } from 'vuex';
 
 import menus from './menus';
 import { MenusStateInterface } from './menus/state';
+import auth from './auth';
+import { AuthStateInterface } from './auth/state';
 
 /*
  * If not building with SSR mode, you can
@@ -16,12 +18,14 @@ import { MenusStateInterface } from './menus/state';
 export interface StateInterface {
   // Define your own store structure, using submodules if needed
   menus: MenusStateInterface;
+  auth: AuthStateInterface;
 }
 
 export default store(function (/* { ssrContext } */) {
   const Store = createStore<StateInterface>({
     modules: {
       menus,
+      auth,
     },
 
     // enable strict mode (adds overhead!)

@@ -7,6 +7,8 @@ const UserFactory = Factory.define(User, ({ faker }) => {
     password: faker.internet.password(),
   }
 
+  console.log(generatedUser)
+
   return generatedUser
 }).build()
 

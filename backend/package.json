@@ -1,5 +1,5 @@
 {
-  "name": "agboho-adonis-backend",
+  "name": "akpoho-adonis-backend",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -23,9 +23,12 @@
     "youch-terminal": "^1.0.1"
   },
   "dependencies": {
+    "@adonisjs/auth": "^5.1.1",
     "@adonisjs/core": "^5.0.4-preview-rc",
     "@adonisjs/lucid": "^10.0.0",
+    "@adonisjs/redis": "^5.0.9",
     "@adonisjs/repl": "^1.0.0",
+    "@adonisjs/session": "^4.0.6",
     "@types/luxon": "^1.26.0",
     "luxon": "^1.26.0",
     "mysql": "^2.18.1",

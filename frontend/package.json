@@ -1,8 +1,8 @@
 {
-  "name": "agboho-invoicing-software-quasar-v2",
+  "name": "akpoho-invoicing-software-quasar-v2",
   "version": "0.0.1",
-  "description": "Agboho Invoicing Software is an open-source software which provides quotation, invoicing, and receipt functionalities for small businesses.",
-  "productName": "Agboho Invoicing Software",
+  "description": "Akpoho Invoicing Software is an open-source software which provides quotation, invoicing, and receipt functionalities for small businesses.",
+  "productName": "Akpoho Invoicing Software",
   "author": "Ndianabasi Udonkang <ndianabasi@furnish.ng>",
   "private": true,
   "scripts": {

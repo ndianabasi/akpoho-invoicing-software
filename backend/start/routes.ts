@@ -30,3 +30,5 @@ Route.get('health', async ({ response }) => {
 Route.get('/', async () => {
   return { hello: 'world' }
 })
+
+Route.post('/login', 'AuthController.login')

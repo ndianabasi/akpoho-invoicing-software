@@ -87,7 +87,7 @@ export const http: ServerConfig = {
   | Whether or not to generate an etag for every response.
   |
   */
-  etag: false,
+  etag: true,
 
   /*
   |--------------------------------------------------------------------------
