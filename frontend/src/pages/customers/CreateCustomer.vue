@@ -18,100 +18,142 @@
       <div class="row q-mx-auto justify-center">
         <div class="q-gutter-y-md column q-mt-xl-xl q-mt-sm col-12 col-md-6">
           <form @submit.prevent="submitForm" class="q-pa-md">
-            <q-input
-              filled
-              clearable
-              bottom-slots
-              v-model="form.first_name"
-              label="First Name"
-              :dense="dense"
-              class="q-mb-md"
+            <div class="row q-mx-auto">
+              <div class="column col-6">
+                <q-toggle
+                  v-model="form.is_corporate_customer"
+                  checked-icon="check"
+                  color="green"
+                  unchecked-icon="clear"
+                  label="This is a corporate customer"
+                  class="q-ml-lg q-mb-md"
+                />
+              </div>
+              <div v-if="form.is_corporate_customer" class="column col-6">
+                <q-toggle
+                  v-model="form.corporate_customer_has_rep"
+                  checked-icon="check"
+                  color="green"
+                  unchecked-icon="clear"
+                  label="Corporate customer has a rep."
+                  class="q-ml-lg q-mb-md"
+                />
+              </div>
+            </div>
+            <template
+              v-if="
+                form.corporate_customer_has_rep || !form.is_corporate_customer
+              "
             >
-              <template #before>
-                <q-icon name="person" />
-              </template>
+              <q-select
+                filled
+                v-model="form.title"
+                :options="titles"
+                label="Title"
+                clearable
+                bottom-slots
+                class="q-mb-md"
+                transition-show="scale"
+                transition-hide="scale"
+                ><template #before>
+                  <q-icon name="person" />
+                </template>
 
-              <template #hint> Field hint </template>
-              <template #error> Sorry! Invalid input </template>
-            </q-input>
-            <q-input
-              filled
-              clearable
-              bottom-slots
-              v-model="form.middle_name"
-              label="Middle Name"
-              :dense="dense"
-              class="q-mb-md"
-            >
-              <template #before>
-                <q-icon name="person" />
-              </template>
+                <template #hint> Field hint </template>
+                <template #error> Sorry! Invalid input </template>
+              </q-select>
 
-              <template #hint> Field hint </template>
-              <template #error> Sorry! Invalid input </template>
-            </q-input>
+              <q-input
+                filled
+                clearable
+                bottom-slots
+                v-model="form.first_name"
+                label="First Name"
+                :dense="dense"
+                class="q-mb-md"
+              >
+                <template #before>
+                  <q-icon name="person" />
+                </template>
 
-            <q-input
-              filled
-              clearable
-              bottom-slots
-              v-model="form.last_name"
-              label="Last Name"
-              :dense="dense"
-              class="q-mb-md"
-            >
-              <template #before>
-                <q-icon name="person" />
-              </template>
+                <template #hint> Field hint </template>
+                <template #error> Sorry! Invalid input </template>
+              </q-input>
+              <q-input
+                filled
+                clearable
+                bottom-slots
+                v-model="form.middle_name"
+                label="Middle Name"
+                :dense="dense"
+                class="q-mb-md"
+              >
+                <template #before>
+                  <q-icon name="person" />
+                </template>
 
-              <template #hint> Field hint </template>
-            </q-input>
+                <template #hint> Field hint </template>
+                <template #error> Sorry! Invalid input </template>
+              </q-input>
 
-            <q-input
-              filled
-              clearable
-              bottom-slots
-              v-model="form.phone_number"
-              label="Phone Number"
-              :dense="dense"
-              class="q-mb-md"
-              type="tel"
-            >
-              <template #before>
-                <q-icon name="smartphone" />
-              </template>
-            </q-input>
+              <q-input
+                filled
+                clearable
+                bottom-slots
+                v-model="form.last_name"
+                label="Last Name"
+                :dense="dense"
+                class="q-mb-md"
+              >
+                <template #before>
+                  <q-icon name="person" />
+                </template>
 
-            <q-input
-              filled
-              clearable
-              bottom-slots
-              v-model="form.email_address"
-              label="Email Address"
-              :dense="dense"
-              class="q-mb-md"
-              type="email"
-              :error="v$.email_address.$invalid"
-              error-message="Invalid email address"
-            >
-              <template #before>
-                <q-icon name="email" />
-              </template>
+                <template #hint> Field hint </template>
+              </q-input>
 
-              <template v-slot:error>Sorry! Invalid input</template>
-            </q-input>
+              <q-input
+                filled
+                clearable
+                bottom-slots
+                v-model="form.phone_number"
+                label="Phone Number"
+                :dense="dense"
+                class="q-mb-md"
+                type="tel"
+              >
+                <template #before>
+                  <q-icon name="smartphone" />
+                </template>
+              </q-input>
 
-            <q-toggle
-              v-model="form.belongs_to_company"
-              checked-icon="check"
-              color="green"
-              unchecked-icon="clear"
-              label="Belongs to a company?"
-              class="q-ml-lg q-mb-md"
-            />
+              <q-input
+                filled
+                clearable
+                bottom-slots
+                v-model="v$.email_address.$model"
+                label="Email Address"
+                :dense="dense"
+                class="q-mb-md"
+                type="email"
+                :error="v$.email_address.$error"
+              >
+                <template #before>
+                  <q-icon name="email" />
+                </template>
+
+                <template v-slot:error
+                  ><small
+                    v-for="(error, index) in v$.email_address.$errors"
+                    :key="'email_addresses_error_' + index"
+                    >{{ error.$message }}</small
+                  ></template
+                >
+              </q-input>
+            </template>
 
             <q-select
-              v-if="form.belongs_to_company"
+              v-if="form.is_corporate_customer"
               filled
               v-model="form.company"
               :options="companies"
@@ -130,7 +172,7 @@
             </q-select>
 
             <template
-              v-if="!form.company && form.belongs_to_company"
+              v-if="!form.company && form.is_corporate_customer"
               transition-show="slide-down"
               transition-hide="slide-up"
             >
@@ -551,6 +593,7 @@ export default defineComponent({
   setup() {
     const submitting = ref(false);
     const companies = ['Google', 'Facebook', 'Twitter', 'Apple', 'Oracle'];
+    const titles = ['Mr', 'Mrs', 'Miss', 'Dr', 'Prof', 'Chief', 'Sir'];
     const countriesList = ref([
       { value: 'google', label: 'Google' },
       { value: 'facebook', label: 'Facebook' },
@@ -590,7 +633,6 @@ export default defineComponent({
     }
 
     function processSelect(field: string, modelValue: string) {
-      console.log(field, modelValue);
       if (!modelValue) {
         if (field === 'company_country') form.company_state = '';
         if (field === 'shipping_country') form.shipping_state = '';
@@ -598,12 +640,14 @@ export default defineComponent({
     }
 
     const form = reactive({
+      title: '',
       first_name: '',
       last_name: '',
       middle_name: '',
       email_address: '',
       phone_number: '',
-      belongs_to_company: false,
+      is_corporate_customer: false,
+      corporate_customer_has_rep: false,
       company: null,
       company_name: '',
       company_phone: '',
@@ -628,8 +672,8 @@ export default defineComponent({
 
     const rules = {
       first_name: { required },
-      last_name: { required },
       email_address: { email },
+      company_email_address: { email },
     };
 
     const v$ = useVuelidate(rules, form);
@@ -646,6 +690,7 @@ export default defineComponent({
       countries,
       countriesList,
       v$,
+      titles,
     };
   },
 });
