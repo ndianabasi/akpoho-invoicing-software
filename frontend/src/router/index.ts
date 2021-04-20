@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { route } from 'quasar/wrappers';
 import {
   createMemoryHistory,
@@ -5,8 +8,12 @@ import {
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
-import { StateInterface } from '../store';
 import routes from './routes';
+
+/* const actions = {
+  ...mapActions('auth', ['logoutUser']),
+};
+const logoutUser = actions.logoutUser; */
 
 /*
  * If not building with SSR mode, you can
@@ -17,7 +24,9 @@ import routes from './routes';
  * with the Router instance.
  */
 
-export default route<StateInterface>(function (/* { store, ssrContext } */) {
+export default route(function ({ store /* ssrContext */ }) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const isLoggedIn = store.getters['auth/isLoggedIn'];
   const createHistory =
     process.env.MODE === 'ssr'
       ? createMemoryHistory
@@ -35,6 +44,20 @@ export default route<StateInterface>(function (/* { store, ssrContext } */) {
     history: createHistory(
       process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE
     ),
+  });
+
+  Router.beforeEach(async (to, _from, next) => {
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+      if (isLoggedIn) {
+        next();
+      } else {
+        await store.dispatch('auth/logoutUser', {
+          message: 'You are not logged in!',
+        }),
+          await Router.push({ name: 'Login' });
+        return;
+      }
+    } else next();
   });
 
   return Router;

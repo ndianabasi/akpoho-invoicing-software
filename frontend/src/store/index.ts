@@ -6,6 +6,7 @@ import menus from './menus';
 import { MenusStateInterface } from './menus/state';
 import auth from './auth';
 import { AuthStateInterface } from './auth/state';
+import { AuthGettersInterface } from './auth/getters';
 
 /*
  * If not building with SSR mode, you can
@@ -26,10 +27,37 @@ interface RootState {
   tokenRefreshTime: number;
 }
 
+type HttpOptions = {
+  baseURL: string;
+  timeout: number;
+  headers?: { Authorization: string };
+};
+
+interface RootGetterInterface {
+  getHttpProtocol: (state: StoreElements) => string;
+  getCurrentYear: (state: StoreElements) => number;
+  getGtmID: (state: StoreElements) => number;
+  getRootURL: (state: StoreElements) => string;
+  getBaseURL: (state: StoreElements) => string;
+  getHttpTimeout: (state: StoreElements) => number;
+  getHttpOptions: (
+    state: StoreElements,
+    getters: RootGetterInterface
+  ) => HttpOptions;
+  getHttpNoAuthOptions: (
+    state: StoreElements,
+    getters: RootGetterInterface
+  ) => HttpOptions;
+  getMessage: (state: StoreElements) => AlertInterface;
+  getTokenRefreshTime: (state: StoreElements) => number;
+}
+
 export interface StateInterface {
   menus?: MenusStateInterface;
   auth?: AuthStateInterface;
 }
+
+export type StoreGetters = RootGetterInterface & AuthGettersInterface;
 
 interface AlertInterface {
   type: string;
@@ -39,18 +67,17 @@ interface AlertInterface {
   activity: string;
 }
 
+export type StoreElements = RootState & StateInterface;
 export interface StoreInterface {
   state: RootState;
   modules: StateInterface;
   getters: GetterTree<RootState, StateInterface>;
 }
 
-type StoreElements = RootState & StateInterface;
-
 export const key: InjectionKey<Store<StoreElements>> = Symbol();
 
 export default store(function (/* { ssrContext } */) {
-  const Store = createStore<StoreElements>({
+  return createStore<StoreElements>({
     state: () => ({
       baseURL: `${
         process.env.NODE_ENV === 'production'
@@ -117,6 +144,4 @@ export default store(function (/* { ssrContext } */) {
     // for dev mode and --debug builds only
     strict: !!process.env.DEBUGGING,
   });
-
-  return Store;
 });

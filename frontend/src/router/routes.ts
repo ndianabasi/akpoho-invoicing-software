@@ -8,6 +8,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       label: 'Home',
       icon: 'home',
+      requiresAuth: true,
       //canViewOrganisations: true,
     },
     children: [
