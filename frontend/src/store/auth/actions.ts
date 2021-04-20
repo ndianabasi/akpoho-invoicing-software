@@ -5,7 +5,9 @@ import { AuthStateInterface } from './state';
 import { api as $httpNoAuth } from '../../boot/httpNoAuth';
 
 const actions: ActionTree<AuthStateInterface, StateInterface> = {
-  loginUser({ commit }) {
+  LOGIN_USER({ commit }, form) {
+    console.log('LOGIN_USER called!', form);
+
     // Async call
     const token = '';
     commit('SET_TOKEN', token);

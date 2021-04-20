@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { store } from 'quasar/wrappers';
-import { createStore, GetterTree, Store } from 'vuex';
+import { createStore, GetterTree, useStore as baseUseStore, Store } from 'vuex';
 import { InjectionKey } from 'vue';
 import menus from './menus';
 import { MenusStateInterface } from './menus/state';
@@ -69,15 +69,22 @@ interface AlertInterface {
 
 export type StoreElements = RootState & StateInterface;
 export interface StoreInterface {
+  strict?: boolean;
   state: RootState;
   modules: StateInterface;
   getters: GetterTree<RootState, StateInterface>;
 }
 
-export const key: InjectionKey<Store<StoreElements>> = Symbol();
+const key: InjectionKey<Store<StoreElements>> = Symbol('agboho_store_symbol');
+
+// define your own `useStore` composition function
+export function useStore() {
+  return baseUseStore(key);
+}
 
 export default store(function (/* { ssrContext } */) {
   return createStore<StoreElements>({
+    strict: process.env.NODE_ENV !== 'production',
     state: () => ({
       baseURL: `${
         process.env.NODE_ENV === 'production'
@@ -139,9 +146,5 @@ export default store(function (/* { ssrContext } */) {
       menus,
       auth,
     },
-
-    // enable strict mode (adds overhead!)
-    // for dev mode and --debug builds only
-    strict: !!process.env.DEBUGGING,
   });
 });

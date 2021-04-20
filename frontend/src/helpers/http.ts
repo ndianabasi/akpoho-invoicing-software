@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import axios from 'axios';
-import { key } from '../store/index';
-import { useStore } from 'vuex';
+import { useStore } from '../store/index';
 
-const Store = useStore(key);
+const Store = useStore();
 
 /* interface AsyncError {
   message?: string;

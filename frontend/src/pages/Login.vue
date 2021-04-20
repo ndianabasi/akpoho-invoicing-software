@@ -6,7 +6,7 @@
     >
       <q-card class="login-card text-white q-pa-lg">
         <q-card-section>
-          <form class="form validate-form">
+          <form class="form validate-form" @submit.prevent="handleLogin">
             <span class="form-logo">
               <p class="text-center">Akpoho Invoicing Software</p>
               <!-- <q-img
@@ -19,18 +19,30 @@
             <q-input
               dark
               bottom-slots
-              v-model="form.username"
-              label="Username"
+              clearable
+              :error="form$.email.$invalid"
+              v-model="form.email"
+              label="Email"
               color="white"
               label-color="white"
               bg-color="transparent"
               autofocus
             >
               <template v-slot:hint> Field hint </template>
+              <template v-slot:error>
+                {{
+                  form$.email.$silentErrors
+                    .map((error) => error.$message)
+                    .join(', ')
+                }}
+              </template>
             </q-input>
             <q-input
               dark
               bottom-slots
+              counter
+              clearable
+              :error="form$.password.$invalid"
               v-model="form.password"
               label="Password"
               type="password"
@@ -40,6 +52,13 @@
               class="q-mt-md"
             >
               <template v-slot:hint> Field hint </template>
+              <template v-slot:error>
+                {{
+                  form$.password.$silentErrors
+                    .map((error) => error.$message)
+                    .join(', ')
+                }}
+              </template>
             </q-input>
             <div class="q-gutter-sm q-mt-lg">
               <q-checkbox
@@ -49,7 +68,15 @@
               />
             </div>
             <div class="q-gutter-sm flex justify-center q-mt-md">
-              <q-btn color="accent" icon-right="send" label="Submit" />
+              <q-btn
+                :loading="submitting"
+                color="accent"
+                icon-right="send"
+                label="Submit"
+                @click.prevent="handleLogin"
+              >
+                <template v-slot:loading> Logging In... </template>
+              </q-btn>
             </div>
 
             <div class="text-center q-py-lg text-white form-footer">
@@ -68,18 +95,68 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { defineComponent, reactive, ref } from 'vue';
+import { defineComponent, reactive, ref, nextTick } from 'vue';
 import useVuelidate from '@vuelidate/core';
-import { required, email } from '@vuelidate/validators';
+import {
+  required,
+  email,
+  minLength,
+  helpers,
+  maxLength,
+} from '@vuelidate/validators';
+import { useStore } from 'vuex';
+
+//const strongPassword = helpers.regex('strongPassword', //)
 
 export default defineComponent({
-  name: 'NewCustomer',
+  name: 'Login',
   components: {},
   setup() {
     const submitting = ref(false);
+    const store = useStore();
 
-    function submitForm() {
+    const form = reactive({
+      remember_me: false,
+      email: '',
+      password: '',
+    });
+
+    type MinMaxParams = {
+      $params: {
+        min?: number;
+        max?: number;
+      };
+    };
+
+    const rules = {
+      email: {
+        email: helpers.withMessage('Provide a valid email address.', email),
+        required: helpers.withMessage('Email address is required.', required),
+      },
+      password: {
+        required: helpers.withMessage('Password is required.', required),
+        minLength: helpers.withMessage(
+          ({ $params }: MinMaxParams) =>
+            `Password should maximum of ${$params.min} character`,
+          minLength(6)
+        ),
+        maxLength: helpers.withMessage(
+          ({ $params }: MinMaxParams) =>
+            `Password should maximum of ${$params.max} character`,
+          maxLength(32)
+        ),
+      },
+    };
+
+    const form$ = useVuelidate(rules, form);
+
+    async function handleLogin() {
+      console.log('handling login');
       submitting.value = true;
+
+      await nextTick(() => {
+        void store.dispatch('auth/LOGIN_USER', form);
+      });
 
       // Simulating a delay here.
       // When we are done, we reset "submitting"
@@ -92,27 +169,14 @@ export default defineComponent({
       }, 3000);
     }
 
-    const form = reactive({
-      remember_me: false,
-      email: '',
-      password: '',
-    });
-
-    const rules = {
-      email: { email, required },
-      password: { required },
-    };
-
-    const v$ = useVuelidate(rules, form);
-
     return {
       ph: ref(''),
       dense: ref(false),
       dismissed: ref(false),
       submitting,
       form,
-      submitForm,
-      v$,
+      handleLogin,
+      form$,
     };
   },
 });
@@ -131,7 +195,7 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   padding: 15px;
-  background: url('https://placeimg.com/1920/1080/nature');
+  background: url('/cosmic-blue.jpg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
