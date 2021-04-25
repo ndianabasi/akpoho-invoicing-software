@@ -31,7 +31,7 @@ Server.middleware.register(['Adonis/Core/BodyParserMiddleware'])
 | or middleware function and key is the alias. Later you can use these
 | alias on individual routes. For example:
 |
-| { auth: 'App/Auth/Middleware' }
+| { auth: 'App/Middleware/Auth' }
 |
 | and then use it as follows
 |

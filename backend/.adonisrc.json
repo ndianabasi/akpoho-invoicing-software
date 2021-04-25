@@ -1,11 +1,6 @@
 {
   "typescript": true,
-  "commands": [
-    "./commands",
-    "@adonisjs/core/build/commands",
-    "@adonisjs/repl/build/commands",
-    "@adonisjs/lucid/build/commands"
-  ],
+  "commands": ["./commands", "@adonisjs/core/build/commands", "@adonisjs/repl/build/commands"],
   "exceptionHandlerNamespace": "App/Exceptions/Handler",
   "aliases": {
     "App": "app",
@@ -13,26 +8,17 @@
     "Database": "database",
     "Contracts": "contracts"
   },
-  "preloads": [
-    "./start/routes",
-    "./start/kernel",
+  "preloads": ["./start/routes", "./start/kernel"],
+  "providers": ["./providers/AppProvider", "@adonisjs/core", "@adonisjs/session", "@adonisjs/view"],
+  "metaFiles": [
     {
-      "file": "./start/events",
-      "environment": [
-        "console",
-        "web"
-      ]
+      "pattern": "public/**",
+      "reloadServer": false
+    },
+    {
+      "pattern": "resources/views/**/*.edge",
+      "reloadServer": false
     }
   ],
-  "providers": [
-    "./providers/AppProvider",
-    "@adonisjs/core",
-    "@adonisjs/lucid",
-    "@adonisjs/session",
-    "@adonisjs/auth",
-    "@adonisjs/redis"
-  ],
-  "aceProviders": [
-    "@adonisjs/repl"
-  ]
+  "aceProviders": ["@adonisjs/repl"]
 }

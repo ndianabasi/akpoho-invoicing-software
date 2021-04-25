@@ -1,5 +1,5 @@
 {
-  "name": "akpoho-adonis-backend",
+  "name": "new_backend",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -10,36 +10,25 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@adonisjs/assembler": "^3.0.0",
-    "adonis-preset-ts": "^1.1.0",
-    "eslint": "^7.19.0",
-    "eslint-config-prettier": "^7.2.0",
-    "eslint-plugin-adonis": "^1.1.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "pino-pretty": "^4.5.0",
+    "@adonisjs/assembler": "^3.1.1",
+    "adonis-preset-ts": "^2.1.0",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-adonis": "^1.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "pino-pretty": "^4.7.1",
     "prettier": "^2.2.1",
-    "typescript": "^4.1.3",
-    "youch": "^2.1.1",
-    "youch-terminal": "^1.0.1"
+    "typescript": "~4.1",
+    "youch": "^2.2.1",
+    "youch-terminal": "^1.1.0"
   },
   "dependencies": {
-    "@adonisjs/auth": "^5.1.1",
-    "@adonisjs/core": "^5.0.4-preview-rc",
-    "@adonisjs/lucid": "^10.0.0",
-    "@adonisjs/redis": "^5.0.9",
-    "@adonisjs/repl": "^1.0.0",
+    "@adonisjs/core": "~5.0.4-preview-rc",
+    "@adonisjs/repl": "^1.1.6",
     "@adonisjs/session": "^4.0.6",
-    "@types/luxon": "^1.26.0",
-    "luxon": "^1.26.0",
-    "mysql": "^2.18.1",
-    "pg": "^8.5.1",
-    "phc-argon2": "^1.1.0",
-    "phc-bcrypt": "^1.0.5",
+    "@adonisjs/view": "^3.1.0",
     "proxy-addr": "^2.0.6",
     "reflect-metadata": "^0.1.13",
-    "secure-random-password": "^0.2.2",
-    "slugify": "^1.4.7",
-    "source-map-support": "^0.5.19",
-    "uuid": "^8.3.2"
+    "source-map-support": "^0.5.19"
   }
 }

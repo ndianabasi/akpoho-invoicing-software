@@ -87,7 +87,7 @@ export const http: ServerConfig = {
   | Whether or not to generate an etag for every response.
   |
   */
-  etag: true,
+  etag: false,
 
   /*
   |--------------------------------------------------------------------------
@@ -109,24 +109,6 @@ export const http: ServerConfig = {
     secure: false,
     sameSite: false,
   },
-
-  /*
-  |--------------------------------------------------------------------------
-  | Force content negotiation to JSON
-  |--------------------------------------------------------------------------
-  |
-  | The internals of the framework relies on the content negotiation to
-  | detect the best possible response type for a given HTTP request.
-  |
-  | However, it is a very common these days that API servers always wants to
-  | make response in JSON regardless of the existence of the `Accept` header.
-  |
-  | By setting `forceContentNegotiationToJSON = true`, you negotiate with the
-  | server in advance to always return JSON without relying on the client
-  | to set the header explicitly.
-  |
-  */
-  forceContentNegotiationToJSON: true,
 }
 
 /*
