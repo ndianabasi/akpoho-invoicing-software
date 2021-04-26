@@ -30,6 +30,69 @@ import StickySidebar from '../components/StickySidebar.vue';
 import GoToTop from '../components/GoToTop.vue';
 import SideDrawer from '../components/SideDrawer.vue';
 import PrimaryToolbar from '../components/PrimaryToolbar.vue';
+import { useMeta } from 'quasar';
+
+const metaData = {
+  // sets document title
+  title: 'Index Page',
+  // optional; sets final title as "Index Page - My Website", useful for multiple level meta
+  titleTemplate: (title: string) => `${title} - Agboho Invoicing Software`,
+
+  // meta tags
+  meta: {
+    description: {
+      name: 'description',
+      content:
+        'Agboho Invoicing Software is an open-source software which provides quotation, invoicing, and receipt functionalities for small businesses.',
+    },
+    keywords: {
+      name: 'keywords',
+      content:
+        'invoice software, invoicing software, Agboho Invoicing Software, invoice',
+    },
+    equiv: {
+      'http-equiv': 'Content-Type',
+      content: 'text/html; charset=UTF-8',
+    },
+    // note: for Open Graph type metadata you will need to use SSR, to ensure page is rendered by the server
+    ogTitle: {
+      name: 'og:title',
+      // optional; similar to titleTemplate, but allows templating with other meta properties
+      template(ogTitle: string) {
+        return `${ogTitle} - Agboho Invoicing Software`;
+      },
+    },
+  },
+
+  // CSS tags
+  link: {
+    material: {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/icon?family=Material+Icons',
+    },
+  },
+
+  // JS tags
+  script: {
+    ldJson: {
+      type: 'application/ld+json',
+      innerHTML: '{ "@context": "http://schema.org" }',
+    },
+  },
+
+  // <html> attributes
+  htmlAttr: {
+    'xmlns:cc': 'http://creativecommons.org/ns#', // generates <html xmlns:cc="http://creativecommons.org/ns#">,
+  },
+
+  // <body> attributes
+  bodyAttr: {},
+
+  // <noscript> tags
+  noscript: {
+    default: 'This is content for browsers with no JS (or disabled JS)',
+  },
+};
 
 export default defineComponent({
   name: 'MainLayout',
@@ -43,6 +106,7 @@ export default defineComponent({
   },
 
   setup() {
+    useMeta(metaData);
     const store = useStore();
 
     const search = ref('');

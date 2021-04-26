@@ -18,9 +18,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, ref, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import Breadcrumbs from './Breadcrumbs.vue';
+import { useMeta } from 'quasar';
 
 export default defineComponent({
   name: 'SecondaryToolbar',
@@ -36,6 +37,22 @@ export default defineComponent({
   setup(/* props */) {
     const route = useRoute();
 
+    const title = ref(''); // we define the "title" prop
+
+    // NOTICE the parameter here is a function
+    // Under the covers, it is converted to a Vue computed prop for reactivity
+    useMeta(() => {
+      return {
+        // whenever "title" from above changes, your meta will automatically update
+        title: title.value,
+        ogTitle: { name: title.value },
+      };
+    });
+
+    function setPageTitle(newTitle: string) {
+      title.value = newTitle; // will automatically trigger a Meta update due to the binding
+    }
+
     const breadcrumbsRoutes = computed(() => {
       return route.matched.map((route) => ({
         meta: route.meta,
@@ -48,6 +65,10 @@ export default defineComponent({
       return breadcrumbsRoutes.value
         .filter((_route, index, routes) => index === routes.length - 1)
         .reduce((_prev, cur) => `${cur.meta.label as string}`, '');
+    });
+
+    watchEffect(() => {
+      setPageTitle(currentRouteLabel.value);
     });
 
     return {

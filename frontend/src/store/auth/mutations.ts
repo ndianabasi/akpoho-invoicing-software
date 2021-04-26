@@ -8,10 +8,8 @@ const mutation: MutationTree<AuthStateInterface> = {
   SET_LOGIN_DATA(state: AuthStateInterface, payload: LoginData) {
     state.loginData = payload;
   },
-  LOGOUT_USER: (state: AuthStateInterface, message: string) => {
+  LOGOUT_USER: (state: AuthStateInterface) => {
     state.token = '';
-    state.authFormMessage = { message, type: 'danger' };
-    localStorage.removeItem('akpoho-state');
   },
 };
 

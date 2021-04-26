@@ -7,6 +7,8 @@ import { AuthStateInterface } from './state';
 import { api as $httpNoAuth } from '../../boot/httpNoAuth';
 import { AxiosResponse, AxiosError } from 'axios';
 import { Notify } from 'quasar';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 type LoginResponseData = {
   message: string;
@@ -68,10 +70,9 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         });
     });
   },
-  logoutUser({ commit }, { message }) {
-    commit('LOGOUT_USER', message);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    delete $httpNoAuth.defaults.headers.common['Authorization'];
+  LOGOUT_USER({ commit }) {
+    commit('LOGOUT_USER');
+    void router.push({ name: 'Login' });
   },
 };
 

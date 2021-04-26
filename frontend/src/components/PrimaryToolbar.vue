@@ -115,6 +115,7 @@
               <div class="text-subtitle1 q-mt-md q-mb-xs">John Doe</div>
 
               <q-btn
+                @click.prevent="handleLogout"
                 color="primary"
                 label="Logout"
                 push
@@ -207,6 +208,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import CreateMenu from './CreateMenu.vue';
+import { useStore } from 'vuex';
 
 export default defineComponent({
   name: 'SecondaryToolbar',
@@ -224,6 +226,7 @@ export default defineComponent({
   emits: ['update:leftDrawerOpen'],
 
   setup(/* props */) {
+    const store = useStore();
     const leftDrawerOpen = ref(false);
     const search = ref('');
 
@@ -231,9 +234,14 @@ export default defineComponent({
       leftDrawerOpen.value = !leftDrawerOpen.value;
     };
 
+    const handleLogout = function () {
+      void store.dispatch('auth/LOGOUT_USER');
+    };
+
     return {
       TOGGLE_LEFT_DRAWER,
       search,
+      handleLogout,
     };
   },
 });
