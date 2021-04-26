@@ -3,6 +3,8 @@ import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
 
 export default class Role extends BaseModel {
+  public static selfAssignPrimaryKey = true
+
   @column({ isPrimary: true })
   public id: string
 

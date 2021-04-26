@@ -6,11 +6,16 @@ import {
   beforeCreate,
   manyToMany,
   ManyToMany,
+  hasMany,
+  HasMany,
 } from '@ioc:Adonis/Lucid/Orm'
 import CompanyHook from './Hooks/CompanyHook'
 import User from 'App/Models/User'
+import Customer from 'App/Models/Customer'
 
 export default class Company extends BaseModel {
+  public static selfAssignPrimaryKey = true
+
   @column({ isPrimary: true })
   public id: string
 
@@ -27,9 +32,9 @@ export default class Company extends BaseModel {
   @column()
   public city: string
   @column()
-  public state: number
+  public state: number | null
   @column()
-  public country: number
+  public country: number | null
   @column()
   public slug: string
   @column()
@@ -61,4 +66,7 @@ export default class Company extends BaseModel {
 
   @manyToMany(() => User)
   public users: ManyToMany<typeof User>
+
+  @hasMany(() => Customer)
+  public customers: HasMany<typeof Customer>
 }

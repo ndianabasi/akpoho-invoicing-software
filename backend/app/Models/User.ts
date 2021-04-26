@@ -8,12 +8,17 @@ import {
   BelongsTo,
   manyToMany,
   ManyToMany,
+  hasOne,
+  HasOne,
 } from '@ioc:Adonis/Lucid/Orm'
-import UserHook from './Hooks/UserHook'
+import UserHook from 'App/Models/Hooks/UserHook'
 import Company from 'App/Models/Company'
 import Role from 'App/Models/Role'
+import UserProfile from 'App/Models/UserProfile'
 
 export default class User extends BaseModel {
+  public static selfAssignPrimaryKey = true
+
   @column({ isPrimary: true })
   public id: string
 
@@ -103,4 +108,7 @@ export default class User extends BaseModel {
 
   @belongsTo(() => Role)
   public role: BelongsTo<typeof Role>
+
+  @hasOne(() => UserProfile)
+  public profile: HasOne<typeof UserProfile>
 }

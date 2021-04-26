@@ -8,7 +8,7 @@ export default class Companies extends BaseSchema {
       table.uuid('id').primary().index().unique().notNullable()
       table.string('name', 50).unique().notNullable().index()
       table.string('email', 50).unique().notNullable().index()
-      table.string('phone_number', 20).unique().nullable()
+      table.string('phone_number', 30).unique().nullable()
       table.boolean('is_approved').defaultTo(0)
       table.string('address').nullable()
       table.string('city', 50).nullable()
