@@ -20,7 +20,7 @@ const databaseConfig: DatabaseConfig & { orm: Partial<OrmConfig> } = {
   | file.
   |
   */
-  connection: Env.get('DB_CONNECTION', 'mysql') as string,
+  connection: Env.get('DB_CONNECTION'),
 
   connections: {
     /*
@@ -37,14 +37,14 @@ const databaseConfig: DatabaseConfig & { orm: Partial<OrmConfig> } = {
     mysql: {
       client: 'mysql',
       connection: {
-        host: Env.get('MYSQL_HOST') as string,
-        port: Number(Env.get('MYSQL_PORT')),
-        user: Env.get('MYSQL_USER') as string,
-        password: Env.get('MYSQL_PASSWORD', '') as string,
-        database: Env.get('MYSQL_DB_NAME') as string,
+        host: Env.get('MYSQL_HOST'),
+        port: Env.get('MYSQL_PORT'),
+        user: Env.get('MYSQL_USER'),
+        password: Env.get('MYSQL_PASSWORD', ''),
+        database: Env.get('MYSQL_DB_NAME'),
       },
       healthCheck: false,
-      debug: false,
+			debug: false,
     },
 
     /*
@@ -68,8 +68,9 @@ const databaseConfig: DatabaseConfig & { orm: Partial<OrmConfig> } = {
         database: Env.get('PG_DB_NAME'),
       },
       healthCheck: false,
-      debug: false,
+			debug: false,
     },
+
   },
 
   /*
@@ -84,7 +85,8 @@ const databaseConfig: DatabaseConfig & { orm: Partial<OrmConfig> } = {
   | - Or define a custom function to compute the primary key for a given model.
   |
   */
-  orm: {},
+  orm: {
+  },
 }
 
 export default databaseConfig

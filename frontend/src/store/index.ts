@@ -7,6 +7,7 @@ import { MenusStateInterface } from './menus/state';
 import auth from './auth';
 import { AuthStateInterface } from './auth/state';
 import { AuthGettersInterface } from './auth/getters';
+import { createLogger } from 'vuex';
 
 /*
  * If not building with SSR mode, you can
@@ -146,5 +147,16 @@ export default store(function (/* { ssrContext } */) {
       menus,
       auth,
     },
+    plugins:
+      process.env.NODE_ENV !== 'production'
+        ? [
+            createLogger({
+              collapsed: false, // auto-expand logged mutations
+              logActions: true, // Log Actions
+              logMutations: true, // Log mutations
+              logger: console, // implementation of the `console` API, default `console`
+            }),
+          ]
+        : [],
   });
 });

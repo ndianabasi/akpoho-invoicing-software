@@ -20,4 +20,6 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.on('/').render('welcome')
+Route.group(() => {
+  Route.post('/login', 'AuthController.login')
+}).prefix('/v1')

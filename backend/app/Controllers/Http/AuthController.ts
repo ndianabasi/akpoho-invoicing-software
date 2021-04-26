@@ -38,69 +38,68 @@ export default class AuthController {
 
     let user = await User.findBy('email', email)
     if (!user) throw new NoLoginException({ message: 'Log in not allowed' })
+    else {
+      // Check if user can log in.
+      // Get login status
+      const loginStatus = Boolean(user.login_status)
+      if (!loginStatus) {
+        throw new NoLoginException({
+          message: 'Log in is not permitted for this account!',
+        })
+      }
 
-    const token = await auth.use('api').attempt(email, password)
-    // Check if credentials are valid, else return error
-    if (!token) throw new NoLoginException({ message: 'Email address or password is not correct.' })
+      // Get activation status
+      const activationStatus = Boolean(user.is_account_activated)
+      if (!activationStatus) {
+        throw new NoLoginException({
+          message:
+            'Your account is not activated. Please activate your account with the activation link sent to you via email.',
+        })
+      }
 
-    // Check if user can log in.
-    // Get login status
-    const loginStatus = Boolean(user.login_status)
-    if (!loginStatus)
-      throw new NoLoginException({
-        message: 'Log in is not permitted for this account!',
-      })
+      // Get email verification status
+      const emailVerificationStatus = Boolean(user.is_email_verified)
+      if (!emailVerificationStatus) {
+        throw new NoLoginException({
+          message:
+            'Your email address is not verified. Please check your email inbox for a verification sent to you or request for a new verification email from your Church admin. If you are a Church admin, please contact us for assistance.',
+        })
+      }
 
-    // Get activation status
-    const activationStatus = Boolean(user.is_account_activated)
-    if (!activationStatus)
-      throw new NoLoginException({
-        message:
-          'Your account is not activated. Please activate your account with the activation link sent to you via email.',
-      })
+      const token = await auth.use('api').attempt(email, password)
+      // Check if credentials are valid, else return error
+      if (!token)
+        throw new NoLoginException({ message: 'Email address or password is not correct.' })
 
-    // Get email verification status
-    const emailVerificationStatus = Boolean(user.is_email_verified)
-    if (!emailVerificationStatus)
-      throw new NoLoginException({
-        message:
-          'Your email address is not verified. Please check your email inbox for a verification sent to you or request for a new verification email from your Church admin. If you are a Church admin, please contact us for assistance.',
-      })
+      /* Retrieve user with company information */
+      user = await User.query()
+        .select('users.id', 'users.email', 'users.login_status')
+        .where('email', email)
+        .preload('companies')
+        .first()
 
-    /* Retrieve user with role information */
-    user = await User.query()
-      .select('users.id', 'users.email', 'users.login_status', 'roles.name as role')
-      .where('email', email)
-      .leftJoin('roles', 'users.role_id', 'roles.id')
-      .first()
-    user = user.toJSON()
+      console.log(user)
 
-    /**
-     * Emit event to log login activity and
-     * persist login meta information to DB
-     * Clean up login code information
-     */
-    const ip = request.ip()
-    Event.fire('new::login', {
-      ip: ip,
-      user_id: user.id,
-      time: null,
-      response,
-    })
-
-    return response.status(200).json({
-      message: 'Login successful.',
-      type: token.type,
-      token: token.token,
-      refreshToken: token.refreshToken,
-      data: {
+      /**
+       * Emit event to log login activity and
+       * persist login meta information to DB
+       * Clean up login code information
+       */
+      /* const ip = request.ip()
+      Event.fire('new::login', {
+        ip: ip,
         user_id: user.id,
-        email: user.email,
-        role: user.role,
-        organisation_id: user.organisation_id || null,
-      },
-      status: 200,
-      statusText: 'OK',
-    })
+        time: null,
+        response,
+      }) */
+
+      return response.status(200).json({
+        message: 'Login successful.',
+        token: token,
+        data: user,
+        status: 200,
+        statusText: 'OK',
+      })
+    }
   }
 }

@@ -1,5 +1,5 @@
 import Env from '@ioc:Adonis/Core/Env'
-import { v5 as uuidv5 } from 'uuid'
+import { v5 as uuidV5 } from 'uuid'
 import { DateTime } from 'luxon'
 
 import Hash from '@ioc:Adonis/Core/Hash'
@@ -57,7 +57,7 @@ const UserHook: UserHookContract = {
     const randomString = PasswordGenerator.randomString({
       length: 15,
     })
-    userInstance.id = uuidv5(userInstance.email + randomString, UUID_NAMESPACE)
+    userInstance.id = uuidV5(userInstance.email + randomString, UUID_NAMESPACE)
   },
 
   generateActivationCode: (userInstance) => {

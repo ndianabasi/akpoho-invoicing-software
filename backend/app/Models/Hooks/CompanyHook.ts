@@ -31,7 +31,11 @@ const CompanyHook: CompanyHookContract = {
     }
   },
   generateSlug: (organisationInstance) => {
-    if (organisationInstance.$dirty.slug && organisationInstance.slug.length > 0) {
+    if (
+      organisationInstance.$dirty.slug &&
+      organisationInstance.slug &&
+      organisationInstance.slug.length > 0
+    ) {
       return
     } else if (organisationInstance.$dirty.slug || organisationInstance.$dirty.name) {
       organisationInstance.slug = slugify(organisationInstance.name, {

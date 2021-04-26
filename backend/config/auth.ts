@@ -17,7 +17,7 @@ import { AuthConfig } from '@ioc:Adonis/Addons/Auth'
 |
 */
 const authConfig: AuthConfig = {
-  guard: 'web',
+  guard: 'api',
   list: {
     /*
     |--------------------------------------------------------------------------

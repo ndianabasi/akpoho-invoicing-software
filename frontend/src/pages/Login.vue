@@ -105,6 +105,7 @@ import {
   maxLength,
 } from '@vuelidate/validators';
 import { useStore } from 'vuex';
+import { useQuasar } from 'quasar';
 
 //const strongPassword = helpers.regex('strongPassword', //)
 
@@ -112,6 +113,8 @@ export default defineComponent({
   name: 'Login',
   components: {},
   setup() {
+    const $q = useQuasar();
+
     const submitting = ref(false);
     const store = useStore();
 
@@ -155,18 +158,15 @@ export default defineComponent({
       submitting.value = true;
 
       await nextTick(() => {
-        void store.dispatch('auth/LOGIN_USER', form);
+        void store
+          .dispatch('auth/LOGIN_USER', form)
+          .catch(() => {
+            submitting.value = false;
+          })
+          .then(() => {
+            submitting.value = false;
+          });
       });
-
-      // Simulating a delay here.
-      // When we are done, we reset "submitting"
-      // Boolean to false to restore the
-      // initial state.
-      setTimeout(() => {
-        // delay simulated, we are done,
-        // now restoring submit to its initial state
-        submitting.value = false;
-      }, 3000);
     }
 
     return {

@@ -77,7 +77,7 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
       https: false,
-      port: 8080,
+      port: 8090,
       open: true, // opens browser window automatically
     },
 
@@ -86,6 +86,13 @@ module.exports = configure(function (/* ctx */) {
       config: {
         screen: {
           bodyClasses: true, // <<< add this
+          notify: {
+            /* look at QuasarConfOptions from the API card */
+            position: 'top-right',
+            progress: true,
+            timeout: 7500,
+            closeBtn: true,
+          },
         },
       },
 
@@ -100,7 +107,7 @@ module.exports = configure(function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: ['Notify'],
     },
 
     // animations: 'all', // --- includes all animations
