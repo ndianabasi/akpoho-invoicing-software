@@ -38,4 +38,6 @@ Server.middleware.register(['Adonis/Core/BodyParserMiddleware'])
 | Route.get('dashboard', 'UserController.dashboard').middleware('auth')
 |
 */
-Server.middleware.registerNamed({})
+Server.middleware.registerNamed({
+  findRequestedCompany: 'App/Middleware/FindRequestedCompany',
+})

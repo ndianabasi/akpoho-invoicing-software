@@ -18,6 +18,29 @@
         </q-toolbar-title>
       </q-toolbar>
 
+      <q-select
+        class="q-mx-md"
+        filled
+        v-model="model"
+        :options="options"
+        label="Choose Company"
+        color="teal"
+        clearable
+        options-selected-class="text-deep-orange"
+      >
+        <template #option="scope">
+          <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+            <q-item-section avatar>
+              <q-icon :name="scope.opt.icon" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label v-html="scope.opt.label" />
+              <q-item-label caption>{{ scope.opt.description }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
+
       <q-list padding>
         <template v-if="links1 && links1.length">
           <q-item
@@ -106,6 +129,40 @@ export default defineComponent({
   setup(/* props */) {
     const store = useStore();
 
+    const options = ref([
+      {
+        label: 'Google',
+        value: 'Google',
+        description: 'Search engine',
+        icon: 'mail',
+      },
+      {
+        label: 'Facebook',
+        value: 'Facebook',
+        description: 'Social media',
+        icon: 'bluetooth',
+      },
+      {
+        label: 'Twitter',
+        value: 'Twitter',
+        description: 'Quick updates',
+        icon: 'map',
+      },
+      {
+        label: 'Apple',
+        value: 'Apple',
+        description: 'iStuff',
+        icon: 'golf_course',
+      },
+      {
+        label: 'Oracle',
+        value: 'Oracle',
+        disable: true,
+        description: 'Databases',
+        icon: 'casino',
+      },
+    ]);
+
     //const leftDrawerOpen = unref(GET_LEFT_DRAWER_OPEN) as boolean;
     const leftDrawerOpen = ref(false);
 
@@ -126,6 +183,8 @@ export default defineComponent({
       links3: computed(() => store.getters['menus/GET_LINKS3']),
       TOGGLE_LEFT_DRAWER,
       leftDrawerOpen,
+      model: ref(null),
+      options,
     };
   },
 });

@@ -22,4 +22,7 @@ import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
   Route.post('/login', 'AuthController.login')
+  Route.post('/:company_id/customers', 'CustomersController.index').middleware(
+    'findRequestedCompany'
+  )
 }).prefix('/v1')
