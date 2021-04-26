@@ -78,7 +78,7 @@ export default class AuthController {
         .preload('companies')
         .first()
 
-      console.log(user)
+      //console.log(user)
 
       /**
        * Emit event to log login activity and

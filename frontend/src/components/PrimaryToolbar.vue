@@ -13,16 +13,18 @@
       class="q-mx-md"
     />
 
-    <q-toolbar-title
-      v-if="$q.screen.gt.sm"
-      shrink
-      class="row items-center no-wrap"
-    >
-      <!-- <img
+    <router-link class="cursor-point no-underline" :to="{ name: 'Home' }"
+      ><q-toolbar-title
+        v-if="$q.screen.gt.sm"
+        shrink
+        class="row items-center no-wrap"
+      >
+        <!-- <img
             src="https://cdn.quasar.dev/img/layout-gallery/logo-google.svg"
           /> -->
-      <span class="q-ml-sm">Agboho</span>
-    </q-toolbar-title>
+        <span class="q-ml-sm">Agboho</span>
+      </q-toolbar-title></router-link
+    >
 
     <q-space />
 
@@ -236,3 +238,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss">
+.no-underline {
+  text-decoration: none;
+}
+</style>

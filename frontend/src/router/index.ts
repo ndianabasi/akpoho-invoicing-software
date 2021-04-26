@@ -26,7 +26,6 @@ const logoutUser = actions.logoutUser; */
 
 export default route(function ({ store /* ssrContext */ }) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const isLoggedIn = store.getters['auth/isLoggedIn'];
   const createHistory =
     process.env.MODE === 'ssr'
       ? createMemoryHistory
@@ -47,15 +46,16 @@ export default route(function ({ store /* ssrContext */ }) {
   });
 
   Router.beforeEach(async (to, _from, next) => {
+    const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       if (isLoggedIn) {
         next();
       } else {
         await store.dispatch('auth/logoutUser', {
           message: 'You are not logged in!',
-        }),
-          await Router.push({ name: 'Login' });
-        return;
+        });
+        await Router.push({ name: 'Login' });
+        next();
       }
     } else next();
   });

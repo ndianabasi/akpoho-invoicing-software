@@ -105,18 +105,17 @@ import {
   maxLength,
 } from '@vuelidate/validators';
 import { useStore } from 'vuex';
-import { useQuasar } from 'quasar';
-
+//import { useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
 //const strongPassword = helpers.regex('strongPassword', //)
 
 export default defineComponent({
   name: 'Login',
   components: {},
   setup() {
-    const $q = useQuasar();
-
     const submitting = ref(false);
     const store = useStore();
+    const router = useRouter();
 
     const form = reactive({
       remember_me: false,
@@ -165,6 +164,14 @@ export default defineComponent({
           })
           .then(() => {
             submitting.value = false;
+            void nextTick(() => {
+              const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
+              console.log(isLoggedIn);
+
+              if (isLoggedIn) {
+                void router.push({ name: 'Home' });
+              }
+            });
           });
       });
     }

@@ -35,10 +35,9 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
           Notify.create({
             message: data?.message,
             type: 'positive',
-            avatar: 'https://cdn.quasar.dev/img/boy-avatar.png',
             position: 'top',
             progress: true,
-            timeout: 10000,
+            timeout: 2000,
             actions: [
               {
                 label: 'Dismiss',
@@ -54,7 +53,6 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
             message:
               (error?.response?.data as string) ?? 'An unknown error occurred!',
             type: 'negative',
-            avatar: 'https://cdn.quasar.dev/img/boy-avatar.png',
             position: 'top',
             progress: true,
             timeout: 10000,

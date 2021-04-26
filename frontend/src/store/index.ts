@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { store } from 'quasar/wrappers';
 import { createStore, GetterTree, useStore as baseUseStore, Store } from 'vuex';
@@ -8,6 +10,10 @@ import auth from './auth';
 import { AuthStateInterface } from './auth/state';
 import { AuthGettersInterface } from './auth/getters';
 import { createLogger } from 'vuex';
+import createPersistedState from 'vuex-persistedstate';
+
+import SecureLS from 'secure-ls';
+const ls = new SecureLS({ isCompression: false });
 
 /*
  * If not building with SSR mode, you can
@@ -156,7 +162,16 @@ export default store(function (/* { ssrContext } */) {
               logMutations: true, // Log mutations
               logger: console, // implementation of the `console` API, default `console`
             }),
+            createPersistedState(),
           ]
-        : [],
+        : [
+            createPersistedState({
+              storage: {
+                getItem: (key) => ls.get(key),
+                setItem: (key, value) => ls.set(key, value),
+                removeItem: (key) => ls.remove(key),
+              },
+            }),
+          ],
   });
 });
