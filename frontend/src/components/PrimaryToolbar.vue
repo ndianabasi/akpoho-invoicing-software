@@ -209,6 +209,7 @@
 import { defineComponent, ref } from 'vue';
 import CreateMenu from './CreateMenu.vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'SecondaryToolbar',
@@ -229,13 +230,16 @@ export default defineComponent({
     const store = useStore();
     const leftDrawerOpen = ref(false);
     const search = ref('');
+    const router = useRouter();
 
     const TOGGLE_LEFT_DRAWER = () => {
       leftDrawerOpen.value = !leftDrawerOpen.value;
     };
 
     const handleLogout = function () {
-      void store.dispatch('auth/LOGOUT_USER');
+      void store
+        .dispatch('auth/LOGOUT_USER')
+        .then(() => router.push({ name: 'Login' }));
     };
 
     return {

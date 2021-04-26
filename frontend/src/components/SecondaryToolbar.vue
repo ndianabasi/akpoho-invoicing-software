@@ -68,6 +68,8 @@ export default defineComponent({
     });
 
     watchEffect(() => {
+      console.log(currentRouteLabel.value);
+
       setPageTitle(currentRouteLabel.value);
     });
 

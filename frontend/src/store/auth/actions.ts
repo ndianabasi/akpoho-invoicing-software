@@ -7,8 +7,6 @@ import { AuthStateInterface } from './state';
 import { api as $httpNoAuth } from '../../boot/httpNoAuth';
 import { AxiosResponse, AxiosError } from 'axios';
 import { Notify } from 'quasar';
-import { useRouter } from 'vue-router';
-const router = useRouter();
 
 type LoginResponseData = {
   message: string;
@@ -72,7 +70,6 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
   },
   LOGOUT_USER({ commit }) {
     commit('LOGOUT_USER');
-    void router.push({ name: 'Login' });
   },
 };
 
