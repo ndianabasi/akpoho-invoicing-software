@@ -12,16 +12,19 @@ export default class UserProfile extends BaseModel {
   public id: string
 
   @column()
-  public first_name: string
+  public userId: string
 
   @column()
-  public middle_name: string
+  public firstName: string
 
   @column()
-  public last_name: string
+  public middleName: string
 
   @column()
-  public phone_number: string
+  public lastName: string
+
+  @column()
+  public phoneNumber: string
 
   @column()
   public address: string
@@ -36,7 +39,7 @@ export default class UserProfile extends BaseModel {
   public country: number
 
   @column()
-  public profile_picture: string
+  public profilePicture: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

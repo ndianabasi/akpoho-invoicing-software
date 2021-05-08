@@ -16,10 +16,10 @@ export default class State extends BaseModel {
   public code: string
 
   @column()
-  public country_numeric_code: string
+  public countryNumericCode: string
 
   @column()
-  public country_id: number
+  public countryId: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

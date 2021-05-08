@@ -32,58 +32,58 @@ export default class User extends BaseModel {
   public createdAt: DateTime
 
   @column()
-  public role_id: string
+  public roleId: string
 
   @column()
-  public login_code: number
+  public loginCode: number
 
   @column()
-  public activation_code: string
+  public activationCode: string
 
   @column()
-  public forgot_password_code: number
+  public forgotPasswordCode: number
 
   @column()
-  public login_status: boolean
+  public loginStatus: boolean
 
   @column()
-  public is_account_activated: boolean
+  public isAccountActivated: boolean
 
   @column()
-  public is_email_verified: boolean
+  public isEmailVerified: boolean
 
   @column()
-  public lifetime_login: number
+  public lifetimeLogin: number
 
   @column()
-  public password_change_required: boolean
+  public passwordChangeRequired: boolean
 
   @column()
-  public remember_token: boolean
+  public rememberToken: boolean
 
   @column()
-  public last_login_time: DateTime
+  public lastLoginTime: DateTime
 
   @column()
-  public account_activated_at: DateTime
+  public accountActivatedAt: DateTime
 
   @column()
-  public email_verified_at: DateTime
+  public emailVerifiedAt: DateTime
 
   @column()
-  public forgot_password_code_expires_at: DateTime
+  public forgotPasswordCodeExpiresAt: DateTime
 
   @column({ prepare: (value) => value.toFormat('yyyy-LL-dd HH:mm:ss') })
-  public activation_code_expires_at: DateTime
+  public activationCodeExpiresAt: DateTime
 
   @column()
-  public login_code_expires_at: DateTime
+  public loginCodeExpiresAt: DateTime
 
   @column()
-  public password_last_changed_at: DateTime
+  public passwordLastChangedAt: DateTime
 
   @column()
-  public password_change_secret: string
+  public passwordChangeSecret: string
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime

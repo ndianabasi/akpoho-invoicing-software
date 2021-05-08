@@ -11,6 +11,27 @@ export default class CustomerAddress extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
+  @column()
+  public streetAddress: string
+
+  @column()
+  public customerId: string
+
+  @column()
+  public city: string
+
+  @column()
+  public postalCode: string
+
+  @column()
+  public addressType: string
+
+  @column()
+  public stateId: number
+
+  @column()
+  public countryId: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

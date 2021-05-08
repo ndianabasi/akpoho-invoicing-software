@@ -1,6 +1,7 @@
 import Factory from '@ioc:Adonis/Lucid/Factory'
 import Company from 'App/Models/Company'
 import slugify from 'slugify'
+import CustomerFactory from './CustomerFactory'
 import UserFactory from './UserFactory'
 
 const CompanyFactory = Factory.define(Company, ({ faker }) => {
@@ -17,11 +18,12 @@ const CompanyFactory = Factory.define(Company, ({ faker }) => {
     slug: slugify(companyName, { lower: true, strict: true }),
   }
 
-  console.log(generatedCompany)
+  //console.log(generatedCompany)
 
   return generatedCompany
 })
   .relation('users', () => UserFactory)
+  .relation('customers', () => CustomerFactory)
   .build()
 
 export default CompanyFactory

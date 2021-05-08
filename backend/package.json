@@ -10,7 +10,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@adonisjs/assembler": "^3.1.1",
+    "@adonisjs/assembler": "^5.1.1",
     "adonis-preset-ts": "^2.1.0",
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^8.3.0",
@@ -23,16 +23,16 @@
     "youch-terminal": "^1.1.0"
   },
   "dependencies": {
-    "@adonisjs/auth": "^5.1.1",
-    "@adonisjs/core": "~5.0.4-preview-rc",
-    "@adonisjs/lucid": "^10.0.0",
-    "@adonisjs/redis": "^5.0.9",
-    "@adonisjs/repl": "^1.1.6",
-    "@adonisjs/session": "^4.0.6",
-    "@adonisjs/view": "^3.1.0",
+    "@adonisjs/auth": "^8.0.3",
+    "@adonisjs/core": "^5.1.6",
+    "@adonisjs/lucid": "^14.0.1",
+    "@adonisjs/redis": "^7.0.2",
+    "@adonisjs/repl": "^3.1.2",
+    "@adonisjs/session": "^6.0.3",
+    "@adonisjs/shield": "^7.0.2",
+    "@adonisjs/view": "^6.0.1",
     "luxon": "^1.26.0",
     "mysql": "^2.18.1",
-    "pg": "^8.6.0",
     "phc-argon2": "^1.1.1",
     "proxy-addr": "^2.0.6",
     "reflect-metadata": "^0.1.13",

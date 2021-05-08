@@ -15,16 +15,20 @@ export default class UserProfiles extends BaseSchema {
       table.string('phone_number', 30).unique().nullable()
       table.string('address').nullable()
       table.string('city', 50).nullable()
-      table.integer('state').unsigned().nullable()
-      table.integer('country').unsigned().nullable()
+      table.integer('state_id').unsigned().nullable()
+      table.integer('country_id').unsigned().nullable()
 
       table.string('profile_picture').nullable()
 
       table.timestamps(true)
 
       table.foreign('user_id').references('users.id').onDelete('CASCADE').onUpdate('CASCADE')
-      table.foreign('state').references('states.id').onDelete('SET NULL').onUpdate('CASCADE')
-      table.foreign('country').references('countries.id').onDelete('SET NULL').onUpdate('CASCADE')
+      table.foreign('state_id').references('states.id').onDelete('SET NULL').onUpdate('CASCADE')
+      table
+        .foreign('country_id')
+        .references('countries.id')
+        .onDelete('SET NULL')
+        .onUpdate('CASCADE')
     })
   }
 

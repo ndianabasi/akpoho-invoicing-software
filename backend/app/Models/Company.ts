@@ -24,9 +24,9 @@ export default class Company extends BaseModel {
   @column()
   public email: string
   @column()
-  public phone_number: string
+  public phoneNumber: string
   @column()
-  public is_approved: boolean
+  public isApproved: boolean
   @column()
   public address: string
   @column()
@@ -40,13 +40,13 @@ export default class Company extends BaseModel {
   @column()
   public size: number
   @column()
-  public profile_picture: string
+  public profilePicture: string
   @column()
   public website: string
   @column()
-  public approved_at: DateTime
+  public approvedAt: DateTime
   @column()
-  public approved_by: string
+  public approvedBy: string
 
   @beforeCreate()
   public static generateUUID(company: Company) {
@@ -64,7 +64,9 @@ export default class Company extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @manyToMany(() => User)
+  @manyToMany(() => User, {
+    pivotTimestamps: true,
+  })
   public users: ManyToMany<typeof User>
 
   @hasMany(() => Customer)

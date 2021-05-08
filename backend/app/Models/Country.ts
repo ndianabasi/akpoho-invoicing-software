@@ -16,28 +16,28 @@ export default class Country extends BaseModel {
   public citizenship: string
 
   @column()
-  public numeric_code: string
+  public numericCode: string
 
   @column()
-  public country_code: string
+  public countryCode: string
 
   @column()
   public currency: string
 
   @column()
-  public currency_code: string
+  public currencyCode: string
 
   @column()
-  public currency_sub_unit: string
+  public currencySubUnit: string
 
   @column()
-  public currency_symbol: string
+  public currencySymbol: string
 
   @column()
-  public currency_decimals: number
+  public currencyDecimals: number
 
   @column()
-  public full_name: string
+  public fullName: string
 
   @column()
   public iso_3166_2: string
@@ -46,16 +46,16 @@ export default class Country extends BaseModel {
   public iso_3166_3: string
 
   @column()
-  public region_code: string
+  public regionCode: string
 
   @column()
-  public sub_region_code: string
+  public subRegionCode: string
 
   @column()
   public eea: boolean
 
   @column()
-  public calling_code: string
+  public callingCode: string
 
   @column()
   public flag: string

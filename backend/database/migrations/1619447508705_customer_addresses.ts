@@ -11,8 +11,8 @@ export default class CustomerAddresses extends BaseSchema {
       table.string('street_address').notNullable()
       table.string('city', 50).nullable()
       table.string('postal_code', 10).nullable()
-      table.integer('state').unsigned().nullable()
-      table.integer('country').unsigned().nullable()
+      table.integer('state_id').unsigned().nullable()
+      table.integer('country_id').unsigned().nullable()
 
       table.enum('address_type', ['billing_address', 'shipping_address']).notNullable()
       table.timestamps(true)
@@ -21,6 +21,14 @@ export default class CustomerAddresses extends BaseSchema {
         .foreign('customer_id')
         .references('customers.id')
         .onDelete('CASCADE')
+        .onUpdate('CASCADE')
+
+      table.foreign('state_id').references('states.id').onDelete('SET NULL').onUpdate('CASCADE')
+
+      table
+        .foreign('country_id')
+        .references('countries.id')
+        .onDelete('SET NULL')
         .onUpdate('CASCADE')
     })
   }

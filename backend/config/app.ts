@@ -109,6 +109,7 @@ export const http: ServerConfig = {
     secure: false,
     sameSite: false,
   },
+  forceContentNegotiationTo: 'application/json',
 }
 
 /*

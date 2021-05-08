@@ -32,7 +32,8 @@
       "@adonisjs/view",
       "@adonisjs/auth",
       "@adonisjs/lucid",
-      "@adonisjs/redis"
+      "@adonisjs/redis",
+      "@adonisjs/shield"
     ]
   }
 }
