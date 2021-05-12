@@ -135,7 +135,7 @@
                     <q-icon name="inbox" />
                   </q-item-section>
 
-                  <q-item-section>Inbox Inbox Inbox Inbox</q-item-section>
+                  <q-item-section>Inbox</q-item-section>
                 </q-item>
 
                 <q-item
@@ -239,7 +239,10 @@ export default defineComponent({
     const handleLogout = function () {
       void store
         .dispatch('auth/LOGOUT_USER')
-        .then(() => router.push({ name: 'Login' }));
+        .then(() => router.push({ name: 'Login' }))
+        .catch(() => {
+          void router.push({ name: 'Login' });
+        });
     };
 
     return {

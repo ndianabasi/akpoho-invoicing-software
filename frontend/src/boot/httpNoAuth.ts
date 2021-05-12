@@ -11,10 +11,10 @@ declare module '@vue/runtime-core' {
   }
 }
 
-let api: AxiosInstance;
+let apiNoAuth: AxiosInstance;
 export default boot(
   ({ app, store }: { app: App; store: Store<StoreElements> }) => {
-    api = axios.create({
+    apiNoAuth = axios.create({
       timeout: store.getters.getHttpNoAuthOptions.timeout as number,
       baseURL: store.getters.getHttpNoAuthOptions.baseURL as string,
     });
@@ -24,11 +24,11 @@ export default boot(
     // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
     //       so you won't necessarily have to import axios in each vue file
 
-    app.config.globalProperties.$httpNoAuth = api;
-    app.config.globalProperties.$apiNoAuth = api;
+    app.config.globalProperties.$httpNoAuth = apiNoAuth;
+    app.config.globalProperties.$apiNoAuth = apiNoAuth;
     // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
     //       so you can easily perform requests against your app's API
   }
 );
 
-export { axios, api };
+export { axios, apiNoAuth };

@@ -33,7 +33,7 @@ export default class AuthController {
   }
 
   public async login({ request, auth, response }: HttpContextContract) {
-    const { email, password, loginCode /* recaptchaResponseToken */ } = request.post()
+    const { email, password, loginCode /* recaptchaResponseToken */ } = request.body()
     //const loginRecaptchaHelper = new LoginRecaptchaHelper(recaptchaResponseToken);
 
     let user = await User.findBy('email', email)
@@ -41,7 +41,7 @@ export default class AuthController {
     else {
       // Check if user can log in.
       // Get login status
-      const loginStatus = Boolean(user.login_status)
+      const loginStatus = Boolean(user.loginStatus)
       if (!loginStatus) {
         throw new NoLoginException({
           message: 'Log in is not permitted for this account!',
@@ -49,7 +49,7 @@ export default class AuthController {
       }
 
       // Get activation status
-      const activationStatus = Boolean(user.is_account_activated)
+      const activationStatus = Boolean(user.isAccountActivated)
       if (!activationStatus) {
         throw new NoLoginException({
           message:
@@ -58,7 +58,7 @@ export default class AuthController {
       }
 
       // Get email verification status
-      const emailVerificationStatus = Boolean(user.is_email_verified)
+      const emailVerificationStatus = Boolean(user.isEmailVerified)
       if (!emailVerificationStatus) {
         throw new NoLoginException({
           message:

@@ -1,13 +1,13 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 import {
   CompanyFactory,
-  UserFactory,
+  /* UserFactory,
   CustomerFactory,
   UserProfileFactory,
-  CustomerAddressFactory,
+  CustomerAddressFactory, */
 } from '../factories'
-import Company from 'App/Models/Company'
-import Customer from 'App/Models/Customer'
+//import Company from 'App/Models/Company'
+//import Customer from 'App/Models/Customer'
 
 export default class CompanySeeder extends BaseSeeder {
   public async run() {
@@ -18,6 +18,8 @@ export default class CompanySeeder extends BaseSeeder {
         customer.with('addresses', 1, (address) => address.apply('billingAddress'))
       })
       .createMany(3)
+
+    // Alternative implementation of the same factory call above.
 
     /* let companies = await CompanyFactory.makeMany(3)
     companies = JSON.parse(JSON.stringify(companies))

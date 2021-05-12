@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { store } from 'quasar/wrappers';
+//import { store } from 'quasar/wrappers';
 import { createStore, GetterTree, useStore as baseUseStore, Store } from 'vuex';
 import { InjectionKey } from 'vue';
 import menus from './menus';
-import { MenusStateInterface } from './menus/state';
 import auth from './auth';
+import customers from './customers';
+import { MenusStateInterface } from './menus/state';
 import { AuthStateInterface } from './auth/state';
+import { CustomersStateInterface } from './customers/state';
 import { AuthGettersInterface } from './auth/getters';
+import { CustomersGetterInterface } from './customers/getters';
 import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -62,9 +65,12 @@ interface RootGetterInterface {
 export interface StateInterface {
   menus?: MenusStateInterface;
   auth?: AuthStateInterface;
+  customers?: CustomersStateInterface;
 }
 
-export type StoreGetters = RootGetterInterface & AuthGettersInterface;
+export type StoreGetters = RootGetterInterface &
+  AuthGettersInterface &
+  CustomersGetterInterface;
 
 interface AlertInterface {
   type: string;
@@ -82,28 +88,27 @@ export interface StoreInterface {
   getters: GetterTree<RootState, StateInterface>;
 }
 
-const key: InjectionKey<Store<StoreElements>> = Symbol('agboho_store_symbol');
-
 // define your own `useStore` composition function
 export function useStore() {
+  const key: InjectionKey<Store<StoreElements>> = Symbol('agboho_store_symbol');
   return baseUseStore(key);
 }
 
-export default store(function (/* { ssrContext } */) {
-  return createStore<StoreElements>({
+let store: Store<StoreElements>;
+
+export default function (/* { ssrContext } */) {
+  store = createStore<StoreElements>({
     strict: process.env.NODE_ENV !== 'production',
     state: () => ({
       baseURL: `${
         process.env.NODE_ENV === 'production'
           ? 'api.xxx.com/v1'
-          : '127.0.0.1:3333/v1'
+          : '127.0.0.1:4444/v1'
       }`,
       rootURL: `${
-        process.env.NODE_ENV === 'production' ? 'api.xxx.com' : '127.0.0.1:3333'
+        process.env.NODE_ENV === 'production' ? 'api.xxx.com' : '127.0.0.1:4444'
       }`,
-      gtmID: `${
-        process.env.NODE_ENV === 'production' ? 'GTM-56SGN89' : 'GTM-M7W36ZV'
-      }`,
+      gtmID: `${process.env.NODE_ENV === 'production' ? '' : ''}`,
       httpTimeout: process.env.NODE_ENV === 'production' ? 60000 : 30000,
       currentYear: null,
       message: {
@@ -132,6 +137,8 @@ export default store(function (/* { ssrContext } */) {
       },
       getHttpTimeout: (state) => state.httpTimeout,
       getHttpOptions: (state, getters) => {
+        console.log(getters['auth/getToken']);
+
         return {
           baseURL: getters.getBaseURL as string,
           timeout: getters.getHttpTimeout as number,
@@ -152,6 +159,7 @@ export default store(function (/* { ssrContext } */) {
     modules: {
       menus,
       auth,
+      customers,
     },
     plugins:
       process.env.NODE_ENV !== 'production'
@@ -174,4 +182,8 @@ export default store(function (/* { ssrContext } */) {
             }),
           ],
   });
-});
+
+  return store;
+}
+
+export { store };

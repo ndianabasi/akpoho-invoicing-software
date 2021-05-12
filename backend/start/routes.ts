@@ -22,7 +22,20 @@ import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
   Route.post('/login', 'AuthController.login')
-  Route.post('/:company_id/customers', 'CustomersController.index').middleware(
+}).prefix('/v1')
+
+// Authenticated routes
+Route.group(() => {
+  Route.get('/:company_id/customers', 'CustomersController.index').middleware(
     'findRequestedCompany'
   )
-}).prefix('/v1')
+
+  Route.post('/logout', async ({ auth, response }) => {
+    await auth.use('api').revoke()
+    return response.ok({
+      revoked: true,
+    })
+  })
+})
+  .prefix('/v1')
+  .middleware('auth')

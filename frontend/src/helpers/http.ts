@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import axios from 'axios';
-import { useStore } from '../store/index';
+import { useStore } from 'vuex';
+import { AxiosInstance } from 'axios';
 
-const Store = useStore();
+//const Store = useStore();
 
 /* interface AsyncError {
   message?: string;
@@ -18,16 +19,18 @@ const Store = useStore();
     statusText: string;
   };
 } */
+let axiosInstance: AxiosInstance;
+const store = useStore();
+if (store) {
+  const getHttpOptions = store.getters['getHttpOptions'];
 
-const instance = () => {
-  const getHttpOptions = Store.getters['getHttpOptions'];
-
-  const axiosInstance = axios.create({
+  axiosInstance = axios.create({
     baseURL: getHttpOptions.baseURL as string,
     timeout: getHttpOptions.timeout as number,
     headers: getHttpOptions.headers as string,
   });
-  return axiosInstance;
-};
+} else {
+  axiosInstance = axios;
+}
 
-export default instance;
+export default axiosInstance;

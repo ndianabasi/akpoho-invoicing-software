@@ -3,29 +3,17 @@
 import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { AuthStateInterface } from './state';
-//import {AuthGettersInterface} from './getters'
-import { api as $httpNoAuth } from '../../boot/httpNoAuth';
-import { AxiosResponse, AxiosError } from 'axios';
+import { apiNoAuth as $httpNoAuth } from '../../boot/httpNoAuth';
+import { api as $http } from '../../boot/http';
 import { Notify } from 'quasar';
-
-type LoginResponseData = {
-  message: string;
-  token: unknown;
-  data: unknown;
-  status: number;
-  statusText: string;
-};
-
-interface HttpResponse extends AxiosResponse {
-  data: LoginResponseData;
-}
+import { LoginHttpResponse, HttpError } from '../types';
 
 const actions: ActionTree<AuthStateInterface, StateInterface> = {
   LOGIN_USER({ commit }, form) {
     return new Promise(async (resolve, reject) => {
       await $httpNoAuth
         .post('login', form)
-        .then((res: HttpResponse) => {
+        .then((res: LoginHttpResponse) => {
           console.log(res.data);
           const data = res.data;
 
@@ -48,7 +36,7 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
 
           resolve(res.data);
         })
-        .catch((error: AxiosError) => {
+        .catch((error: HttpError) => {
           Notify.create({
             message:
               (error?.response?.data as string) ?? 'An unknown error occurred!',
@@ -70,6 +58,46 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
   },
   LOGOUT_USER({ commit }) {
     commit('LOGOUT_USER');
+
+    return new Promise(async (resolve, reject) => {
+      await $http
+        .post('logout')
+        .then((res: LoginHttpResponse) => {
+          Notify.create({
+            message: 'You have been logged out!',
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 2000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          Notify.create({
+            message:
+              (error?.response?.data as string) ?? 'An unknown error occurred!',
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 10000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          reject(error);
+        });
+    });
   },
 };
 
