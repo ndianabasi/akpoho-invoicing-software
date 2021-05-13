@@ -108,12 +108,10 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
 
   FETCH_AUTH_PROFILE({ commit }, form) {
     return new Promise(async (resolve, reject) => {
-      await $httpNoAuth
+      await $http
         .get('auth-profile', form)
         .then((res: LoginHttpResponse) => {
-          console.log(res.data);
           commit('SET_USER_DATA', res.data.data);
-
           resolve(res.data);
         })
         .catch((error: HttpError) => {

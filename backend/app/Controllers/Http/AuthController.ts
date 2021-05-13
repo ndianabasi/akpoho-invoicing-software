@@ -112,4 +112,28 @@ export default class AuthController {
       })
     }
   }
+
+  public async authProfile({ request, auth, response }: HttpContextContract) {
+    /* Retrieve user with company information */
+    const email = auth.user?.email!
+
+    const user = await User.query()
+      .select(
+        'users.id',
+        'users.email',
+        'users.login_status',
+        'users.is_account_activated',
+        'users.is_email_verified'
+      )
+      .where('email', email)
+      .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
+      .preload('profile', (profilesQuery) =>
+        profilesQuery.select(...['id', 'first_name', 'last_name', 'profile_picture'])
+      )
+      .first()
+
+    return response.ok({
+      data: user,
+    })
+  }
 }

@@ -30,6 +30,8 @@ Route.group(() => {
     'findRequestedCompany'
   )
 
+  Route.get('/auth-profile', 'AuthController.authProfile')
+
   Route.post('/logout', async ({ auth, response }) => {
     await auth.use('api').revoke()
     return response.ok({
