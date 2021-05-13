@@ -84,7 +84,7 @@ export default class AuthController {
         .where('email', email)
         .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
         .preload('profile', (profilesQuery) =>
-          profilesQuery.select(...['id', 'first_name', 'last_name'])
+          profilesQuery.select(...['id', 'first_name', 'last_name', 'profile_picture'])
         )
         .first()
 

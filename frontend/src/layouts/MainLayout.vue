@@ -24,7 +24,7 @@
 <script lang="ts">
 //import EssentialLink from '../components/EssentialLink.vue';
 import { useStore } from 'vuex';
-import { defineComponent, ref, onMounted, computed } from 'vue';
+import { defineComponent, ref, onMounted, computed, watchEffect } from 'vue';
 import SecondaryToolbar from '../components/SecondaryToolbar.vue';
 import StickySidebar from '../components/StickySidebar.vue';
 import GoToTop from '../components/GoToTop.vue';
@@ -115,6 +115,8 @@ export default defineComponent({
     const leftDrawerOpen = ref(false);
 
     let breadcrumbsRoutes;
+
+    watchEffect(() => void store.dispatch('auth/FETCH_AUTH_PROFILE'));
 
     onMounted(() => {
       /* console.log('route matched', route.matched);

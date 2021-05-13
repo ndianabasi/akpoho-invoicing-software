@@ -40,7 +40,9 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         .catch((error: HttpError) => {
           Notify.create({
             message:
-              (error?.response?.data as string) ?? 'An unknown error occurred!',
+              error?.response?.data?.message ??
+              (error?.response?.data as string) ??
+              'An unknown error occurred!',
             type: 'negative',
             position: 'top',
             progress: true,
@@ -57,6 +59,7 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         });
     });
   },
+
   LOGOUT_USER({ commit }) {
     commit('LOGOUT_USER');
 
@@ -83,7 +86,44 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         .catch((error: HttpError) => {
           Notify.create({
             message:
-              (error?.response?.data as string) ?? 'An unknown error occurred!',
+              error?.response?.data?.message ??
+              (error?.response?.data as string) ??
+              'An unknown error occurred!',
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 10000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          reject(error);
+        });
+    });
+  },
+
+  FETCH_AUTH_PROFILE({ commit }, form) {
+    return new Promise(async (resolve, reject) => {
+      await $httpNoAuth
+        .get('auth-profile', form)
+        .then((res: LoginHttpResponse) => {
+          console.log(res.data);
+          commit('SET_USER_DATA', res.data.data);
+
+          resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          console.log(error?.response);
+
+          Notify.create({
+            message:
+              error?.response?.data?.message ??
+              (error?.response?.data as string) ??
+              'An unknown error occurred!',
             type: 'negative',
             position: 'top',
             progress: true,

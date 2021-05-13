@@ -5,13 +5,18 @@ type Token = {
   type: string;
 };
 
-export type LoginResponseData = {
-  message: string;
+export interface ResponseData {
+  message?: string;
+  status?: number;
+  statusText?: string;
+  stack?: string;
+  data?: unknown;
+}
+
+export interface LoginResponseData extends ResponseData {
   token: Token;
-  data: LoginUserData;
-  status: number;
-  statusText: string;
-};
+  data?: LoginUserData;
+}
 
 interface IDEntity {
   id: string;
@@ -47,12 +52,8 @@ export interface LoginUserSummary extends IDEntity {
 export interface UserProfileSummary extends IDEntity {
   first_name: string;
   last_name: string;
+  profile_picture: string;
 }
-
-export type ResponseData = {
-  message: string;
-  data: unknown;
-};
 
 export interface LoginHttpResponse extends AxiosResponse {
   data: LoginResponseData;
@@ -60,9 +61,14 @@ export interface LoginHttpResponse extends AxiosResponse {
 
 export interface HttpResponse extends AxiosResponse {
   data: ResponseData;
+  message?: string;
+  code?: string;
+  stack?: string;
 }
 
-export type HttpError = AxiosError;
+export interface HttpError extends AxiosError {
+  response?: HttpResponse;
+}
 
 export type SelectOption = {
   label: string;

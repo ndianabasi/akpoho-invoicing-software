@@ -30,6 +30,7 @@ const mutation: MutationTree<AuthStateInterface> = {
       first_name: payload.profile.first_name,
       last_name: payload.profile.last_name,
       id: payload.profile.id,
+      profile_picture: payload.profile.profile_picture,
     };
     state.userSummary = {
       id: payload.id,
