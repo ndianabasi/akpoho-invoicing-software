@@ -102,17 +102,22 @@
       </q-btn>
       <q-btn round flat>
         <q-avatar size="26px">
-          <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+          <img :src="userProfile.profile_picture" />
         </q-avatar>
         <q-tooltip v-if="$q.screen.gt.xs">Account</q-tooltip>
         <q-menu>
           <div class="row no-wrap q-py-md" style="min-width: 200px">
             <div class="col-12 column items-center">
               <q-avatar size="72px">
-                <img src="https://cdn.quasar.dev/img/avatar4.jpg" />
+                <img :src="userProfile.profile_picture" />
               </q-avatar>
 
-              <div class="text-subtitle1 q-mt-md q-mb-xs">John Doe</div>
+              <div class="text-subtitle1 text-center q-mt-md q-mb-xs">
+                {{ userFullName }}<br /><span
+                  class="text-caption text-weight-light"
+                  >{{ userSummary.email }}</span
+                >
+              </div>
 
               <q-btn
                 @click.prevent="handleLogout"
@@ -205,11 +210,13 @@
 </template>
 
 <!-- eslint-disable @typescript-eslint/no-unsafe-call -->
+<!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import CreateMenu from './CreateMenu.vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { UserProfileSummary } from '../store/types/index';
 
 export default defineComponent({
   name: 'SecondaryToolbar',
@@ -245,10 +252,25 @@ export default defineComponent({
         });
     };
 
+    const userProfile = store.getters[
+      'auth/GET_USER_PROFILE'
+    ] as UserProfileSummary;
+
+    const userSummary = store.getters[
+      'auth/GET_USER_SUMMARY'
+    ] as UserProfileSummary;
+
+    const userFullName = `${userProfile.first_name} ${
+      userProfile.last_name ? userProfile.last_name : ''
+    }`;
+
     return {
       TOGGLE_LEFT_DRAWER,
       search,
       handleLogout,
+      userProfile: ref(userProfile),
+      userFullName: ref(userFullName),
+      userSummary: ref(userSummary),
     };
   },
 });

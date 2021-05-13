@@ -11,7 +11,48 @@
         selection="multiple"
         v-model:selected="selected"
         :class="{ 'my-sticky-header-column-table': stickyTable }"
-      />
+        :visible-columns="visibleColumns"
+        ><template #top="props">
+          <div class="col-2 q-table__title">{{ tableName }}</div>
+
+          <q-space />
+
+          <!--
+            Using v-if directive will make the toggle or select dropdown disappear when all columns are unselected
+          -->
+          <div v-if="$q.screen.gt.xs" class="col">
+            <q-toggle
+              v-for="column in visibleColumnsObjects"
+              :key="column.name"
+              v-model="visibleColumns"
+              :val="column.name"
+              :label="column.label"
+            />
+          </div>
+          <q-select
+            v-else
+            v-model="visibleColumns"
+            multiple
+            borderless
+            dense
+            options-dense
+            :display-value="$q.lang.table.columns"
+            emit-value
+            map-options
+            :options="visibleColumns"
+            option-value="name"
+            style="min-width: 150px"
+          />
+
+          <q-btn
+            flat
+            round
+            dense
+            :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+            @click="props.toggleFullscreen"
+            class="q-ml-md"
+          /> </template
+      ></q-table>
 
       <div class="q-mt-md">Selected: {{ JSON.stringify(selected) }}</div>
     </div>
@@ -38,8 +79,18 @@ import customerColumns from '../../components/data/table-definitions/customers';
 export default defineComponent({
   name: 'Customers',
   setup() {
+    const tableName = ref('All Customers');
     const store = useStore();
     const selected = ref([]);
+    const visibleColumnsObjects = ref([
+      ...customerColumns
+        .filter((column) => !column.required)
+        .map((column) => column),
+    ]);
+
+    const visibleColumns = ref(
+      visibleColumnsObjects.value.map((column) => column.name)
+    );
 
     const fetchCustomers = async function () {
       void (await store.dispatch('customers/FETCH_ALL_CUSTOMERS'));
@@ -64,7 +115,10 @@ export default defineComponent({
     });
 
     return {
+      tableName,
       selected,
+      visibleColumns,
+      visibleColumnsObjects,
       columns: data.columns,
       rows: customers,
       getSelectedString() {
