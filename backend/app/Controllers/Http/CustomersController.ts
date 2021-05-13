@@ -8,7 +8,7 @@ export default class CustomersController {
     const { search, page, descending, perPage, sortBy } = request.qs()
     console.log(search, page, descending, perPage, sortBy)
 
-    let subquery = Database.from('customers')
+    let subquery = Customer.query()
       .select(
         'id',
         'first_name',
