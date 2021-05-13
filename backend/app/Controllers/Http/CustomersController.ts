@@ -1,11 +1,14 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Customer from 'App/Models/Customer'
-import { CustomContextContract } from '../../Controllers/types/index'
+import Database from '@ioc:Adonis/Lucid/Database'
+import { CustomContextContract, SortSearchParams } from '../../Controllers/types/index'
 
 export default class CustomersController {
-  public async index({ response, requestedCompany }: CustomContextContract) {
-    const customers = await Customer.query()
-      .where({ company_id: requestedCompany?.id })
+  public async index({ response, requestedCompany, request }: CustomContextContract) {
+    const { search, page, descending, perPage, sortBy } = request.qs()
+    console.log(search, page, descending, perPage, sortBy)
+
+    let subquery = Database.from('customers')
       .select(
         'id',
         'first_name',
@@ -22,9 +25,18 @@ export default class CustomersController {
         'company_postal_code',
         'company_city'
       )
-    /* customers
-        .with('companyCountry', (query) => query.select('name'))
-        .with('companyState', (query) => query.select('name')) */
+      .where({ company_id: requestedCompany?.id })
+
+    if (sortBy) {
+      subquery = subquery.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
+    }
+
+    let customers
+    if (page && perPage) {
+      customers = await subquery.paginate(page, perPage)
+    } else {
+      customers = await subquery
+    }
 
     return response.ok({ data: customers })
   }

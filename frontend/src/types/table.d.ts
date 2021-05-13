@@ -18,3 +18,26 @@ export interface TableRow {
   required?: boolean;
   format?: Format;
 }
+
+export interface GenericTableData extends Array<unknown> {
+  [index: number]: unknown;
+}
+
+export interface TableRequestInterface {
+  pagination: {
+    page: number;
+    rowsPerPage: number;
+    sortBy: string;
+    descending: boolean;
+  };
+
+  filter: string;
+}
+
+export interface RequestParams {
+  search: string;
+  page: number;
+  descending: boolean;
+  perPage: number;
+  sortBy: string;
+}

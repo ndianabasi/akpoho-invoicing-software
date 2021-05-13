@@ -6,10 +6,14 @@ import { StateInterface } from '../index';
 import { CustomersStateInterface, Customers } from './state';
 import { api as $http } from '../../boot/http';
 import { HttpResponse, HttpError, UserCompany } from '../types';
+import { RequestParams } from '../../types/table';
 import { Notify } from 'quasar';
 
 const actions: ActionTree<CustomersStateInterface, StateInterface> = {
-  async FETCH_ALL_CUSTOMERS({ commit, rootGetters }) {
+  async FETCH_ALL_CUSTOMERS(
+    { commit, rootGetters },
+    requestParams: RequestParams
+  ) {
     return new Promise(async (resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const currentCompany = rootGetters[
@@ -17,7 +21,9 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
       ] as UserCompany;
 
       await $http
-        .get(`/${currentCompany.id}/customers`)
+        .get(`/${currentCompany.id}/customers`, {
+          params: requestParams ? requestParams : {},
+        })
         .then((res: HttpResponse) => {
           commit('SET_ALL_CUSTOMERS', res.data.data as Customers);
 

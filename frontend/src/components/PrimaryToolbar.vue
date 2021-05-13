@@ -212,7 +212,7 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-call -->
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref } from 'vue';
 import CreateMenu from './CreateMenu.vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
