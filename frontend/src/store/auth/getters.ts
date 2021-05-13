@@ -11,9 +11,13 @@ const getters: GetterTree<AuthStateInterface, StateInterface> = {
   getToken(state: AuthStateInterface) {
     return state.token;
   },
+
   isLoggedIn: (state) => {
     return !!state.token;
   },
+
+  GET_USER_COMPANIES: (state) => state.userCompanies,
+  GET_CURRENT_COMPANY: (state) => state.currentCompany,
 };
 
 export default getters;

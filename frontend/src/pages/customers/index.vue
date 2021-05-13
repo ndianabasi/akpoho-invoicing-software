@@ -3,9 +3,10 @@
     <router-view />
     <div class="q-pa-md">
       <q-table
+        v-if="rows && rows.length"
         :rows="rows"
         :columns="columns"
-        row-key="name"
+        row-key="id"
         :selected-rows-label="getSelectedString"
         selection="multiple"
         v-model:selected="selected"
@@ -21,7 +22,14 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { defineComponent, reactive, ref, computed } from 'vue';
+import {
+  defineComponent,
+  reactive,
+  ref,
+  computed,
+  watchEffect,
+  onBeforeUnmount,
+} from 'vue';
 import { useStore } from 'vuex';
 import { Customer } from '../../store/customers/state';
 
@@ -29,22 +37,30 @@ import customerColumns from '../../components/data/table-definitions/customers';
 
 export default defineComponent({
   name: 'Customers',
-  async setup() {
+  setup() {
     const store = useStore();
     const selected = ref([]);
 
-    void (await store.dispatch('customers/FETCH_ALL_CUSTOMERS'));
+    const fetchCustomers = async function () {
+      void (await store.dispatch('customers/FETCH_ALL_CUSTOMERS'));
+    };
+
+    const stopfetchCustomerWatchEffect = watchEffect(
+      () => void fetchCustomers()
+    );
 
     const customers = computed(
       () => store.getters['customers/GET_ALL_CUSTOMERS']
     );
 
-    console.log(customers);
-
     const data = reactive({
       columns: customerColumns,
       rows: store.getters['customers/GET_ALL_CUSTOMERS'] as Array<Customer>,
       stickyTable: false,
+    });
+
+    onBeforeUnmount(() => {
+      stopfetchCustomerWatchEffect();
     });
 
     return {

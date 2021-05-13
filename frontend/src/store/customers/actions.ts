@@ -1,34 +1,25 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { CustomersStateInterface, Customers } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpResponse, HttpError } from '../types';
+import { HttpResponse, HttpError, UserCompany } from '../types';
 import { Notify } from 'quasar';
 
 const actions: ActionTree<CustomersStateInterface, StateInterface> = {
-  async FETCH_ALL_CUSTOMERS({ commit }) {
+  async FETCH_ALL_CUSTOMERS({ commit, rootGetters }) {
     return new Promise(async (resolve, reject) => {
-      await $http
-        .get('/abcd-eee-fff-ggg/customers')
-        .then((res: HttpResponse) => {
-          console.log(res.data);
-          commit('SET_ALL_CUSTOMERS', res.data.data as Customers);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as UserCompany;
 
-          Notify.create({
-            message: res.data?.message,
-            type: 'positive',
-            position: 'top',
-            progress: true,
-            timeout: 2000,
-            actions: [
-              {
-                label: 'Dismiss',
-                color: 'white',
-              },
-            ],
-          });
+      await $http
+        .get(`/${currentCompany.id}/customers`)
+        .then((res: HttpResponse) => {
+          commit('SET_ALL_CUSTOMERS', res.data.data as Customers);
 
           resolve(res.data);
         })

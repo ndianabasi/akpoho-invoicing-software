@@ -72,10 +72,20 @@ export default class AuthController {
         throw new NoLoginException({ message: 'Email address or password is not correct.' })
 
       /* Retrieve user with company information */
+
       user = await User.query()
-        .select('users.id', 'users.email', 'users.login_status')
+        .select(
+          'users.id',
+          'users.email',
+          'users.login_status',
+          'users.is_account_activated',
+          'users.is_email_verified'
+        )
         .where('email', email)
-        .preload('companies')
+        .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
+        .preload('profile', (profilesQuery) =>
+          profilesQuery.select(...['id', 'first_name', 'last_name'])
+        )
         .first()
 
       //console.log(user)

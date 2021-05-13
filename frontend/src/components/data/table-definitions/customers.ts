@@ -1,38 +1,91 @@
 import { TableRow } from '../../../types/table';
-const columns: Array<TableRow> = [
+import { stringSortFn, dateSortFn } from '../../../helpers/utils';
+
+interface CustomerHeaders extends TableRow {
+  name: CustomerColumns;
+  field: CustomerColumns;
+}
+
+enum CustomerColumns {
+  id = 'id',
+  first_name = 'first_name',
+  last_name = 'last_name',
+  email = 'email',
+  phone_number = 'phone_number',
+  is_corporate = 'is_corporate',
+  created_at = 'created_at',
+  updated_at = 'updated_at',
+}
+
+const columns: Array<CustomerHeaders> = [
   {
-    name: 'desc',
-    required: true,
-    label: 'Dessert (100g serving)',
-    align: 'left',
-    field: (row) => row.name,
-    format: (val: string) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: 'calories',
+    name: CustomerColumns.id,
+    required: false,
+    label: 'Customer ID',
     align: 'center',
-    label: 'Calories',
-    field: 'calories',
-    sortable: true,
-  },
-  { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-  { name: 'carbs', label: 'Carbs (g)', field: 'carbs' },
-  { name: 'protein', label: 'Protein (g)', field: 'protein' },
-  { name: 'sodium', label: 'Sodium (mg)', field: 'sodium' },
-  {
-    name: 'calcium',
-    label: 'Calcium (%)',
-    field: 'calcium',
-    sortable: true,
-    sort: (a: string, b: string) => parseInt(a, 10) - parseInt(b, 10),
+    field: CustomerColumns.id,
   },
   {
-    name: 'iron',
-    label: 'Iron (%)',
-    field: 'iron',
+    name: CustomerColumns.first_name,
+    required: true,
+    label: 'First Name',
+    align: 'center',
+    field: CustomerColumns.first_name,
     sortable: true,
-    sort: (a: string, b: string) => parseInt(a, 10) - parseInt(b, 10),
+    sort: (a: string, b: string) => stringSortFn(a, b),
+  },
+  {
+    name: CustomerColumns.last_name,
+    required: true,
+    label: 'Last Name',
+    align: 'center',
+    field: CustomerColumns.last_name,
+    sortable: true,
+    sort: (a: string, b: string) => stringSortFn(a, b),
+  },
+  {
+    name: CustomerColumns.email,
+    required: true,
+    label: 'Email Address',
+    align: 'center',
+    field: CustomerColumns.email,
+    sortable: true,
+    sort: (a: string, b: string) => stringSortFn(a, b),
+  },
+  {
+    name: CustomerColumns.phone_number,
+    required: true,
+    label: 'Phone Number',
+    align: 'center',
+    field: CustomerColumns.phone_number,
+    sortable: true,
+    sort: (a: string, b: string) => stringSortFn(a, b),
+  },
+  {
+    name: CustomerColumns.is_corporate,
+    required: true,
+    label: 'Is Corporate Customer',
+    align: 'center',
+    field: CustomerColumns.is_corporate,
+    sortable: true,
+  },
+  {
+    name: CustomerColumns.created_at,
+    required: true,
+    label: 'Created At',
+    align: 'center',
+    field: CustomerColumns.created_at,
+    sortable: true,
+    sort: (a: string, b: string) => dateSortFn(a, b),
+  },
+  {
+    name: CustomerColumns.updated_at,
+    required: true,
+    label: 'Updated At',
+    align: 'center',
+    field: CustomerColumns.updated_at,
+    sortable: true,
+    sort: (a: string, b: string) => dateSortFn(a, b),
   },
 ];
 

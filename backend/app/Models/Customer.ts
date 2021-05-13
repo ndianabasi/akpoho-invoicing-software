@@ -13,6 +13,7 @@ import CustomerAddress from 'App/Models/CustomerAddress'
 import UUIDHook from './Hooks/UUIDHook'
 import Country from 'App/Models/Country'
 import State from 'App/Models/State'
+import { STANDARD_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
 export default class Customer extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -38,11 +39,19 @@ export default class Customer extends BaseModel {
   @column()
   public phoneNumber: string
 
-  @column()
-  public isCorporate: boolean
+  @column({
+    serialize(value: number) {
+      return Boolean(value)
+    },
+  })
+  public isCorporate: number
 
-  @column()
-  public corporateHasRep: boolean
+  @column({
+    serialize(value: number) {
+      return Boolean(value)
+    },
+  })
+  public corporateHasRep: number
 
   @column()
   public companyName: string
@@ -65,10 +74,21 @@ export default class Customer extends BaseModel {
   @column()
   public companyCountryId: number
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({
+    autoCreate: true,
+    serialize(value: DateTime) {
+      return value.toFormat(STANDARD_DATE_TIME_FORMAT)
+    },
+  })
   public createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({
+    autoCreate: true,
+    autoUpdate: true,
+    serialize(value: DateTime) {
+      return value.toFormat(STANDARD_DATE_TIME_FORMAT)
+    },
+  })
   public updatedAt: DateTime
 
   @beforeCreate()

@@ -1,3 +1,5 @@
+import { UserCompany, UserProfileSummary, UserSummary } from '../types';
+
 export type LoginData = {
   username: string;
   password: string;
@@ -10,6 +12,10 @@ export interface AuthStateInterface {
     type?: string;
   };
   loginData: LoginData;
+  userSummary: UserSummary | null;
+  userCompanies: UserCompany[] | null;
+  userProfile: UserProfileSummary | null;
+  currentCompany: { name: string; id: string } | null;
 }
 
 function state(): AuthStateInterface {
@@ -21,6 +27,10 @@ function state(): AuthStateInterface {
       password: '',
       remember_me: false,
     },
+    userCompanies: null,
+    userProfile: null,
+    userSummary: null,
+    currentCompany: null,
   };
 }
 

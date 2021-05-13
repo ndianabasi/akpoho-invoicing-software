@@ -21,21 +21,18 @@
       <q-select
         class="q-mx-md"
         filled
-        v-model="model"
-        :options="options"
+        v-model="selectedCompany"
+        :options="userCompanies"
         label="Choose Company"
         color="teal"
         clearable
         options-selected-class="text-deep-orange"
+        @update:model-value="handleSelectedCompanyUpdate"
       >
         <template #option="scope">
           <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
-            <q-item-section avatar>
-              <q-icon :name="scope.opt.icon" />
-            </q-item-section>
             <q-item-section>
               <q-item-label v-html="scope.opt.label" />
-              <q-item-label caption>{{ scope.opt.description }}</q-item-label>
             </q-item-section>
           </q-item>
         </template>
@@ -116,6 +113,7 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from 'vue';
 import { useStore } from 'vuex';
+import { UserCompany, SelectOption } from '../store/types';
 
 export default defineComponent({
   name: 'SideDrawer',
@@ -129,45 +127,33 @@ export default defineComponent({
   setup(/* props */) {
     const store = useStore();
 
-    const options = ref([
-      {
-        label: 'Google',
-        value: 'Google',
-        description: 'Search engine',
-        icon: 'mail',
-      },
-      {
-        label: 'Facebook',
-        value: 'Facebook',
-        description: 'Social media',
-        icon: 'bluetooth',
-      },
-      {
-        label: 'Twitter',
-        value: 'Twitter',
-        description: 'Quick updates',
-        icon: 'map',
-      },
-      {
-        label: 'Apple',
-        value: 'Apple',
-        description: 'iStuff',
-        icon: 'golf_course',
-      },
-      {
-        label: 'Oracle',
-        value: 'Oracle',
-        disable: true,
-        description: 'Databases',
-        icon: 'casino',
-      },
-    ]);
+    const selectedCompany = ref({ label: '', value: '' });
+
+    const userCompanies = store.getters[
+      'auth/GET_USER_COMPANIES'
+    ] as UserCompany[];
+    const companies = userCompanies.map((company) => ({
+      label: company.name,
+      value: company.id,
+    }));
+
+    if (companies.length === 1) {
+      selectedCompany.value = companies[0];
+      store.commit('auth/SET_CURRENT_COMPANY', selectedCompany.value);
+    } else {
+      selectedCompany.value = companies[0];
+      store.commit('auth/SET_CURRENT_COMPANY', selectedCompany.value);
+    }
 
     //const leftDrawerOpen = unref(GET_LEFT_DRAWER_OPEN) as boolean;
     const leftDrawerOpen = ref(false);
 
     const TOGGLE_LEFT_DRAWER = () => {
       leftDrawerOpen.value = !leftDrawerOpen.value;
+    };
+
+    const handleSelectedCompanyUpdate = (event: SelectOption) => {
+      store.commit('auth/SET_CURRENT_COMPANY', event);
     };
 
     /* watch(
@@ -183,8 +169,9 @@ export default defineComponent({
       links3: computed(() => store.getters['menus/GET_LINKS3']),
       TOGGLE_LEFT_DRAWER,
       leftDrawerOpen,
-      model: ref(null),
-      options,
+      selectedCompany,
+      userCompanies: ref(companies),
+      handleSelectedCompanyUpdate,
     };
   },
 });

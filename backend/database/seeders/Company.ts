@@ -12,7 +12,8 @@ import {
 export default class CompanySeeder extends BaseSeeder {
   public async run() {
     // Write your database queries inside the run method
-    await CompanyFactory.with('users', 3, (user) => user.with('profile'))
+    await CompanyFactory.with('users', 2, (user) => user.with('profile'))
+      .with('users', 2, (user) => user.apply('fullAccess').with('profile'))
       .with('customers', 10, (customer) => {
         customer.with('addresses', 1, (address) => address.apply('shippingAddress'))
         customer.with('addresses', 1, (address) => address.apply('billingAddress'))

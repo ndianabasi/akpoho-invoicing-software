@@ -18,20 +18,21 @@
     "build:electron": "quasar build -m electron"
   },
   "dependencies": {
-    "@quasar/extras": "^1.10.3",
+    "@quasar/extras": "^1.10.4",
     "@vuelidate/core": "^2.0.0-alpha.14",
     "@vuelidate/validators": "^2.0.0-alpha.12",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "luxon": "^1.26.0",
-    "quasar": "^2.0.0-beta.12",
+    "quasar": "^2.0.0-beta.16",
     "secure-ls": "^1.2.6",
     "vue-i18n": "^9.0.0-beta.0",
     "vuex": "^4.0.0",
     "vuex-persistedstate": "^4.0.0-beta.3"
   },
   "devDependencies": {
-    "@quasar/app": "^3.0.0-beta.15",
+    "@quasar/app": "^3.0.0-beta.23",
+    "@types/luxon": "^1.26.5",
     "@types/node": "^10.17.15",
     "@typescript-eslint/eslint-plugin": "^4.9.0",
     "@typescript-eslint/parser": "^4.9.0",

@@ -12,6 +12,7 @@ import { AuthStateInterface } from './auth/state';
 import { CustomersStateInterface } from './customers/state';
 import { AuthGettersInterface } from './auth/getters';
 import { CustomersGetterInterface } from './customers/getters';
+import { MenusGettersInterface } from './menus/getters';
 import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -68,9 +69,13 @@ export interface StateInterface {
   customers?: CustomersStateInterface;
 }
 
-export type StoreGetters = RootGetterInterface &
-  AuthGettersInterface &
-  CustomersGetterInterface;
+export interface StoreGettersInterface {
+  menus?: MenusGettersInterface;
+  auth?: AuthGettersInterface;
+  customers?: CustomersGetterInterface;
+}
+
+export type StoreGetters = RootGetterInterface & StoreGettersInterface;
 
 interface AlertInterface {
   type: string;

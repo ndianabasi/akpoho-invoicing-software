@@ -16,9 +16,10 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         .then((res: LoginHttpResponse) => {
           console.log(res.data);
           const data = res.data;
-
           const token = data.token;
+          const userData = data.data;
           commit('SET_TOKEN', token);
+          commit('SET_USER_DATA', userData);
 
           Notify.create({
             message: data?.message,

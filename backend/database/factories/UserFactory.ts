@@ -12,10 +12,14 @@ const UserFactory = Factory.define(User, ({ faker }) => {
     is_email_verified: faker.datatype.boolean(),
   }
 
-  //console.log(generatedUser)
+  console.log(generatedUser)
 
   return generatedUser
 })
+  .state('fullAccess', (user) => {
+    user.loginStatus = user.isAccountActivated = user.isEmailVerified = true
+    return user
+  })
   .relation('companies', () => CompanyFactory)
   .relation('profile', () => UserProfileFactory)
   .build()
