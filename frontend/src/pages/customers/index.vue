@@ -2,59 +2,7 @@
   <q-page>
     <router-view />
     <div class="q-pa-md">
-      <q-table
-        v-if="rows && rows.length"
-        :rows="rows"
-        :columns="columns"
-        row-key="id"
-        :selected-rows-label="getSelectedString"
-        selection="multiple"
-        v-model:selected="selected"
-        :class="{ 'my-sticky-header-column-table': stickyTable }"
-        :visible-columns="visibleColumns"
-        ><template #top="props">
-          <div class="col-2 q-table__title">{{ tableName }}</div>
-
-          <q-space />
-
-          <!--
-            Using v-if directive will make the toggle or select dropdown disappear when all columns are unselected
-          -->
-          <div v-if="$q.screen.gt.xs" class="col">
-            <q-toggle
-              v-for="column in visibleColumnsObjects"
-              :key="column.name"
-              v-model="visibleColumns"
-              :val="column.name"
-              :label="column.label"
-            />
-          </div>
-          <q-select
-            v-else
-            v-model="visibleColumns"
-            multiple
-            borderless
-            dense
-            options-dense
-            :display-value="$q.lang.table.columns"
-            emit-value
-            map-options
-            :options="visibleColumns"
-            option-value="name"
-            style="min-width: 150px"
-          />
-
-          <q-btn
-            flat
-            round
-            dense
-            :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-            @click="props.toggleFullscreen"
-            class="q-ml-md"
-          /> </template
-      ></q-table>
-
-      <div class="q-mt-md">Selected: {{ JSON.stringify(selected) }}</div>
+      <quasar-table :table-columns="columns" :table-rows="rows"></quasar-table>
     </div>
   </q-page>
 </template>
@@ -76,9 +24,16 @@ import { Customer } from '../../store/customers/state';
 
 import customerColumns from '../../components/data/table-definitions/customers';
 
+import QuasarTable from '../../components/QuasarTable.vue';
+
 export default defineComponent({
   name: 'Customers',
+  components: {
+    QuasarTable,
+  },
   setup() {
+    const filter = ref('');
+    const loading = ref(false);
     const tableName = ref('All Customers');
     const store = useStore();
     const selected = ref([]);
@@ -87,6 +42,14 @@ export default defineComponent({
         .filter((column) => !column.required)
         .map((column) => column),
     ]);
+
+    const pagination = {
+      sortBy: 'desc',
+      descending: false,
+      page: 1,
+      rowsPerPage: 5,
+      rowsNumber: 5,
+    };
 
     const visibleColumns = ref(
       visibleColumnsObjects.value.map((column) => column.name)
@@ -120,6 +83,10 @@ export default defineComponent({
       visibleColumns,
       visibleColumnsObjects,
       columns: data.columns,
+      pagination,
+      pagesNumber: computed(() => {
+        return Math.ceil(data.rows.length / pagination.rowsPerPage);
+      }),
       rows: customers,
       getSelectedString() {
         return selected.value.length === 0

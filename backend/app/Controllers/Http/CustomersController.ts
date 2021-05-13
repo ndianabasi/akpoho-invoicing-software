@@ -14,8 +14,17 @@ export default class CustomersController {
         'phone_number',
         'is_corporate',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'corporate_has_rep',
+        'company_name',
+        'company_email',
+        'company_street_address',
+        'company_postal_code',
+        'company_city'
       )
+    /* customers
+        .with('companyCountry', (query) => query.select('name'))
+        .with('companyState', (query) => query.select('name')) */
 
     return response.ok({ data: customers })
   }
