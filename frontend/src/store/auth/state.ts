@@ -5,6 +5,12 @@ export type LoginData = {
   password: string;
   remember_me: boolean;
 };
+
+export type CurrentCompany = {
+  name: string;
+  id: string;
+};
+
 export interface AuthStateInterface {
   token: string;
   authFormMessage: {
@@ -15,7 +21,7 @@ export interface AuthStateInterface {
   userSummary: UserSummary | null;
   userCompanies: UserCompany[] | null;
   userProfile: UserProfileSummary | null;
-  currentCompany: { name: string; id: string } | null;
+  currentCompany: CurrentCompany | null;
 }
 
 function state(): AuthStateInterface {

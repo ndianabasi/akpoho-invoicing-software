@@ -114,6 +114,7 @@
 import { defineComponent, computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { UserCompany, SelectOption } from '../store/types';
+import { CurrentCompany } from '../store/auth/state';
 
 export default defineComponent({
   name: 'SideDrawer',
@@ -128,6 +129,9 @@ export default defineComponent({
     const store = useStore();
 
     const selectedCompany = ref({ label: '', value: '' });
+    const currentCompany = computed(
+      () => store.getters['auth/GET_CURRENT_COMPANY'] as CurrentCompany
+    );
 
     const userCompanies = store.getters[
       'auth/GET_USER_COMPANIES'
@@ -137,7 +141,13 @@ export default defineComponent({
       value: company.id,
     }));
 
-    if (companies.length === 1) {
+    if (currentCompany.value) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      selectedCompany.value = {
+        label: currentCompany.value.name,
+        value: currentCompany.value.id,
+      };
+    } else if (companies.length === 1) {
       selectedCompany.value = companies[0];
       store.commit('auth/SET_CURRENT_COMPANY', selectedCompany.value);
     } else {
