@@ -261,6 +261,42 @@
           "alias": "c"
         }
       ]
+    },
+    "make:policy": {
+      "settings": {},
+      "commandPath": "@adonisjs/bouncer/build/commands/MakePolicy",
+      "commandName": "make:policy",
+      "description": "Make a new bouncer policy",
+      "args": [
+        {
+          "type": "string",
+          "propertyName": "name",
+          "name": "name",
+          "required": true,
+          "description": "Name of the policy to create"
+        }
+      ],
+      "aliases": [],
+      "flags": [
+        {
+          "name": "resource-model",
+          "propertyName": "resourceModel",
+          "type": "string",
+          "description": "Name of the resource model to authorize"
+        },
+        {
+          "name": "user-model",
+          "propertyName": "userModel",
+          "type": "string",
+          "description": "Name of the user model to be authorized"
+        },
+        {
+          "name": "actions",
+          "propertyName": "actions",
+          "type": "array",
+          "description": "Actions to implement"
+        }
+      ]
     }
   },
   "aliases": {}

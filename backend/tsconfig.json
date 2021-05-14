@@ -33,7 +33,8 @@
       "@adonisjs/auth",
       "@adonisjs/lucid",
       "@adonisjs/redis",
-      "@adonisjs/shield"
+      "@adonisjs/shield",
+      "@adonisjs/bouncer"
     ]
   }
 }
