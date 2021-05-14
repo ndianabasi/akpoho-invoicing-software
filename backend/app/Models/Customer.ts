@@ -92,7 +92,7 @@ export default class Customer extends BaseModel {
   public updatedAt: DateTime
 
   @beforeCreate()
-  public static generateUUID(model: CustomerAddress) {
+  public static generateUUID(model: Customer) {
     UUIDHook.generateUUID(model)
   }
 

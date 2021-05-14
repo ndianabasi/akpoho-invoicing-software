@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@adonisjs/auth": "^8.0.3",
+    "@adonisjs/bouncer": "^2.2.1",
     "@adonisjs/core": "^5.1.6",
     "@adonisjs/lucid": "^14.0.1",
     "@adonisjs/redis": "^7.0.2",

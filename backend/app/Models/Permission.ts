@@ -1,9 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeCreate, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
-import User from 'App/Models/User'
+import { BaseModel, beforeCreate, column } from '@ioc:Adonis/Lucid/Orm'
 import UUIDHook from './Hooks/UUIDHook'
 
-export default class Role extends BaseModel {
+export default class Permission extends BaseModel {
   public static selfAssignPrimaryKey = true
 
   @column({ isPrimary: true })
@@ -21,11 +20,8 @@ export default class Role extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @hasMany(() => User)
-  public users: HasMany<typeof User>
-
   @beforeCreate()
-  public static generateUUID(model: Role) {
+  public static generateUUID(model: Permission) {
     UUIDHook.generateUUID(model)
   }
 }
