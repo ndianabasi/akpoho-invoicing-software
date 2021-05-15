@@ -71,7 +71,7 @@ const columns: Array<CustomerHeaders> = [
   },
   {
     name: CustomerColumns.created_at,
-    required: true,
+    required: false,
     label: 'Created At',
     align: 'center',
     field: CustomerColumns.created_at,
@@ -80,7 +80,7 @@ const columns: Array<CustomerHeaders> = [
   },
   {
     name: CustomerColumns.updated_at,
-    required: true,
+    required: false,
     label: 'Updated At',
     align: 'center',
     field: CustomerColumns.updated_at,

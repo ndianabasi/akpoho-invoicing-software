@@ -8,6 +8,8 @@
         :table-data-fetch-action-type="tableDataFetchActionType"
         :table-data-getter-type="tableDataGetterType"
         :default-sort="defaultSort"
+        no-results-label="Sorry! No customers were found. Please check your filters too."
+        show-selections
       ></quasar-table>
     </div>
   </q-page>

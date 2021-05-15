@@ -16,6 +16,8 @@
         @request="processTableRequest"
         :filter="filter"
         binary-state-sort
+        :hide-no-data="false"
+        :no-results-label="noResultsLabel_"
       >
         <template #top-right>
           <q-input
@@ -76,9 +78,13 @@
         <template #header="props">
           <q-tr :props="props">
             <q-th auto-width />
+            <q-th v-if="showSelections_" auto-width
+              ><q-toggle v-model="props.selected"
+            /></q-th>
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
               {{ col.label }}
             </q-th>
+            <q-th v-if="showActions_" auto-width> Actions </q-th>
           </q-tr>
         </template>
 
@@ -94,8 +100,75 @@
                 :icon="props.expand ? 'remove' : 'add'"
               />
             </q-td>
+            <q-td v-if="showSelections_" auto-width>
+              <q-toggle v-model="props.selected" />
+            </q-td>
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               {{ col.value }}
+            </q-td>
+            <q-td v-if="showActions_">
+              <q-btn-dropdown
+                split
+                class="glossy"
+                color="accent"
+                label="Actions"
+              >
+                <q-list>
+                  <q-item
+                    clickable
+                    v-close-popup
+                    @click="onActionItemClick(props, 'view')"
+                  >
+                    <q-item-section avatar>
+                      <q-avatar
+                        icon="remove_red_eye"
+                        color="primary"
+                        text-color="white"
+                      />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>View</q-item-label>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item
+                    clickable
+                    v-close-popup
+                    @click="onActionItemClick(props, 'edit')"
+                  >
+                    <q-item-section avatar>
+                      <q-avatar
+                        icon="edit"
+                        color="primary"
+                        text-color="white"
+                      />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Edit</q-item-label>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item
+                    clickable
+                    v-close-popup
+                    @click="onActionItemClick(props, 'delete')"
+                  >
+                    <q-item-section avatar>
+                      <q-avatar
+                        icon="delete_forever"
+                        color="warning"
+                        text-color="white"
+                      />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Delete</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-icon name="info" color="amber" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
             </q-td>
           </q-tr>
           <q-tr v-show="props.expand" :props="props">
@@ -144,7 +217,9 @@ import {
   GenericTableData,
   TableRequestInterface,
   RequestParams,
+  RowProps,
 } from '../../src/types/table';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'QuasarTable',
@@ -154,11 +229,23 @@ export default defineComponent({
       type: Array,
       required: true,
     },
+    showSelections: {
+      type: Boolean,
+      default: false,
+    },
+    showActions: {
+      type: Boolean,
+      default: true,
+    },
     tableName: {
       type: String,
       required: true,
     },
     tableDataFetchActionType: {
+      type: String,
+      required: true,
+    },
+    noResultsLabel: {
       type: String,
       required: true,
     },
@@ -173,6 +260,7 @@ export default defineComponent({
   },
 
   setup(props) {
+    const $q = useQuasar();
     const filter = ref('');
     const loading = ref(false);
     const store = useStore();
@@ -257,6 +345,18 @@ export default defineComponent({
       stickyTable: false,
     });
 
+    const onActionItemClick = (props: RowProps, action: string) => {
+      const id = props.row.id;
+      console.log(id);
+      if (action === 'delete') {
+        $q.notify({
+          type: 'negative',
+          message: `item ${id} deleted!`,
+          position: 'top',
+        });
+      }
+    };
+
     onBeforeUnmount(() => {
       stopFetchActionWatchEffect();
     });
@@ -278,6 +378,10 @@ export default defineComponent({
       loading,
       processTableRequest,
       filter,
+      noResultsLabel_: ref(props.noResultsLabel),
+      showSelections_: ref(props.showSelections),
+      showActions_: ref(props.showActions),
+      onActionItemClick,
     };
   },
 });

@@ -41,3 +41,7 @@ export interface RequestParams {
   perPage: number;
   sortBy: string;
 }
+
+export interface RowProps {
+  row: { id: string };
+}
