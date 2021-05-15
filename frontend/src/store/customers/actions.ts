@@ -32,7 +32,9 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
         .catch((error: HttpError) => {
           Notify.create({
             message:
-              (error?.response?.data as string) ?? 'An unknown error occurred!',
+              error?.response?.data?.message ??
+              (error?.response?.data as string) ??
+              'An unknown error occurred!',
             type: 'negative',
             position: 'top',
             progress: true,

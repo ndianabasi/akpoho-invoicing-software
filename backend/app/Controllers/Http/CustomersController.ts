@@ -4,9 +4,11 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import { CustomContextContract, SortSearchParams } from '../../Controllers/types/index'
 
 export default class CustomersController {
-  public async index({ response, requestedCompany, request }: CustomContextContract) {
+  public async index({ response, requestedCompany, request, bouncer }: CustomContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('list', requestedCompany!)
+
     const { search, page, descending, perPage, sortBy } = request.qs()
-    console.log(search, page, descending, perPage, sortBy)
+    //console.log(search, page, descending, perPage, sortBy)
 
     let subquery = Customer.query()
       .select(

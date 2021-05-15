@@ -26,10 +26,6 @@ Route.group(() => {
 
 // Authenticated routes
 Route.group(() => {
-  Route.get('/:company_id/customers', 'CustomersController.index').middleware(
-    'findRequestedCompany'
-  )
-
   Route.get('/auth-profile', 'AuthController.authProfile')
 
   Route.post('/logout', async ({ auth, response }) => {
@@ -41,3 +37,12 @@ Route.group(() => {
 })
   .prefix('/v1')
   .middleware('auth')
+
+// Company-specific routes
+Route.group(() => {
+  Route.get('/:company_id/customers', 'CustomersController.index')
+  Route.get('/:company_id/customers/:customer_id', 'CustomersController.show')
+})
+  .prefix('/v1')
+  .middleware('auth')
+  .middleware('findRequestedCompany')

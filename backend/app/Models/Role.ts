@@ -1,6 +1,15 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeCreate, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  beforeCreate,
+  column,
+  hasMany,
+  HasMany,
+  ManyToMany,
+  manyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
+import Permission from 'App/Models/Permission'
 import UUIDHook from './Hooks/UUIDHook'
 
 export default class Role extends BaseModel {
@@ -23,6 +32,9 @@ export default class Role extends BaseModel {
 
   @hasMany(() => User)
   public users: HasMany<typeof User>
+
+  @manyToMany(() => Permission)
+  public permissions: ManyToMany<typeof Permission>
 
   @beforeCreate()
   public static generateUUID(model: Role) {

@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeCreate, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeCreate, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import UUIDHook from './Hooks/UUIDHook'
+import Role from 'App/Models/Role'
 
 export default class Permission extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -19,6 +20,9 @@ export default class Permission extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @manyToMany(() => Role)
+  public roles: ManyToMany<typeof Role>
 
   @beforeCreate()
   public static generateUUID(model: Permission) {
