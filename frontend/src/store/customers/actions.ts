@@ -51,6 +51,41 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
         });
     });
   },
+
+  async DELETE_CUSTOMER({ rootGetters }, ID: string) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as UserCompany;
+
+      await $http
+        .delete(`/${currentCompany.id}/customers/${ID}`)
+        .then((res: HttpResponse) => {
+          resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          Notify.create({
+            message:
+              error?.response?.data?.message ??
+              (error?.response?.data as string) ??
+              'An unknown error occurred!',
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 10000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          reject(error);
+        });
+    });
+  },
 };
 
 export default actions;

@@ -41,7 +41,12 @@ Route.group(() => {
 // Company-specific routes
 Route.group(() => {
   Route.get('/:company_id/customers', 'CustomersController.index')
-  Route.get('/:company_id/customers/:customer_id', 'CustomersController.show')
+  Route.get('/:company_id/customers/:customer_id', 'CustomersController.show').middleware(
+    'findRequestedCustomer'
+  )
+  Route.delete('/:company_id/customers/:customer_id', 'CustomersController.destroy').middleware(
+    'findRequestedCustomer'
+  )
 })
   .prefix('/v1')
   .middleware('auth')

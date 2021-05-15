@@ -9,6 +9,10 @@
         :table-data-getter-type="tableDataGetterType"
         :default-sort="defaultSort"
         no-results-label="Sorry! No customers were found. Please check your filters too."
+        row-view-route-name="view_customer"
+        row-edit-route-name="edit_customer"
+        row-delete-action-type="customers/DELETE_CUSTOMER"
+        entity-name="Customer"
         show-selections
       ></quasar-table>
     </div>

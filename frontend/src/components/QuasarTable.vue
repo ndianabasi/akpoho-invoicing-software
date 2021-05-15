@@ -78,9 +78,9 @@
         <template #header="props">
           <q-tr :props="props">
             <q-th auto-width />
-            <q-th v-if="showSelections_" auto-width
-              ><q-toggle v-model="props.selected"
-            /></q-th>
+            <q-th v-if="showSelections_" auto-width>
+              <q-checkbox v-model="props.selected" />
+            </q-th>
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
               {{ col.label }}
             </q-th>
@@ -101,7 +101,7 @@
               />
             </q-td>
             <q-td v-if="showSelections_" auto-width>
-              <q-toggle v-model="props.selected" />
+              <q-checkbox v-model="props.selected" />
             </q-td>
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               {{ col.value }}
@@ -245,6 +245,26 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    rowViewRouteName: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    rowEditRouteName: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    rowDeleteActionType: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    entityName: {
+      type: String,
+      required: false,
+      default: 'Resource',
+    },
     noResultsLabel: {
       type: String,
       required: true,
@@ -283,9 +303,7 @@ export default defineComponent({
       );
     };
 
-    const visibleColumns = ref(
-      visibleColumnsObjects().value.map((column) => column.name)
-    );
+    const visibleColumns = ref([]);
 
     const processTableRequest = async function (
       requestProps: TableRequestInterface
@@ -319,7 +337,7 @@ export default defineComponent({
           sortBy: requestParams?.sortBy || pagination.value.sortBy,
         })
         .then((response) => {
-          console.log(response);
+          //console.log(response);
 
           void nextTick(() => {
             loading.value = false;
@@ -345,14 +363,38 @@ export default defineComponent({
       stickyTable: false,
     });
 
-    const onActionItemClick = (props: RowProps, action: string) => {
-      const id = props.row.id;
-      console.log(id);
+    const onActionItemClick = (rowProps: RowProps, action: string) => {
+      const id = rowProps.row.id;
+      //console.log(id);
       if (action === 'delete') {
-        $q.notify({
-          type: 'negative',
-          message: `item ${id} deleted!`,
-          position: 'top',
+        $q.dialog({
+          title: 'Deletion Warning',
+          message: `You are about to delete this ${props.entityName}. Please type 'DELETE' to confirm your action.`,
+          prompt: {
+            model: '',
+            isValid: (val: string) => val.trim().toLowerCase() === 'delete',
+            type: 'text',
+          },
+          cancel: true,
+          persistent: true,
+        }).onOk(async () => {
+          const deleteProgressDialog = $q.dialog({
+            title: 'In Progress',
+            message: 'Software at work!',
+            progress: true,
+            ok: false,
+            cancel: false,
+            persistent: true,
+          });
+          await store.dispatch(props.rowDeleteActionType, id).then(() => {
+            deleteProgressDialog.hide();
+
+            $q.notify({
+              type: 'positive',
+              message: 'Customer was successfully deleted!',
+              position: 'top',
+            });
+          });
         });
       }
     };

@@ -43,15 +43,25 @@ export default class CustomersController {
     return response.ok({ data: customers })
   }
 
-  public async create({}: HttpContextContract) {}
-
   public async store({}: HttpContextContract) {}
 
   public async show({}: HttpContextContract) {}
 
-  public async edit({}: HttpContextContract) {}
-
   public async update({}: HttpContextContract) {}
 
-  public async destroy({}: HttpContextContract) {}
+  public async destroy({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    bouncer,
+  }: CustomContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('delete', requestedCompany!, requestedCustomer!)
+
+    await requestedCustomer?.delete()
+
+    return response.ok({
+      message: 'Customer was deleted successfully.',
+      data: requestedCustomer?.id,
+    })
+  }
 }
