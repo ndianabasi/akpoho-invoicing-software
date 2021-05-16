@@ -6,14 +6,14 @@ import { AuthStateInterface } from './state';
 import { apiNoAuth as $httpNoAuth } from '../../boot/httpNoAuth';
 import { api as $http } from '../../boot/http';
 import { Notify } from 'quasar';
-import { LoginHttpResponse, HttpError } from '../types';
+import { LoginHttpResponse, HttpError, HttpResponse } from '../types';
 
 const actions: ActionTree<AuthStateInterface, StateInterface> = {
   LOGIN_USER({ commit }, form) {
     return new Promise(async (resolve, reject) => {
       await $httpNoAuth
         .post('login', form)
-        .then((res: LoginHttpResponse) => {
+        .then((res: LoginHttpResponse & HttpResponse) => {
           console.log(res.data);
           const data = res.data;
           const token = data.token;
@@ -40,9 +40,7 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         .catch((error: HttpError) => {
           Notify.create({
             message:
-              error?.response?.data?.message ??
-              (error?.response?.data as string) ??
-              'An unknown error occurred!',
+              error?.response?.data?.message ?? 'An unknown error occurred!',
             type: 'negative',
             position: 'top',
             progress: true,
@@ -86,9 +84,7 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         .catch((error: HttpError) => {
           Notify.create({
             message:
-              error?.response?.data?.message ??
-              (error?.response?.data as string) ??
-              'An unknown error occurred!',
+              error?.response?.data?.message ?? 'An unknown error occurred!',
             type: 'negative',
             position: 'top',
             progress: true,
@@ -119,9 +115,7 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
 
           Notify.create({
             message:
-              error?.response?.data?.message ??
-              (error?.response?.data as string) ??
-              'An unknown error occurred!',
+              error?.response?.data?.message ?? 'An unknown error occurred!',
             type: 'negative',
             position: 'top',
             progress: true,

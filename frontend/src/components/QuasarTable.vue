@@ -3,7 +3,6 @@
     <router-view />
     <div class="q-pa-md">
       <q-table
-        v-if="tableDataRows && tableDataRows.length"
         :rows="tableDataRows"
         :columns="columns"
         row-key="id"
@@ -17,6 +16,7 @@
         :filter="filter"
         binary-state-sort
         :hide-no-data="false"
+        :no-data-label="noResultsLabel_"
         :no-results-label="noResultsLabel_"
       >
         <template #top-right>
@@ -210,6 +210,8 @@ import {
   onBeforeUnmount,
   nextTick,
   Ref,
+  onMounted,
+  watch,
 } from 'vue';
 import { useStore } from 'vuex';
 import {
@@ -220,6 +222,9 @@ import {
   RowProps,
 } from '../../src/types/table';
 import { useQuasar } from 'quasar';
+import { PaginatedData, ResponseData } from '../store/types';
+import { GenericRowObject } from '../store/quasar_tables/state';
+import { log } from 'util';
 
 export default defineComponent({
   name: 'QuasarTable',
@@ -241,7 +246,7 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    tableDataFetchActionType: {
+    tableDataFetchEndPoint: {
       type: String,
       required: true,
     },
@@ -318,45 +323,65 @@ export default defineComponent({
         descending,
         perPage: rowsPerPage,
         sortBy,
-      }).then(() => {
-        pagination.value.page = page;
-        pagination.value.rowsPerPage = rowsPerPage;
-        pagination.value.sortBy = sortBy;
-        pagination.value.descending = descending;
       });
     };
 
-    const fetchTableData = async function (requestParams?: RequestParams) {
+    const fetchTableData = async function (
+      requestParams?: RequestParams
+    ): Promise<any> {
       loading.value = true;
       await store
-        .dispatch(props.tableDataFetchActionType, {
-          search: requestParams?.search ?? '',
-          page: requestParams?.page || pagination.value.page,
-          descending: requestParams?.descending || pagination.value.descending,
-          perPage: requestParams?.perPage || pagination.value.rowsPerPage,
-          sortBy: requestParams?.sortBy || pagination.value.sortBy,
+        .dispatch('quasar_tables/FETCH_TABLE_DATA', {
+          requestParams: {
+            search: requestParams?.search ?? '',
+            page: requestParams?.page || pagination.value.page,
+            descending:
+              requestParams?.descending || pagination.value.descending,
+            perPage: requestParams?.perPage || pagination.value.rowsPerPage,
+            sortBy: requestParams?.sortBy || pagination.value.sortBy,
+          },
+          entityEndPoint: props.tableDataFetchEndPoint,
         })
-        .then((response) => {
-          //console.log(response);
-
+        .then((response: ResponseData) => {
           void nextTick(() => {
             loading.value = false;
-            const data: unknown[] = response.data.data as unknown[];
+            // The value from the getter is actually a Proxy which does not work with the Quasar table. So stringify and parse the Proxy first.
+            const data: unknown[] = JSON.parse(
+              JSON.stringify(
+                store.getters['quasar_tables/GET_TABLE_ROWS'] as unknown[]
+              )
+            );
 
-            tableRows.value.length = 0;
+            tableRows.value = [];
             tableRows.value = data;
 
-            return;
+            const meta = response?.data?.meta;
+            console.log(response.data);
+
+            if (meta) {
+              pagination.value.page = meta.current_page;
+              pagination.value.rowsPerPage = meta.per_page;
+              pagination.value.rowsNumber = meta.total;
+            } else {
+              pagination.value.page =
+                requestParams?.page || pagination.value.page;
+              pagination.value.rowsPerPage =
+                requestParams?.perPage || pagination.value.rowsPerPage;
+            }
+            pagination.value.sortBy =
+              requestParams?.sortBy || pagination.value.sortBy;
+            pagination.value.descending =
+              requestParams?.descending || pagination.value.descending;
           });
         })
         .catch(() => {
           loading.value = false;
           tableRows.value.length = 0;
-          return;
+          return {};
         });
     };
 
-    const stopFetchActionWatchEffect = watchEffect(() => void fetchTableData());
+    //const stopFetchActionWatchEffect = watchEffect(() => void fetchTableData());
 
     const data = reactive({
       columns: props.tableColumns,
@@ -400,7 +425,20 @@ export default defineComponent({
     };
 
     onBeforeUnmount(() => {
-      stopFetchActionWatchEffect();
+      //stopFetchActionWatchEffect();
+    });
+
+    onMounted(async () => {
+      await fetchTableData();
+    });
+
+    const currentCompany = computed(
+      () => store.getters['auth/GET_CURRENT_COMPANY']
+    );
+
+    // Reactively watch for changes in the currentCompany and update the table
+    watch(currentCompany, async () => {
+      await fetchTableData();
     });
 
     return {

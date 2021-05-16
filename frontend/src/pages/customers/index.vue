@@ -5,7 +5,6 @@
       <quasar-table
         :table-columns="columns"
         :table-name="tableName"
-        :table-data-fetch-action-type="tableDataFetchActionType"
         :table-data-getter-type="tableDataGetterType"
         :default-sort="defaultSort"
         no-results-label="Sorry! No customers were found. Please check your filters too."
@@ -13,6 +12,7 @@
         row-edit-route-name="edit_customer"
         row-delete-action-type="customers/DELETE_CUSTOMER"
         entity-name="Customer"
+        table-data-fetch-end-point="customers"
         show-selections
       ></quasar-table>
     </div>

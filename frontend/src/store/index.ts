@@ -4,15 +4,23 @@
 //import { store } from 'quasar/wrappers';
 import { createStore, GetterTree, useStore as baseUseStore, Store } from 'vuex';
 import { InjectionKey } from 'vue';
-import menus from './menus';
+
 import auth from './auth';
-import customers from './customers';
-import { MenusStateInterface } from './menus/state';
 import { AuthStateInterface } from './auth/state';
-import { CustomersStateInterface } from './customers/state';
 import { AuthGettersInterface } from './auth/getters';
+
+import customers from './customers';
+import { CustomersStateInterface } from './customers/state';
 import { CustomersGetterInterface } from './customers/getters';
+
+import menus from './menus';
+import { MenusStateInterface } from './menus/state';
 import { MenusGettersInterface } from './menus/getters';
+
+import quasar_tables from './quasar_tables';
+import { QuasarTableStateInterface } from './quasar_tables/state';
+import { QuasarTableGetterInterface } from './quasar_tables/getters';
+
 import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -67,12 +75,14 @@ export interface StateInterface {
   menus?: MenusStateInterface;
   auth?: AuthStateInterface;
   customers?: CustomersStateInterface;
+  quasar_tables?: QuasarTableStateInterface;
 }
 
 export interface StoreGettersInterface {
   menus?: MenusGettersInterface;
   auth?: AuthGettersInterface;
   customers?: CustomersGetterInterface;
+  quasar_tables?: QuasarTableGetterInterface;
 }
 
 export type StoreGetters = RootGetterInterface & StoreGettersInterface;
@@ -165,6 +175,7 @@ export default function (/* { ssrContext } */) {
       menus,
       auth,
       customers,
+      quasar_tables,
     },
     plugins:
       process.env.NODE_ENV !== 'production'

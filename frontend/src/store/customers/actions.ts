@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
-import { CustomersStateInterface, Customers } from './state';
+import { CustomersStateInterface /* Customers */ } from './state';
 import { api as $http } from '../../boot/http';
 import { HttpResponse, HttpError, UserCompany } from '../types';
 import { RequestParams } from '../../types/table';
@@ -25,16 +25,14 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
           params: requestParams ? requestParams : {},
         })
         .then((res: HttpResponse) => {
-          commit('SET_ALL_CUSTOMERS', res.data.data as Customers);
+          commit('SET_ALL_CUSTOMERS', res.data.data);
 
           resolve(res.data);
         })
         .catch((error: HttpError) => {
           Notify.create({
             message:
-              error?.response?.data?.message ??
-              (error?.response?.data as string) ??
-              'An unknown error occurred!',
+              error?.response?.data?.message ?? 'An unknown error occurred!',
             type: 'negative',
             position: 'top',
             progress: true,
@@ -67,9 +65,7 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
         .catch((error: HttpError) => {
           Notify.create({
             message:
-              error?.response?.data?.message ??
-              (error?.response?.data as string) ??
-              'An unknown error occurred!',
+              error?.response?.data?.message ?? 'An unknown error occurred!',
             type: 'negative',
             position: 'top',
             progress: true,
