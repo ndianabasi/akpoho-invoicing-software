@@ -1,199 +1,183 @@
 <template>
-  <q-page>
-    <router-view />
-    <div class="q-pa-md">
-      <q-table
-        :rows="tableDataRows"
-        :columns="columns"
-        row-key="id"
-        selection="multiple"
-        v-model:selected="selected"
-        :class="{ 'my-sticky-header-column-table': stickyTable }"
-        :visible-columns="visibleColumns"
-        v-model:pagination="pagination"
-        :loading="loading"
-        @request="processTableRequest"
-        :filter="filter"
-        binary-state-sort
-        :hide-no-data="false"
-        :no-data-label="noResultsLabel_"
-        :no-results-label="noResultsLabel_"
-      >
-        <template #top-right>
-          <q-input
-            borderless
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Search"
-          >
-            <template #append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
+  <div class="q-pa-md">
+    <q-table
+      :rows="tableDataRows"
+      :columns="columns"
+      row-key="id"
+      selection="multiple"
+      v-model:selected="selected"
+      :class="{ 'my-sticky-header-column-table': stickyTable }"
+      :visible-columns="visibleColumns"
+      v-model:pagination="pagination"
+      :loading="loading"
+      @request="processTableRequest"
+      :filter="filter"
+      binary-state-sort
+      :hide-no-data="false"
+      :no-data-label="noResultsLabel_"
+      :no-results-label="noResultsLabel_"
+      :rows-per-page-options="rosPerPageOptions"
+    >
+      <template #top-right>
+        <q-input
+          borderless
+          dense
+          debounce="300"
+          v-model="filter"
+          placeholder="Search"
+        >
+          <template #append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </template>
 
-        <template #top="props">
-          <div class="col-2 q-table__title">{{ nameOfTable }}</div>
+      <template #top="props">
+        <div class="col-2 q-table__title">{{ nameOfTable }}</div>
 
-          <q-space />
+        <q-space />
 
-          <!--
+        <!--
             Using v-if directive will make the toggle or select dropdown disappear when all columns are unselected
           -->
-          <div v-if="$q.screen.gt.xs" class="col">
-            <q-toggle
-              v-for="column in visibleColumnsObjects"
-              :key="column.name"
-              v-model="visibleColumns"
-              :val="column.name"
-              :label="column.label"
-            />
-          </div>
-          <q-select
-            v-else
+        <div v-if="$q.screen.gt.xs" class="col">
+          <q-toggle
+            v-for="column in visibleColumnsObjects"
+            :key="column.name"
             v-model="visibleColumns"
-            multiple
-            borderless
-            dense
-            options-dense
-            :display-value="$q.lang.table.columns"
-            emit-value
-            map-options
-            :options="visibleColumns"
-            option-value="name"
-            style="min-width: 150px"
+            :val="column.name"
+            :label="column.label"
           />
+        </div>
+        <q-select
+          v-else
+          v-model="visibleColumns"
+          multiple
+          borderless
+          dense
+          options-dense
+          :display-value="$q.lang.table.columns"
+          emit-value
+          map-options
+          :options="visibleColumns"
+          option-value="name"
+          style="min-width: 150px"
+        />
 
-          <q-btn
-            flat
-            round
-            dense
-            :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-            @click="props.toggleFullscreen"
-            class="q-ml-md"
-          />
-        </template>
+        <q-btn
+          flat
+          round
+          dense
+          :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+          @click="props.toggleFullscreen"
+          class="q-ml-md"
+        />
+      </template>
 
-        <template #header="props">
-          <q-tr :props="props">
-            <q-th auto-width />
-            <q-th v-if="showSelections_" auto-width>
-              <q-checkbox v-model="props.selected" />
-            </q-th>
-            <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              {{ col.label }}
-            </q-th>
-            <q-th v-if="showActions_" auto-width> Actions </q-th>
-          </q-tr>
-        </template>
+      <template #header="props">
+        <q-tr :props="props">
+          <q-th auto-width />
+          <q-th v-if="showSelections_" auto-width>
+            <q-checkbox v-model="props.selected" />
+          </q-th>
+          <q-th v-for="col in props.cols" :key="col.name" :props="props">
+            {{ col.label }}
+          </q-th>
+          <q-th v-if="showActions_" auto-width> Actions </q-th>
+        </q-tr>
+      </template>
 
-        <template #body="props">
-          <q-tr :props="props">
-            <q-td auto-width>
-              <q-btn
-                size="sm"
-                color="accent"
-                round
-                dense
-                @click="props.expand = !props.expand"
-                :icon="props.expand ? 'remove' : 'add'"
-              />
-            </q-td>
-            <q-td v-if="showSelections_" auto-width>
-              <q-checkbox v-model="props.selected" />
-            </q-td>
-            <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              {{ col.value }}
-            </q-td>
-            <q-td v-if="showActions_">
-              <q-btn-dropdown
-                split
-                class="glossy"
-                color="accent"
-                label="Actions"
-              >
-                <q-list>
-                  <q-item
-                    clickable
-                    v-close-popup
-                    @click="onActionItemClick(props, 'view')"
-                  >
-                    <q-item-section avatar>
-                      <q-avatar
-                        icon="remove_red_eye"
-                        color="primary"
-                        text-color="white"
-                      />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>View</q-item-label>
-                    </q-item-section>
-                  </q-item>
+      <template #body="props">
+        <q-tr :props="props">
+          <q-td auto-width>
+            <q-btn
+              size="sm"
+              color="accent"
+              round
+              dense
+              @click="props.expand = !props.expand"
+              :icon="props.expand ? 'remove' : 'add'"
+            />
+          </q-td>
+          <q-td v-if="showSelections_" auto-width>
+            <q-checkbox v-model="props.selected" />
+          </q-td>
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            {{ col.value }}
+          </q-td>
+          <q-td v-if="showActions_">
+            <q-btn-dropdown split class="glossy" color="accent" label="Actions">
+              <q-list>
+                <q-item
+                  clickable
+                  v-close-popup
+                  @click="onActionItemClick(props, 'view')"
+                >
+                  <q-item-section avatar>
+                    <q-avatar
+                      icon="remove_red_eye"
+                      color="primary"
+                      text-color="white"
+                    />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>View</q-item-label>
+                  </q-item-section>
+                </q-item>
 
-                  <q-item
-                    clickable
-                    v-close-popup
-                    @click="onActionItemClick(props, 'edit')"
-                  >
-                    <q-item-section avatar>
-                      <q-avatar
-                        icon="edit"
-                        color="primary"
-                        text-color="white"
-                      />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Edit</q-item-label>
-                    </q-item-section>
-                  </q-item>
+                <q-item
+                  clickable
+                  v-close-popup
+                  @click="onActionItemClick(props, 'edit')"
+                >
+                  <q-item-section avatar>
+                    <q-avatar icon="edit" color="primary" text-color="white" />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Edit</q-item-label>
+                  </q-item-section>
+                </q-item>
 
-                  <q-item
-                    clickable
-                    v-close-popup
-                    @click="onActionItemClick(props, 'delete')"
-                  >
-                    <q-item-section avatar>
-                      <q-avatar
-                        icon="delete_forever"
-                        color="warning"
-                        text-color="white"
-                      />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Delete</q-item-label>
-                    </q-item-section>
-                    <q-item-section side>
-                      <q-icon name="info" color="amber" />
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
-            </q-td>
-          </q-tr>
-          <q-tr v-show="props.expand" :props="props">
-            <q-td colspan="100%">
-              <div class="text-left">
-                <q-list bordered separator>
-                  <q-item
-                    v-for="(v, k) in props.row"
-                    :key="k"
-                    clickable
-                    v-ripple
-                  >
-                    <q-item-section>
-                      <q-item-label overline>{{ k }}</q-item-label>
-                      <q-item-label>{{ v }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </div>
-            </q-td>
-          </q-tr>
-        </template>
-      </q-table>
-    </div>
-  </q-page>
+                <q-item
+                  clickable
+                  v-close-popup
+                  @click="onActionItemClick(props, 'delete')"
+                >
+                  <q-item-section avatar>
+                    <q-avatar
+                      icon="delete_forever"
+                      color="warning"
+                      text-color="white"
+                    />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Delete</q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-icon name="info" color="amber" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+          </q-td>
+        </q-tr>
+        <q-tr v-show="props.expand" :props="props">
+          <q-td colspan="100%">
+            <div class="text-left">
+              <q-list bordered separator>
+                <q-item v-for="(v, k) in props.row" :key="k" clickable v-ripple>
+                  <q-item-section>
+                    <q-item-label overline>{{ k }}</q-item-label>
+                    <q-item-label>{{ v }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </div>
+          </q-td>
+        </q-tr>
+      </template>
+    </q-table>
+  </div>
 </template>
 
 <!-- eslint-disable @typescript-eslint/no-unsafe-return -->
@@ -281,6 +265,10 @@ export default defineComponent({
     defaultSort: {
       type: Object,
       required: true,
+    },
+    rosPerPageOptions: {
+      type: Array,
+      default: () => [5, 10, 15, 20, 30, 50, 100],
     },
   },
 
@@ -411,15 +399,20 @@ export default defineComponent({
             cancel: false,
             persistent: true,
           });
-          await store.dispatch(props.rowDeleteActionType, id).then(() => {
-            deleteProgressDialog.hide();
+          await store
+            .dispatch(props.rowDeleteActionType, id)
+            .then(() => {
+              deleteProgressDialog.hide();
 
-            $q.notify({
-              type: 'positive',
-              message: 'Customer was successfully deleted!',
-              position: 'top',
+              $q.notify({
+                type: 'positive',
+                message: 'Customer was successfully deleted!',
+                position: 'top',
+              });
+            })
+            .catch(() => {
+              deleteProgressDialog.hide();
             });
-          });
         });
       }
     };

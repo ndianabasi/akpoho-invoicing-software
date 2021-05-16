@@ -48,7 +48,7 @@ const accessCompanyCustomer = async (
     return true
   }
 
-  return Bouncer.deny('You are permitted to perform this action!')
+  return Bouncer.deny('You are not permitted to perform this action!')
 }
 
 const accessCompany = async (resourcePermission: string, user: User, company: Company) => {
@@ -68,5 +68,5 @@ const accessCompany = async (resourcePermission: string, user: User, company: Co
     return true
   }
 
-  return Bouncer.deny('You are permitted to perform this action!')
+  return Bouncer.deny('You are not permitted to perform this action!')
 }
