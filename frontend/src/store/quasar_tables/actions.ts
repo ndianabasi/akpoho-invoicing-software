@@ -7,7 +7,6 @@ import { QuasarTableStateInterface, DataRows } from './state';
 import { api as $http } from '../../boot/http';
 import { HttpResponse, HttpError, UserCompany } from '../types';
 import { RequestParams } from '../../types/table';
-import { Notify } from 'quasar';
 
 export interface QuasarTableActionsContract
   extends ActionTree<QuasarTableStateInterface, StateInterface> {
@@ -46,22 +45,6 @@ const actions: QuasarTableActionsContract = {
           resolve(res.data);
         })
         .catch((error: HttpError) => {
-          Notify.create({
-            message:
-              error?.response?.data?.message ??
-              'An unknown error occurred while fetching table data!',
-            type: 'negative',
-            position: 'top',
-            progress: true,
-            timeout: 10000,
-            actions: [
-              {
-                label: 'Dismiss',
-                color: 'white',
-              },
-            ],
-          });
-
           reject(error);
         });
     });

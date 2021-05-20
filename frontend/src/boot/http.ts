@@ -4,6 +4,8 @@ import axios, { AxiosInstance } from 'axios';
 import { Store } from 'vuex';
 import { StoreElements } from '../store';
 import { App } from 'vue';
+import { Notify } from 'quasar';
+import { HttpError } from 'src/store/types';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -43,6 +45,37 @@ export default boot(
           //console.log('token is unset');
           setAuthHeader('');
         }
+      }
+    );
+
+    api.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      async (error: HttpError) => {
+        //console.log(error.response);
+        if (error?.response?.status === 401) {
+          setAuthHeader('');
+          void (await store.dispatch('auth/LOGOUT_USER'));
+
+          Notify.create({
+            message:
+              (error?.response?.data as string) ??
+              error?.response?.data?.message,
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 10000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+        }
+
+        return Promise.reject(error);
       }
     );
   }

@@ -77,7 +77,7 @@ export interface LoginHttpResponse extends AxiosResponse {
 }
 
 export interface HttpResponse extends AxiosResponse {
-  data: ResponseData;
+  data: ResponseData & string;
   message?: string;
   code?: string;
   stack?: string;

@@ -190,7 +190,6 @@ import {
   reactive,
   ref,
   computed,
-  watchEffect,
   onBeforeUnmount,
   nextTick,
   Ref,
@@ -206,9 +205,7 @@ import {
   RowProps,
 } from '../../src/types/table';
 import { useQuasar } from 'quasar';
-import { PaginatedData, ResponseData } from '../store/types';
-import { GenericRowObject } from '../store/quasar_tables/state';
-import { log } from 'util';
+import { ResponseData } from '../store/types';
 
 export default defineComponent({
   name: 'QuasarTable',

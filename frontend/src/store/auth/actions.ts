@@ -38,21 +38,6 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
           resolve(res.data);
         })
         .catch((error: HttpError) => {
-          Notify.create({
-            message:
-              error?.response?.data?.message ?? 'An unknown error occurred!',
-            type: 'negative',
-            position: 'top',
-            progress: true,
-            timeout: 10000,
-            actions: [
-              {
-                label: 'Dismiss',
-                color: 'white',
-              },
-            ],
-          });
-
           reject(error);
         });
     });
@@ -82,21 +67,6 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
           resolve(res.data);
         })
         .catch((error: HttpError) => {
-          Notify.create({
-            message:
-              error?.response?.data?.message ?? 'An unknown error occurred!',
-            type: 'negative',
-            position: 'top',
-            progress: true,
-            timeout: 10000,
-            actions: [
-              {
-                label: 'Dismiss',
-                color: 'white',
-              },
-            ],
-          });
-
           reject(error);
         });
     });
@@ -111,23 +81,6 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
           resolve(res.data);
         })
         .catch((error: HttpError) => {
-          console.log(error?.response);
-
-          Notify.create({
-            message:
-              error?.response?.data?.message ?? 'An unknown error occurred!',
-            type: 'negative',
-            position: 'top',
-            progress: true,
-            timeout: 10000,
-            actions: [
-              {
-                label: 'Dismiss',
-                color: 'white',
-              },
-            ],
-          });
-
           reject(error);
         });
     });

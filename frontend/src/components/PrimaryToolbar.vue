@@ -107,16 +107,16 @@
         <q-tooltip v-if="$q.screen.gt.xs">Account</q-tooltip>
         <q-menu>
           <div class="row no-wrap q-py-md" style="min-width: 200px">
-            <div class="col-12 column items-center">
+            <div class="col-12 column items-center q-px-md">
               <q-avatar size="72px">
                 <img :src="userProfile.profile_picture" />
               </q-avatar>
 
               <div class="text-subtitle1 text-center q-mt-md q-mb-xs">
-                {{ userFullName }}<br /><span
-                  class="text-caption text-weight-light"
-                  >{{ userSummary.email }}</span
-                >
+                {{ userFullName }} <q-badge align="middle">cli v1.0.0</q-badge
+                ><br /><span class="text-caption text-weight-light">{{
+                  userSummary.email
+                }}</span>
               </div>
 
               <q-btn
