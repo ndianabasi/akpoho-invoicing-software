@@ -82,10 +82,14 @@ export default class AuthController {
           'users.is_email_verified'
         )
         .where('email', email)
-        .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
-        .preload('profile', (profilesQuery) =>
-          profilesQuery.select(...['id', 'first_name', 'last_name', 'profile_picture'])
+        .preload('companies', (companiesQuery) =>
+          companiesQuery.select(...['id', 'name']).debug(true)
         )
+        .preload('profile', (profilesQuery) =>
+          profilesQuery.select(...['id', 'first_name', 'last_name', 'profile_picture']).debug(true)
+        )
+        //.preload('role', (roleQuery) => roleQuery.select(...['name']))
+        .debug(true)
         .first()
 
       //console.log(user)

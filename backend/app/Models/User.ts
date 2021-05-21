@@ -32,7 +32,7 @@ export default class User extends BaseModel {
   public createdAt: DateTime
 
   @column()
-  public roleId: string
+  public roleId: string | null
 
   @column()
   public loginCode: number

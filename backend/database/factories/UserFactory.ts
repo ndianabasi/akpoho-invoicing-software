@@ -5,7 +5,7 @@ import UserProfileFactory from './UserProfileFactory'
 
 import Role from 'App/Models/Role'
 
-const getRoles = await (async function () {
+const getRoles = async function () {
   const superAdminRole = await Role.findBy('name', 'SuperAdmin')
   const companyAdminRole = await Role.findBy('name', 'CompanyAdmin')
   const companyEditorRole = await Role.findBy('name', 'CompanyEditor')
@@ -17,7 +17,7 @@ const getRoles = await (async function () {
     companyEditorRole: companyEditorRole?.id,
     companyStaffRole: companyStaffRole?.id,
   }
-})()
+}
 
 const UserFactory = Factory.define(User, async ({ faker }) => {
   const generatedUser = {
@@ -36,23 +36,27 @@ const UserFactory = Factory.define(User, async ({ faker }) => {
     user.loginStatus = user.isAccountActivated = user.isEmailVerified = true
     return user
   })
-  .state('superAdmin', (user) => {
-    user.roleId = getRoles.superAdminRole!
+  .state('superAdmin', async (user) => {
+    const roles = await getRoles()
+    user.roleId = roles.superAdminRole!
     user.loginStatus = user.isAccountActivated = user.isEmailVerified = true
     return user
   })
-  .state('companyAdmin', (user) => {
-    user.roleId = getRoles.companyAdminRole!
+  .state('companyAdmin', async (user) => {
+    const roles = await getRoles()
+    user.roleId = roles.companyAdminRole!
     user.loginStatus = user.isAccountActivated = user.isEmailVerified = true
     return user
   })
-  .state('companyEditor', (user) => {
-    user.roleId = getRoles.companyEditorRole!
+  .state('companyEditor', async (user) => {
+    const roles = await getRoles()
+    user.roleId = roles.companyEditorRole!
     user.loginStatus = user.isAccountActivated = user.isEmailVerified = true
     return user
   })
-  .state('companyStaff', (user) => {
-    user.roleId = getRoles.companyStaffRole!
+  .state('companyStaff', async (user) => {
+    const roles = await getRoles()
+    user.roleId = roles.companyStaffRole!
     user.loginStatus = user.isAccountActivated = user.isEmailVerified = true
     return user
   })
