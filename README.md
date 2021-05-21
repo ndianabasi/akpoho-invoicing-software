@@ -68,12 +68,12 @@ Akpoho Invoicing Software is developed with the following technologies:
     node ace db:seed -i
     ``` 
 12. Take note of the user credentials logged to the console when you seeded `database\seeders\Company`. Only users with full access can log in. That is:
-    ```json
+    ```js
     {
         ...,
         login_status: true, 
         is_account_activated: true, 
-        is_email_verified: false
+        is_email_verified: true
     }
     
     ```
