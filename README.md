@@ -56,5 +56,26 @@ Akpoho Invoicing Software is developed with the following technologies:
     cd /home/dev/akpoho-invoicing-software/frontend
     yarn serve
     ```
-9. A browser window will open when the frontend is launched.
-10. Seeding the database //To do
+9. A browser window will open when the frontend is launched. 
+10. You won't be able to log in because there are no users. So, it is time to seed the database.
+11. To seed the database:
+    1.  Let's migrate the database.
+    ```bash
+    node ace migration:run
+    ```
+    2.  Seed the `roles` table. Run the command below. On the prompt, select `database\seeders\Role`. After the `roles` table is seeded. Run the command again and select `database\seeders\Permission`. Then run again and select `database\seeders\PermissionRole`. Then run the command again and select `database\seeders\Company`.
+    ```bash
+    node ace db:seed -i
+    ``` 
+12. Take note of the user credentials logged to the console when you seeded `database\seeders\Company`. Only users with full access can log in. That is:
+    ```json
+    {
+        ...,
+        login_status: true, 
+        is_account_activated: true, 
+        is_email_verified: false
+    }
+    
+    ```
+   13. Copy the email and password of a user with full access from the console and log in.\
+   14. Congratulations. You have successfully set up the Akpoho Invoicing Software.
