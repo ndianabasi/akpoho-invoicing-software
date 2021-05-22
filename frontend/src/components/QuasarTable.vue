@@ -17,7 +17,6 @@
       :no-data-label="noResultsLabel_"
       :no-results-label="noResultsLabel_"
       :rows-per-page-options="rosPerPageOptions"
-      style="height: 600px"
     >
       <template #top-right>
         <q-input
