@@ -5,7 +5,7 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { CustomersStateInterface /* Customers */ } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpResponse, HttpError, UserCompany } from '../types';
+import { HttpResponse, HttpError, StringIDNameInterface } from '../types';
 import { RequestParams } from '../../types/table';
 import { Notify } from 'quasar';
 
@@ -18,7 +18,7 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const currentCompany = rootGetters[
         'auth/GET_CURRENT_COMPANY'
-      ] as UserCompany;
+      ] as StringIDNameInterface;
 
       await $http
         .get(`/${currentCompany.id}/customers`, {
@@ -55,7 +55,7 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const currentCompany = rootGetters[
         'auth/GET_CURRENT_COMPANY'
-      ] as UserCompany;
+      ] as StringIDNameInterface;
 
       await $http
         .delete(`/${currentCompany.id}/customers/${ID}`)

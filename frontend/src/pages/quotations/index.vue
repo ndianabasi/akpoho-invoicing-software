@@ -1,13 +1,13 @@
 <template>
   <div class="q-pa-md">
     <q-table
+      v-model="selected"
       title="Treats"
       :rows="rows"
       :columns="columns"
       row-key="name"
       :selected-rows-label="getSelectedString"
       selection="multiple"
-      v-model="selected"
     />
 
     <div class="q-mt-md">Selected: {{ JSON.stringify(selected) }}</div>
@@ -29,7 +29,6 @@ const columns: Array<TableRow> = [
     label: 'Dessert (100g serving)',
     align: 'left',
     field: 'desc',
-    format: (val: string) => `${val}`,
     sortable: true,
   },
   {

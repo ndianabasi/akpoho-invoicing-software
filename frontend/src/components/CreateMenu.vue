@@ -14,8 +14,8 @@
         <q-item
           v-for="menu in createMenu"
           :key="menu.title"
-          clickable
           v-close-popup
+          clickable
           aria-hidden="true"
           :to="{ name: menu.link }"
         >

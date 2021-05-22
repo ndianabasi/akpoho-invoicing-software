@@ -1,6 +1,6 @@
 import { MutationTree } from 'vuex';
-import { AuthStateInterface, LoginData } from './state';
-import { LoginUserData, SelectOption } from '../types';
+import { AuthStateInterface } from './state';
+import { LoginUserData, SelectOption, LoginData } from '../types';
 
 type Token = {
   token: string;
@@ -32,6 +32,7 @@ const mutation: MutationTree<AuthStateInterface> = {
       id: payload.profile.id,
       profile_picture: payload.profile.profile_picture,
     };
+
     state.userSummary = {
       id: payload.id,
       email: payload.email,
@@ -39,6 +40,8 @@ const mutation: MutationTree<AuthStateInterface> = {
       is_email_verified: Boolean(payload.is_email_verified),
       login_status: Boolean(payload.login_status),
     };
+
+    state.authRole = payload.roles;
   },
 };
 

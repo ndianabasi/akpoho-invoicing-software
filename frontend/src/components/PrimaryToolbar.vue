@@ -4,13 +4,13 @@
       flat
       dense
       round
+      aria-label="Menu"
+      icon="menu"
+      class="q-mx-md"
       @click="
         TOGGLE_LEFT_DRAWER();
         $emit('update:leftDrawerOpen', leftDrawerOpen);
       "
-      aria-label="Menu"
-      icon="menu"
-      class="q-mx-md"
     />
 
     <router-link class="cursor-point no-underline" :to="{ name: 'Home' }"
@@ -29,10 +29,10 @@
     <q-space />
 
     <q-input
+      v-model="search"
       class="AGIS__toolbar-input"
       dense
       standout="bg-primary"
-      v-model="search"
       placeholder="Search"
     >
       <!-- eslint-disable-next-line vue/v-slot-style -->
@@ -59,7 +59,7 @@
           <q-list bordered class="rounded-borders" style="max-width: 95vw">
             <q-item-label header>Notifications</q-item-label>
 
-            <q-item clickable v-ripple>
+            <q-item v-ripple clickable>
               <q-item-section avatar>
                 <q-avatar>
                   <img src="https://cdn.quasar.dev/img/avatar2.jpg" />
@@ -80,7 +80,7 @@
 
             <q-separator inset="item" />
 
-            <q-item clickable v-ripple>
+            <q-item v-ripple clickable>
               <q-item-section avatar>
                 <q-avatar>
                   <img src="https://cdn.quasar.dev/img/avatar4.jpg" />
@@ -120,21 +120,21 @@
               </div>
 
               <q-btn
-                @click.prevent="handleLogout"
+                v-close-popup
                 color="primary"
                 label="Logout"
                 push
                 size="sm"
-                v-close-popup
+                @click.prevent="handleLogout"
               />
 
               <q-list class="text-primary q-mt-md">
                 <q-item
-                  clickable
                   v-ripple
+                  clickable
                   :active="link === 'inbox'"
-                  @click="link = 'inbox'"
                   active-class="my-menu-link"
+                  @click="link = 'inbox'"
                 >
                   <q-item-section avatar class="q-pr-none">
                     <q-icon name="inbox" />
@@ -144,11 +144,11 @@
                 </q-item>
 
                 <q-item
-                  clickable
                   v-ripple
+                  clickable
                   :active="link === 'outbox'"
-                  @click="link = 'outbox'"
                   active-class="my-menu-link"
+                  @click="link = 'outbox'"
                 >
                   <q-item-section avatar>
                     <q-icon name="send" />
@@ -158,11 +158,11 @@
                 </q-item>
 
                 <q-item
-                  clickable
                   v-ripple
+                  clickable
                   :active="link === 'trash'"
-                  @click="link = 'trash'"
                   active-class="my-menu-link"
+                  @click="link = 'trash'"
                 >
                   <q-item-section avatar>
                     <q-icon name="delete" />
@@ -174,11 +174,11 @@
                 <q-separator spaced />
 
                 <q-item
-                  clickable
                   v-ripple
+                  clickable
                   :active="link === 'settings'"
-                  @click="link = 'settings'"
                   active-class="my-menu-link"
+                  @click="link = 'settings'"
                 >
                   <q-item-section avatar>
                     <q-icon name="settings" />
@@ -188,11 +188,11 @@
                 </q-item>
 
                 <q-item
-                  clickable
                   v-ripple
+                  clickable
                   :active="link === 'help'"
-                  @click="link = 'help'"
                   active-class="my-menu-link"
+                  @click="link = 'help'"
                 >
                   <q-item-section avatar>
                     <q-icon name="help" />

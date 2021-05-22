@@ -2,22 +2,22 @@
 <template>
   <q-page>
     <div class="q-pa-md q-gutter-sm">
-      <q-banner inline-actions v-if="!dismissed" class="bg-primary text-white">
+      <q-banner v-if="!dismissed" inline-actions class="bg-primary text-white">
         Unfortunately, the credit card did not go through, please try again.
         <template #action>
           <q-btn
-            @click="dismissed = !dismissed"
             flat
             color="white"
             title="Dismiss"
             icon="close"
             round
+            @click="dismissed = !dismissed"
           />
         </template>
       </q-banner>
       <div class="row q-mx-auto justify-center">
         <div class="q-gutter-y-md column q-mt-xl-xl q-mt-sm col-12 col-md-6">
-          <form @submit.prevent="submitForm" class="q-pa-md">
+          <form class="q-pa-md" @submit.prevent="submitForm">
             <div class="row q-mx-auto">
               <div class="column col-6">
                 <q-toggle
@@ -46,8 +46,8 @@
               "
             >
               <q-select
-                filled
                 v-model="form.title"
+                filled
                 :options="titles"
                 label="Title"
                 clearable
@@ -64,10 +64,10 @@
               </q-select>
 
               <q-input
+                v-model="form.first_name"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.first_name"
                 label="First Name"
                 :dense="dense"
                 class="q-mb-md"
@@ -80,10 +80,10 @@
                 <template #error> Sorry! Invalid input </template>
               </q-input>
               <q-input
+                v-model="form.middle_name"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.middle_name"
                 label="Middle Name"
                 :dense="dense"
                 class="q-mb-md"
@@ -97,10 +97,10 @@
               </q-input>
 
               <q-input
+                v-model="form.last_name"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.last_name"
                 label="Last Name"
                 :dense="dense"
                 class="q-mb-md"
@@ -113,10 +113,10 @@
               </q-input>
 
               <q-input
+                v-model="form.phone_number"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.phone_number"
                 label="Phone Number"
                 :dense="dense"
                 class="q-mb-md"
@@ -128,10 +128,10 @@
               </q-input>
 
               <q-input
+                v-model="v$.email_address.$model"
                 filled
                 clearable
                 bottom-slots
-                v-model="v$.email_address.$model"
                 label="Email Address"
                 :dense="dense"
                 class="q-mb-md"
@@ -154,8 +154,8 @@
 
             <q-select
               v-if="form.is_corporate_customer"
-              filled
               v-model="form.company"
+              filled
               :options="companies"
               label="Company"
               clearable
@@ -177,10 +177,10 @@
               transition-hide="slide-up"
             >
               <q-input
+                v-model="form.company_name"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.company_name"
                 label="Company Name"
                 :dense="dense"
                 autogrow
@@ -195,10 +195,10 @@
               </q-input>
 
               <q-input
+                v-model="form.company_address"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.company_address"
                 label="Company Address"
                 :dense="dense"
                 type="textarea"
@@ -214,10 +214,10 @@
               </q-input>
 
               <q-input
+                v-model="form.company_phone"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.company_phone"
                 label="Company Phone Number"
                 :dense="dense"
                 class="q-mb-md"
@@ -232,10 +232,10 @@
               </q-input>
 
               <q-input
+                v-model="form.company_email_address"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.company_email_address"
                 label="Email Address"
                 :dense="dense"
                 class="q-mb-md"
@@ -250,10 +250,10 @@
               </q-input>
 
               <q-input
+                v-model="form.company_lga"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.company_lga"
                 label="Company LGA/County"
                 :dense="dense"
                 class="q-mb-md"
@@ -267,10 +267,10 @@
               </q-input>
 
               <q-input
+                v-model="form.company_postal_code"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.company_postal_code"
                 label="Company Postal Code"
                 :dense="dense"
                 type="textarea"
@@ -286,8 +286,8 @@
               </q-input>
 
               <q-select
-                filled
                 v-model="form.company_country"
+                filled
                 :options="countriesList"
                 label="Company Country"
                 clearable
@@ -295,9 +295,9 @@
                 class="q-mb-md"
                 transition-show="scale"
                 transition-hide="scale"
-                @update:modelValue="processSelect('company_country', $event)"
                 emit-value
                 map-options
+                @update:modelValue="processSelect('company_country', $event)"
                 ><template #before>
                   <q-icon name="business" />
                 </template>
@@ -307,12 +307,12 @@
               </q-select>
 
               <q-select
+                v-model="form.company_state"
                 filled
                 :disable="!form.company_country"
                 :placeholder="
                   !form.company_country ? 'Please select the country first' : ''
                 "
-                v-model="form.company_state"
                 :options="
                   form.company_country
                     ? countries[`${form.company_country}`]
@@ -324,9 +324,9 @@
                 class="q-mb-md"
                 transition-show="scale"
                 transition-hide="scale"
-                @update:modelValue="processSelect('company_state', $event)"
                 emit-value
                 map-options
+                @update:modelValue="processSelect('company_state', $event)"
                 ><template #before>
                   <q-icon name="business" />
                 </template>
@@ -337,10 +337,10 @@
             </template>
 
             <q-input
+              v-model="form.billing_address"
               filled
               clearable
               bottom-slots
-              v-model="form.billing_address"
               label="Billing Address"
               :dense="dense"
               type="textarea"
@@ -356,10 +356,10 @@
             </q-input>
 
             <q-input
+              v-model="form.billing_lga"
               filled
               clearable
               bottom-slots
-              v-model="form.billing_lga"
               label="Billing LGA/County"
               :dense="dense"
               class="q-mb-md"
@@ -373,10 +373,10 @@
             </q-input>
 
             <q-input
+              v-model="form.billing_postal_code"
               filled
               clearable
               bottom-slots
-              v-model="form.billing_postal_code"
               label="Billing Postal Code"
               :dense="dense"
               type="textarea"
@@ -392,8 +392,8 @@
             </q-input>
 
             <q-select
-              filled
               v-model="form.billing_country"
+              filled
               :options="countriesList"
               label="Billing Country"
               clearable
@@ -401,9 +401,9 @@
               class="q-mb-md"
               transition-show="scale"
               transition-hide="scale"
-              @update:modelValue="processSelect('billing_country', $event)"
               emit-value
               map-options
+              @update:modelValue="processSelect('billing_country', $event)"
               ><template #before>
                 <q-icon name="local_shipping" />
               </template>
@@ -413,12 +413,12 @@
             </q-select>
 
             <q-select
+              v-model="form.billing_state"
               filled
               :disable="!form.billing_country"
               :placeholder="
                 !form.billing_country ? 'Please select the country first' : ''
               "
-              v-model="form.billing_state"
               :options="
                 form.billing_country ? countries[`${form.billing_country}`] : []
               "
@@ -428,9 +428,9 @@
               class="q-mb-md"
               transition-show="scale"
               transition-hide="scale"
-              @update:modelValue="processSelect('billing_state', $event)"
               emit-value
               map-options
+              @update:modelValue="processSelect('billing_state', $event)"
               ><template #before>
                 <q-icon name="local_shipping" />
               </template>
@@ -450,10 +450,10 @@
 
             <template v-if="!form.is_billing_shipping_addresses_same">
               <q-input
+                v-model="form.shipping_address"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.shipping_address"
                 label="Shipping Address"
                 :dense="dense"
                 type="textarea"
@@ -469,10 +469,10 @@
               </q-input>
 
               <q-input
+                v-model="form.shipping_lga"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.shipping_lga"
                 label="Shipping LGA/County"
                 :dense="dense"
                 class="q-mb-md"
@@ -486,10 +486,10 @@
               </q-input>
 
               <q-input
+                v-model="form.shipping_postal_code"
                 filled
                 clearable
                 bottom-slots
-                v-model="form.shipping_postal_code"
                 label="Shipping Postal Code"
                 :dense="dense"
                 type="textarea"
@@ -505,8 +505,8 @@
               </q-input>
 
               <q-select
-                filled
                 v-model="form.shipping_country"
+                filled
                 :options="countriesList"
                 label="Shipping Country"
                 clearable
@@ -514,9 +514,9 @@
                 class="q-mb-md"
                 transition-show="scale"
                 transition-hide="scale"
-                @update:modelValue="processSelect('shipping_country', $event)"
                 emit-value
                 map-options
+                @update:modelValue="processSelect('shipping_country', $event)"
                 ><template #before>
                   <q-icon name="local_shipping" />
                 </template>
@@ -526,6 +526,7 @@
               </q-select>
 
               <q-select
+                v-model="form.shipping_state"
                 filled
                 :disable="!form.shipping_country"
                 :placeholder="
@@ -533,7 +534,6 @@
                     ? 'Please select the country first'
                     : ''
                 "
-                v-model="form.shipping_state"
                 :options="
                   form.shipping_country
                     ? countries[`${form.shipping_country}`]
@@ -545,9 +545,9 @@
                 class="q-mb-md"
                 transition-show="scale"
                 transition-hide="scale"
-                @update:modelValue="processSelect('shipping_state', $event)"
                 emit-value
                 map-options
+                @update:modelValue="processSelect('shipping_state', $event)"
                 ><template #before>
                   <q-icon name="local_shipping" />
                 </template>
@@ -561,13 +561,13 @@
       </div>
       <div class="row justify-center q-mb-xl">
         <q-btn
-          @click.prevent="submitForm"
           type="submit"
           :loading="submitting"
           label="Submit"
           class="q-mt-md"
           color="primary"
           icon-right="send"
+          @click.prevent="submitForm"
         >
           <!-- eslint-disable-next-line vue/v-slot-style -->
           <template v-slot:loading>

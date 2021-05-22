@@ -1,6 +1,21 @@
 import { AxiosResponse, AxiosError } from 'axios';
 import { DataRows } from '../quasar_tables/state';
 
+export type LoginData = {
+  username: string;
+  password: string;
+  remember_me: boolean;
+};
+
+export interface IDNameInterface {
+  id: string | number;
+  name: string;
+}
+
+export interface StringIDNameInterface extends IDNameInterface {
+  id: string;
+}
+
 type Token = {
   token: string;
   type: string;
@@ -40,17 +55,14 @@ interface IDEntity {
 }
 
 export interface LoginUserDataInterface {
-  companies: UserCompany[];
+  companies: StringIDNameInterface[];
   profile: UserProfileSummary;
+  roles: StringIDNameInterface;
 }
 
 export type LoginUserData = LoginUserSummary & LoginUserDataInterface;
 
 export type StateUserData = UserSummary & LoginUserDataInterface;
-
-export interface UserCompany extends IDEntity {
-  name: string;
-}
 
 export interface UserSummary extends IDEntity {
   email: string;

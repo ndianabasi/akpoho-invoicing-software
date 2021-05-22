@@ -15,6 +15,7 @@ import UserHook from 'App/Models/Hooks/UserHook'
 import Company from 'App/Models/Company'
 import Role from 'App/Models/Role'
 import UserProfile from 'App/Models/UserProfile'
+import { STANDARD_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
 export default class User extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -28,9 +29,6 @@ export default class User extends BaseModel {
   @column()
   public email: string
 
-  @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
-
   @column()
   public roleId: string | null
 
@@ -43,50 +41,108 @@ export default class User extends BaseModel {
   @column()
   public forgotPasswordCode: number
 
-  @column()
+  @column({
+    serialize(value: number) {
+      return Boolean(value)
+    },
+  })
   public loginStatus: boolean
 
-  @column()
+  @column({
+    serialize(value: number) {
+      return Boolean(value)
+    },
+  })
   public isAccountActivated: boolean
 
-  @column()
+  @column({
+    serialize(value: number) {
+      return Boolean(value)
+    },
+  })
   public isEmailVerified: boolean
 
   @column()
   public lifetimeLogin: number
 
-  @column()
+  @column({
+    serialize(value: number) {
+      return Boolean(value)
+    },
+  })
   public passwordChangeRequired: boolean
 
-  @column()
+  @column({
+    serialize(value: number) {
+      return Boolean(value)
+    },
+  })
   public rememberToken: boolean
 
-  @column()
+  @column({
+    serialize(value: DateTime) {
+      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+    },
+  })
   public lastLoginTime: DateTime
 
-  @column()
+  @column({
+    serialize(value: DateTime) {
+      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+    },
+  })
   public accountActivatedAt: DateTime
 
-  @column()
+  @column({
+    serialize(value: DateTime) {
+      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+    },
+  })
   public emailVerifiedAt: DateTime
 
-  @column()
+  @column({
+    serialize(value: DateTime) {
+      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+    },
+  })
   public forgotPasswordCodeExpiresAt: DateTime
 
   @column({ prepare: (value) => value.toFormat('yyyy-LL-dd HH:mm:ss') })
   public activationCodeExpiresAt: DateTime
 
-  @column()
+  @column({
+    serialize(value: DateTime) {
+      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+    },
+  })
   public loginCodeExpiresAt: DateTime
 
-  @column()
+  @column({
+    serialize(value: DateTime) {
+      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+    },
+  })
   public passwordLastChangedAt: DateTime
 
   @column()
   public passwordChangeSecret: string
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({
+    autoCreate: true,
+    autoUpdate: true,
+    serialize(value: DateTime) {
+      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+    },
+  })
   public updatedAt: DateTime
+
+  @column.dateTime({
+    autoCreate: true,
+    serialize(value: DateTime) {
+      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+    },
+  })
+  public createdAt: DateTime
 
   @beforeCreate()
   public static generateUUID(user: User) {

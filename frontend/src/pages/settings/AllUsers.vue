@@ -10,7 +10,6 @@
     row-delete-action-type="customers/DELETE_CUSTOMER"
     entity-name="Customer"
     table-data-fetch-end-point="users"
-    show-selections
   ></quasar-table>
 </template>
 

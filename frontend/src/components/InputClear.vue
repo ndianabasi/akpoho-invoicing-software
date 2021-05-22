@@ -2,8 +2,8 @@
   <q-icon
     v-if="field !== ''"
     name="close"
-    @click="$emit('clear')"
     class="cursor-pointer"
+    @click="$emit('clear')"
   />
 </template>
 

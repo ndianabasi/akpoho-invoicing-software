@@ -1,5 +1,9 @@
 declare type FieldFn = (row: TableRow) => string;
-declare type Format = (value: string) => string;
+//declare type Format = (value: string) => string;
+
+declare interface Formatter<ValueType, RowType, FormattedType> {
+  (value: ValueType, row: RowType): FormattedType;
+}
 
 declare function SortStringToBooleanFn(arg1: string, arg2: string): boolean;
 declare function SortStringToNumberFn(arg1: string, arg2: string): number;
@@ -16,7 +20,7 @@ export interface TableRow {
     | typeof SortStringToNumberFn;
   field: string | FieldFn | unknown;
   required?: boolean;
-  format?: Format;
+  format?: Formatter<unknown, unknown, unknown> | null;
 }
 
 export interface GenericTableData extends Array<unknown> {

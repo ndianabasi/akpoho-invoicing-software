@@ -4,21 +4,21 @@
       <div class="q-gutter-y-md column" style="max-width: 300px">
         <q-toggle v-model="dense" label="Dense QInput" />
 
-        <q-input filled v-model="text" :dense="dense" />
+        <q-input v-model="text" filled :dense="dense" />
 
         <q-input
-          filled
           v-model="text"
+          filled
           label="Label (stacked)"
           stack-label
           :dense="dense"
         />
 
-        <q-input filled v-model="text" label="Label" :dense="dense" />
+        <q-input v-model="text" filled label="Label" :dense="dense" />
 
         <q-input
-          filled
           v-model="ph"
+          filled
           label="Label"
           placeholder="Placeholder"
           hint="With placeholder"
@@ -26,28 +26,28 @@
         />
 
         <q-input
-          filled
           v-model="ph"
+          filled
           placeholder="Placeholder"
           hint="With placeholder"
           :dense="dense"
         />
 
         <q-input
+          v-model="text"
           filled
           square
-          v-model="text"
           hint="With perfect square borders"
           :dense="dense"
         />
 
-        <q-input filled v-model="text" :dense="dense">
+        <q-input v-model="text" filled :dense="dense">
           <template #prepend>
             <q-icon name="event" />
           </template>
         </q-input>
 
-        <q-input filled v-model="text" :dense="dense">
+        <q-input v-model="text" filled :dense="dense">
           <template #append>
             <q-avatar>
               <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
@@ -56,9 +56,9 @@
         </q-input>
 
         <q-input
+          v-model="text"
           filled
           bottom-slots
-          v-model="text"
           label="Label"
           counter
           :dense="dense"
@@ -67,16 +67,16 @@
             <q-icon name="place" />
           </template>
           <template #append>
-            <q-icon name="close" @click="text = ''" class="cursor-pointer" />
+            <q-icon name="close" class="cursor-pointer" @click="text = ''" />
           </template>
 
           <template #hint> Field hint </template>
         </q-input>
 
         <q-input
+          v-model="text"
           filled
           bottom-slots
-          v-model="text"
           label="Label"
           counter
           maxlength="12"
@@ -90,8 +90,8 @@
             <q-icon
               v-if="text !== ''"
               name="close"
-              @click="text = ''"
               class="cursor-pointer"
+              @click="text = ''"
             />
             <q-icon name="search" />
           </template>
@@ -100,9 +100,9 @@
         </q-input>
 
         <q-input
+          v-model="text"
           filled
           bottom-slots
-          v-model="text"
           label="Label"
           counter
           maxlength="12"
@@ -118,8 +118,8 @@
             <q-icon
               v-if="text !== ''"
               name="close"
-              @click="text = ''"
               class="cursor-pointer"
+              @click="text = ''"
             />
             <q-icon name="schedule" />
           </template>
@@ -132,9 +132,9 @@
         </q-input>
 
         <q-input
+          v-model="text"
           filled
           bottom-slots
-          v-model="text"
           label="Label"
           counter
           maxlength="12"
@@ -151,19 +151,19 @@
           </template>
         </q-input>
 
-        <q-input filled v-model="text" hint="Disable" :dense="dense" disable />
+        <q-input v-model="text" filled hint="Disable" :dense="dense" disable />
 
         <q-input
-          filled
           v-model="text"
+          filled
           hint="Readonly"
           :dense="dense"
           readonly
         />
 
         <q-input
-          filled
           v-model="text"
+          filled
           hint="Disable and readonly"
           :dense="dense"
           disable

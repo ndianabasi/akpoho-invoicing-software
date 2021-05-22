@@ -77,7 +77,7 @@ export default class Customer extends BaseModel {
   @column.dateTime({
     autoCreate: true,
     serialize(value: DateTime) {
-      return value.toFormat(STANDARD_DATE_TIME_FORMAT)
+      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
     },
   })
   public createdAt: DateTime
@@ -86,7 +86,7 @@ export default class Customer extends BaseModel {
     autoCreate: true,
     autoUpdate: true,
     serialize(value: DateTime) {
-      return value.toFormat(STANDARD_DATE_TIME_FORMAT)
+      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
     },
   })
   public updatedAt: DateTime

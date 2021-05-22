@@ -32,12 +32,7 @@ export default class CustomersController {
       subquery = subquery.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
     }
 
-    let customers
-    if (page && perPage) {
-      customers = await subquery.paginate(page, perPage)
-    } else {
-      customers = await subquery
-    }
+    const customers = await subquery.paginate(page ? page : 1, perPage ? perPage : 20)
 
     return response.ok({ data: customers })
   }

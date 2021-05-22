@@ -2,7 +2,12 @@
 <template>
   <div class="row q-mx-auto justify-center items-center container">
     <div
-      class="q-gutter-y-md column q-mt-xl-xl q-mt-sm col-md-4 col-sm-12 col-xs-12 col-lg-4 col-xl-3"
+      class="
+        q-gutter-y-md
+        column
+        q-mt-xl-xl q-mt-sm
+        col-md-4 col-sm-12 col-xs-12 col-lg-4 col-xl-3
+      "
     >
       <q-card class="login-card text-white q-pa-lg">
         <q-card-section>
@@ -17,11 +22,11 @@
             </span>
             <span class="form-title q-mb-md q-pb-md"> Log In </span>
             <q-input
+              v-model="form.email"
               dark
               bottom-slots
               clearable
               :error="form$.email.$invalid"
-              v-model="form.email"
               label="Email"
               color="white"
               label-color="white"
@@ -38,12 +43,12 @@
               </template>
             </q-input>
             <q-input
+              v-model="form.password"
               dark
               bottom-slots
               counter
               clearable
               :error="form$.password.$invalid"
-              v-model="form.password"
               label="Password"
               type="password"
               color="white"

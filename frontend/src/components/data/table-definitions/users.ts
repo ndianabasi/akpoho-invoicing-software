@@ -1,4 +1,5 @@
-import { TableRow } from '../../../types/table';
+import /* booleanFormatter */ 'src/helpers/utils';
+import { /* Formatter, */ TableRow } from '../../../types/table';
 
 interface UserHeaders extends TableRow {
   name: UserColumns;
@@ -20,10 +21,18 @@ enum UserColumns {
   updated_at = 'updated_at',
 }
 
+/* const booleanFormatter: Formatter<boolean, TableRow, string> = function (
+  value: boolean,
+  row: TableRow
+) {
+  console.log(value, row);
+  return value ? 'TRUE' : 'FALSE';
+}; */
+
 const columns: Array<UserHeaders> = [
   {
     name: UserColumns.id,
-    required: false,
+    required: true,
     label: 'User ID',
     align: 'center',
     field: UserColumns.id,

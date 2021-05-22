@@ -2,12 +2,12 @@
   <q-page-sticky expand position="top" style="z-index: 10">
     <q-toolbar class="bg-white text-primary q-pl-lg">
       <q-btn
-        @click="$router.go(-1)"
         flat
         round
         dense
         icon="arrow_back"
         class="q-mr-sm"
+        @click="$router.go(-1)"
       />
 
       <q-toolbar-title>{{ currentRouteLabel }}</q-toolbar-title>

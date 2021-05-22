@@ -5,7 +5,7 @@ import { ActionContext, ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { QuasarTableStateInterface, DataRows } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpResponse, HttpError, UserCompany } from '../types';
+import { HttpResponse, HttpError, StringIDNameInterface } from '../types';
 import { RequestParams } from '../../types/table';
 
 export interface QuasarTableActionsContract
@@ -28,7 +28,7 @@ const actions: QuasarTableActionsContract = {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const currentCompany = rootGetters[
         'auth/GET_CURRENT_COMPANY'
-      ] as UserCompany;
+      ] as StringIDNameInterface;
 
       commit('SET_TABLE_DATA', []);
 

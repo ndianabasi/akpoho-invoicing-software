@@ -19,9 +19,9 @@
       </q-toolbar>
 
       <q-select
+        v-model="selectedCompany"
         class="q-mx-md"
         filled
-        v-model="selectedCompany"
         :options="userCompanies"
         label="Choose Company"
         color="teal"
@@ -32,6 +32,7 @@
         <template #option="scope">
           <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
             <q-item-section>
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <q-item-label v-html="scope.opt.label" />
             </q-item-section>
           </q-item>
@@ -115,8 +116,7 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from 'vue';
 import { useStore } from 'vuex';
-import { UserCompany, SelectOption } from '../store/types';
-import { CurrentCompany } from '../store/auth/state';
+import { SelectOption, StringIDNameInterface } from '../store/types';
 
 export default defineComponent({
   name: 'SideDrawer',
@@ -132,12 +132,12 @@ export default defineComponent({
 
     const selectedCompany = ref({ label: '', value: '' });
     const currentCompany = computed(
-      () => store.getters['auth/GET_CURRENT_COMPANY'] as CurrentCompany
+      () => store.getters['auth/GET_CURRENT_COMPANY'] as StringIDNameInterface
     );
 
     const userCompanies = store.getters[
       'auth/GET_USER_COMPANIES'
-    ] as UserCompany[];
+    ] as StringIDNameInterface[];
     const companies = userCompanies.map((company) => ({
       label: company.name,
       value: company.id,

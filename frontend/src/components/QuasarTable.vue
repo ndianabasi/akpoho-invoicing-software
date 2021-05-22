@@ -1,29 +1,31 @@
+<!-- eslint-disable vue/no-v-html -->
+<!-- eslint-disable vue/no-v-model-argument -->
 <template>
   <div class="q-pa-md">
     <q-table
+      v-model:selected="selected"
+      v-model:pagination="pagination"
       :rows="tableDataRows"
       :columns="columns"
       row-key="id"
       selection="multiple"
-      v-model:selected="selected"
       :class="{ 'my-sticky-header-column-table': stickyTable }"
       :visible-columns="visibleColumns"
-      v-model:pagination="pagination"
       :loading="loading"
-      @request="processTableRequest"
       :filter="filter"
       binary-state-sort
       :hide-no-data="false"
       :no-data-label="noResultsLabel_"
       :no-results-label="noResultsLabel_"
       :rows-per-page-options="rosPerPageOptions"
+      @request="processTableRequest"
     >
       <template #top-right>
         <q-input
+          v-model="filter"
           borderless
           dense
           debounce="300"
-          v-model="filter"
           placeholder="Search"
         >
           <template #append>
@@ -69,8 +71,8 @@
           round
           dense
           :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-          @click="props.toggleFullscreen"
           class="q-ml-md"
+          @click="props.toggleFullscreen"
         />
       </template>
 
@@ -95,8 +97,8 @@
               color="accent"
               round
               dense
-              @click="props.expand = !props.expand"
               :icon="props.expand ? 'remove' : 'add'"
+              @click="props.expand = !props.expand"
             />
           </q-td>
           <q-td v-if="showSelections_" auto-width>
@@ -109,8 +111,8 @@
             <q-btn-dropdown split class="glossy" color="accent" label="Actions">
               <q-list>
                 <q-item
-                  clickable
                   v-close-popup
+                  clickable
                   @click="onActionItemClick(props, 'view')"
                 >
                   <q-item-section avatar>
@@ -126,8 +128,8 @@
                 </q-item>
 
                 <q-item
-                  clickable
                   v-close-popup
+                  clickable
                   @click="onActionItemClick(props, 'edit')"
                 >
                   <q-item-section avatar>
@@ -139,8 +141,8 @@
                 </q-item>
 
                 <q-item
-                  clickable
                   v-close-popup
+                  clickable
                   @click="onActionItemClick(props, 'delete')"
                 >
                   <q-item-section avatar>
@@ -165,7 +167,7 @@
           <q-td colspan="100%">
             <div class="text-left">
               <q-list bordered separator>
-                <q-item v-for="(v, k) in props.row" :key="k" clickable v-ripple>
+                <q-item v-for="(v, k) in props.row" :key="k" v-ripple clickable>
                   <q-item-section>
                     <q-item-label overline>{{ k }}</q-item-label>
                     <q-item-label>{{ v }}</q-item-label>

@@ -1,16 +1,9 @@
-import { UserCompany, UserProfileSummary, UserSummary } from '../types';
-
-export type LoginData = {
-  username: string;
-  password: string;
-  remember_me: boolean;
-};
-
-export type CurrentCompany = {
-  name: string;
-  id: string;
-};
-
+import {
+  LoginData,
+  UserSummary,
+  UserProfileSummary,
+  StringIDNameInterface,
+} from '../types';
 export interface AuthStateInterface {
   token: string;
   authFormMessage: {
@@ -19,9 +12,10 @@ export interface AuthStateInterface {
   };
   loginData: LoginData;
   userSummary: UserSummary | null;
-  userCompanies: UserCompany[] | null;
+  userCompanies: StringIDNameInterface[] | null;
   userProfile: UserProfileSummary | null;
-  currentCompany: CurrentCompany | null;
+  currentCompany: StringIDNameInterface | null;
+  authRole: StringIDNameInterface | null;
 }
 
 function state(): AuthStateInterface {
@@ -37,6 +31,7 @@ function state(): AuthStateInterface {
     userProfile: null,
     userSummary: null,
     currentCompany: null,
+    authRole: null,
   };
 }
 
