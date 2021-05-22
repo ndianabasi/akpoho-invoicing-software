@@ -17,7 +17,8 @@
   "preloads": [
     "./start/routes",
     "./start/kernel",
-    "./start/bouncer"
+    "./start/bouncer",
+    { "file": "./start/events", "optional": true, "environment": ["web", "console", "test"] }
   ],
   "providers": [
     "./providers/AppProvider",
@@ -40,7 +41,5 @@
       "reloadServer": false
     }
   ],
-  "aceProviders": [
-    "@adonisjs/repl"
-  ]
+  "aceProviders": ["@adonisjs/repl"]
 }
