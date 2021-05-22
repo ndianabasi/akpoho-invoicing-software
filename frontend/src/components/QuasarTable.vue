@@ -17,6 +17,7 @@
       :no-data-label="noResultsLabel_"
       :no-results-label="noResultsLabel_"
       :rows-per-page-options="rosPerPageOptions"
+      style="height: 600px"
     >
       <template #top-right>
         <q-input
@@ -319,17 +320,15 @@ export default defineComponent({
         .dispatch('quasar_tables/FETCH_TABLE_DATA', {
           requestParams: {
             search: requestParams?.search ?? '',
-            page: requestParams?.page || pagination.value.page,
-            descending:
-              requestParams?.descending || pagination.value.descending,
-            perPage: requestParams?.perPage || pagination.value.rowsPerPage,
-            sortBy: requestParams?.sortBy || pagination.value.sortBy,
+            page: requestParams?.page ?? null,
+            descending: requestParams?.descending ?? false,
+            perPage: requestParams?.perPage ?? null,
+            sortBy: requestParams?.sortBy ?? '',
           },
           entityEndPoint: props.tableDataFetchEndPoint,
         })
         .then((response: ResponseData) => {
           void nextTick(() => {
-            loading.value = false;
             // The value from the getter is actually a Proxy which does not work with the Quasar table. So stringify and parse the Proxy first.
             const data: unknown[] = JSON.parse(
               JSON.stringify(
@@ -355,9 +354,11 @@ export default defineComponent({
             }
             pagination.value.sortBy =
               requestParams?.sortBy || pagination.value.sortBy;
-            pagination.value.descending =
-              requestParams?.descending || pagination.value.descending;
+            pagination.value.descending = requestParams?.descending;
+
+            loading.value = false;
           });
+          return;
         })
         .catch(() => {
           loading.value = false;
@@ -365,8 +366,6 @@ export default defineComponent({
           return {};
         });
     };
-
-    //const stopFetchActionWatchEffect = watchEffect(() => void fetchTableData());
 
     const data = reactive({
       columns: props.tableColumns,

@@ -1,7 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Customer from 'App/Models/Customer'
-import Database from '@ioc:Adonis/Lucid/Database'
-import { CustomContextContract, SortSearchParams } from '../../Controllers/types/index'
+import { CustomContextContract } from '../../Controllers/types/index'
 
 export default class CustomersController {
   public async index({ response, requestedCompany, request, bouncer }: CustomContextContract) {

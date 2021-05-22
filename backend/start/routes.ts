@@ -47,6 +47,8 @@ Route.group(() => {
   Route.delete('/:company_id/customers/:customer_id', 'CustomersController.destroy').middleware(
     'findRequestedCustomer'
   )
+
+  Route.get('/:company_id/users', 'UsersController.index')
 })
   .prefix('/v1')
   .middleware('auth')

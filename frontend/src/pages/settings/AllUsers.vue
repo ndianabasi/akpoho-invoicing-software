@@ -4,12 +4,12 @@
     :table-name="tableName"
     :table-data-getter-type="tableDataGetterType"
     :default-sort="defaultSort"
-    no-results-label="Sorry! No customers were found. Please check your filters too."
-    row-view-route-name="view_customer"
-    row-edit-route-name="edit_customer"
+    no-results-label="Sorry! No users were found. Please check your filters too."
+    row-view-route-name="view_user"
+    row-edit-route-name="edit_user"
     row-delete-action-type="customers/DELETE_CUSTOMER"
     entity-name="Customer"
-    table-data-fetch-end-point="customers"
+    table-data-fetch-end-point="users"
     show-selections
   ></quasar-table>
 </template>
@@ -22,21 +22,21 @@ import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { Customer } from '../../store/customers/state';
 
-import customerColumns from '../../components/data/table-definitions/customers';
+import userColumns from '../../components/data/table-definitions/users';
 
 import QuasarTable from '../../components/QuasarTable.vue';
 
 export default defineComponent({
-  name: 'AllCustomers',
+  name: 'AllUsers',
   components: {
     QuasarTable,
   },
   setup() {
-    const tableName = ref('All Customers');
+    const tableName = ref('All Users');
     const store = useStore();
 
     const defaultSort = {
-      sortBy: 'first_name',
+      sortBy: 'email',
       descending: false,
     };
 
@@ -48,7 +48,7 @@ export default defineComponent({
     );
 
     const data = reactive({
-      columns: customerColumns,
+      columns: userColumns,
       rows: store.getters['customers/GET_ALL_CUSTOMERS'] as Array<Customer>,
       stickyTable: false,
     });

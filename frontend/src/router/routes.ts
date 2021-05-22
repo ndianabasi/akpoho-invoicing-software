@@ -53,7 +53,6 @@ const routes: RouteRecordRaw[] = [
           },
         ],
       },
-
       {
         path: 'quotations',
         name: 'quotations',
@@ -110,6 +109,37 @@ const routes: RouteRecordRaw[] = [
           label: 'New Receipt',
           //canViewOrganisations: true,
         },
+      },
+      {
+        path: 'settings',
+        component: () => import('pages/settings/Index.vue'),
+        meta: {
+          label: 'Settings',
+          icon: 'settings',
+          //canViewOrganisations: true,
+        },
+        children: [
+          {
+            path: '',
+            component: () => import('pages/settings/AllSettings.vue'),
+            name: 'all_settings',
+            meta: {
+              label: 'All Settings',
+              icon: 'settings',
+              //canViewOrganisations: true,
+            },
+          },
+          {
+            path: 'users',
+            component: () => import('pages/settings/AllUsers.vue'),
+            props: true,
+            name: 'all_users',
+            meta: {
+              label: 'All Users',
+              //canViewOrganisations: true,
+            },
+          },
+        ],
       },
     ],
   },

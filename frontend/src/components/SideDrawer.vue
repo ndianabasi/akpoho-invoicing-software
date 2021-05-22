@@ -63,6 +63,7 @@
             :key="link.title"
             clickable
             class="AGIS__drawer-item"
+            :to="{ name: link.link }"
           >
             <q-item-section avatar>
               <q-icon :name="link.icon" />
@@ -80,6 +81,7 @@
             :key="link.title"
             clickable
             class="AGIS__drawer-item"
+            :to="{ name: link.link }"
           >
             <q-item-section avatar>
               <q-icon :name="link.icon" />

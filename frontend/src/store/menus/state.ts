@@ -25,8 +25,8 @@ function state(): MenusStateInterface {
       { icon: 'delete', title: 'Trash' }, */
     ],
     links3: [
-      { icon: 'settings', title: 'Settings' },
-      { icon: 'help', title: 'Help & Feedback' },
+      { icon: 'settings', title: 'Settings', link: 'all_settings' },
+      { icon: 'help', title: 'Help & Feedback' /* link: 'help' */ },
     ],
     createMenu: [
       { icon: 'person_add_alt', title: 'Customer', link: 'create_customer' },
