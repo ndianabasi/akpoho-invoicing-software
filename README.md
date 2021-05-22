@@ -58,22 +58,22 @@ Akpoho Invoicing Software is developed with the following technologies:
     ```
 9. A browser window will open when the frontend is launched. 
 10. You won't be able to log in because there are no users. So, it is time to seed the database.
-11. To seed the database:
-    1.  Let's migrate the database.
-    ```bash
-    node ace migration:run
-    ```
-    2.  Seed the `roles` table. Run the command below:
+11. To prepare (seed) the database with mock data:
+    1.  First, let's migrate the database.
+        ```bash
+        node ace migration:run
+        ```
+    1.  Next, Let's seed important tables on the database. Run the seeder command below:
       
         ```bash
         node ace db:seed -i
         ``` 
 
         1.  On the prompt, select `database\seeders\Role` to create `roles` for authorisation. 
-        2.  After the `roles` table is seeded. Run the command again and select `database\seeders\Permission` to create `permissions` for authorisation. 
-        3.  Run again and select `database\seeders\PermissionRole` to associate `roles` with `permissions`. 
-        4.  Run the command again and select `database\seeders\Company` to create companies, users, customers, and customer addresses.
-        5.  Run the command again and selecte `database\seeders\UserExtraCompany` to associate each existing user with two more companies. This ensures that the user belongs to one than one company.
+        2.  After the `roles` table is seeded. Run the seeder command again and select `database\seeders\Permission` to create `permissions` for authorisation. 
+        3.  Run the seeder command again and select `database\seeders\PermissionRole` to associate `roles` with `permissions`. 
+        4.  Run the seeder command again and select `database\seeders\Company` to create companies, users, customers, and customer addresses. Please, take note of the user credentials logged to the console.
+        5.  Run the seeder command again and select `database\seeders\UserExtraCompany` to associate each existing user with two more companies. This ensures that the user belongs to one than one company.
     
 12. Take note of the user credentials logged to the console when you seeded `database\seeders\Company`. Only users with full access can log in. That is:
     ```js
@@ -85,5 +85,5 @@ Akpoho Invoicing Software is developed with the following technologies:
     }
     
     ```
-   1.  Copy the email and password of a user with full access from the console and log in.\
+   1.  Copy the email and password of a user with full access from the console and log in.
    2.  Congratulations. You have successfully set up the Akpoho Invoicing Software.
