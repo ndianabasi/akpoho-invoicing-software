@@ -313,7 +313,7 @@ export default defineComponent({
 
     const fetchTableData = async function (
       requestParams?: RequestParams
-    ): Promise<any> {
+    ): Promise<void> {
       loading.value = true;
       await store
         .dispatch('quasar_tables/FETCH_TABLE_DATA', {

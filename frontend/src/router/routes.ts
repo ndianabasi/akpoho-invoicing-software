@@ -15,33 +15,45 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: () => import('pages/Index.vue') },
       {
         path: 'customers',
-        name: 'customers',
         component: () => import('pages/customers/Index.vue'),
         meta: {
-          label: 'All Customers',
+          label: 'Customers',
           icon: 'people',
           //canViewOrganisations: true,
         },
+        children: [
+          {
+            path: '',
+            component: () => import('pages/customers/AllCustomers.vue'),
+            name: 'customers',
+            meta: {
+              label: 'All Customers',
+              icon: 'people',
+              //canViewOrganisations: true,
+            },
+          },
+          {
+            path: ':customerId',
+            component: () => import('pages/customers/Customer.vue'),
+            props: true,
+            name: 'view_customer',
+            meta: {
+              label: 'View Customer',
+              //canViewOrganisations: true,
+            },
+          },
+          {
+            path: 'new',
+            component: () => import('pages/customers/CreateCustomer.vue'),
+            name: 'create_customer',
+            meta: {
+              label: 'New Customer',
+              //canViewOrganisations: true,
+            },
+          },
+        ],
       },
-      {
-        path: '/customers/:customerId',
-        component: () => import('pages/customers/Customer.vue'),
-        props: true,
-        name: 'view_customer',
-        meta: {
-          label: 'View Customer',
-          //canViewOrganisations: true,
-        },
-      },
-      {
-        path: '/customers/new',
-        component: () => import('pages/customers/CreateCustomer.vue'),
-        name: 'create_customer',
-        meta: {
-          label: 'New Customer',
-          //canViewOrganisations: true,
-        },
-      },
+
       {
         path: 'quotations',
         name: 'quotations',
