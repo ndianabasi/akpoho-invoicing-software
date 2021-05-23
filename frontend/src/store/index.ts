@@ -21,6 +21,10 @@ import quasar_tables from './quasar_tables';
 import { QuasarTableStateInterface } from './quasar_tables/state';
 import { QuasarTableGetterInterface } from './quasar_tables/getters';
 
+import users from './users';
+import { UsersStateInterface } from './users/state';
+import { UsersGetterInterface } from './users/getters';
+
 import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -76,6 +80,7 @@ export interface StateInterface {
   auth?: AuthStateInterface;
   customers?: CustomersStateInterface;
   quasar_tables?: QuasarTableStateInterface;
+  users?: UsersStateInterface;
 }
 
 export interface StoreGettersInterface {
@@ -83,6 +88,7 @@ export interface StoreGettersInterface {
   auth?: AuthGettersInterface;
   customers?: CustomersGetterInterface;
   quasar_tables?: QuasarTableGetterInterface;
+  users?: UsersGetterInterface;
 }
 
 export type StoreGetters = RootGetterInterface & StoreGettersInterface;
@@ -176,6 +182,7 @@ export default function (/* { ssrContext } */) {
       auth,
       customers,
       quasar_tables,
+      users,
     },
     plugins:
       process.env.NODE_ENV !== 'production'

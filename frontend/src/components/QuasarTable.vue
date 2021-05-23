@@ -208,6 +208,7 @@ import {
 } from '../../src/types/table';
 import { useQuasar } from 'quasar';
 import { ResponseData } from '../store/types';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'QuasarTable',
@@ -276,6 +277,7 @@ export default defineComponent({
     const filter = ref('');
     const loading = ref(false);
     const store = useStore();
+    const router = useRouter();
     const selected = ref([]);
     const tableRows: Ref<GenericTableData> = ref([]);
     const pagination = ref({
@@ -376,6 +378,20 @@ export default defineComponent({
     const onActionItemClick = (rowProps: RowProps, action: string) => {
       const id = rowProps.row.id;
       //console.log(id);
+      if (action === 'view') {
+        void router.push({
+          name: props.rowViewRouteName,
+          params: { userId: id },
+        });
+      }
+
+      if (action === 'edit') {
+        void router.push({
+          name: props.rowEditRouteName,
+          params: { userId: id },
+        });
+      }
+
       if (action === 'delete') {
         $q.dialog({
           title: 'Deletion Warning',

@@ -1,23 +1,22 @@
-import Bouncer, { BasePolicy } from '@ioc:Adonis/Addons/Bouncer'
+import { BasePolicy } from '@ioc:Adonis/Addons/Bouncer'
 import User from 'App/Models/User'
 import Customer from 'App/Models/Customer'
-import PermissionHelper from '../Helpers/PermissionHelper'
 import Company from 'App/Models/Company'
 import { accessCompany, accessCompanyUser } from 'App/Helpers/PolicyHelper'
 
-export default class CustomerPolicy extends BasePolicy {
-  public async view(user: User, company: Company, customer: Customer) {
+export default class UserPolicy extends BasePolicy {
+  public async view(authUser: User, requestedCompany: Company, requestedUser: User) {
     const resourcePermission = 'can_view_users'
-    return await accessCompanyUser(resourcePermission, user, company, customer)
+    return await accessCompanyUser(resourcePermission, authUser, requestedCompany, requestedUser)
   }
 
   public async create(user: User) {}
 
   public async update(user: User, Customer: Customer) {}
 
-  public async delete(user: User, company: Company, customer: Customer) {
+  public async delete(authUser: User, requestedCompany: Company, requestedUser: User) {
     const resourcePermission = 'can_delete_users'
-    return await accessCompanyUser(resourcePermission, user, company, customer)
+    return await accessCompanyUser(resourcePermission, authUser, requestedCompany, requestedUser)
   }
 
   public async list(user: User, company: Company) {

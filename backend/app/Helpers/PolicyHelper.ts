@@ -27,22 +27,25 @@ const accessCompany = async (resourcePermission: string, user: User, company: Co
 
 const accessCompanyUser = async (
   resourcePermission: string,
-  user: User,
-  company: Company,
-  customer: Customer
+  authUser: User,
+  requestedCompany: Company,
+  requestedUser: User
 ) => {
   const isPermitted = await PermissionHelper.hasResourcePermission({
     resourcePermission,
-    user,
+    user: authUser,
     loggable: true,
   })
 
-  await user.load('companies')
-  const serialisedUser = user.toJSON()
+  await authUser.load('companies')
+  const authUserCompanies = authUser.companies
+
+  await requestedUser.load('companies')
+  const reqUserCompanies = requestedUser.companies
 
   if (
-    serialisedUser.companies.some((serialisedCompany) => serialisedCompany.id === company.id) &&
-    customer.companyId === company.id &&
+    authUserCompanies.some((authCompany) => authCompany.id === requestedCompany.id) &&
+    reqUserCompanies.some((reqCompany) => reqCompany.id === requestedCompany.id) &&
     isPermitted
   ) {
     return true

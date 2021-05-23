@@ -19,11 +19,11 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import { Customer } from '../../store/customers/state';
+import { Customer } from '../../../store/customers/state';
 
-import userColumns from '../../components/data/table-definitions/users';
+import userColumns from '../../../components/data/table-definitions/users';
 
-import QuasarTable from '../../components/QuasarTable.vue';
+import QuasarTable from '../../../components/QuasarTable.vue';
 
 export default defineComponent({
   name: 'AllUsers',

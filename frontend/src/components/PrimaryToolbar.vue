@@ -113,7 +113,8 @@
               </q-avatar>
 
               <div class="text-subtitle1 text-center q-mt-md q-mb-xs">
-                {{ userFullName }} <q-badge align="middle">cli v1.0.0</q-badge
+                {{ userFullName }}
+                <q-badge align="middle">{{ authRole }}</q-badge
                 ><br /><span class="text-caption text-weight-light">{{
                   userSummary.email
                 }}</span>
@@ -216,10 +217,13 @@ import { defineComponent, ref } from 'vue';
 import CreateMenu from './CreateMenu.vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { UserProfileSummary } from '../store/types/index';
+import {
+  UserProfileSummary,
+  StringIDNameInterface,
+} from '../store/types/index';
 
 export default defineComponent({
-  name: 'SecondaryToolbar',
+  name: 'PrimaryToolbar',
   components: {
     CreateMenu,
   },
@@ -236,6 +240,7 @@ export default defineComponent({
   setup(/* props */) {
     const store = useStore();
     const leftDrawerOpen = ref(false);
+    const link = ref('');
     const search = ref('');
     const router = useRouter();
 
@@ -260,6 +265,10 @@ export default defineComponent({
       'auth/GET_USER_SUMMARY'
     ] as UserProfileSummary;
 
+    const authRole = store.getters[
+      'auth/GET_AUTH_ROLE'
+    ] as StringIDNameInterface['name'];
+
     const userFullName = `${userProfile.first_name} ${
       userProfile.last_name ? userProfile.last_name : ''
     }`;
@@ -271,6 +280,8 @@ export default defineComponent({
       userProfile: ref(userProfile),
       userFullName: ref(userFullName),
       userSummary: ref(userSummary),
+      link,
+      authRole: ref(authRole),
     };
   },
 });

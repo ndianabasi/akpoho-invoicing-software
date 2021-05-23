@@ -19,6 +19,7 @@ const getters: GetterTree<AuthStateInterface, StateInterface> = {
   GET_CURRENT_COMPANY: (state) => state.currentCompany,
   GET_USER_PROFILE: (state) => state.userProfile,
   GET_USER_SUMMARY: (state) => state.userSummary,
+  GET_AUTH_ROLE: (state) => state.authRole?.name,
 };
 
 export default getters;

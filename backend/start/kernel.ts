@@ -46,4 +46,5 @@ Server.middleware.registerNamed({
   auth: () => import('App/Middleware/Auth'),
   findRequestedCompany: 'App/Middleware/FindRequestedCompany',
   findRequestedCustomer: 'App/Middleware/FindRequestedCustomer',
+  findRequestedUser: 'App/Middleware/FindRequestedUser',
 })

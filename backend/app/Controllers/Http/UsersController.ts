@@ -22,10 +22,15 @@ export default class UsersController {
         'users.account_activated_at',
         'users.email_verified_at',
         'users.created_at',
-        'users.updated_at'
+        'users.updated_at',
+        'user_profiles.first_name',
+        'user_profiles.last_name'
       )
       .leftJoin('company_user', (query) => {
         query.on('company_user.user_id', '=', 'users.id')
+      })
+      .leftJoin('user_profiles', (query) => {
+        query.on('user_profiles.user_id', '=', 'users.id')
       })
       .where({ 'company_user.company_id': requestedCompany?.id })
 
@@ -38,13 +43,17 @@ export default class UsersController {
     return response.ok({ data: users })
   }
 
-  public async create({}: HttpContextContract) {}
+  public async show({ response, requestedCompany, requestedUser, bouncer }: CustomContextContract) {
+    await bouncer.with('UserPolicy').authorize('view', requestedCompany!, requestedUser!)
 
-  public async store({}: HttpContextContract) {}
+    const user = await User.query()
+      .preload('role', (roleQuery) => roleQuery.select('name'))
+      .preload('profile', (profileQuery) => profileQuery.select('first_name', 'last_name'))
+      .where('id', requestedUser?.id!)
+      .first()
 
-  public async show({}: HttpContextContract) {}
-
-  public async edit({}: HttpContextContract) {}
+    return response.ok({ data: user })
+  }
 
   public async update({}: HttpContextContract) {}
 

@@ -131,13 +131,42 @@ const routes: RouteRecordRaw[] = [
           },
           {
             path: 'users',
-            component: () => import('pages/settings/AllUsers.vue'),
-            props: true,
-            name: 'all_users',
+            component: () => import('pages/settings/users/Index.vue'),
             meta: {
-              label: 'All Users',
+              label: 'Users',
               //canViewOrganisations: true,
             },
+            children: [
+              {
+                path: '',
+                component: () => import('pages/settings/users/AllUsers.vue'),
+                name: 'all_users',
+                meta: {
+                  label: 'All Users',
+                  //canViewOrganisations: true,
+                },
+              },
+              {
+                path: ':userId/view',
+                props: true,
+                component: () => import('pages/settings/users/User.vue'),
+                name: 'view_user',
+                meta: {
+                  label: 'View User',
+                  //canViewOrganisations: true,
+                },
+              },
+              {
+                path: ':userId/edit',
+                props: true,
+                component: () => import('pages/settings/users/EditUser.vue'),
+                name: 'edit_user',
+                meta: {
+                  label: 'Edit User',
+                  //canViewOrganisations: true,
+                },
+              },
+            ],
           },
         ],
       },

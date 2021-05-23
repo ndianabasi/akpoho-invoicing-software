@@ -57,7 +57,7 @@ interface IDEntity {
 export interface LoginUserDataInterface {
   companies: StringIDNameInterface[];
   profile: UserProfileSummary;
-  roles: StringIDNameInterface;
+  role: StringIDNameInterface;
 }
 
 export type LoginUserData = LoginUserSummary & LoginUserDataInterface;

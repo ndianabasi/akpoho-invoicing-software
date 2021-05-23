@@ -41,7 +41,7 @@ const mutation: MutationTree<AuthStateInterface> = {
       login_status: Boolean(payload.login_status),
     };
 
-    state.authRole = payload.roles;
+    state.authRole = payload.role;
   },
 };
 

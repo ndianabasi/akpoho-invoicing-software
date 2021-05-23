@@ -23,7 +23,7 @@ export default class User extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
-  @column(/* { prepare: async (value: string) => await UserHook.preparePassword(value) } */)
+  @column({ serializeAs: null })
   public password: string
 
   @column()
