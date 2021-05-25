@@ -9,6 +9,8 @@ interface UserHeaders extends TableRow {
 enum UserColumns {
   id = 'id',
   email = 'email',
+  first_name = 'first_name',
+  last_name = 'last_name',
   login_status = 'login_status',
   is_account_activated = 'is_account_activated',
   is_email_verified = 'is_email_verified',
@@ -36,6 +38,22 @@ const columns: Array<UserHeaders> = [
     label: 'User ID',
     align: 'center',
     field: UserColumns.id,
+  },
+  {
+    name: UserColumns.first_name,
+    required: true,
+    label: 'First Name',
+    align: 'center',
+    field: UserColumns.first_name,
+    sortable: true,
+  },
+  {
+    name: UserColumns.last_name,
+    required: true,
+    label: 'Last Name',
+    align: 'center',
+    field: UserColumns.last_name,
+    sortable: true,
   },
   {
     name: UserColumns.email,
@@ -71,7 +89,7 @@ const columns: Array<UserHeaders> = [
   },
   {
     name: UserColumns.lifetime_login,
-    required: true,
+    required: false,
     label: 'Lifetime Login',
     align: 'center',
     field: UserColumns.lifetime_login,
@@ -79,7 +97,7 @@ const columns: Array<UserHeaders> = [
   },
   {
     name: UserColumns.last_login_time,
-    required: true,
+    required: false,
     label: 'Last Login Time',
     align: 'center',
     field: UserColumns.last_login_time,

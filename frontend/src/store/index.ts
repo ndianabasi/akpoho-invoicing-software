@@ -25,7 +25,7 @@ import users from './users';
 import { UsersStateInterface } from './users/state';
 import { UsersGetterInterface } from './users/getters';
 
-import { createLogger } from 'vuex';
+//import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
 import SecureLS from 'secure-ls';
@@ -186,15 +186,7 @@ export default function (/* { ssrContext } */) {
     },
     plugins:
       process.env.NODE_ENV !== 'production'
-        ? [
-            createLogger({
-              collapsed: false, // auto-expand logged mutations
-              logActions: true, // Log Actions
-              logMutations: true, // Log mutations
-              logger: console, // implementation of the `console` API, default `console`
-            }),
-            createPersistedState(),
-          ]
+        ? [createPersistedState()]
         : [
             createPersistedState({
               storage: {

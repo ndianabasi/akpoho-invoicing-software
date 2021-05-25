@@ -148,14 +148,7 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import {
-  defineComponent,
-  ref,
-  Ref,
-  computed,
-  watchEffect,
-  onBeforeMount,
-} from 'vue';
+import { defineComponent, ref, Ref, watchEffect, onBeforeMount } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 

@@ -1,4 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
 import User from 'App/Models/User'
 import { CustomContextContract } from '../../Controllers/types/index'
 
@@ -9,7 +10,7 @@ export default class UsersController {
     const { search, page, descending, perPage, sortBy } = request.qs()
     //console.log(search, page, descending, perPage, sortBy)
 
-    let subquery = User.query()
+    let subquery = Database.from('users')
       .select(
         'users.id',
         'users.email',
