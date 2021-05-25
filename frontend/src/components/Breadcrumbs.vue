@@ -2,10 +2,10 @@
   <q-breadcrumbs
     class="desktop-only text-grey"
     active-color="primary"
-    style="font-size: 16px"
+    style="font-size: 12px; max-width: 50%"
   >
     <template #separator>
-      <q-icon size="1.2em" name="arrow_forward" color="secondary" />
+      <q-icon size="1em" name="arrow_forward" color="secondary" />
     </template>
     <q-breadcrumbs-el
       v-for="route in routes"
@@ -13,6 +13,7 @@
       :label="route.meta.label"
       :icon="route.meta.icon"
       :to="{ name: route.name }"
+      exact
     />
   </q-breadcrumbs>
 </template>

@@ -49,7 +49,7 @@ export default class UsersController {
 
     const user = await User.query()
       .preload('role', (roleQuery) => roleQuery.select('name'))
-      .preload('profile', (profileQuery) => profileQuery.select('first_name', 'last_name'))
+      .preload('profile')
       .where('id', requestedUser?.id!)
       .first()
 
