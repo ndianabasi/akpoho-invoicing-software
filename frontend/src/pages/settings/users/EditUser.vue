@@ -2,24 +2,8 @@
   <div class="q-pa-md">
     <div class="row justify-center">
       <div class="col-md-6 col-sm-12 col-xs-12">
-        <q-card v-if="user" class="my-card" flat bordered>
-          <q-item>
-            <q-item-section avatar>
-              <q-avatar>
-                <img :src="user.profile.profile_picture" />
-              </q-avatar>
-            </q-item-section>
-
-            <q-item-section>
-              <q-item-label class="text-h6">{{
-                `${user.profile.first_name} ${user.profile.last_name}`
-              }}</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-separator />
-
-          <q-card-section>
+        <view-card v-if="user" :title-info="titleInfo" show-avatar>
+          <template #body-panel>
             <form class="q-pa-md" @submit.prevent="submitForm">
               <q-input
                 v-model="v$.email.$model"
@@ -130,6 +114,9 @@
                 <template #error> <div>Sorry! Invalid input</div> </template>
               </q-select>
             </form>
+          </template>
+
+          <template #footer-panel>
             <div class="row justify-center q-mb-xl">
               <q-btn
                 type="submit"
@@ -141,13 +128,26 @@
                 @click.prevent="submitForm"
               >
                 <!-- eslint-disable-next-line vue/v-slot-style -->
-                <template v-slot:loading>
+                <template #loading>
                   <q-spinner-facebook color="white" />
                 </template>
               </q-btn>
             </div>
-          </q-card-section>
-        </q-card>
+          </template>
+
+          <template #title-panel-side>
+            <q-btn
+              :to="{
+                name: 'view_user',
+                params: { userId: userId }, //userId from route props
+              }"
+              flat
+              round
+              color="primary"
+              icon="remove_red_eye"
+            />
+          </template>
+        </view-card>
       </div>
     </div>
   </div>
@@ -157,16 +157,26 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { defineComponent, ref, onBeforeMount, reactive } from 'vue';
 import {
-  stopFetchCurrentlyViewedUser,
-  currentUser,
-} from '../../../composables/useFetchCurrentlyViewedUser';
+  defineComponent,
+  ref,
+  onBeforeMount,
+  watchEffect,
+  computed,
+} from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, email } from '@vuelidate/validators';
+import ViewCard from '../../../components/ViewCard.vue';
+import useTitleInfo from '../../../composables/useTitleInfo';
+import { store } from '../../../store';
+import { CurrentlyViewedUser } from '../../../store/types';
 
 export default defineComponent({
   name: 'EditUser',
+
+  components: {
+    ViewCard,
+  },
 
   props: {
     userId: {
@@ -248,6 +258,24 @@ export default defineComponent({
       },
     ]);
 
+    const currentUser = computed(
+      () =>
+        store.getters['users/GET_CURRENTLY_VIEWED_USER'] as CurrentlyViewedUser
+    );
+
+    const titleInfo = useTitleInfo({
+      title: `${currentUser?.value?.profile?.first_name ?? ''} ${
+        currentUser?.value?.profile?.last_name ?? ''
+      }`,
+      avatar: currentUser?.value?.profile?.profile_picture ?? '',
+    });
+
+    const stopFetchCurrentlyViewedUser = watchEffect(() => {
+      void store.dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
+        userId: props.userId,
+      });
+    });
+
     const form = ref({
       first_name: currentUser?.value?.profile.first_name,
       last_name: currentUser?.value?.profile.last_name,
@@ -271,7 +299,7 @@ export default defineComponent({
     const v$ = useVuelidate(rules, form);
 
     onBeforeMount(() => {
-      stopFetchCurrentlyViewedUser(props.userId);
+      stopFetchCurrentlyViewedUser();
     });
 
     return {
@@ -290,6 +318,7 @@ export default defineComponent({
       v$,
       titles,
       profileTextFields,
+      titleInfo,
     };
   },
 });

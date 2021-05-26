@@ -1,7 +1,6 @@
-import Bouncer, { BasePolicy } from '@ioc:Adonis/Addons/Bouncer'
+import { BasePolicy } from '@ioc:Adonis/Addons/Bouncer'
 import User from 'App/Models/User'
 import Customer from 'App/Models/Customer'
-import PermissionHelper from '../Helpers/PermissionHelper'
 import Company from 'App/Models/Company'
 import { accessCompany, accessCompanyCustomer } from 'App/Helpers/PolicyHelper'
 

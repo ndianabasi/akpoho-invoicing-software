@@ -2,37 +2,13 @@
   <div class="q-pa-md">
     <div class="row justify-center">
       <div class="col-md-6 col-sm-12 col-xs-12">
-        <q-card v-if="user" class="my-card" flat bordered>
-          <q-item>
-            <q-item-section avatar>
-              <q-avatar>
-                <img :src="user.profile.profile_picture" />
-              </q-avatar>
-            </q-item-section>
-
-            <q-item-section>
-              <q-item-label class="text-h6">{{
-                `${user.profile.first_name} ${user.profile.last_name}`
-              }}</q-item-label>
-            </q-item-section>
-
-            <q-item-section side>
-              <q-btn
-                :to="{
-                  name: 'edit_user',
-                  params: { userId: userId }, //userId from route props
-                }"
-                flat
-                round
-                color="primary"
-                icon="edit"
-              />
-            </q-item-section>
-          </q-item>
-
-          <q-separator />
-
-          <q-card-section>
+        <view-card
+          v-if="user"
+          :title-info="titleInfo"
+          show-avatar
+          show-title-panel-side
+        >
+          <template #body-panel>
             <q-tabs
               v-model="tab"
               align="justify"
@@ -351,8 +327,21 @@
                 </q-tab-panel>
               </q-tab-panels>
             </div>
-          </q-card-section>
-        </q-card>
+          </template>
+
+          <template #title-panel-side>
+            <q-btn
+              :to="{
+                name: 'edit_user',
+                params: { userId: userId }, //userId from route props
+              }"
+              flat
+              round
+              color="primary"
+              icon="edit"
+            />
+          </template>
+        </view-card>
       </div>
     </div>
   </div>
@@ -362,14 +351,25 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { defineComponent, ref, onBeforeMount } from 'vue';
 import {
-  stopFetchCurrentlyViewedUser,
-  currentUser,
-} from '../../../composables/useFetchCurrentlyViewedUser';
+  defineComponent,
+  ref,
+  onBeforeMount,
+  watchEffect,
+  computed,
+} from 'vue';
+import ViewCard from '../../../components/ViewCard.vue';
+import useTitleInfo from '../../../composables/useTitleInfo';
+import { CurrentlyViewedUser } from '../../../store/types';
+import { store } from '../../../store';
 
 export default defineComponent({
   name: 'ViewUser',
+
+  components: {
+    ViewCard,
+  },
+
   props: {
     userId: {
       type: String,
@@ -379,13 +379,32 @@ export default defineComponent({
   },
 
   setup(props) {
+    const currentUser = computed(
+      () =>
+        store.getters['users/GET_CURRENTLY_VIEWED_USER'] as CurrentlyViewedUser
+    );
+
+    const titleInfo = useTitleInfo({
+      title: `${currentUser?.value?.profile?.first_name ?? ''} ${
+        currentUser?.value?.profile?.last_name ?? ''
+      }`,
+      avatar: currentUser?.value?.profile?.profile_picture ?? '',
+    });
+
+    const stopFetchCurrentlyViewedUser = watchEffect(() => {
+      void store.dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
+        userId: props.userId,
+      });
+    });
+
     onBeforeMount(() => {
-      stopFetchCurrentlyViewedUser(props.userId);
+      stopFetchCurrentlyViewedUser();
     });
 
     return {
       user: currentUser,
       tab: ref('user_account'),
+      titleInfo,
     };
   },
 });

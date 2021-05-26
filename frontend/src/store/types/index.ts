@@ -114,8 +114,19 @@ export type CurrentlyViewedUser = {
     phone_number: string;
     address: string;
     city: string;
+    profile_picture: string;
   };
   email: string;
   login_status: boolean;
   role: StringIDNameInterface;
 };
+
+export interface SelectionOption {
+  label: string;
+  value: string & number & boolean;
+}
+
+export interface TitleInfo extends Object {
+  title: string;
+  avatar: string;
+}

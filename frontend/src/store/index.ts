@@ -158,8 +158,6 @@ export default function (/* { ssrContext } */) {
       },
       getHttpTimeout: (state) => state.httpTimeout,
       getHttpOptions: (state, getters) => {
-        console.log(getters['auth/getToken']);
-
         return {
           baseURL: getters.getBaseURL as string,
           timeout: getters.getHttpTimeout as number,
