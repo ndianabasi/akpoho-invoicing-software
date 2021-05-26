@@ -22,7 +22,7 @@ export default class Country extends BaseModel {
   public countryCode: string
 
   @column()
-  public currency: string
+  public currency: string | null
 
   @column()
   public currencyCode: string
