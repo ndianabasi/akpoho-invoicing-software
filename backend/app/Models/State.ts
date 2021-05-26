@@ -16,7 +16,7 @@ export default class State extends BaseModel {
   public code: string
 
   @column()
-  public countryNumericCode: string
+  public countryNumericCode: number
 
   @column()
   public countryId: number
