@@ -15,6 +15,19 @@
                 `${user.profile.first_name} ${user.profile.last_name}`
               }}</q-item-label>
             </q-item-section>
+
+            <q-item-section side>
+              <q-btn
+                :to="{
+                  name: 'edit_user',
+                  params: { userId: userId }, //userId from route props
+                }"
+                flat
+                round
+                color="primary"
+                icon="edit"
+              />
+            </q-item-section>
           </q-item>
 
           <q-separator />
@@ -349,36 +362,25 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { defineComponent, ref, Ref, watchEffect, onBeforeMount } from 'vue';
-import { useStore } from 'vuex';
-import { useRoute } from 'vue-router';
+import { defineComponent, ref, onBeforeMount } from 'vue';
+import {
+  stopFetchCurrentlyViewedUser,
+  currentUser,
+} from '../../../composables/useFetchCurrentlyViewedUser';
 
 export default defineComponent({
   name: 'ViewUser',
+  props: {
+    userId: {
+      type: String,
+      required: false,
+      default: '',
+    },
+  },
 
-  setup() {
-    const store = useStore();
-    const route = useRoute();
-    let currentUser: Ref<unknown> = ref(null);
-
-    const stopFetchCurrentlyViewedUser = watchEffect(() => {
-      void store
-        .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
-          userId: route.params.userId,
-        })
-        .then(() => {
-          currentUser.value = JSON.parse(
-            JSON.stringify(
-              store.getters['users/GET_CURRENTLY_VIEWED_USER'] as unknown
-            )
-          );
-        });
-    });
-
-    console.log(currentUser);
-
+  setup(props) {
     onBeforeMount(() => {
-      stopFetchCurrentlyViewedUser();
+      stopFetchCurrentlyViewedUser(props.userId);
     });
 
     return {

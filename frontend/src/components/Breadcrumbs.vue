@@ -12,7 +12,7 @@
       :key="'route:' + route.name"
       :label="route.meta.label"
       :icon="route.meta.icon"
-      :to="{ name: route.name }"
+      :to="route.path"
       exact
     />
   </q-breadcrumbs>

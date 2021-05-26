@@ -105,3 +105,17 @@ export type SelectOption = {
   icon?: string;
   description?: string;
 };
+
+export type CurrentlyViewedUser = {
+  profile: {
+    first_name: string;
+    last_name: string;
+    middle_name: string;
+    phone_number: string;
+    address: string;
+    city: string;
+  };
+  email: string;
+  login_status: boolean;
+  role: StringIDNameInterface;
+};
