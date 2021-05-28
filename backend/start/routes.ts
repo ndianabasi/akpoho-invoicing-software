@@ -24,7 +24,7 @@ Route.group(() => {
   Route.post('/login', 'AuthController.login')
 }).prefix('/v1')
 
-// Authenticated routes
+// General Authenticated routes
 Route.group(() => {
   Route.get('/auth-profile', 'AuthController.authProfile')
 
@@ -34,11 +34,21 @@ Route.group(() => {
       revoked: true,
     })
   })
+
+  Route.get('/countries/countries-for-select', 'CountriesController.countriesForSelect')
+
+  Route.get(
+    '/countries/:country_id/states-for-select',
+    'CountriesController.countryStatesForSelect'
+  )
+
+  Route.get('/roles/roles-for-select', 'RolesController.rolesForSelect')
 })
   .prefix('/v1')
   .middleware('auth')
+  .middleware('findAuthRole')
 
-// Company-specific routes
+// Authenticated company-specific routes
 Route.group(() => {
   Route.get('/:company_id/customers', 'CustomersController.index')
   Route.get('/:company_id/customers/:customer_id', 'CustomersController.show').middleware(
@@ -53,16 +63,5 @@ Route.group(() => {
 })
   .prefix('/v1')
   .middleware('auth')
+  .middleware('findAuthRole')
   .middleware('findRequestedCompany')
-
-// Non-Company-specific routes
-Route.group(() => {
-  Route.get('/countries/countries-for-select', 'CountriesController.countriesForSelect')
-
-  Route.get(
-    '/countries/:country_id/states-for-select',
-    'CountriesController.countryStatesForSelect'
-  )
-})
-  .prefix('/v1')
-  .middleware('auth')

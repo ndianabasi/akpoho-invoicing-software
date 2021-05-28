@@ -29,6 +29,10 @@ import countries_states from './countries_states';
 import { CountriesStatesStateInterface } from './countries_states/state';
 import { CountriesStatesGetterInterface } from './countries_states/getters';
 
+import roles from './roles';
+import { RolesStateInterface } from './roles/state';
+import { RolesGetterInterface } from './roles/getters';
+
 //import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -86,6 +90,7 @@ export interface StateInterface {
   quasar_tables?: QuasarTableStateInterface;
   users?: UsersStateInterface;
   countries_states?: CountriesStatesStateInterface;
+  roles?: RolesStateInterface;
 }
 
 export interface StoreGettersInterface {
@@ -95,6 +100,7 @@ export interface StoreGettersInterface {
   quasar_tables?: QuasarTableGetterInterface;
   users?: UsersGetterInterface;
   countries_states?: CountriesStatesGetterInterface;
+  roles?: RolesGetterInterface;
 }
 
 export type StoreGetters = RootGetterInterface & StoreGettersInterface;
@@ -188,6 +194,7 @@ export default function (/* { ssrContext } */) {
       quasar_tables,
       users,
       countries_states,
+      roles,
     },
     plugins:
       process.env.NODE_ENV !== 'production'

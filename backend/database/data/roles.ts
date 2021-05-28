@@ -15,6 +15,11 @@ export const roles = [
       'Users assigned can view every resource across companies but cannot edit or delete them.',
   },
   {
+    name: 'Developer',
+    description:
+      'A developer has access to all resources and settings and hidden/unfinished/beta resources not meant for general/production use.',
+  },
+  {
     name: 'CompanyAdmin',
     description:
       'Users assigned to this role can create, view, edit, and delete any resource within his or her company but cannot delete the company itself. This role can view and edit all company settings. This is the role with the highest privilege in the company.',
@@ -29,9 +34,6 @@ export const roles = [
     description:
       'Users assigned to the role can only view company resource but cannot edit r delete them.',
   },
-  {
-    name: 'Developer',
-    description:
-      'A developer has access to all resources and settings and hidden/unfinished/beta resources not meant for general/production use.',
-  },
 ]
+
+export const globalRoles = ['SuperAdmin', 'SuperEditor', 'SuperViewer', 'Developer']

@@ -1,10 +1,9 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
 import User from 'App/Models/User'
-import { CustomContextContract } from '../../Controllers/types/index'
 
 export default class UsersController {
-  public async index({ response, requestedCompany, request, bouncer }: CustomContextContract) {
+  public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
     await bouncer.with('UserPolicy').authorize('list', requestedCompany!)
 
     const { search, page, descending, perPage, sortBy } = request.qs()
@@ -44,7 +43,7 @@ export default class UsersController {
     return response.ok({ data: users })
   }
 
-  public async show({ response, requestedCompany, requestedUser, bouncer }: CustomContextContract) {
+  public async show({ response, requestedCompany, requestedUser, bouncer }: HttpContextContract) {
     await bouncer.with('UserPolicy').authorize('view', requestedCompany!, requestedUser!)
 
     const user = await User.query()

@@ -6,7 +6,7 @@
           <template #body-panel>
             <form class="q-pa-md" @submit.prevent="submitForm">
               <q-input
-                v-model="v$.email.$model"
+                v-model="form$.email.$model"
                 filled
                 clearable
                 bottom-slots
@@ -14,37 +14,49 @@
                 :dense="dense"
                 class="q-mb-md"
                 type="email"
-                :error="v$.email.$error"
+                :error="form$.email.$error"
               >
                 <template #before>
                   <q-icon name="email" />
                 </template>
 
-                <template #error
-                  ><small
-                    v-for="(error, index) in v$.email.$errors"
-                    :key="'email_error_' + index"
-                    >{{ error.$message }}</small
-                  ></template
-                >
+                <template #error>
+                  {{
+                    form$.email.$silentErrors
+                      .map((error) => error.$message)
+                      .join(', ')
+                  }}
+                </template>
               </q-input>
 
               <q-select
                 v-model="form.role_id"
                 filled
-                :options="plainCountries"
+                :options="roles"
                 label="Role"
                 clearable
                 bottom-slots
+                options-dense
+                use-input
+                emit-value
+                map-options
                 class="q-mb-md"
                 transition-show="scale"
                 transition-hide="scale"
-                ><template #before>
+                :error="form$.role_id.$invalid"
+                @update:modelValue="processSelect('role_id', $event)"
+              >
+                <template #before>
                   <q-icon name="person" />
                 </template>
 
-                <template #hint> Field hint </template>
-                <template #error> Sorry! Invalid input </template>
+                <template #error>
+                  {{
+                    form$.role_id.$silentErrors
+                      .map((error) => error.$message)
+                      .join(', ')
+                  }}
+                </template>
               </q-select>
 
               <q-input
@@ -56,14 +68,22 @@
                 bottom-slots
                 :label="field.label"
                 :dense="dense"
+                :error="form$?.[field.name]?.$invalid ?? false"
                 class="q-mb-md"
               >
                 <template #before>
                   <q-icon name="person" />
                 </template>
 
-                <template #hint> Field hint </template>
-                <template #error> Sorry! Invalid input </template>
+                <template #error>
+                  {{
+                    form$ && form$[field.name]
+                      ? form$[field.name].$silentErrors
+                          .map((error) => error.$message)
+                          .join(', ')
+                      : ''
+                  }}
+                </template>
               </q-input>
 
               <q-select
@@ -174,7 +194,7 @@ import {
   ComputedRef,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
-import { required, email } from '@vuelidate/validators';
+import { required, email, helpers } from '@vuelidate/validators';
 import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
 import { store } from '../../../store';
@@ -217,13 +237,20 @@ export default defineComponent({
     });
 
     const rules = {
-      first_name: { required },
-      last_name: { required },
-      role_id: { required },
-      email: { email, required },
+      first_name: {
+        required: helpers.withMessage('First name is required.', required),
+      },
+      last_name: {
+        required: helpers.withMessage('Last name is required.', required),
+      },
+      role_id: { required: helpers.withMessage('Role is required.', required) },
+      email: {
+        email: helpers.withMessage('Email is not valid.', email),
+        required: helpers.withMessage('Email is required.', required),
+      },
     };
 
-    const v$ = useVuelidate(rules, form);
+    const form$ = useVuelidate(rules, form);
 
     function submitForm() {
       submitting.value = true;
@@ -253,12 +280,12 @@ export default defineComponent({
         label: 'First Name',
       },
       {
-        name: 'last_name',
-        label: 'Last Name',
-      },
-      {
         name: 'middle_name',
         label: 'Middle Name',
+      },
+      {
+        name: 'last_name',
+        label: 'Last Name',
       },
       {
         name: 'phone_number',
@@ -288,6 +315,10 @@ export default defineComponent({
         ] as SelectionOption[]
     );
 
+    const roles = computed(
+      () => store.getters['roles/GET_ROLES_FOR_SELECT'] as SelectionOption[]
+    );
+
     const titleInfo = useTitleInfo({
       title: `${currentUser?.value?.profile?.first_name ?? ''} ${
         currentUser?.value?.profile?.last_name ?? ''
@@ -303,6 +334,10 @@ export default defineComponent({
 
     const stopFetchCountriesForSelect = watchEffect(() => {
       void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
+    });
+
+    const stopFetchRolesForSelect = watchEffect(() => {
+      void store.dispatch('roles/FETCH_ROLES_FOR_SELECT');
     });
 
     watch(
@@ -321,6 +356,7 @@ export default defineComponent({
     onBeforeMount(() => {
       stopFetchCurrentlyViewedUser();
       stopFetchCountriesForSelect();
+      stopFetchRolesForSelect();
     });
 
     interface SelectCallback {
@@ -375,12 +411,13 @@ export default defineComponent({
       form,
       submitForm,
       processSelect,
-      v$,
+      form$,
       profileTextFields,
       titleInfo,
       plainCountries,
       plainCountryStates,
       selectFilterFn,
+      roles,
     };
   },
 });
