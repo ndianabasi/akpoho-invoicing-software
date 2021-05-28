@@ -27,6 +27,7 @@ export interface ResponseData {
   statusText?: string;
   stack?: string;
   data: ResponseData & PaginatedData;
+  errors?: Array<{ rule: string; field: string; message: string }>;
 }
 
 export type PaginatedData = {
@@ -129,4 +130,17 @@ export interface SelectionOption {
 export interface TitleInfo extends Object {
   title: string;
   avatar: string;
+}
+
+export interface UserFormShape extends Object {
+  first_name: string;
+  last_name: string;
+  middle_name: string;
+  phone_number: string;
+  address: string;
+  city: string;
+  email: string;
+  role_id: string;
+  state_id: string;
+  country_id: string;
 }

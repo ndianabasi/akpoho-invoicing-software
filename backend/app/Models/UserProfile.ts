@@ -33,10 +33,10 @@ export default class UserProfile extends BaseModel {
   public city: string
 
   @column()
-  public state: number
+  public stateId: number
 
   @column()
-  public country: number
+  public countryId: number
 
   @column()
   public profilePicture: string

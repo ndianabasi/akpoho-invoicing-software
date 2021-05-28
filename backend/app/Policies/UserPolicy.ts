@@ -12,7 +12,10 @@ export default class UserPolicy extends BasePolicy {
 
   public async create(user: User) {}
 
-  public async update(user: User, Customer: Customer) {}
+  public async edit(authUser: User, requestedCompany: Company, requestedUser: User) {
+    const resourcePermission = 'can_edit_users'
+    return await accessCompanyUser(resourcePermission, authUser, requestedCompany, requestedUser)
+  }
 
   public async delete(authUser: User, requestedCompany: Company, requestedUser: User) {
     const resourcePermission = 'can_delete_users'

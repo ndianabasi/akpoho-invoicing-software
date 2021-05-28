@@ -12,7 +12,7 @@ export default class CustomerPolicy extends BasePolicy {
 
   public async create(user: User) {}
 
-  public async update(user: User, Customer: Customer) {}
+  public async edit(user: User, Customer: Customer) {}
 
   public async delete(user: User, company: Company, customer: Customer) {
     const resourcePermission = 'can_delete_customers'

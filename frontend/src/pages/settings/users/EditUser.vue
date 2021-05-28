@@ -44,7 +44,6 @@
                 transition-show="scale"
                 transition-hide="scale"
                 :error="form$.role_id.$invalid"
-                @update:modelValue="processSelect('role_id', $event)"
               >
                 <template #before>
                   <q-icon name="person" />
@@ -103,7 +102,6 @@
                 emit-value
                 map-options
                 @filter="selectFilterFn"
-                @update:modelValue="processSelect('country_id', $event)"
                 ><template #before>
                   <q-icon name="business" />
                 </template>
@@ -130,7 +128,6 @@
                 emit-value
                 map-options
                 @filter="selectFilterFn"
-                @update:modelValue="processSelect('state_id', $event)"
                 ><template #before>
                   <q-icon name="business" />
                 </template>
@@ -198,7 +195,13 @@ import { required, email, helpers } from '@vuelidate/validators';
 import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
 import { store } from '../../../store';
-import { CurrentlyViewedUser, SelectionOption } from '../../../store/types';
+import {
+  CurrentlyViewedUser,
+  SelectionOption,
+  UserFormShape,
+} from '../../../store/types';
+import { Notify } from 'quasar';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'EditUser',
@@ -217,13 +220,14 @@ export default defineComponent({
 
   setup(props) {
     const submitting = ref(false);
+    const router = useRouter();
 
     const currentUser = computed(
       () =>
         store.getters['users/GET_CURRENTLY_VIEWED_USER'] as CurrentlyViewedUser
     );
 
-    const form = ref({
+    const form: Ref<UserFormShape> = ref({
       first_name: currentUser?.value?.profile.first_name,
       last_name: currentUser?.value?.profile.last_name,
       middle_name: currentUser?.value?.profile.middle_name,
@@ -250,27 +254,42 @@ export default defineComponent({
       },
     };
 
-    const form$ = useVuelidate(rules, form);
+    const form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
 
     function submitForm() {
-      submitting.value = true;
+      if (!form$.value.$invalid) {
+        submitting.value = true;
 
-      // Simulating a delay here.
-      // When we are done, we reset "submitting"
-      // Boolean to false to restore the
-      // initial state.
-      setTimeout(() => {
-        // delay simulated, we are done,
-        // now restoring submit to its initial state
-        submitting.value = false;
-      }, 3000);
-    }
-
-    function processSelect(field: string, modelValue: string) {
-      if (!modelValue) {
-        if (field === 'role_id') form.value.role_id = '';
-        if (field === 'country_id') form.value.country_id = '';
-        if (field === 'state_id') form.value.state_id = '';
+        void store
+          .dispatch('users/EDIT_USER', {
+            userId: props.userId,
+            form: form.value,
+          })
+          .then(() => {
+            submitting.value = false;
+            void router.push({
+              name: 'view_user',
+              params: { userId: props.userId },
+            });
+            return;
+          })
+          .catch(() => {
+            submitting.value = false;
+          });
+      } else {
+        Notify.create({
+          message: 'Errors exist on the form!',
+          type: 'negative',
+          position: 'bottom',
+          progress: true,
+          timeout: 2500,
+          actions: [
+            {
+              label: 'Dismiss',
+              color: 'white',
+            },
+          ],
+        });
       }
     }
 
@@ -410,7 +429,6 @@ export default defineComponent({
       submitting,
       form,
       submitForm,
-      processSelect,
       form$,
       profileTextFields,
       titleInfo,

@@ -1,6 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
 import User from 'App/Models/User'
+import UserValidator from 'App/Validators/UserValidator'
 
 export default class UsersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -55,7 +56,49 @@ export default class UsersController {
     return response.ok({ data: user })
   }
 
-  public async update({}: HttpContextContract) {}
+  public async update({
+    response,
+    requestedCompany,
+    requestedUser,
+    request,
+    bouncer,
+  }: HttpContextContract) {
+    await request.validate(UserValidator)
+
+    await bouncer.with('UserPolicy').authorize('edit', requestedCompany!, requestedUser!)
+
+    const {
+      first_name,
+      last_name,
+      middle_name,
+      phone_number,
+      address,
+      city,
+      email,
+      role_id,
+      state_id,
+      country_id,
+    } = request.body()
+
+    requestedUser?.merge({ email, roleId: role_id })
+    await requestedUser?.save()
+
+    await requestedUser?.load('profile')
+    const requestedUserProfile = requestedUser?.profile
+    requestedUserProfile?.merge({
+      firstName: first_name,
+      middleName: middle_name,
+      lastName: last_name,
+      phoneNumber: phone_number,
+      address,
+      city,
+      stateId: state_id || null,
+      countryId: country_id || null,
+    })
+    await requestedUserProfile?.save()
+
+    return response.created()
+  }
 
   public async destroy({}: HttpContextContract) {}
 }

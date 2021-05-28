@@ -5,7 +5,12 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { UsersStateInterface /* Users */ } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpResponse, HttpError, StringIDNameInterface } from '../types';
+import {
+  HttpResponse,
+  HttpError,
+  StringIDNameInterface,
+  UserFormShape,
+} from '../types';
 import { Notify } from 'quasar';
 
 const actions: ActionTree<UsersStateInterface, StateInterface> = {
@@ -42,6 +47,41 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
             ],
           });
 
+          reject(error);
+        });
+    });
+  },
+
+  async EDIT_USER(
+    { rootGetters },
+    { userId, form }: { userId: string; form: UserFormShape }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      await $http
+        .patch(`/${currentCompany.id}/users/${userId}`, { ...form })
+        .then((res: HttpResponse) => {
+          resolve(res.data);
+
+          Notify.create({
+            message: 'User was successfully edited',
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+        })
+        .catch((error: HttpError) => {
           reject(error);
         });
     });

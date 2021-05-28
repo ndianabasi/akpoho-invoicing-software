@@ -60,6 +60,9 @@ Route.group(() => {
 
   Route.get('/:company_id/users', 'UsersController.index')
   Route.get('/:company_id/users/:user_id', 'UsersController.show').middleware('findRequestedUser')
+  Route.patch('/:company_id/users/:user_id', 'UsersController.update').middleware(
+    'findRequestedUser'
+  )
 })
   .prefix('/v1')
   .middleware('auth')

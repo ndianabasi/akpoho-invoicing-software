@@ -73,6 +73,28 @@ export default boot(
               },
             ],
           });
+        } else if (error?.response?.status === 422) {
+          // Intercept validation errors
+          const validationErrors = error?.response?.data?.errors;
+          if (Array.isArray(validationErrors) && validationErrors.length) {
+            const errorListItems: string[] = validationErrors.map(
+              (error) => `<li>${error.message}</li>`
+            );
+            Notify.create({
+              message: '<ul>' + errorListItems.join('') + '</ul>',
+              html: true,
+              type: 'negative',
+              position: 'top',
+              progress: true,
+              timeout: 10000,
+              actions: [
+                {
+                  label: 'Dismiss',
+                  color: 'white',
+                },
+              ],
+            });
+          }
         }
 
         return Promise.reject(error);
