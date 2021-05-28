@@ -5,23 +5,30 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { CountriesStatesStateInterface /* Users */ } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpResponse, StringIDNameInterface } from '../types';
+import { HttpResponse } from '../types';
 
 const actions: ActionTree<CountriesStatesStateInterface, StateInterface> = {
-  async FETCH_COUNTRIES_STATES_FOR_SELECT(
-    { commit, rootGetters },
-    { userId }: { userId: string }
+  async FETCH_COUNTRIES_FOR_SELECT({ commit }) {
+    return new Promise(async (resolve) => {
+      await $http
+        .get('/countries/countries-for-select')
+        .then((res: HttpResponse) => {
+          commit('SET_COUNTRIES_FOR_SELECT', res.data.data);
+
+          resolve(res.data);
+        });
+    });
+  },
+
+  async FETCH_COUNTRY_STATES_FOR_SELECT(
+    { commit },
+    { countryId }: { countryId: string }
   ) {
     return new Promise(async (resolve) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const currentCompany = rootGetters[
-        'auth/GET_CURRENT_COMPANY'
-      ] as StringIDNameInterface;
-
       await $http
-        .get(`/${currentCompany.id}/users/${userId}`)
+        .get(`/countries/${countryId}/states-for-select`)
         .then((res: HttpResponse) => {
-          commit('SET_COUNTRIES_STATES_FOR_SELECT', res.data.data);
+          commit('SET_COUNTRY_STATES_FOR_SELECT', res.data.data);
 
           resolve(res.data);
         });

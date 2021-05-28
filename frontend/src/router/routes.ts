@@ -3,7 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('../layouts/MainLayout.vue'),
     name: 'Home',
     meta: {
       label: 'Home',
@@ -12,10 +12,10 @@ const routes: RouteRecordRaw[] = [
       //canViewOrganisations: true,
     },
     children: [
-      { path: '', component: () => import('pages/Index.vue') },
+      { path: '', component: () => import('../pages/Index.vue') },
       {
         path: 'customers',
-        component: () => import('pages/customers/Index.vue'),
+        component: () => import('../pages/customers/Index.vue'),
         meta: {
           label: 'Customers',
           icon: 'people',
@@ -24,7 +24,7 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: '',
-            component: () => import('pages/customers/AllCustomers.vue'),
+            component: () => import('../pages/customers/AllCustomers.vue'),
             name: 'customers',
             meta: {
               label: 'All Customers',
@@ -34,7 +34,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             path: ':customerId',
-            component: () => import('pages/customers/Customer.vue'),
+            component: () => import('../pages/customers/Customer.vue'),
             props: true,
             name: 'view_customer',
             meta: {
@@ -44,7 +44,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             path: 'new',
-            component: () => import('pages/customers/CreateCustomer.vue'),
+            component: () => import('../pages/customers/CreateCustomer.vue'),
             name: 'create_customer',
             meta: {
               label: 'New Customer',
@@ -56,7 +56,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'quotations',
         name: 'quotations',
-        component: () => import('pages/quotations/index.vue'),
+        component: () => import('../pages/quotations/index.vue'),
         meta: {
           label: 'All Quotations',
           icon: 'request_page',
@@ -65,7 +65,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: '/quotations/new',
-        component: () => import('pages/quotations/CreateQuotation.vue'),
+        component: () => import('../pages/quotations/CreateQuotation.vue'),
         name: 'create_quotation',
         meta: {
           label: 'New Quotation',
@@ -75,7 +75,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'invoices',
         name: 'invoices',
-        component: () => import('pages/invoices/index.vue'),
+        component: () => import('../pages/invoices/index.vue'),
         meta: {
           label: 'All Invoices',
           icon: 'list_alt',
@@ -84,7 +84,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: '/invoices/new',
-        component: () => import('pages/invoices/CreateInvoice.vue'),
+        component: () => import('../pages/invoices/CreateInvoice.vue'),
         name: 'create_invoice',
         meta: {
           label: 'New Invoice',
@@ -94,7 +94,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'receipts',
         name: 'receipts',
-        component: () => import('pages/receipts/index.vue'),
+        component: () => import('../pages/receipts/index.vue'),
         meta: {
           label: 'All Receipts',
           icon: 'receipt',
@@ -103,7 +103,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: '/receipts/new',
-        component: () => import('pages/receipts/CreateReceipt.vue'),
+        component: () => import('../pages/receipts/CreateReceipt.vue'),
         name: 'create_receipt',
         meta: {
           label: 'New Receipt',
@@ -112,7 +112,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'settings',
-        component: () => import('pages/settings/Index.vue'),
+        component: () => import('../pages/settings/Index.vue'),
         meta: {
           label: 'Settings',
           icon: 'settings',
@@ -121,7 +121,7 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: '',
-            component: () => import('pages/settings/AllSettings.vue'),
+            component: () => import('../pages/settings/AllSettings.vue'),
             name: 'all_settings',
             meta: {
               label: 'All Settings',
@@ -131,7 +131,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             path: 'users',
-            component: () => import('pages/settings/users/Index.vue'),
+            component: () => import('../pages/settings/users/Index.vue'),
             meta: {
               label: 'Users',
               //canViewOrganisations: true,
@@ -139,7 +139,7 @@ const routes: RouteRecordRaw[] = [
             children: [
               {
                 path: '',
-                component: () => import('pages/settings/users/AllUsers.vue'),
+                component: () => import('../pages/settings/users/AllUsers.vue'),
                 name: 'all_users',
                 meta: {
                   label: 'All Users',
@@ -149,7 +149,7 @@ const routes: RouteRecordRaw[] = [
               {
                 path: ':userId/view',
                 props: true,
-                component: () => import('pages/settings/users/User.vue'),
+                component: () => import('../pages/settings/users/User.vue'),
                 name: 'view_user',
                 meta: {
                   label: 'View User',
@@ -159,7 +159,7 @@ const routes: RouteRecordRaw[] = [
               {
                 path: ':userId/edit',
                 props: true,
-                component: () => import('pages/settings/users/EditUser.vue'),
+                component: () => import('../pages/settings/users/EditUser.vue'),
                 name: 'edit_user',
                 meta: {
                   label: 'Edit User',
@@ -174,7 +174,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/login',
-    component: () => import('pages/Login.vue'),
+    component: () => import('../pages/Login.vue'),
     name: 'Login',
     meta: {
       label: 'Login',
@@ -186,7 +186,7 @@ const routes: RouteRecordRaw[] = [
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/Error404.vue'),
+    component: () => import('../pages/Error404.vue'),
   },
 ];
 

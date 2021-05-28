@@ -57,11 +57,12 @@ Route.group(() => {
 
 // Non-Company-specific routes
 Route.group(() => {
+  Route.get('/countries/countries-for-select', 'CountriesController.countriesForSelect')
+
   Route.get(
     '/countries/:country_id/states-for-select',
     'CountriesController.countryStatesForSelect'
   )
-  Route.get('/countries/countries-for-select', 'CountriesController.countriesForSelect')
 })
   .prefix('/v1')
   .middleware('auth')

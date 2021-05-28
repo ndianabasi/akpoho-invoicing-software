@@ -32,7 +32,7 @@
               <q-select
                 v-model="form.role_id"
                 filled
-                :options="titles"
+                :options="plainCountries"
                 label="Role"
                 clearable
                 bottom-slots
@@ -69,43 +69,48 @@
               <q-select
                 v-model="form.country_id"
                 filled
-                :options="countriesList"
+                :options="plainCountries"
                 label="Country"
+                name="country_id"
                 clearable
                 bottom-slots
+                options-dense
+                use-input
+                input-debounce="0"
                 class="q-mb-md"
                 transition-show="scale"
                 transition-hide="scale"
                 emit-value
                 map-options
+                @filter="selectFilterFn"
                 @update:modelValue="processSelect('country_id', $event)"
                 ><template #before>
                   <q-icon name="business" />
                 </template>
 
                 <template #hint> Field hint </template>
-                <template #error> Sorry! Invalid input </template>
+                <template #error> <div>Sorry! Invalid input</div> </template>
               </q-select>
 
               <q-select
                 v-model="form.state_id"
                 filled
                 :disable="!form.country_id"
-                :placeholder="
-                  !form.company_country ? 'Please select the country first' : ''
-                "
-                :options="
-                  form.company_country ? countries[`${form.country_id}`] : []
-                "
+                :options="plainCountryStates"
                 label="State"
+                name="state_id"
                 clearable
                 bottom-slots
+                options-dense
+                use-input
+                input-debounce="0"
                 class="q-mb-md"
                 transition-show="scale"
                 transition-hide="scale"
                 emit-value
                 map-options
-                @update:modelValue="processSelect('company_state', $event)"
+                @filter="selectFilterFn"
+                @update:modelValue="processSelect('state_id', $event)"
                 ><template #before>
                   <q-icon name="business" />
                 </template>
@@ -162,14 +167,18 @@ import {
   ref,
   onBeforeMount,
   watchEffect,
+  watch,
   computed,
+  unref,
+  Ref,
+  ComputedRef,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, email } from '@vuelidate/validators';
 import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
 import { store } from '../../../store';
-import { CurrentlyViewedUser } from '../../../store/types';
+import { CurrentlyViewedUser, SelectionOption } from '../../../store/types';
 
 export default defineComponent({
   name: 'EditUser',
@@ -188,26 +197,33 @@ export default defineComponent({
 
   setup(props) {
     const submitting = ref(false);
-    const companies = ['Google', 'Facebook', 'Twitter', 'Apple', 'Oracle'];
-    const titles = ['Mr', 'Mrs', 'Miss', 'Dr', 'Prof', 'Chief', 'Sir'];
-    const countriesList = ref([
-      { value: 'google', label: 'Google' },
-      { value: 'facebook', label: 'Facebook' },
-      { value: 'twitter', label: 'Twitter' },
-      { value: 'apple', label: 'Apple' },
-      { value: 'oracle', label: 'Oracle' },
-    ]);
 
-    const countries_: { [index: string]: typeof countriesList.value } = {};
-    countriesList.value.forEach((country) => {
-      countries_[country.value] = [
-        { value: 'google', label: 'Google' },
-        { value: 'facebook', label: 'Facebook' },
-        { value: 'twitter', label: 'Twitter' },
-        { value: 'apple', label: 'Apple' },
-        { value: 'oracle', label: 'Oracle' },
-      ];
+    const currentUser = computed(
+      () =>
+        store.getters['users/GET_CURRENTLY_VIEWED_USER'] as CurrentlyViewedUser
+    );
+
+    const form = ref({
+      first_name: currentUser?.value?.profile.first_name,
+      last_name: currentUser?.value?.profile.last_name,
+      middle_name: currentUser?.value?.profile.middle_name,
+      phone_number: currentUser?.value?.profile.phone_number,
+      address: currentUser?.value?.profile.address,
+      city: currentUser?.value?.profile.city,
+      email: currentUser?.value?.email,
+      role_id: '',
+      state_id: '',
+      country_id: '',
     });
+
+    const rules = {
+      first_name: { required },
+      last_name: { required },
+      role_id: { required },
+      email: { email, required },
+    };
+
+    const v$ = useVuelidate(rules, form);
 
     function submitForm() {
       submitting.value = true;
@@ -258,9 +274,18 @@ export default defineComponent({
       },
     ]);
 
-    const currentUser = computed(
+    const countries = computed(
       () =>
-        store.getters['users/GET_CURRENTLY_VIEWED_USER'] as CurrentlyViewedUser
+        store.getters[
+          'countries_states/GET_COUNTRIES_FOR_SELECT'
+        ] as SelectionOption[]
+    );
+
+    const countryStates = computed(
+      () =>
+        store.getters[
+          'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
+        ] as SelectionOption[]
     );
 
     const titleInfo = useTitleInfo({
@@ -276,31 +301,69 @@ export default defineComponent({
       });
     });
 
-    const form = ref({
-      first_name: currentUser?.value?.profile.first_name,
-      last_name: currentUser?.value?.profile.last_name,
-      middle_name: currentUser?.value?.profile.middle_name,
-      phone_number: currentUser?.value?.profile.phone_number,
-      address: currentUser?.value?.profile.address,
-      city: currentUser?.value?.profile.city,
-      email: currentUser?.value?.email,
-      role_id: '',
-      state_id: '',
-      country_id: '',
+    const stopFetchCountriesForSelect = watchEffect(() => {
+      void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
     });
 
-    const rules = {
-      first_name: { required },
-      last_name: { required },
-      role_id: { required },
-      email: { email, required },
-    };
-
-    const v$ = useVuelidate(rules, form);
+    watch(
+      () => form.value.country_id,
+      (country) => {
+        if (country) {
+          form.value.state_id = '';
+          void store.dispatch(
+            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
+            { countryId: country }
+          );
+        }
+      }
+    );
 
     onBeforeMount(() => {
       stopFetchCurrentlyViewedUser();
+      stopFetchCountriesForSelect();
     });
+
+    interface SelectCallback {
+      (
+        val: string,
+        update: (fn: () => void, ref?: (ref: { name: string }) => void) => void
+      ): void;
+    }
+
+    const plainCountries = ref(unref(countries));
+    const plainCountryStates = ref(unref(countryStates));
+
+    const selectFilterFn: SelectCallback = function (val, update) {
+      let plainOptions: Ref<SelectionOption[]>;
+      let computedOptions: ComputedRef<SelectionOption[]>;
+
+      update(
+        () => {
+          // here you have access to "ref" which
+          // is the Vue reference of the QSelect
+        },
+        (ref) => {
+          const refName = ref.name;
+          if (refName === 'country_id') {
+            plainOptions = plainCountries;
+            computedOptions = countries;
+          } else if (refName === 'state_id') {
+            plainOptions = plainCountryStates;
+            computedOptions = countryStates;
+          }
+
+          if (val === '') plainOptions.value = computedOptions.value;
+          else {
+            const needle = val.toLowerCase();
+            plainOptions.value = computedOptions.value.filter(
+              (v) => v.label.toLowerCase().indexOf(needle) > -1
+            );
+          }
+        }
+      );
+
+      return;
+    };
 
     return {
       user: currentUser,
@@ -312,13 +375,12 @@ export default defineComponent({
       form,
       submitForm,
       processSelect,
-      companies,
-      countries: ref(countries_),
-      countriesList,
       v$,
-      titles,
       profileTextFields,
       titleInfo,
+      plainCountries,
+      plainCountryStates,
+      selectFilterFn,
     };
   },
 });
