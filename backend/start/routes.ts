@@ -65,6 +65,9 @@ Route.group(() => {
   Route.patch('/:company_id/users/:user_id', 'UsersController.update').middleware(
     'findRequestedUser'
   )
+  Route.delete('/:company_id/users/:user_id', 'UsersController.destroy').middleware(
+    'findRequestedUser'
+  )
   Route.post('/:company_id/users', 'UsersController.store')
 })
   .prefix('/v1')

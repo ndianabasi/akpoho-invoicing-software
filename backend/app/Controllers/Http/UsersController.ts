@@ -154,21 +154,34 @@ export default class UsersController {
       ?.related('users')
       .create({ email, loginStatus: login_status, roleId: role_id })
 
-    await newUser
-      ?.related('profile')
-      .create({
-        firstName: first_name,
-        middleName: middle_name,
-        lastName: last_name,
-        phoneNumber: phone_number,
-        address,
-        city,
-        stateId: state_id || null,
-        countryId: country_id || null,
-      })
+    await newUser?.related('profile').create({
+      firstName: first_name,
+      middleName: middle_name,
+      lastName: last_name,
+      phoneNumber: phone_number,
+      address,
+      city,
+      stateId: state_id || null,
+      countryId: country_id || null,
+    })
 
     return response.created({ data: newUser?.id })
   }
 
-  public async destroy({}: HttpContextContract) {}
+  public async destroy({
+    response,
+    requestedCompany,
+    requestedUser,
+    bouncer,
+  }: HttpContextContract) {
+    await bouncer.with('UserPolicy').authorize('delete', requestedCompany!, requestedUser!)
+
+    // Ensure that a SuperAdmin is not deleted
+    if (requestedUser?.role?.name !== ROLES.SUPERADMIN) {
+      requestedUser?.delete()
+      return response.created({ data: requestedUser?.id })
+    } else {
+      return response.badRequest({ message: 'User cannot be deleted!' })
+    }
+  }
 }

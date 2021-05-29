@@ -1,13 +1,21 @@
-declare type FieldFn = (row: TableRow) => string;
+import { SelectOption } from 'src/store/types';
+
+type FieldFn = (row: TableRow) => string;
 //declare type Format = (value: string) => string;
 
-declare interface Formatter<ValueType, RowType, FormattedType> {
+interface Formatter<ValueType, RowType, FormattedType> {
   (value: ValueType, row: RowType): FormattedType;
 }
 
 declare function SortStringToBooleanFn(arg1: string, arg2: string): boolean;
 declare function SortStringToNumberFn(arg1: string, arg2: string): number;
 declare function SortNumberFn(arg1: number, arg2: number): number;
+
+export enum InputTypes {
+  text = 'text',
+  select = 'select',
+  date = 'date',
+}
 
 export interface TableRow {
   name: string | Enumerator | unknown;
@@ -21,6 +29,9 @@ export interface TableRow {
   field: string | FieldFn | unknown;
   required?: boolean;
   format?: Formatter<unknown, unknown, unknown> | null;
+  filterable?: boolean;
+  filterInputType?: keyof typeof InputTypes;
+  filterOptions?: SelectOption[];
 }
 
 export interface GenericTableData extends Array<unknown> {

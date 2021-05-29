@@ -7,8 +7,8 @@
     no-results-label="Sorry! No users were found. Please check your filters too."
     row-view-route-name="view_user"
     row-edit-route-name="edit_user"
-    row-delete-action-type="customers/DELETE_CUSTOMER"
-    entity-name="Customer"
+    row-delete-action-type="users/DELETE_USER"
+    entity-name="User"
     table-data-fetch-end-point="users"
   ></quasar-table>
 </template>

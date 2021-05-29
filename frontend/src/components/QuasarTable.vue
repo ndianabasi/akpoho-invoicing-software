@@ -35,7 +35,13 @@
       </template>
 
       <template #top="props">
-        <div class="col-2 q-table__title">
+        <div
+          class="
+            col-md-2 col-xl-2 col-sm-12 col-xs-12
+            q-mb-sm-xl q-mb-xs-xl
+            q-table__title
+          "
+        >
           {{ nameOfTable }}&nbsp;<q-btn
             :to="{
               name: 'add_user',
@@ -72,6 +78,59 @@
           class="q-ml-md"
           @click="props.toggleFullscreen"
         />
+
+        <q-separator />
+
+        <div class="col-12 q-mt-md">
+          <q-expansion-item
+            v-model="filterPanelExpanded"
+            icon="filter"
+            label="Filters"
+          >
+            <q-card>
+              <q-card-section>
+                <div class="q-gutter-md row items-start">
+                  <template v-for="column in filterableColumns">
+                    <q-input
+                      v-if="column.filterInputType === 'text'"
+                      :key="'filter_text_input_' + column.name"
+                      v-model="filterForm[column.name]"
+                      :label="column.label"
+                      dense
+                      class="q-mb-md"
+                    >
+                    </q-input>
+                    <q-select
+                      v-else-if="column.filterInputType === 'select'"
+                      :key="'filter_select_input_' + column.name"
+                      v-model="filterForm[column.name]"
+                      :options="column?.filterOptions ?? []"
+                      :label="column.label"
+                      options-dense
+                      dense
+                      use-input
+                      emit-value
+                      map-options
+                      class="q-mb-md"
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                    </q-select>
+                    <q-input
+                      v-else
+                      :key="'filter_date_input_' + column.name"
+                      v-model="filterForm[column.name]"
+                      type="date"
+                      :label="column.label"
+                      stack-label
+                      dense
+                    />
+                  </template>
+                </div>
+              </q-card-section>
+            </q-card>
+          </q-expansion-item>
+        </div>
       </template>
 
       <template #header="props">
@@ -203,7 +262,7 @@ import {
   TableRequestInterface,
   RequestParams,
   RowProps,
-} from '../../src/types/table';
+} from '../types/table';
 import { useQuasar } from 'quasar';
 import { ResponseData } from '../store/types';
 import { useRouter } from 'vue-router';
@@ -249,7 +308,7 @@ export default defineComponent({
     },
     entityName: {
       type: String,
-      required: false,
+      required: true,
       default: 'Resource',
     },
     noResultsLabel: {
@@ -294,6 +353,21 @@ export default defineComponent({
           .map((column) => column)
       );
     };
+
+    const columns = props.tableColumns as TableRow[];
+    const filterableColumns = ref(
+      [...columns].filter(
+        (column) => column.filterable && column.filterInputType
+      )
+    );
+
+    const filterFormArray: string[] = filterableColumns.value.map(
+      (col) => col.name as string
+    );
+    let filterForm: { [index: string]: string } = reactive({});
+    filterFormArray.forEach((name) => {
+      filterForm[name] = '';
+    });
 
     const visibleColumns = ref([]);
 
@@ -391,40 +465,44 @@ export default defineComponent({
       }
 
       if (action === 'delete') {
-        $q.dialog({
-          title: 'Deletion Warning',
-          message: `You are about to delete this ${props.entityName}. Please type 'DELETE' to confirm your action.`,
-          prompt: {
-            model: '',
-            isValid: (val: string) => val.trim().toLowerCase() === 'delete',
-            type: 'text',
-          },
-          cancel: true,
-          persistent: true,
-        }).onOk(async () => {
-          const deleteProgressDialog = $q.dialog({
-            title: 'In Progress',
-            message: 'Software at work!',
-            progress: true,
-            ok: false,
-            cancel: false,
+        if (props.rowDeleteActionType) {
+          $q.dialog({
+            title: 'Deletion Warning',
+            message: `You are about to delete this ${props.entityName}. Please type 'DELETE' to confirm your action.`,
+            prompt: {
+              model: '',
+              isValid: (val: string) => val.trim().toLowerCase() === 'delete',
+              type: 'text',
+            },
+            cancel: true,
             persistent: true,
-          });
-          await store
-            .dispatch(props.rowDeleteActionType, id)
-            .then(() => {
-              deleteProgressDialog.hide();
-
-              $q.notify({
-                type: 'positive',
-                message: 'Customer was successfully deleted!',
-                position: 'top',
-              });
-            })
-            .catch(() => {
-              deleteProgressDialog.hide();
+          }).onOk(async () => {
+            const deleteProgressDialog = $q.dialog({
+              title: 'In Progress',
+              message: 'Software at work!',
+              progress: true,
+              ok: false,
+              cancel: false,
+              persistent: true,
             });
-        });
+            await store
+              .dispatch(props.rowDeleteActionType, id)
+              .then(() => {
+                deleteProgressDialog.hide();
+
+                void fetchTableData();
+              })
+              .catch(() => {
+                deleteProgressDialog.hide();
+              });
+          });
+        } else {
+          $q.notify({
+            type: 'negative',
+            message: 'Deletion type is not set for this table',
+            position: 'top',
+          });
+        }
       }
     };
 
@@ -466,6 +544,9 @@ export default defineComponent({
       showSelections_: ref(props.showSelections),
       showActions_: ref(props.showActions),
       onActionItemClick,
+      filterPanelExpanded: ref(false),
+      filterableColumns,
+      filterForm,
     };
   },
 });

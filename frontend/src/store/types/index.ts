@@ -106,7 +106,7 @@ export interface HttpError extends AxiosError {
 
 export type SelectOption = {
   label: string;
-  value: string;
+  value: string | boolean | number;
   icon?: string;
   description?: string;
 };

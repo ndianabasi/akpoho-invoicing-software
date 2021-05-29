@@ -21,7 +21,7 @@ const mutation: MutationTree<AuthStateInterface> = {
   },
 
   SET_CURRENT_COMPANY: (state: AuthStateInterface, payload: SelectOption) => {
-    state.currentCompany = { id: payload.value, name: payload.label };
+    state.currentCompany = { id: payload.value as string, name: payload.label };
   },
 
   SET_USER_DATA(state: AuthStateInterface, payload: LoginUserData) {
