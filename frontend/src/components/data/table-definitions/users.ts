@@ -92,7 +92,7 @@ const columns: Array<UserHeaders> = [
     sortable: true,
     filterable: true,
     filterInputType: 'select',
-    filterOptions: roles.value,
+    filterOptions: [{ label: '', value: null }, ...roles.value],
   },
   {
     name: UserColumns.login_status,
@@ -104,8 +104,9 @@ const columns: Array<UserHeaders> = [
     filterable: true,
     filterInputType: 'select',
     filterOptions: [
+      { label: '', value: null },
       { label: 'Can Login', value: true },
-      { label: 'Cannot Login', value: true },
+      { label: 'Cannot Login', value: false },
     ],
   },
   {
@@ -118,8 +119,9 @@ const columns: Array<UserHeaders> = [
     filterable: true,
     filterInputType: 'select',
     filterOptions: [
+      { label: '', value: null },
       { label: 'Yes', value: true },
-      { label: 'No', value: true },
+      { label: 'No', value: false },
     ],
   },
   {
@@ -132,8 +134,9 @@ const columns: Array<UserHeaders> = [
     filterable: true,
     filterInputType: 'select',
     filterOptions: [
+      { label: '', value: null },
       { label: 'Yes', value: true },
-      { label: 'No', value: true },
+      { label: 'No', value: false },
     ],
   },
   {

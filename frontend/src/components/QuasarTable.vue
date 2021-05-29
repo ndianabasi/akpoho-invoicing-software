@@ -98,6 +98,7 @@
                       :label="column.label"
                       dense
                       class="q-mb-md"
+                      clearable
                     >
                     </q-input>
                     <q-select
@@ -392,9 +393,18 @@ export default defineComponent({
       filterForm[name] = '';
     });
 
-    const clearFilter = function () {
+    const clearFilter = async function () {
       filterFormArray.forEach((name) => {
         filterForm[name] = '';
+      });
+
+      const { page, rowsPerPage, sortBy, descending } = pagination.value;
+
+      await fetchTableData({
+        page,
+        descending,
+        perPage: rowsPerPage,
+        sortBy,
       });
     };
 
