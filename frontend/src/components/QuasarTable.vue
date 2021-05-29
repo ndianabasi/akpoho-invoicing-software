@@ -35,35 +35,33 @@
       </template>
 
       <template #top="props">
-        <div class="col-2 q-table__title">{{ nameOfTable }}</div>
+        <div class="col-2 q-table__title">
+          {{ nameOfTable }}&nbsp;<q-btn
+            :to="{
+              name: 'add_user',
+            }"
+            flat
+            round
+            color="primary"
+            icon="person_add_alt"
+            title="New User"
+          />
+        </div>
 
         <q-space />
 
-        <!--
-            Using v-if directive will make the toggle or select dropdown disappear when all columns are unselected
-          -->
-        <div v-if="$q.screen.gt.xs" class="col">
-          <q-toggle
-            v-for="column in visibleColumnsObjects"
-            :key="column.name"
-            v-model="visibleColumns"
-            :val="column.name"
-            :label="column.label"
-          />
-        </div>
         <q-select
-          v-else
           v-model="visibleColumns"
           multiple
-          borderless
           dense
           options-dense
           :display-value="$q.lang.table.columns"
           emit-value
           map-options
-          :options="visibleColumns"
+          :options="visibleColumnsObjects"
           option-value="name"
-          style="min-width: 150px"
+          options-cover
+          style="min-width: 200px"
         />
 
         <q-btn

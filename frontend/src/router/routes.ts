@@ -147,7 +147,17 @@ const routes: RouteRecordRaw[] = [
                 },
               },
               {
-                path: ':userId/view',
+                path: 'new',
+                component: () =>
+                  import('../pages/settings/users/CreateUser.vue'),
+                name: 'add_user',
+                meta: {
+                  label: 'New User',
+                  //canViewOrganisations: true,
+                },
+              },
+              {
+                path: ':?userId/view',
                 props: true,
                 component: () => import('../pages/settings/users/User.vue'),
                 name: 'view_user',
@@ -157,7 +167,7 @@ const routes: RouteRecordRaw[] = [
                 },
               },
               {
-                path: ':userId/edit',
+                path: ':?userId/edit',
                 props: true,
                 component: () => import('../pages/settings/users/EditUser.vue'),
                 name: 'edit_user',

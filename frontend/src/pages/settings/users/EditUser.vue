@@ -3,7 +3,7 @@
     <div class="row justify-center">
       <div class="col-md-6 col-sm-12 col-xs-12">
         <view-card
-          v-if="user"
+          v-if="creationMode || user"
           :title-info="titleInfo"
           show-avatar
           show-title-panel-side
@@ -19,7 +19,7 @@
                 :dense="dense"
                 class="q-mb-md"
                 type="email"
-                :error="form$.email.$error"
+                :error="form$.email.$invalid"
               >
                 <template #before>
                   <q-icon name="email" />
@@ -110,9 +110,6 @@
                 ><template #before>
                   <q-icon name="business" />
                 </template>
-
-                <template #hint> Field hint </template>
-                <template #error> <div>Sorry! Invalid input</div> </template>
               </q-select>
 
               <q-select
@@ -136,9 +133,6 @@
                 ><template #before>
                   <q-icon name="business" />
                 </template>
-
-                <template #hint> Field hint </template>
-                <template #error> <div>Sorry! Invalid input</div> </template>
               </q-select>
 
               <q-toggle
@@ -170,7 +164,7 @@
             </div>
           </template>
 
-          <template #title-panel-side>
+          <template v-if="!creationMode" #title-panel-side>
             <q-btn
               :to="{
                 name: 'view_user',
@@ -203,7 +197,6 @@ import {
   unref,
   Ref,
   ComputedRef,
-  nextTick,
   reactive,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
@@ -232,18 +225,26 @@ export default defineComponent({
       required: false,
       default: '',
     },
+    creationMode: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   setup(props) {
     const submitting = ref(false);
     const router = useRouter();
 
-    let currentUser: Ref<CurrentlyViewedUser>;
+    let currentUser: Ref<CurrentlyViewedUser | null>;
 
-    currentUser = computed(
-      () =>
-        store.getters['users/GET_CURRENTLY_VIEWED_USER'] as CurrentlyViewedUser
-    );
+    currentUser = !props.creationMode
+      ? computed(
+          () =>
+            store.getters[
+              'users/GET_CURRENTLY_VIEWED_USER'
+            ] as CurrentlyViewedUser
+        )
+      : ref(null);
 
     const form: UserFormShape = reactive({
       first_name: '',
@@ -279,22 +280,40 @@ export default defineComponent({
       if (!form$.value.$invalid) {
         submitting.value = true;
 
-        void store
-          .dispatch('users/EDIT_USER', {
-            userId: props.userId,
-            form: form,
-          })
-          .then(() => {
-            submitting.value = false;
-            void router.push({
-              name: 'view_user',
-              params: { userId: props.userId },
+        if (!props.creationMode) {
+          void store
+            .dispatch('users/EDIT_USER', {
+              userId: props.userId,
+              form: form,
+            })
+            .then(() => {
+              submitting.value = false;
+              void router.push({
+                name: 'view_user',
+                params: { userId: props.userId },
+              });
+              return;
+            })
+            .catch(() => {
+              submitting.value = false;
             });
-            return;
-          })
-          .catch(() => {
-            submitting.value = false;
-          });
+        } else {
+          store
+            .dispatch('users/CREATE_USER', {
+              form: form,
+            })
+            .then((userId: string) => {
+              submitting.value = false;
+              void router.push({
+                name: 'view_user',
+                params: { userId },
+              });
+              return;
+            })
+            .catch(() => {
+              submitting.value = false;
+            });
+        }
       } else {
         Notify.create({
           message: 'Errors exist on the form!',
@@ -357,40 +376,51 @@ export default defineComponent({
       () => store.getters['roles/GET_ROLES_FOR_SELECT'] as SelectionOption[]
     );
 
-    const titleInfo = useTitleInfo({
-      title: `${currentUser?.value?.profile?.first_name ?? ''} ${
-        currentUser?.value?.profile?.last_name ?? ''
-      }`,
-      avatar: currentUser?.value?.profile?.profile_picture ?? '',
-    });
+    const titleInfo =
+      currentUser && currentUser.value
+        ? useTitleInfo({
+            title: `${currentUser.value.profile?.first_name ?? ''} ${
+              currentUser.value.profile?.last_name ?? ''
+            }`,
+            avatar: currentUser.value.profile?.profile_picture ?? '',
+          })
+        : props.creationMode
+        ? useTitleInfo({
+            title: 'New User',
+            avatar: '',
+          })
+        : ref(null);
 
     const stopFetchCurrentlyViewedUser = watchEffect(() => {
-      void store
-        .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
-          userId: props.userId,
-        })
-        .then(() => {
-          currentUser.value = unref(
-            computed(
-              () =>
-                store.getters[
-                  'users/GET_CURRENTLY_VIEWED_USER'
-                ] as CurrentlyViewedUser
-            )
-          );
+      if (!props.creationMode) {
+        void store
+          .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
+            userId: props.userId,
+          })
+          .then(() => {
+            currentUser.value = unref(
+              computed(
+                () =>
+                  store.getters[
+                    'users/GET_CURRENTLY_VIEWED_USER'
+                  ] as CurrentlyViewedUser
+              )
+            );
 
-          form.first_name = currentUser?.value?.profile.first_name;
-          form.last_name = currentUser?.value?.profile.last_name;
-          form.middle_name = currentUser?.value?.profile.middle_name;
-          form.phone_number = currentUser?.value?.profile.phone_number;
-          form.address = currentUser?.value?.profile.address;
-          form.city = currentUser?.value?.profile.city;
-          form.email = currentUser?.value?.email;
-          form.role_id = currentUser?.value.role.id;
-          form.state_id = currentUser?.value?.profile.userState?.id ?? null;
-          form.country_id = currentUser?.value?.profile.userCountry?.id ?? null;
-          form.login_status = Boolean(currentUser?.value.login_status);
-        });
+            form.first_name = currentUser?.value?.profile.first_name;
+            form.last_name = currentUser?.value?.profile.last_name;
+            form.middle_name = currentUser?.value?.profile.middle_name;
+            form.phone_number = currentUser?.value?.profile.phone_number;
+            form.address = currentUser?.value?.profile.address;
+            form.city = currentUser?.value?.profile.city;
+            form.email = currentUser?.value?.email;
+            form.role_id = currentUser?.value.role.id;
+            form.state_id = currentUser?.value?.profile.userState?.id ?? null;
+            form.country_id =
+              currentUser?.value?.profile.userCountry?.id ?? null;
+            form.login_status = Boolean(currentUser?.value.login_status);
+          });
+      }
     });
 
     const stopFetchCountriesForSelect = watchEffect(() => {

@@ -53,7 +53,7 @@ export default boot(
         return response;
       },
       async (error: HttpError) => {
-        //console.log(error.response);
+        console.log(error.response);
         if (error?.response?.status === 401) {
           setAuthHeader('');
           void (await store.dispatch('auth/LOGOUT_USER'));
@@ -95,6 +95,23 @@ export default boot(
               ],
             });
           }
+        } else if (error?.response?.status === 404) {
+          Notify.create({
+            message:
+              error?.response?.data?.message ??
+              (error?.response?.data as string) ??
+              'Not found',
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
         }
 
         return Promise.reject(error);

@@ -131,5 +131,44 @@ export default class UsersController {
     return response.created()
   }
 
+  public async store({ response, requestedCompany, request, bouncer }: HttpContextContract) {
+    await request.validate(UserValidator)
+
+    await bouncer.with('UserPolicy').authorize('create', requestedCompany!)
+
+    const {
+      first_name,
+      last_name,
+      middle_name,
+      phone_number,
+      address,
+      city,
+      email,
+      role_id,
+      state_id,
+      country_id,
+      login_status,
+    } = request.body()
+
+    const newUser = await requestedCompany
+      ?.related('users')
+      .create({ email, loginStatus: login_status, roleId: role_id })
+
+    await newUser
+      ?.related('profile')
+      .create({
+        firstName: first_name,
+        middleName: middle_name,
+        lastName: last_name,
+        phoneNumber: phone_number,
+        address,
+        city,
+        stateId: state_id || null,
+        countryId: country_id || null,
+      })
+
+    return response.created({ data: newUser?.id })
+  }
+
   public async destroy({}: HttpContextContract) {}
 }

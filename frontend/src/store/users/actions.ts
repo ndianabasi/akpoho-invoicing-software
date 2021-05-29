@@ -52,6 +52,38 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
     });
   },
 
+  async CREATE_USER({ rootGetters }, { form }: { form: UserFormShape }) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      await $http
+        .post(`/${currentCompany.id}/users`, { ...form })
+        .then((res: HttpResponse) => {
+          Notify.create({
+            message: 'User was successfully created',
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
   async EDIT_USER(
     { rootGetters },
     { userId, form }: { userId: string; form: UserFormShape }

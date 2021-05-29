@@ -50,6 +50,7 @@ Route.group(() => {
 
 // Authenticated company-specific routes
 Route.group(() => {
+  // Customers routes
   Route.get('/:company_id/customers', 'CustomersController.index')
   Route.get('/:company_id/customers/:customer_id', 'CustomersController.show').middleware(
     'findRequestedCustomer'
@@ -58,11 +59,13 @@ Route.group(() => {
     'findRequestedCustomer'
   )
 
+  // Users routes
   Route.get('/:company_id/users', 'UsersController.index')
   Route.get('/:company_id/users/:user_id', 'UsersController.show').middleware('findRequestedUser')
   Route.patch('/:company_id/users/:user_id', 'UsersController.update').middleware(
     'findRequestedUser'
   )
+  Route.post('/:company_id/users', 'UsersController.store')
 })
   .prefix('/v1')
   .middleware('auth')
