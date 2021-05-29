@@ -37,3 +37,13 @@ export const roles = [
 ]
 
 export const globalRoles = ['SuperAdmin', 'SuperEditor', 'SuperViewer', 'Developer']
+
+export enum ROLES {
+  SUPERADMIN = 'SuperAdmin',
+  SUPER_EDITOR = 'SuperEditor',
+  SUPER_VIEWER = 'SuperViewer',
+  DEVELOPER = 'Developer',
+  COMPANY_ADMIN = 'CompanyAdmin',
+  COMPANY_EDITOR = 'CompanyEditor',
+  COMPANY_STAFF = 'CompanyStaff',
+}

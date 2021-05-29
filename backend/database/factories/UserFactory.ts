@@ -2,14 +2,15 @@ import Factory from '@ioc:Adonis/Lucid/Factory'
 import User from 'App/Models/User'
 import CompanyFactory from './CompanyFactory'
 import UserProfileFactory from './UserProfileFactory'
+import { ROLES } from 'Database/data/roles'
 
 import Role from 'App/Models/Role'
 
 const getRoles = async function () {
-  const superAdminRole = await Role.findBy('name', 'SuperAdmin')
-  const companyAdminRole = await Role.findBy('name', 'CompanyAdmin')
-  const companyEditorRole = await Role.findBy('name', 'CompanyEditor')
-  const companyStaffRole = await Role.findBy('name', 'CompanyStaff')
+  const superAdminRole = await Role.findBy('name', ROLES.SUPERADMIN)
+  const companyAdminRole = await Role.findBy('name', ROLES.COMPANY_ADMIN)
+  const companyEditorRole = await Role.findBy('name', ROLES.COMPANY_EDITOR)
+  const companyStaffRole = await Role.findBy('name', ROLES.COMPANY_STAFF)
 
   return {
     superAdminRole: superAdminRole?.id,

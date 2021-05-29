@@ -353,6 +353,15 @@
               color="primary"
               icon="edit"
             />
+            <!-- <q-btn
+              :to="{
+                name: 'all_users',
+              }"
+              flat
+              round
+              color="primary"
+              icon="view_list"
+            /> -->
           </template>
         </view-card>
       </div>

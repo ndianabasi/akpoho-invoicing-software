@@ -2,6 +2,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
 import User from 'App/Models/User'
 import UserValidator from 'App/Validators/UserValidator'
+import { ROLES } from 'Database/data/roles'
 
 export default class UsersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -25,13 +26,17 @@ export default class UsersController {
         'users.created_at',
         'users.updated_at',
         'user_profiles.first_name',
-        'user_profiles.last_name'
+        'user_profiles.last_name',
+        'roles.name as role'
       )
       .leftJoin('company_user', (query) => {
         query.on('company_user.user_id', '=', 'users.id')
       })
       .leftJoin('user_profiles', (query) => {
         query.on('user_profiles.user_id', '=', 'users.id')
+      })
+      .leftJoin('roles', (query) => {
+        query.on('roles.id', '=', 'users.role_id')
       })
       .where({ 'company_user.company_id': requestedCompany?.id })
 
@@ -97,8 +102,17 @@ export default class UsersController {
       login_status,
     } = request.body()
 
-    requestedUser?.merge({ email, roleId: role_id, loginStatus: login_status })
+    requestedUser?.merge({ email, loginStatus: login_status })
     await requestedUser?.save()
+
+    // Ensure that a SuperAdmin does not lose login access
+    await requestedUser?.load('role')
+    console.log(requestedUser?.role?.name)
+
+    if (requestedUser?.role?.name !== ROLES.SUPERADMIN) {
+      requestedUser?.merge({ roleId: role_id })
+      await requestedUser?.save()
+    }
 
     await requestedUser?.load('profile')
     const requestedUserProfile = requestedUser?.profile

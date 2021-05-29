@@ -180,6 +180,7 @@
               round
               color="primary"
               icon="remove_red_eye"
+              title="Edit user"
             />
           </template>
         </view-card>
@@ -368,31 +369,28 @@ export default defineComponent({
         .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
           userId: props.userId,
         })
-        .then(() =>
-          nextTick(() => {
-            currentUser.value = unref(
-              computed(
-                () =>
-                  store.getters[
-                    'users/GET_CURRENTLY_VIEWED_USER'
-                  ] as CurrentlyViewedUser
-              )
-            );
+        .then(() => {
+          currentUser.value = unref(
+            computed(
+              () =>
+                store.getters[
+                  'users/GET_CURRENTLY_VIEWED_USER'
+                ] as CurrentlyViewedUser
+            )
+          );
 
-            form.first_name = currentUser?.value?.profile.first_name;
-            form.last_name = currentUser?.value?.profile.last_name;
-            form.middle_name = currentUser?.value?.profile.middle_name;
-            form.phone_number = currentUser?.value?.profile.phone_number;
-            form.address = currentUser?.value?.profile.address;
-            form.city = currentUser?.value?.profile.city;
-            form.email = currentUser?.value?.email;
-            form.role_id = currentUser?.value.role.id;
-            form.state_id = currentUser?.value?.profile.userState?.id ?? null;
-            form.country_id =
-              currentUser?.value?.profile.userCountry?.id ?? null;
-            form.login_status = Boolean(currentUser?.value.login_status);
-          })
-        );
+          form.first_name = currentUser?.value?.profile.first_name;
+          form.last_name = currentUser?.value?.profile.last_name;
+          form.middle_name = currentUser?.value?.profile.middle_name;
+          form.phone_number = currentUser?.value?.profile.phone_number;
+          form.address = currentUser?.value?.profile.address;
+          form.city = currentUser?.value?.profile.city;
+          form.email = currentUser?.value?.email;
+          form.role_id = currentUser?.value.role.id;
+          form.state_id = currentUser?.value?.profile.userState?.id ?? null;
+          form.country_id = currentUser?.value?.profile.userCountry?.id ?? null;
+          form.login_status = Boolean(currentUser?.value.login_status);
+        });
     });
 
     const stopFetchCountriesForSelect = watchEffect(() => {

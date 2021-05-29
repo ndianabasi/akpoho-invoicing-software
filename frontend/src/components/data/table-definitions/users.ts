@@ -21,6 +21,7 @@ enum UserColumns {
   email_verified_at = 'email_verified_at',
   created_at = 'created_at',
   updated_at = 'updated_at',
+  role = 'role',
 }
 
 /* const booleanFormatter: Formatter<boolean, TableRow, string> = function (
@@ -61,6 +62,14 @@ const columns: Array<UserHeaders> = [
     label: 'Email Address',
     align: 'center',
     field: UserColumns.email,
+    sortable: true,
+  },
+  {
+    name: UserColumns.role,
+    required: true,
+    label: 'Role',
+    align: 'center',
+    field: UserColumns.role,
     sortable: true,
   },
   {
