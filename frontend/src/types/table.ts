@@ -40,12 +40,9 @@ export interface TableRequestInterface {
     sortBy: string;
     descending: boolean;
   };
-
-  filter: string;
 }
 
 export interface RequestParams {
-  search: string;
   page: number;
   descending: boolean;
   perPage: number;

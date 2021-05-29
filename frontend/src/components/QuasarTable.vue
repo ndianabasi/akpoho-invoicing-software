@@ -127,6 +127,28 @@
                     />
                   </template>
                 </div>
+                <q-btn
+                  type="submit"
+                  :loading="filterSubmitting"
+                  label="Submit"
+                  class="q-mt-md"
+                  color="primary"
+                  icon-right="send"
+                  @click.prevent="submitFilter"
+                >
+                  <!-- eslint-disable-next-line vue/v-slot-style -->
+                  <template #loading>
+                    <q-spinner-facebook color="white" />
+                  </template>
+                </q-btn>
+                <q-btn
+                  type="submit"
+                  label="Clear All"
+                  class="q-mt-md q-ml-md"
+                  color="warning"
+                  @click.prevent="clearFilter"
+                >
+                </q-btn>
               </q-card-section>
             </q-card>
           </q-expansion-item>
@@ -344,6 +366,7 @@ export default defineComponent({
       rowsPerPage: 10,
       rowsNumber: 10,
     });
+    const filterSubmitting = ref(false);
 
     const visibleColumnsObjects = function () {
       const columns = props.tableColumns as TableRow[];
@@ -369,17 +392,20 @@ export default defineComponent({
       filterForm[name] = '';
     });
 
+    const clearFilter = function () {
+      filterFormArray.forEach((name) => {
+        filterForm[name] = '';
+      });
+    };
+
     const visibleColumns = ref([]);
 
     const processTableRequest = async function (
       requestProps: TableRequestInterface
     ) {
-      console.log(requestProps);
       const { page, rowsPerPage, sortBy, descending } = requestProps.pagination;
-      const filter = requestProps.filter;
 
       await fetchTableData({
-        search: filter,
         page,
         descending,
         perPage: rowsPerPage,
@@ -394,13 +420,13 @@ export default defineComponent({
       await store
         .dispatch('quasar_tables/FETCH_TABLE_DATA', {
           requestParams: {
-            search: requestParams?.search ?? '',
             page: requestParams?.page ?? null,
             descending: requestParams?.descending ?? false,
             perPage: requestParams?.perPage ?? null,
             sortBy: requestParams?.sortBy ?? '',
           },
           entityEndPoint: props.tableDataFetchEndPoint,
+          queryObject: filterForm,
         })
         .then((response: ResponseData) => {
           void nextTick(() => {
@@ -415,7 +441,6 @@ export default defineComponent({
             tableRows.value = data;
 
             const meta = response?.data?.meta;
-            console.log(response.data);
 
             if (meta) {
               pagination.value.page = meta.current_page;
@@ -442,6 +467,24 @@ export default defineComponent({
         });
     };
 
+    const submitFilter = async () => {
+      const { page, rowsPerPage, sortBy, descending } = pagination.value;
+
+      filterSubmitting.value = true;
+      await fetchTableData({
+        page,
+        descending,
+        perPage: rowsPerPage,
+        sortBy,
+      })
+        .then(() => {
+          filterSubmitting.value = false;
+        })
+        .catch(() => {
+          filterSubmitting.value = false;
+        });
+    };
+
     const data = reactive({
       columns: props.tableColumns,
       stickyTable: false,
@@ -449,7 +492,6 @@ export default defineComponent({
 
     const onActionItemClick = (rowProps: RowProps, action: string) => {
       const id = rowProps.row.id;
-      //console.log(id);
       if (action === 'view') {
         void router.push({
           name: props.rowViewRouteName,
@@ -547,6 +589,9 @@ export default defineComponent({
       filterPanelExpanded: ref(false),
       filterableColumns,
       filterForm,
+      submitFilter,
+      clearFilter,
+      filterSubmitting,
     };
   },
 });

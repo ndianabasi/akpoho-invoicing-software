@@ -15,6 +15,7 @@ export interface QuasarTableActionsContract
     payload: {
       requestParams: RequestParams;
       entityEndPoint: string;
+      queryObject: { [index: string]: string };
     }
   ) => Promise<unknown>;
 }
@@ -22,7 +23,7 @@ export interface QuasarTableActionsContract
 const actions: QuasarTableActionsContract = {
   async FETCH_TABLE_DATA(
     { commit, rootGetters },
-    { requestParams, entityEndPoint }
+    { requestParams, entityEndPoint, queryObject }
   ) {
     return new Promise(async (resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -34,7 +35,10 @@ const actions: QuasarTableActionsContract = {
 
       await $http
         .get(`/${currentCompany.id}/${entityEndPoint}`, {
-          params: requestParams ? requestParams : {},
+          params:
+            requestParams && queryObject
+              ? { ...requestParams, ...queryObject }
+              : {},
         })
         .then((res: HttpResponse) => {
           commit(
