@@ -11,12 +11,7 @@ declare function SortStringToBooleanFn(arg1: string, arg2: string): boolean;
 declare function SortStringToNumberFn(arg1: string, arg2: string): number;
 declare function SortNumberFn(arg1: number, arg2: number): number;
 
-export enum InputTypes {
-  text = 'text',
-  select = 'select',
-  date = 'date',
-}
-
+export type InputTypes = 'text' | 'select' | 'date';
 export interface TableRow {
   name: string | Enumerator | unknown;
   label: string;
@@ -30,7 +25,7 @@ export interface TableRow {
   required?: boolean;
   format?: Formatter<unknown, unknown, unknown> | null;
   filterable?: boolean;
-  filterInputType?: keyof typeof InputTypes;
+  filterInputType?: InputTypes;
   filterOptions?: SelectOption[];
 }
 

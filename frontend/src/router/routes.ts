@@ -56,7 +56,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'quotations',
         name: 'quotations',
-        component: () => import('../pages/quotations/index.vue'),
+        component: () => import('../pages/quotations/Index.vue'),
         meta: {
           label: 'All Quotations',
           icon: 'request_page',
@@ -75,7 +75,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'invoices',
         name: 'invoices',
-        component: () => import('../pages/invoices/index.vue'),
+        component: () => import('../pages/invoices/Index.vue'),
         meta: {
           label: 'All Invoices',
           icon: 'list_alt',
@@ -94,7 +94,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'receipts',
         name: 'receipts',
-        component: () => import('../pages/receipts/index.vue'),
+        component: () => import('../pages/receipts/Index.vue'),
         meta: {
           label: 'All Receipts',
           icon: 'receipt',

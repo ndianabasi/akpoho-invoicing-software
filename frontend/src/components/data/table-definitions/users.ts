@@ -2,7 +2,7 @@
 import { computed, watchEffect, onBeforeUnmount } from 'vue';
 import { store } from 'src/store';
 import { SelectionOption } from 'src/store/types';
-import { InputTypes, TableRow } from '../../../types/table';
+import { TableRow } from '../../../types/table';
 
 interface UserHeaders extends TableRow {
   name: UserColumns;
@@ -51,7 +51,7 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.id,
     filterable: true,
-    filterInputType: InputTypes.text,
+    filterInputType: 'text',
   },
   {
     name: UserColumns.first_name,
@@ -61,7 +61,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.first_name,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.text,
+    filterInputType: 'text',
   },
   {
     name: UserColumns.last_name,
@@ -71,7 +71,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.last_name,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.text,
+    filterInputType: 'text',
   },
   {
     name: UserColumns.email,
@@ -81,7 +81,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.email,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.text,
+    filterInputType: 'text',
   },
   {
     name: UserColumns.role,
@@ -91,7 +91,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.role,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.select,
+    filterInputType: 'select',
     filterOptions: roles.value,
   },
   {
@@ -102,7 +102,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.login_status,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.select,
+    filterInputType: 'select',
     filterOptions: [
       { label: 'Can Login', value: true },
       { label: 'Cannot Login', value: true },
@@ -116,7 +116,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.is_account_activated,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.select,
+    filterInputType: 'select',
     filterOptions: [
       { label: 'Yes', value: true },
       { label: 'No', value: true },
@@ -130,7 +130,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.is_email_verified,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.select,
+    filterInputType: 'select',
     filterOptions: [
       { label: 'Yes', value: true },
       { label: 'No', value: true },
@@ -144,7 +144,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.lifetime_login,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.text,
+    filterInputType: 'text',
   },
   {
     name: UserColumns.last_login_time,
@@ -154,7 +154,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.last_login_time,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.date,
+    filterInputType: 'date',
   },
   {
     name: UserColumns.account_activated_at,
@@ -164,7 +164,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.account_activated_at,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.date,
+    filterInputType: 'date',
   },
   {
     name: UserColumns.email_verified_at,
@@ -174,7 +174,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.email_verified_at,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.date,
+    filterInputType: 'date',
   },
   {
     name: UserColumns.created_at,
@@ -184,7 +184,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.created_at,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.date,
+    filterInputType: 'date',
   },
   {
     name: UserColumns.updated_at,
@@ -194,7 +194,7 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.updated_at,
     sortable: true,
     filterable: true,
-    filterInputType: InputTypes.date,
+    filterInputType: 'date',
   },
 ];
 

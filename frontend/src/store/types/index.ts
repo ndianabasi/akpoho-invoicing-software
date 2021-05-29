@@ -104,12 +104,19 @@ export interface HttpError extends AxiosError {
   response?: HttpResponse;
 }
 
-export type SelectOption = {
+export interface SelectOption {
   label: string;
   value: string | boolean | number;
   icon?: string;
   description?: string;
-};
+}
+
+export interface StringSelectOption extends SelectOption {
+  label: string;
+  value: string;
+  icon?: string;
+  description?: string;
+}
 
 export type CurrentlyViewedUser = {
   profile: {
