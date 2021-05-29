@@ -8,12 +8,16 @@ export type LoginData = {
 };
 
 export interface IDNameInterface {
-  id: string | number;
+  id: string | number | undefined | null;
   name: string;
 }
 
 export interface StringIDNameInterface extends IDNameInterface {
   id: string;
+}
+
+export interface NumberIDNameInterface extends IDNameInterface {
+  id: number | null;
 }
 
 type Token = {
@@ -116,8 +120,8 @@ export type CurrentlyViewedUser = {
     address: string;
     city: string;
     profile_picture: string;
-    userState?: StringIDNameInterface;
-    userCountry?: StringIDNameInterface;
+    userState?: NumberIDNameInterface;
+    userCountry?: NumberIDNameInterface;
   };
   email: string;
   login_status: boolean;
@@ -143,6 +147,7 @@ export interface UserFormShape extends Object {
   city: string | undefined | null;
   email: string;
   role_id: string | undefined;
-  state_id: string | undefined;
-  country_id: string | undefined;
+  state_id: number | null;
+  country_id: number | null;
+  login_status: boolean;
 }

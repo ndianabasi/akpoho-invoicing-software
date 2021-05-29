@@ -94,9 +94,10 @@ export default class UsersController {
       role_id,
       state_id,
       country_id,
+      login_status,
     } = request.body()
 
-    requestedUser?.merge({ email, roleId: role_id })
+    requestedUser?.merge({ email, roleId: role_id, loginStatus: login_status })
     await requestedUser?.save()
 
     await requestedUser?.load('profile')

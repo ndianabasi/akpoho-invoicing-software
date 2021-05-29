@@ -36,9 +36,11 @@ export default class UserValidator {
 
     role_id: schema.string({ escape: true, trim: true }, [rules.regex(UUID_REGEX)]),
 
-    state_id: schema.number.optional(),
+    state_id: schema.number.optional([rules.unsigned()]),
 
-    country_id: schema.number.optional(),
+    country_id: schema.number.optional([rules.unsigned()]),
+
+    login_status: schema.boolean(),
   })
 
   public messages = {

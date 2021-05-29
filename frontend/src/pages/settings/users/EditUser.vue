@@ -140,6 +140,14 @@
                 <template #hint> Field hint </template>
                 <template #error> <div>Sorry! Invalid input</div> </template>
               </q-select>
+
+              <q-toggle
+                v-model="form.login_status"
+                checked-icon="check"
+                unchecked-icon="clear"
+                color="primary"
+                :label="form.login_status ? 'Can login' : 'Cannot login'"
+              />
             </form>
           </template>
 
@@ -194,6 +202,8 @@ import {
   unref,
   Ref,
   ComputedRef,
+  nextTick,
+  reactive,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, email, helpers } from '@vuelidate/validators';
@@ -227,22 +237,25 @@ export default defineComponent({
     const submitting = ref(false);
     const router = useRouter();
 
-    const currentUser = computed(
+    let currentUser: Ref<CurrentlyViewedUser>;
+
+    currentUser = computed(
       () =>
         store.getters['users/GET_CURRENTLY_VIEWED_USER'] as CurrentlyViewedUser
     );
 
-    const form: Ref<UserFormShape> = ref({
-      first_name: currentUser?.value?.profile.first_name,
-      last_name: currentUser?.value?.profile.last_name,
-      middle_name: currentUser?.value?.profile.middle_name,
-      phone_number: currentUser?.value?.profile.phone_number,
-      address: currentUser?.value?.profile.address,
-      city: currentUser?.value?.profile.city,
-      email: currentUser?.value?.email,
-      role_id: currentUser?.value.role.id,
-      state_id: currentUser?.value?.profile.userState?.id,
-      country_id: currentUser?.value?.profile.userCountry?.id,
+    const form: UserFormShape = reactive({
+      first_name: '',
+      last_name: '',
+      middle_name: '',
+      phone_number: '',
+      address: '',
+      city: '',
+      email: '',
+      role_id: '',
+      state_id: null,
+      country_id: null,
+      login_status: false,
     });
 
     const rules = {
@@ -268,7 +281,7 @@ export default defineComponent({
         void store
           .dispatch('users/EDIT_USER', {
             userId: props.userId,
-            form: form.value,
+            form: form,
           })
           .then(() => {
             submitting.value = false;
@@ -351,9 +364,35 @@ export default defineComponent({
     });
 
     const stopFetchCurrentlyViewedUser = watchEffect(() => {
-      void store.dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
-        userId: props.userId,
-      });
+      void store
+        .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
+          userId: props.userId,
+        })
+        .then(() =>
+          nextTick(() => {
+            currentUser.value = unref(
+              computed(
+                () =>
+                  store.getters[
+                    'users/GET_CURRENTLY_VIEWED_USER'
+                  ] as CurrentlyViewedUser
+              )
+            );
+
+            form.first_name = currentUser?.value?.profile.first_name;
+            form.last_name = currentUser?.value?.profile.last_name;
+            form.middle_name = currentUser?.value?.profile.middle_name;
+            form.phone_number = currentUser?.value?.profile.phone_number;
+            form.address = currentUser?.value?.profile.address;
+            form.city = currentUser?.value?.profile.city;
+            form.email = currentUser?.value?.email;
+            form.role_id = currentUser?.value.role.id;
+            form.state_id = currentUser?.value?.profile.userState?.id ?? null;
+            form.country_id =
+              currentUser?.value?.profile.userCountry?.id ?? null;
+            form.login_status = Boolean(currentUser?.value.login_status);
+          })
+        );
     });
 
     const stopFetchCountriesForSelect = watchEffect(() => {
@@ -365,10 +404,10 @@ export default defineComponent({
     });
 
     watch(
-      () => form.value.country_id,
+      () => form.country_id,
       (country) => {
         if (country) {
-          form.value.state_id = '';
+          form.state_id = null;
           void store.dispatch(
             'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
             { countryId: country }
