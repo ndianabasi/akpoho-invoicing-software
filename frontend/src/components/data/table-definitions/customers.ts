@@ -24,6 +24,8 @@ const columns: Array<CustomerHeaders> = [
     label: 'Customer ID',
     align: 'center',
     field: CustomerColumns.id,
+    filterable: true,
+    filterInputType: 'text',
   },
   {
     name: CustomerColumns.first_name,
@@ -33,6 +35,8 @@ const columns: Array<CustomerHeaders> = [
     field: CustomerColumns.first_name,
     sortable: true,
     sort: (a: string, b: string) => stringSortFn(a, b),
+    filterable: true,
+    filterInputType: 'text',
   },
   {
     name: CustomerColumns.last_name,
@@ -42,6 +46,8 @@ const columns: Array<CustomerHeaders> = [
     field: CustomerColumns.last_name,
     sortable: true,
     sort: (a: string, b: string) => stringSortFn(a, b),
+    filterable: true,
+    filterInputType: 'text',
   },
   {
     name: CustomerColumns.email,
@@ -51,6 +57,8 @@ const columns: Array<CustomerHeaders> = [
     field: CustomerColumns.email,
     sortable: true,
     sort: (a: string, b: string) => stringSortFn(a, b),
+    filterable: true,
+    filterInputType: 'text',
   },
   {
     name: CustomerColumns.phone_number,
@@ -60,6 +68,8 @@ const columns: Array<CustomerHeaders> = [
     field: CustomerColumns.phone_number,
     sortable: true,
     sort: (a: string, b: string) => stringSortFn(a, b),
+    filterable: true,
+    filterInputType: 'text',
   },
   {
     name: CustomerColumns.is_corporate,
@@ -68,6 +78,13 @@ const columns: Array<CustomerHeaders> = [
     align: 'center',
     field: CustomerColumns.is_corporate,
     sortable: true,
+    filterable: true,
+    filterInputType: 'select',
+    filterOptions: [
+      { label: '', value: null },
+      { label: 'Yes', value: true },
+      { label: 'No', value: false },
+    ],
   },
   {
     name: CustomerColumns.created_at,
@@ -77,6 +94,8 @@ const columns: Array<CustomerHeaders> = [
     field: CustomerColumns.created_at,
     sortable: true,
     sort: (a: string, b: string) => dateSortFn(a, b),
+    filterable: true,
+    filterInputType: 'date',
   },
   {
     name: CustomerColumns.updated_at,
@@ -86,6 +105,8 @@ const columns: Array<CustomerHeaders> = [
     field: CustomerColumns.updated_at,
     sortable: true,
     sort: (a: string, b: string) => dateSortFn(a, b),
+    filterable: true,
+    filterInputType: 'date',
   },
 ];
 

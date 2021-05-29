@@ -84,7 +84,7 @@
         <div class="col-12 q-mt-md">
           <q-expansion-item
             v-model="filterPanelExpanded"
-            icon="filter"
+            icon="tune"
             label="Filters"
           >
             <q-card>
