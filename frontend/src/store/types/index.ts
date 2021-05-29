@@ -116,6 +116,8 @@ export type CurrentlyViewedUser = {
     address: string;
     city: string;
     profile_picture: string;
+    userState?: StringIDNameInterface;
+    userCountry?: StringIDNameInterface;
   };
   email: string;
   login_status: boolean;
@@ -135,12 +137,12 @@ export interface TitleInfo extends Object {
 export interface UserFormShape extends Object {
   first_name: string;
   last_name: string;
-  middle_name: string;
-  phone_number: string;
-  address: string;
-  city: string;
+  middle_name: string | undefined | null;
+  phone_number: string | undefined | null;
+  address: string | undefined | null;
+  city: string | undefined | null;
   email: string;
-  role_id: string;
-  state_id: string;
-  country_id: string;
+  role_id: string | undefined;
+  state_id: string | undefined;
+  country_id: string | undefined;
 }

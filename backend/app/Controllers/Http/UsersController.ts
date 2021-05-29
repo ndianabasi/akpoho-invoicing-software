@@ -48,8 +48,24 @@ export default class UsersController {
     await bouncer.with('UserPolicy').authorize('view', requestedCompany!, requestedUser!)
 
     const user = await User.query()
-      .preload('role', (roleQuery) => roleQuery.select('name'))
-      .preload('profile')
+      .preload('role', (roleQuery) => roleQuery.select('name', 'id'))
+      .preload('profile', (profileQuery) => {
+        profileQuery.preload('userCountry', (countryQuery) => countryQuery.select('id', 'name'))
+        profileQuery.preload('userState', (stateQuery) => stateQuery.select('id', 'name'))
+        profileQuery.select(
+          'first_name',
+          'last_name',
+          'middle_name',
+          'profile_picture',
+          'phone_number',
+          'address',
+          'city',
+          'created_at',
+          'updated_at',
+          'country_id',
+          'state_id'
+        )
+      })
       .where('id', requestedUser?.id!)
       .first()
 

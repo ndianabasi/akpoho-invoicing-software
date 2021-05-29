@@ -2,7 +2,12 @@
   <div class="q-pa-md">
     <div class="row justify-center">
       <div class="col-md-6 col-sm-12 col-xs-12">
-        <view-card v-if="user" :title-info="titleInfo" show-avatar>
+        <view-card
+          v-if="user"
+          :title-info="titleInfo"
+          show-avatar
+          show-title-panel-side
+        >
           <template #body-panel>
             <form class="q-pa-md" @submit.prevent="submitForm">
               <q-input
@@ -235,9 +240,9 @@ export default defineComponent({
       address: currentUser?.value?.profile.address,
       city: currentUser?.value?.profile.city,
       email: currentUser?.value?.email,
-      role_id: '',
-      state_id: '',
-      country_id: '',
+      role_id: currentUser?.value.role.id,
+      state_id: currentUser?.value?.profile.userState?.id,
+      country_id: currentUser?.value?.profile.userCountry?.id,
     });
 
     const rules = {

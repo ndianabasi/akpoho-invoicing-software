@@ -245,9 +245,22 @@
 
                     <q-item>
                       <q-item-section>
-                        <q-item-label class="text-uppercase">City</q-item-label>
+                        <q-item-label class="text-uppercase"
+                          >State</q-item-label
+                        >
                         <q-item-label caption lines="2">{{
-                          user.profile.city
+                          user.profile.userState?.name ?? ''
+                        }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+
+                    <q-item>
+                      <q-item-section>
+                        <q-item-label class="text-uppercase"
+                          >Country</q-item-label
+                        >
+                        <q-item-label caption lines="2">{{
+                          user.profile.userCountry?.name ?? ''
                         }}</q-item-label>
                       </q-item-section>
                     </q-item>
