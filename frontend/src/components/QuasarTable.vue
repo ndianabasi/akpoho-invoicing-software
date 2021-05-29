@@ -43,14 +43,17 @@
           "
         >
           {{ nameOfTable }}&nbsp;<q-btn
+            v-if="
+              showNewRouteButton && newRouteObject && newRouteObject.routeName
+            "
             :to="{
-              name: 'add_user',
+              name: newRouteObject.routeName,
             }"
             flat
             round
             color="primary"
-            icon="person_add_alt"
-            title="New User"
+            :icon="newRouteObject.icon"
+            :title="newRouteObject.title"
           />
         </div>
 
@@ -345,6 +348,17 @@ export default defineComponent({
     defaultSort: {
       type: Object,
       required: true,
+    },
+    newRouteObject: {
+      type: Object,
+      required: false,
+      default: () => {
+        return {};
+      },
+    },
+    showNewRouteButton: {
+      type: Boolean,
+      default: false,
     },
     rosPerPageOptions: {
       type: Array,

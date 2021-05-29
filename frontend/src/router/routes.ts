@@ -1,6 +1,15 @@
 import { RouteRecordRaw } from 'vue-router';
 
-const routes: RouteRecordRaw[] = [
+export type CustomRouteRecord = RouteRecordRaw & {
+  meta?: {
+    label?: string;
+    icon?: string;
+    permission?: string;
+    requiresAuth?: boolean;
+  };
+};
+
+const routes: CustomRouteRecord[] = [
   {
     path: '/',
     component: () => import('../layouts/MainLayout.vue'),
@@ -9,7 +18,7 @@ const routes: RouteRecordRaw[] = [
       label: 'Home',
       icon: 'home',
       requiresAuth: true,
-      //canViewOrganisations: true,
+      permission: 'can_view_company_dashboard',
     },
     children: [
       { path: '', component: () => import('../pages/Index.vue') },
@@ -19,7 +28,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           label: 'Customers',
           icon: 'people',
-          //canViewOrganisations: true,
+          permission: 'can_list_customers',
         },
         children: [
           {
@@ -29,7 +38,6 @@ const routes: RouteRecordRaw[] = [
             meta: {
               label: 'All Customers',
               icon: 'people',
-              //canViewOrganisations: true,
             },
           },
           {
@@ -39,7 +47,7 @@ const routes: RouteRecordRaw[] = [
             name: 'view_customer',
             meta: {
               label: 'View Customer',
-              //canViewOrganisations: true,
+              permission: 'can_view_customers',
             },
           },
           {
@@ -48,7 +56,7 @@ const routes: RouteRecordRaw[] = [
             name: 'create_customer',
             meta: {
               label: 'New Customer',
-              //canViewOrganisations: true,
+              permission: 'can_create_customers',
             },
           },
         ],
@@ -60,7 +68,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           label: 'All Quotations',
           icon: 'request_page',
-          //canViewOrganisations: true,
+          permission: 'can_list_quotations',
         },
       },
       {
@@ -69,7 +77,7 @@ const routes: RouteRecordRaw[] = [
         name: 'create_quotation',
         meta: {
           label: 'New Quotation',
-          //canViewOrganisations: true,
+          permission: 'can_create_quotations',
         },
       },
       {
@@ -79,7 +87,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           label: 'All Invoices',
           icon: 'list_alt',
-          //canViewOrganisations: true,
+          permission: 'can_list_invoices',
         },
       },
       {
@@ -88,7 +96,7 @@ const routes: RouteRecordRaw[] = [
         name: 'create_invoice',
         meta: {
           label: 'New Invoice',
-          //canViewOrganisations: true,
+          permission: 'can_create_invoices',
         },
       },
       {
@@ -98,7 +106,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           label: 'All Receipts',
           icon: 'receipt',
-          //canViewOrganisations: true,
+          permission: 'can_list_receipts',
         },
       },
       {
@@ -107,7 +115,7 @@ const routes: RouteRecordRaw[] = [
         name: 'create_receipt',
         meta: {
           label: 'New Receipt',
-          //canViewOrganisations: true,
+          permission: 'can_create_receipts',
         },
       },
       {
@@ -116,7 +124,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           label: 'Settings',
           icon: 'settings',
-          //canViewOrganisations: true,
+          permission: 'can_view_company_settings',
         },
         children: [
           {
@@ -126,7 +134,6 @@ const routes: RouteRecordRaw[] = [
             meta: {
               label: 'All Settings',
               icon: 'settings',
-              //canViewOrganisations: true,
             },
           },
           {
@@ -134,7 +141,7 @@ const routes: RouteRecordRaw[] = [
             component: () => import('../pages/settings/users/Index.vue'),
             meta: {
               label: 'Users',
-              //canViewOrganisations: true,
+              permission: 'can_list_users',
             },
             children: [
               {
@@ -143,7 +150,6 @@ const routes: RouteRecordRaw[] = [
                 name: 'all_users',
                 meta: {
                   label: 'All Users',
-                  //canViewOrganisations: true,
                 },
               },
               {
@@ -153,7 +159,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'add_user',
                 meta: {
                   label: 'New User',
-                  //canViewOrganisations: true,
+                  permission: 'can_create_users',
                 },
               },
               {
@@ -163,7 +169,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'view_user',
                 meta: {
                   label: 'View User',
-                  //canViewOrganisations: true,
+                  permission: 'can_view_users',
                 },
               },
               {
@@ -173,7 +179,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'edit_user',
                 meta: {
                   label: 'Edit User',
-                  //canViewOrganisations: true,
+                  permission: 'can_edit_users',
                 },
               },
             ],
@@ -188,7 +194,6 @@ const routes: RouteRecordRaw[] = [
     name: 'Login',
     meta: {
       label: 'Login',
-      //canViewOrganisations: true,
     },
   },
 

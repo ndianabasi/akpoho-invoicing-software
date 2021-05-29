@@ -43,6 +43,9 @@ Route.group(() => {
   )
 
   Route.get('/roles/roles-for-select', 'RolesController.rolesForSelect')
+
+  // Permissions routes
+  Route.get('/permissions/user-permissions', 'PermissionsController.userPermissions')
 })
   .prefix('/v1')
   .middleware('auth')

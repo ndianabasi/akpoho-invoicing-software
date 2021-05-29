@@ -10,6 +10,12 @@
     row-delete-action-type="users/DELETE_USER"
     entity-name="User"
     table-data-fetch-end-point="users"
+    show-new-route-button
+    :new-route-object="{
+      routeName: 'add_user',
+      icon: 'person_add_alt',
+      title: 'New User',
+    }"
   ></quasar-table>
 </template>
 

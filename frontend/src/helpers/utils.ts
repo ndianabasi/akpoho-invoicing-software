@@ -2,8 +2,8 @@ import { DateTime } from 'luxon';
 //import { Format, TableRow } from 'src/types/table';
 
 export const stringSortFn = function (a: string, b: string) {
-  if (a.toLowerCase() < b.toLowerCase()) return 1;
-  if (a.toLowerCase() > b.toLowerCase()) return -1;
+  if (a.toLowerCase() > b.toLowerCase()) return 1;
+  if (a.toLowerCase() < b.toLowerCase()) return -1;
   return 0;
 };
 

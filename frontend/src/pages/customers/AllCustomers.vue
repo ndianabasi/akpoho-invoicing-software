@@ -4,6 +4,12 @@
     :table-name="tableName"
     :table-data-getter-type="tableDataGetterType"
     :default-sort="defaultSort"
+    show-new-route-button
+    :new-route-object="{
+      routeName: 'create_customer',
+      icon: 'person_add',
+      title: 'New Customer',
+    }"
     no-results-label="Sorry! No customers were found. Please check your filters too."
     row-view-route-name="view_customer"
     row-edit-route-name="edit_customer"

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -8,7 +9,7 @@ import {
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
-import routes from './routes';
+import routes /* CustomRouteRecord */ from './routes';
 
 /* const actions = {
   ...mapActions('auth', ['logoutUser']),
@@ -58,6 +59,20 @@ export default route(function ({ store /* ssrContext */ }) {
         next();
       }
     } else next();
+  });
+
+  Router.beforeEach((to, from, next) => {
+    const GET_USER_PERMISSION =
+      store.getters['permissions/GET_USER_PERMISSION'];
+    if (to.meta && !!to.meta.permission) {
+      if (GET_USER_PERMISSION(to.meta.permission)) {
+        next();
+        return;
+      } else from;
+    } else {
+      next();
+      return;
+    }
   });
 
   return Router;
