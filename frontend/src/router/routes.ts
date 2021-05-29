@@ -15,7 +15,7 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: () => import('../pages/Index.vue') },
       {
         path: 'customers',
-        component: () => import('../pages/customers/Index.vue'),
+        component: () => import('../pages/customers/index.vue'),
         meta: {
           label: 'Customers',
           icon: 'people',
@@ -34,7 +34,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             path: ':customerId',
-            component: () => import('../pages/customers/Customer.vue'),
+            component: () => import('../pages/customers/customer.vue'),
             props: true,
             name: 'view_customer',
             meta: {
