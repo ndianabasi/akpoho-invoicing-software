@@ -98,3 +98,10 @@ Akpoho Invoicing Software is developed with the following technologies:
     ```
    1.  Copy the email and password of a user with full access from the console and log in.
    2.  Congratulations. You have successfully set up the Akpoho Invoicing Software.
+17. After you log in, check the role of the logged-in user. Click the avatar on the top-right corner of the user interface. The role is displayed after the user's name. E.g. `CompanyAdmin`, `CompanyEditor`, or `CompanyStaff`. 
+18. If you need to switch to another user with a higher role:
+    1. Open the side drawer by clicking the menu icon on the top-left corner of the user interface. 
+    2. Click `Settings`. On the Settings page, view Users. Take note of the email and role of the user you want to switch over to. 
+    3. Log out. 
+    4. Open the `database/data/seeded_users.txt` file to find the user's credentials. 
+    5. Log in with the credentials.
