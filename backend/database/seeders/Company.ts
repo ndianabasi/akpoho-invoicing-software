@@ -11,6 +11,6 @@ export default class CompanySeeder extends BaseSeeder {
         customer.with('addresses', 1, (address) => address.apply('shippingAddress'))
         customer.with('addresses', 1, (address) => address.apply('billingAddress'))
       })
-      .createMany(6)
+      .createMany(1)
   }
 }

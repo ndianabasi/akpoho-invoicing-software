@@ -191,6 +191,29 @@
                 <q-item
                   v-ripple
                   clickable
+                  :active="link === 'settings'"
+                  active-class="my-menu-link"
+                  @click.prevent="toggleDarkMode"
+                >
+                  <q-item-section avatar>
+                    <q-icon
+                      :name="
+                        isDarkModeActive ? 'brightness_low' : 'brightness_2'
+                      "
+                    />
+                  </q-item-section>
+
+                  <q-item-section
+                    >Switch to
+                    {{
+                      isDarkModeActive ? 'Bright Mode' : 'Dark Moe'
+                    }}</q-item-section
+                  >
+                </q-item>
+
+                <q-item
+                  v-ripple
+                  clickable
                   :active="link === 'help'"
                   active-class="my-menu-link"
                   @click="link = 'help'"
@@ -213,7 +236,7 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-call -->
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import CreateMenu from './CreateMenu.vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -221,6 +244,7 @@ import {
   UserProfileSummary,
   StringIDNameInterface,
 } from '../store/types/index';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'PrimaryToolbar',
@@ -243,6 +267,13 @@ export default defineComponent({
     const link = ref('');
     const search = ref('');
     const router = useRouter();
+    const $q = useQuasar();
+
+    const toggleDarkMode = function () {
+      $q.dark.toggle();
+    };
+
+    const isDarkModeActive = computed(() => $q.dark.isActive);
 
     const TOGGLE_LEFT_DRAWER = () => {
       leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -282,6 +313,8 @@ export default defineComponent({
       userSummary: ref(userSummary),
       link,
       authRole: ref(authRole),
+      toggleDarkMode,
+      isDarkModeActive,
     };
   },
 });

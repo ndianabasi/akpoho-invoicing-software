@@ -158,6 +158,7 @@ export default function (/* { ssrContext } */) {
         activity: '',
       },
       tokenRefreshTime: 120,
+      darkMode: false,
     }),
     getters: {
       getHttpProtocol() {
