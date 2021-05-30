@@ -124,7 +124,7 @@ const routes: CustomRouteRecord[] = [
         meta: {
           label: 'Settings',
           icon: 'settings',
-          permission: 'can_view_company_settings',
+          permission: 'can_edit_self',
         },
         children: [
           {

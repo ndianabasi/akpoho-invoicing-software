@@ -73,6 +73,20 @@ export default boot(
               },
             ],
           });
+        } else if (error?.response?.status === 403) {
+          Notify.create({
+            message: 'You are not permitted to perform the requested action',
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
         } else if (error?.response?.status === 422) {
           // Intercept validation errors
           const validationErrors = error?.response?.data?.errors;

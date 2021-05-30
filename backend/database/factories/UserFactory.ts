@@ -5,7 +5,6 @@ import UserProfileFactory from './UserProfileFactory'
 import { ROLES } from 'Database/data/roles'
 import Role from 'App/Models/Role'
 import { appendFile } from 'fs/promises'
-import path from 'path'
 import Logger from '@ioc:Adonis/Core/Logger'
 import { DateTime } from 'luxon'
 
