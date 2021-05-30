@@ -86,7 +86,7 @@ Akpoho Invoicing Software is developed with the following technologies:
         4.  Run the seeder command again and select `database\seeders\Company` to create companies, users, customers, and customer addresses. Please, take note of the user credentials logged to the console.
         5.  Run the seeder command again and select `database\seeders\UserExtraCompany` to associate each existing user with two more companies. This ensures that the user belongs to one than one company.
     
-16. After running the `database\seeders\Company` seeder, all users generated will be logged to file. Check the file: `database/data/seeded_users.json` and take note of the user credentials logged to the file. Only users with full access can log in. That is:
+16. After running the `database\seeders\Company` seeder, all users generated will be logged to file. Check the file: `database/data/seeded_users.txt` and take note of the user credentials logged to the file. Only users with full access can log in. That is:
     ```js
     {
         ...,

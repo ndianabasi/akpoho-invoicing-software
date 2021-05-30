@@ -36,7 +36,7 @@ const UserFactory = Factory.define(User, async ({ faker }) => {
   const NOW = DateTime.utc().toISO()
   const data = `[${NOW}]\n` + JSON.stringify(generatedUser) + '\n\n'
 
-  const relativePath = 'database/data/seeded_users.json'
+  const relativePath = 'database/data/seeded_users.txt'
   appendFile(relativePath, data, { encoding: 'utf-8' }).catch((error) =>
     Logger.error('Error after user creation: \nError:\n%j', error)
   )

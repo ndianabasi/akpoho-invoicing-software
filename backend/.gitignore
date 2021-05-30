@@ -5,4 +5,4 @@ coverage
 .DS_STORE
 .env
 tmp
-database/data/seeded_users.json
+database/data/seeded_users.txt
