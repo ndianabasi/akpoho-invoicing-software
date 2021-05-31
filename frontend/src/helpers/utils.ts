@@ -14,6 +14,10 @@ export const dateSortFn = function (a: string, b: string) {
   return aDate - bDate;
 };
 
+export function isEmpty(obj: { [index: string]: unknown }) {
+  return Object.keys(obj).length === 0;
+}
+
 /* export const booleanFormatter: Format<boolean, TableRow, string> =
   () => (value: boolean, row: TableRow) => {
     console.log(value);

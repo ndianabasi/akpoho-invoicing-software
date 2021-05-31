@@ -10,6 +10,7 @@ import {
   createWebHistory,
 } from 'vue-router';
 import routes /* CustomRouteRecord */ from './routes';
+//import qs from 'qs';
 
 /* const actions = {
   ...mapActions('auth', ['logoutUser']),
@@ -35,8 +36,21 @@ export default route(function ({ store /* ssrContext */ }) {
       : createWebHashHistory;
 
   const Router = createRouter({
-    scrollBehavior: () => ({ left: 0, top: 0 }),
+    scrollBehavior: (to, from, savedPosition) => {
+      if (savedPosition) {
+        return savedPosition;
+      } else if (to.hash) {
+        return {
+          el: to.hash,
+          behavior: 'smooth',
+        };
+      } else {
+        return { left: 0, top: 0 };
+      }
+    },
     routes,
+    /* parseQuery: qs.parse,
+    stringifyQuery: qs.stringify, */
 
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode

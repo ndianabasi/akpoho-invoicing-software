@@ -6,13 +6,13 @@ import { StateInterface } from '../index';
 import { CustomersStateInterface /* Customers */ } from './state';
 import { api as $http } from '../../boot/http';
 import { HttpResponse, HttpError, StringIDNameInterface } from '../types';
-import { RequestParams } from '../../types/table';
+import { PaginationParams } from '../../types/table';
 import { Notify } from 'quasar';
 
 const actions: ActionTree<CustomersStateInterface, StateInterface> = {
   async FETCH_ALL_CUSTOMERS(
     { commit, rootGetters },
-    requestParams: RequestParams
+    requestParams: PaginationParams
   ) {
     return new Promise(async (resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

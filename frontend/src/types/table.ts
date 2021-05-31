@@ -42,7 +42,7 @@ export interface TableRequestInterface {
   };
 }
 
-export interface RequestParams {
+export interface PaginationParams {
   page: number;
   descending: boolean;
   perPage: number;

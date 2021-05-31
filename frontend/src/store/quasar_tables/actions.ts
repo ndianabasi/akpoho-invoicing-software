@@ -6,14 +6,14 @@ import { StateInterface } from '../index';
 import { QuasarTableStateInterface, DataRows } from './state';
 import { api as $http } from '../../boot/http';
 import { HttpResponse, HttpError, StringIDNameInterface } from '../types';
-import { RequestParams } from '../../types/table';
+import { PaginationParams } from '../../types/table';
 
 export interface QuasarTableActionsContract
   extends ActionTree<QuasarTableStateInterface, StateInterface> {
   FETCH_TABLE_DATA: (
     ctx: ActionContext<QuasarTableStateInterface, StateInterface>,
     payload: {
-      requestParams: RequestParams;
+      paginationParams: PaginationParams;
       entityEndPoint: string;
       queryObject: { [index: string]: string };
     }
@@ -23,7 +23,7 @@ export interface QuasarTableActionsContract
 const actions: QuasarTableActionsContract = {
   async FETCH_TABLE_DATA(
     { commit, rootGetters },
-    { requestParams, entityEndPoint, queryObject }
+    { paginationParams, entityEndPoint, queryObject }
   ) {
     return new Promise(async (resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -36,8 +36,8 @@ const actions: QuasarTableActionsContract = {
       await $http
         .get(`/${currentCompany.id}/${entityEndPoint}`, {
           params:
-            requestParams && queryObject
-              ? { ...requestParams, ...queryObject }
+            paginationParams && queryObject
+              ? { ...paginationParams, ...queryObject }
               : {},
         })
         .then((res: HttpResponse) => {

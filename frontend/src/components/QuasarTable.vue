@@ -285,14 +285,15 @@ import {
   TableRow,
   GenericTableData,
   TableRequestInterface,
-  RequestParams,
+  PaginationParams,
   RowProps,
   PropObject,
 } from '../types/table';
 import { useQuasar } from 'quasar';
 import { ResponseData } from '../store/types';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import useResourcePermissions from '../composables/useResourcePermissions';
+import { isEmpty } from '../helpers/utils';
 
 export default defineComponent({
   name: 'QuasarTable',
@@ -387,6 +388,7 @@ export default defineComponent({
     const loading = ref(false);
     const store = useStore();
     const router = useRouter();
+    const route = useRoute();
     const selected = ref([]);
     const tableRows: Ref<GenericTableData> = ref([]);
     const pagination = ref({
@@ -414,12 +416,24 @@ export default defineComponent({
       )
     );
 
+    const existingQueryString = route.query as { [index: string]: string };
+    console.log(existingQueryString);
+
     const filterFormArray: string[] = filterableColumns.value.map(
       (col) => col.name as string
     );
-    let filterForm: { [index: string]: string } = reactive({});
+    let filterForm: { [index: string]: string | boolean } = reactive({});
     filterFormArray.forEach((name) => {
-      filterForm[name] = '';
+      if (!isEmpty(existingQueryString)) {
+        const value = existingQueryString[name];
+        let normalisedValue;
+        if (value) {
+          if (value === 'true') normalisedValue = true;
+          if (value === 'false') normalisedValue = false;
+          else normalisedValue = value;
+          filterForm[name] = normalisedValue;
+        }
+      } else filterForm[name] = '';
     });
 
     const clearFilter = async function () {
@@ -427,13 +441,19 @@ export default defineComponent({
         filterForm[name] = '';
       });
 
+      // clear query string
+      void router.push({ query: {} });
+
       const { page, rowsPerPage, sortBy, descending } = pagination.value;
 
       await fetchTableData({
-        page,
-        descending,
-        perPage: rowsPerPage,
-        sortBy,
+        paginationParams: {
+          page,
+          descending,
+          perPage: rowsPerPage,
+          sortBy,
+        },
+        queryObject: {},
       });
     };
 
@@ -445,27 +465,43 @@ export default defineComponent({
       const { page, rowsPerPage, sortBy, descending } = requestProps.pagination;
 
       await fetchTableData({
-        page,
-        descending,
-        perPage: rowsPerPage,
-        sortBy,
+        paginationParams: {
+          page,
+          descending,
+          perPage: rowsPerPage,
+          sortBy,
+        },
+        queryObject: filterForm,
       });
     };
 
-    const fetchTableData = async function (
-      requestParams?: RequestParams
+    interface FetchTableDataInterface {
+      (options?: {
+        paginationParams?: PaginationParams;
+        queryObject?: { [index: string]: string | boolean };
+      }): Promise<void>;
+    }
+
+    const fetchTableData: FetchTableDataInterface = async function (
+      options
     ): Promise<void> {
+      const paginationParams = options?.paginationParams;
+      const queryObject = options?.queryObject;
+      console.log(queryObject);
+
       loading.value = true;
+
       await store
         .dispatch('quasar_tables/FETCH_TABLE_DATA', {
-          requestParams: {
-            page: requestParams?.page ?? null,
-            descending: requestParams?.descending ?? false,
-            perPage: requestParams?.perPage ?? null,
-            sortBy: requestParams?.sortBy ?? '',
+          paginationParams: {
+            page: paginationParams?.page ?? pagination.value.page,
+            descending:
+              paginationParams?.descending ?? pagination.value.descending,
+            perPage: paginationParams?.perPage ?? pagination.value.rowsPerPage,
+            sortBy: paginationParams?.sortBy ?? pagination.value.sortBy,
           },
           entityEndPoint: props.tableDataFetchEndPoint,
-          queryObject: filterForm,
+          queryObject,
         })
         .then((response: ResponseData) => {
           void nextTick(() => {
@@ -487,13 +523,13 @@ export default defineComponent({
               pagination.value.rowsNumber = meta.total;
             } else {
               pagination.value.page =
-                requestParams?.page || pagination.value.page;
+                paginationParams?.page || pagination.value.page;
               pagination.value.rowsPerPage =
-                requestParams?.perPage || pagination.value.rowsPerPage;
+                paginationParams?.perPage || pagination.value.rowsPerPage;
             }
             pagination.value.sortBy =
-              requestParams?.sortBy || pagination.value.sortBy;
-            pagination.value.descending = requestParams?.descending;
+              paginationParams?.sortBy || pagination.value.sortBy;
+            pagination.value.descending = paginationParams?.descending;
 
             loading.value = false;
           });
@@ -509,12 +545,29 @@ export default defineComponent({
     const submitFilter = async () => {
       const { page, rowsPerPage, sortBy, descending } = pagination.value;
 
+      let activeFilter: { [index: string]: string } = {};
+      if (!isEmpty(filterForm)) {
+        for (const item in filterForm) {
+          const value = filterForm[item];
+          if (value !== undefined && value !== null && value !== '') {
+            activeFilter[item] = <string>value;
+          }
+        }
+      }
+      console.log({ activeFilter });
+
+      // clear query string
+      void router.push({ query: activeFilter });
+
       filterSubmitting.value = true;
       await fetchTableData({
-        page,
-        descending,
-        perPage: rowsPerPage,
-        sortBy,
+        paginationParams: {
+          page,
+          descending,
+          perPage: rowsPerPage,
+          sortBy,
+        },
+        queryObject: activeFilter,
       })
         .then(() => {
           filterSubmitting.value = false;
@@ -572,7 +625,7 @@ export default defineComponent({
               .then(() => {
                 deleteProgressDialog.hide();
 
-                void fetchTableData();
+                void fetchTableData({ queryObject: filterForm });
               })
               .catch(() => {
                 deleteProgressDialog.hide();
@@ -593,7 +646,7 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      await fetchTableData();
+      await fetchTableData({ queryObject: filterForm });
     });
 
     const currentCompany = computed(
@@ -602,8 +655,31 @@ export default defineComponent({
 
     // Reactively watch for changes in the currentCompany and update the table
     watch(currentCompany, async () => {
-      await fetchTableData();
+      await fetchTableData({ queryObject: filterForm });
     });
+    // Watch for changes in the querystring object
+    watch(
+      () => route.query as { [index: string]: string },
+      async (newQueryString: { [index: string]: string }) => {
+        if (!isEmpty(newQueryString)) {
+          for (const item in newQueryString) {
+            const value = newQueryString[item];
+            let normalisedValue;
+            if (value !== undefined && value !== null && value !== '') {
+              console.log(value, typeof value);
+
+              if (value === 'true') normalisedValue = true;
+              if (value === 'false') normalisedValue = false;
+              else normalisedValue = value;
+              filterForm[item] = normalisedValue;
+            } else filterForm[item] = '';
+          }
+        }
+
+        await fetchTableData({ queryObject: newQueryString });
+      },
+      { deep: true }
+    );
 
     return {
       nameOfTable: ref(props.tableName),
