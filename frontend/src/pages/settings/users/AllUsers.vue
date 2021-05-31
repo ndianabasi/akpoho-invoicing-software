@@ -16,6 +16,7 @@
       icon: 'person_add_alt',
       title: 'New User',
     }"
+    :resource-action-permissions="resourceActionPermissions"
   ></quasar-table>
 </template>
 
@@ -26,10 +27,9 @@
 import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { Customer } from '../../../store/customers/state';
-
 import userColumns from '../../../components/data/table-definitions/users';
-
 import QuasarTable from '../../../components/QuasarTable.vue';
+import { PERMISSION } from '../../../store/types';
 
 export default defineComponent({
   name: 'AllUsers',
@@ -66,6 +66,12 @@ export default defineComponent({
       tableDataFetchActionType,
       tableDataGetterType,
       defaultSort,
+      resourceActionPermissions: ref({
+        new: PERMISSION.CAN_CREATE_USERS,
+        view: PERMISSION.CAN_VIEW_USERS,
+        edit: PERMISSION.CAN_EDIT_USERS,
+        delete: PERMISSION.CAN_DELETE_USERS,
+      }),
     };
   },
 });

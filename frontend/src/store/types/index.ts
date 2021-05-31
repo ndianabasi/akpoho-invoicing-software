@@ -158,3 +158,16 @@ export interface UserFormShape extends Object {
   country_id: number | null;
   login_status: boolean;
 }
+
+export enum PERMISSION {
+  CAN_LIST_USERS = 'can_list_users',
+  CAN_CREATE_USERS = 'can_create_users',
+  CAN_VIEW_USERS = 'can_view_users',
+  CAN_EDIT_USERS = 'can_edit_users',
+  CAN_DELETE_USERS = 'can_delete_users',
+  CAN_LIST_CUSTOMERS = 'can_list_customers',
+  CAN_CREATE_CUSTOMERS = 'can_create_customers',
+  CAN_VIEW_CUSTOMERS = 'can_view_customers',
+  CAN_EDIT_CUSTOMERS = 'can_edit_customers',
+  CAN_DELETE_CUSTOMERS = 'can_delete_customers',
+}

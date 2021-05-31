@@ -165,17 +165,41 @@
           </template>
 
           <template v-if="!creationMode" #title-panel-side>
-            <q-btn
-              :to="{
-                name: 'view_user',
-                params: { userId: userId }, //userId from route props
-              }"
-              flat
-              round
-              color="primary"
-              icon="remove_red_eye"
-              title="Edit user"
-            />
+            <q-btn flat color="primary" icon="more_vert">
+              <q-menu
+                anchor="bottom right"
+                self="top end"
+                transition-show="flip-right"
+                transition-hide="flip-left"
+              >
+                <q-list class="text-primary">
+                  <q-item
+                    v-if="resourcePermissions.canView"
+                    :to="{
+                      name: 'view_user',
+                      params: { userId: userId }, //userId from route props
+                    }"
+                  >
+                    <q-item-section>
+                      <q-btn flat icon="visibility" />
+                    </q-item-section>
+                    <q-item-section>View User</q-item-section>
+                  </q-item>
+
+                  <q-item
+                    v-if="resourcePermissions.canList"
+                    :to="{
+                      name: 'all_users',
+                    }"
+                  >
+                    <q-item-section>
+                      <q-btn flat icon="view_list" />
+                    </q-item-section>
+                    <q-item-section>All Users</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
           </template>
         </view-card>
       </div>
@@ -204,10 +228,12 @@ import { required, email, helpers } from '@vuelidate/validators';
 import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
 import { store } from '../../../store';
+import useResourcePermissions from '../../../composables/useResourcePermissions';
 import {
   CurrentlyViewedUser,
   SelectionOption,
   UserFormShape,
+  PERMISSION,
 } from '../../../store/types';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
@@ -508,6 +534,10 @@ export default defineComponent({
       plainCountryStates,
       selectFilterFn,
       roles,
+      resourcePermissions: useResourcePermissions({
+        view: PERMISSION.CAN_VIEW_USERS,
+        list: PERMISSION.CAN_LIST_USERS,
+      }),
     };
   },
 });

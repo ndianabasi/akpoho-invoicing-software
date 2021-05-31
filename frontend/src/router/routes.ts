@@ -163,7 +163,7 @@ const routes: CustomRouteRecord[] = [
                 },
               },
               {
-                path: ':?userId/view',
+                path: ':userId/view',
                 props: true,
                 component: () => import('../pages/settings/users/User.vue'),
                 name: 'view_user',
@@ -173,7 +173,7 @@ const routes: CustomRouteRecord[] = [
                 },
               },
               {
-                path: ':?userId/edit',
+                path: ':userId/edit',
                 props: true,
                 component: () => import('../pages/settings/users/EditUser.vue'),
                 name: 'edit_user',

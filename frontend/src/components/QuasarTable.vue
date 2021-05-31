@@ -42,9 +42,13 @@
             q-table__title
           "
         >
-          {{ nameOfTable }}&nbsp;<q-btn
+          <span>{{ nameOfTable }}</span
+          ><q-btn
             v-if="
-              showNewRouteButton && newRouteObject && newRouteObject.routeName
+              showNewRouteButton &&
+              newRouteObject &&
+              newRouteObject.routeName &&
+              resourcePermissions.canCreate
             "
             :to="{
               name: newRouteObject.routeName,
@@ -194,16 +198,13 @@
             <q-btn-dropdown split class="glossy" color="accent" label="Actions">
               <q-list>
                 <q-item
+                  v-if="resourcePermissions?.canView ?? false"
                   v-close-popup
                   clickable
                   @click="onActionItemClick(props, 'view')"
                 >
                   <q-item-section avatar>
-                    <q-avatar
-                      icon="remove_red_eye"
-                      color="primary"
-                      text-color="white"
-                    />
+                    <q-icon name="remove_red_eye" color="primary" size="md" />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>View</q-item-label>
@@ -211,12 +212,13 @@
                 </q-item>
 
                 <q-item
+                  v-if="resourcePermissions?.canEdit ?? false"
                   v-close-popup
                   clickable
                   @click="onActionItemClick(props, 'edit')"
                 >
                   <q-item-section avatar>
-                    <q-avatar icon="edit" color="primary" text-color="white" />
+                    <q-icon size="md" name="edit" color="primary" />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>Edit</q-item-label>
@@ -224,16 +226,13 @@
                 </q-item>
 
                 <q-item
+                  v-if="resourcePermissions?.canDelete ?? false"
                   v-close-popup
                   clickable
                   @click="onActionItemClick(props, 'delete')"
                 >
                   <q-item-section avatar>
-                    <q-avatar
-                      icon="delete_forever"
-                      color="warning"
-                      text-color="white"
-                    />
+                    <q-icon size="md" name="delete_forever" color="primary" />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>Delete</q-item-label>
@@ -288,10 +287,12 @@ import {
   TableRequestInterface,
   RequestParams,
   RowProps,
+  PropObject,
 } from '../types/table';
 import { useQuasar } from 'quasar';
 import { ResponseData } from '../store/types';
 import { useRouter } from 'vue-router';
+import useResourcePermissions from '../composables/useResourcePermissions';
 
 export default defineComponent({
   name: 'QuasarTable',
@@ -354,6 +355,20 @@ export default defineComponent({
       required: false,
       default: () => {
         return {};
+      },
+      validator: (value: PropObject) => {
+        return ['routeName', 'icon', 'title'].every((prop) =>
+          Object.prototype.hasOwnProperty.call(value, prop)
+        );
+      },
+    },
+    resourceActionPermissions: {
+      type: Object,
+      required: true,
+      validator: (value: PropObject) => {
+        return ['new', 'view', 'edit', 'delete'].every((prop) =>
+          Object.prototype.hasOwnProperty.call(value, prop)
+        );
       },
     },
     showNewRouteButton: {
@@ -516,6 +531,7 @@ export default defineComponent({
 
     const onActionItemClick = (rowProps: RowProps, action: string) => {
       const id = rowProps.row.id;
+      console.log(id);
       if (action === 'view') {
         void router.push({
           name: props.rowViewRouteName,
@@ -616,6 +632,9 @@ export default defineComponent({
       submitFilter,
       clearFilter,
       filterSubmitting,
+      resourcePermissions: useResourcePermissions(
+        props.resourceActionPermissions
+      ),
     };
   },
 });

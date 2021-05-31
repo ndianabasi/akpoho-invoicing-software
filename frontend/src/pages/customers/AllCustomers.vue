@@ -10,6 +10,7 @@
       icon: 'person_add',
       title: 'New Customer',
     }"
+    :resource-action-permissions="resourceActionPermissions"
     no-results-label="Sorry! No customers were found. Please check your filters too."
     row-view-route-name="view_customer"
     row-edit-route-name="edit_customer"
@@ -27,9 +28,8 @@
 import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { Customer } from '../../store/customers/state';
-
+import { PERMISSION } from '../../store/types';
 import customerColumns from '../../components/data/table-definitions/customers';
-
 import QuasarTable from '../../components/QuasarTable.vue';
 
 export default defineComponent({
@@ -67,6 +67,12 @@ export default defineComponent({
       tableDataFetchActionType,
       tableDataGetterType,
       defaultSort,
+      resourceActionPermissions: ref({
+        new: PERMISSION.CAN_CREATE_CUSTOMERS,
+        view: PERMISSION.CAN_VIEW_CUSTOMERS,
+        edit: PERMISSION.CAN_EDIT_CUSTOMERS,
+        delete: PERMISSION.CAN_DELETE_CUSTOMERS,
+      }),
     };
   },
 });

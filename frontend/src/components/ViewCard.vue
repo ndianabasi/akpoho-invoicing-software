@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { TitleInfo } from '../store/types';
 
 export default defineComponent({
@@ -52,18 +52,17 @@ export default defineComponent({
     },
 
     titleInfo: {
-      type: Object,
+      type: Object as PropType<TitleInfo>,
       required: true,
       validator(value: TitleInfo) {
-        return (
-          Object.prototype.hasOwnProperty.call(value, 'title') &&
-          Object.prototype.hasOwnProperty.call(value, 'avatar')
+        return ['title', 'avatar'].every((prop) =>
+          Object.prototype.hasOwnProperty.call(value, prop)
         );
       },
     },
   },
 
-  setup() {
+  setup(props) {
     return {};
   },
 });

@@ -52,3 +52,7 @@ export interface RequestParams {
 export interface RowProps {
   row: { id: string };
 }
+
+export interface PropObject {
+  [index: string]: string;
+}

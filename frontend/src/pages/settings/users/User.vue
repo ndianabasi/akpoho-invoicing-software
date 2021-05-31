@@ -343,25 +343,41 @@
           </template>
 
           <template #title-panel-side>
-            <q-btn
-              :to="{
-                name: 'edit_user',
-                params: { userId: userId }, //userId from route props
-              }"
-              flat
-              round
-              color="primary"
-              icon="edit"
-            />
-            <!-- <q-btn
-              :to="{
-                name: 'all_users',
-              }"
-              flat
-              round
-              color="primary"
-              icon="view_list"
-            /> -->
+            <q-btn flat color="primary" icon="more_vert">
+              <q-menu
+                anchor="bottom right"
+                self="top end"
+                transition-show="flip-right"
+                transition-hide="flip-left"
+              >
+                <q-list class="text-primary">
+                  <q-item
+                    v-if="resourcePermissions.canEdit"
+                    :to="{
+                      name: 'edit_user',
+                      params: { userId: userId }, //userId from route props
+                    }"
+                  >
+                    <q-item-section>
+                      <q-btn flat icon="edit" />
+                    </q-item-section>
+                    <q-item-section>Edit</q-item-section>
+                  </q-item>
+
+                  <q-item
+                    v-if="resourcePermissions.canList"
+                    :to="{
+                      name: 'all_users',
+                    }"
+                  >
+                    <q-item-section>
+                      <q-btn flat icon="view_list" />
+                    </q-item-section>
+                    <q-item-section>All Users</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
           </template>
         </view-card>
       </div>
@@ -382,7 +398,8 @@ import {
 } from 'vue';
 import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
-import { CurrentlyViewedUser } from '../../../store/types';
+import useResourcePermissions from '../../../composables/useResourcePermissions';
+import { CurrentlyViewedUser, PERMISSION } from '../../../store/types';
 import { store } from '../../../store';
 
 export default defineComponent({
@@ -427,6 +444,10 @@ export default defineComponent({
       user: currentUser,
       tab: ref('user_account'),
       titleInfo,
+      resourcePermissions: useResourcePermissions({
+        edit: PERMISSION.CAN_EDIT_USERS,
+        list: PERMISSION.CAN_LIST_USERS,
+      }),
     };
   },
 });
