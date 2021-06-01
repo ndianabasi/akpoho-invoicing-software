@@ -14,6 +14,7 @@ import UUIDHook from './Hooks/UUIDHook'
 import Country from 'App/Models/Country'
 import State from 'App/Models/State'
 import { STANDARD_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import CustomerTitle from './CustomerTitle'
 
 export default class Customer extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -21,7 +22,9 @@ export default class Customer extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
-  @column()
+  @column({
+    serializeAs: null,
+  })
   public companyId: string
 
   @column()
@@ -47,6 +50,11 @@ export default class Customer extends BaseModel {
   public isCorporate: number
 
   @column({
+    serializeAs: null,
+  })
+  public customerTitleId: number
+
+  @column({
     serialize(value: number) {
       return Boolean(value)
     },
@@ -60,19 +68,7 @@ export default class Customer extends BaseModel {
   public companyEmail: string
 
   @column()
-  public companyStreetAddress: string
-
-  @column()
-  public companyCity: string
-
-  @column()
-  public companyPostalCode: string
-
-  @column()
-  public companyStateId: number
-
-  @column()
-  public companyCountryId: number
+  public companyPhone: string
 
   @column.dateTime({
     autoCreate: true,
@@ -99,18 +95,9 @@ export default class Customer extends BaseModel {
   @belongsTo(() => Company)
   public company: BelongsTo<typeof Company>
 
-  @belongsTo(() => Country, {
-    foreignKey: 'companyCountryId',
-    localKey: 'id',
-  })
-  public companyCountry: BelongsTo<typeof Country>
-
-  @belongsTo(() => State, {
-    foreignKey: 'companyStateId',
-    localKey: 'id',
-  })
-  public companyState: BelongsTo<typeof State>
-
   @hasMany(() => CustomerAddress)
   public addresses: HasMany<typeof CustomerAddress>
+
+  @belongsTo(() => CustomerTitle)
+  public title: BelongsTo<typeof CustomerTitle>
 }

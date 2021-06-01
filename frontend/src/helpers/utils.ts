@@ -2,8 +2,8 @@ import { DateTime } from 'luxon';
 //import { Format, TableRow } from 'src/types/table';
 
 export const stringSortFn = function (a: string, b: string) {
-  if (a.toLowerCase() < b.toLowerCase()) return 1;
-  if (a.toLowerCase() > b.toLowerCase()) return -1;
+  if (a.toLowerCase() > b.toLowerCase()) return 1;
+  if (a.toLowerCase() < b.toLowerCase()) return -1;
   return 0;
 };
 
@@ -13,6 +13,10 @@ export const dateSortFn = function (a: string, b: string) {
 
   return aDate - bDate;
 };
+
+export function isEmpty(obj: { [index: string]: unknown }) {
+  return Object.keys(obj).length === 0;
+}
 
 /* export const booleanFormatter: Format<boolean, TableRow, string> =
   () => (value: boolean, row: TableRow) => {

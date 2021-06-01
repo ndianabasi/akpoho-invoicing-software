@@ -7,9 +7,17 @@
     no-results-label="Sorry! No users were found. Please check your filters too."
     row-view-route-name="view_user"
     row-edit-route-name="edit_user"
-    row-delete-action-type="customers/DELETE_CUSTOMER"
-    entity-name="Customer"
+    route-param="userId"
+    row-delete-action-type="users/DELETE_USER"
+    entity-name="User"
     table-data-fetch-end-point="users"
+    show-new-route-button
+    :new-route-object="{
+      routeName: 'add_user',
+      icon: 'person_add_alt',
+      title: 'New User',
+    }"
+    :resource-action-permissions="resourceActionPermissions"
   ></quasar-table>
 </template>
 
@@ -19,11 +27,9 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import { Customer } from '../../../store/customers/state';
-
 import userColumns from '../../../components/data/table-definitions/users';
-
 import QuasarTable from '../../../components/QuasarTable.vue';
+import { PERMISSION } from '../../../store/types';
 
 export default defineComponent({
   name: 'AllUsers',
@@ -48,7 +54,6 @@ export default defineComponent({
 
     const data = reactive({
       columns: userColumns,
-      rows: store.getters['customers/GET_ALL_CUSTOMERS'] as Array<Customer>,
       stickyTable: false,
     });
 
@@ -60,6 +65,12 @@ export default defineComponent({
       tableDataFetchActionType,
       tableDataGetterType,
       defaultSort,
+      resourceActionPermissions: ref({
+        new: PERMISSION.CAN_CREATE_USERS,
+        view: PERMISSION.CAN_VIEW_USERS,
+        edit: PERMISSION.CAN_EDIT_USERS,
+        delete: PERMISSION.CAN_DELETE_USERS,
+      }),
     };
   },
 });

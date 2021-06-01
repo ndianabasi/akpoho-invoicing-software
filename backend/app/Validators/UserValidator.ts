@@ -5,7 +5,7 @@ import { UUID_REGEX } from 'App/Helpers/utils'
 export default class UserValidator {
   constructor(protected ctx: HttpContextContract) {}
 
-  public refs = schema.refs({ userId: this.ctx.params.user_id })
+  public refs = schema.refs({ userId: this.ctx.params?.user_id ?? null })
 
   public schema = schema.create({
     first_name: schema.string({ escape: true, trim: true }, [
@@ -31,7 +31,11 @@ export default class UserValidator {
 
     email: schema.string({ escape: true, trim: true }, [
       rules.email(),
-      rules.unique({ column: 'email', table: 'users', where: { email: this.refs.userId } }),
+      rules.unique({
+        column: 'email',
+        table: 'users',
+        whereNot: this.refs.userId ? { id: this.refs.userId } : {},
+      }),
     ]),
 
     role_id: schema.string({ escape: true, trim: true }, [rules.regex(UUID_REGEX)]),

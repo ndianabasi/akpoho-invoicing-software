@@ -214,6 +214,8 @@ export const rolesPermissions = [
       'can_list_customers',
       'can_edit_companies',
       'can_view_company_dashboard',
+      'can_view_company_settings',
+      'can_edit_company_settings',
     ],
   },
   {
@@ -239,6 +241,7 @@ export const rolesPermissions = [
       'can_edit_customers',
       'can_list_customers',
       'can_view_company_dashboard',
+      'can_view_company_settings',
     ],
   },
   {

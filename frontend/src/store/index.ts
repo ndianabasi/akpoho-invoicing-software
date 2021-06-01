@@ -33,6 +33,10 @@ import roles from './roles';
 import { RolesStateInterface } from './roles/state';
 import { RolesGetterInterface } from './roles/getters';
 
+import permissions from './permissions';
+import { PermissionStateInterface } from './permissions/state';
+import { PermissionGettersInterface } from './permissions/getters';
+
 //import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -91,6 +95,7 @@ export interface StateInterface {
   users?: UsersStateInterface;
   countries_states?: CountriesStatesStateInterface;
   roles?: RolesStateInterface;
+  permissions?: PermissionStateInterface;
 }
 
 export interface StoreGettersInterface {
@@ -101,6 +106,7 @@ export interface StoreGettersInterface {
   users?: UsersGetterInterface;
   countries_states?: CountriesStatesGetterInterface;
   roles?: RolesGetterInterface;
+  permissions?: PermissionGettersInterface;
 }
 
 export type StoreGetters = RootGetterInterface & StoreGettersInterface;
@@ -152,6 +158,7 @@ export default function (/* { ssrContext } */) {
         activity: '',
       },
       tokenRefreshTime: 120,
+      darkMode: false,
     }),
     getters: {
       getHttpProtocol() {
@@ -195,6 +202,7 @@ export default function (/* { ssrContext } */) {
       users,
       countries_states,
       roles,
+      permissions,
     },
     plugins:
       process.env.NODE_ENV !== 'production'

@@ -1,5 +1,8 @@
-import /* booleanFormatter */ 'src/helpers/utils';
-import { /* Formatter, */ TableRow } from '../../../types/table';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { computed, watchEffect, onBeforeUnmount } from 'vue';
+import { store } from 'src/store';
+import { SelectionOption } from 'src/store/types';
+import { TableRow } from '../../../types/table';
 
 interface UserHeaders extends TableRow {
   name: UserColumns;
@@ -32,13 +35,23 @@ enum UserColumns {
   return value ? 'TRUE' : 'FALSE';
 }; */
 
+const stopFetchRolesForSelect = watchEffect(() => {
+  void store.dispatch('roles/FETCH_ROLES_FOR_SELECT');
+});
+
+const roles = computed(
+  () => store.getters['roles/GET_ROLES_FOR_SELECT'] as SelectionOption[]
+);
+
 const columns: Array<UserHeaders> = [
   {
     name: UserColumns.id,
-    required: true,
+    required: false,
     label: 'User ID',
     align: 'center',
     field: UserColumns.id,
+    filterable: true,
+    filterInputType: 'text',
   },
   {
     name: UserColumns.first_name,
@@ -47,6 +60,8 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.first_name,
     sortable: true,
+    filterable: true,
+    filterInputType: 'text',
   },
   {
     name: UserColumns.last_name,
@@ -55,6 +70,8 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.last_name,
     sortable: true,
+    filterable: true,
+    filterInputType: 'text',
   },
   {
     name: UserColumns.email,
@@ -63,6 +80,8 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.email,
     sortable: true,
+    filterable: true,
+    filterInputType: 'text',
   },
   {
     name: UserColumns.role,
@@ -71,6 +90,9 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.role,
     sortable: true,
+    filterable: true,
+    filterInputType: 'select',
+    filterOptions: [{ label: '', value: null }, ...roles.value],
   },
   {
     name: UserColumns.login_status,
@@ -79,6 +101,13 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.login_status,
     sortable: true,
+    filterable: true,
+    filterInputType: 'select',
+    filterOptions: [
+      { label: '', value: null },
+      { label: 'Can Login', value: true },
+      { label: 'Cannot Login', value: false },
+    ],
   },
   {
     name: UserColumns.is_account_activated,
@@ -87,6 +116,13 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.is_account_activated,
     sortable: true,
+    filterable: true,
+    filterInputType: 'select',
+    filterOptions: [
+      { label: '', value: null },
+      { label: 'Yes', value: true },
+      { label: 'No', value: false },
+    ],
   },
   {
     name: UserColumns.is_email_verified,
@@ -95,6 +131,13 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.is_email_verified,
     sortable: true,
+    filterable: true,
+    filterInputType: 'select',
+    filterOptions: [
+      { label: '', value: null },
+      { label: 'Yes', value: true },
+      { label: 'No', value: false },
+    ],
   },
   {
     name: UserColumns.lifetime_login,
@@ -103,6 +146,8 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.lifetime_login,
     sortable: true,
+    filterable: true,
+    filterInputType: 'text',
   },
   {
     name: UserColumns.last_login_time,
@@ -111,6 +156,8 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.last_login_time,
     sortable: true,
+    filterable: true,
+    filterInputType: 'date',
   },
   {
     name: UserColumns.account_activated_at,
@@ -119,6 +166,8 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.account_activated_at,
     sortable: true,
+    filterable: true,
+    filterInputType: 'date',
   },
   {
     name: UserColumns.email_verified_at,
@@ -127,6 +176,8 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.email_verified_at,
     sortable: true,
+    filterable: true,
+    filterInputType: 'date',
   },
   {
     name: UserColumns.created_at,
@@ -135,6 +186,8 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.created_at,
     sortable: true,
+    filterable: true,
+    filterInputType: 'date',
   },
   {
     name: UserColumns.updated_at,
@@ -143,7 +196,13 @@ const columns: Array<UserHeaders> = [
     align: 'center',
     field: UserColumns.updated_at,
     sortable: true,
+    filterable: true,
+    filterInputType: 'date',
   },
 ];
+
+onBeforeUnmount(() => {
+  stopFetchRolesForSelect();
+});
 
 export default columns;

@@ -43,6 +43,14 @@ Route.group(() => {
   )
 
   Route.get('/roles/roles-for-select', 'RolesController.rolesForSelect')
+
+  // Permissions routes
+  Route.get('/permissions/user-permissions', 'PermissionsController.userPermissions')
+
+  Route.get(
+    '/customer-titles/customer-titles-for-select',
+    'CustomersController.customerTitlesForSelect'
+  )
 })
   .prefix('/v1')
   .middleware('auth')
@@ -50,19 +58,32 @@ Route.group(() => {
 
 // Authenticated company-specific routes
 Route.group(() => {
+  // Customers routes
   Route.get('/:company_id/customers', 'CustomersController.index')
   Route.get('/:company_id/customers/:customer_id', 'CustomersController.show').middleware(
     'findRequestedCustomer'
   )
+  Route.get(
+    '/:company_id/customers/:customer_id/customer-addresses',
+    'CustomersController.showAddresses'
+  ).middleware('findRequestedCustomer')
   Route.delete('/:company_id/customers/:customer_id', 'CustomersController.destroy').middleware(
     'findRequestedCustomer'
   )
+  Route.patch('/:company_id/customers/:customer_id', 'CustomersController.update').middleware(
+    'findRequestedCustomer'
+  )
 
+  // Users routes
   Route.get('/:company_id/users', 'UsersController.index')
   Route.get('/:company_id/users/:user_id', 'UsersController.show').middleware('findRequestedUser')
   Route.patch('/:company_id/users/:user_id', 'UsersController.update').middleware(
     'findRequestedUser'
   )
+  Route.delete('/:company_id/users/:user_id', 'UsersController.destroy').middleware(
+    'findRequestedUser'
+  )
+  Route.post('/:company_id/users', 'UsersController.store')
 })
   .prefix('/v1')
   .middleware('auth')

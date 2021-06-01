@@ -1,14 +1,14 @@
 <template>
-  <edit-customer creation-mode />
+  <edit-user creation-mode />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import EditCustomer from './EditCustomer.vue';
+import EditUser from './EditUser.vue';
 
 export default defineComponent({
-  name: 'CreateCustomer',
-  components: { EditCustomer },
+  name: 'CreateUser',
+  components: { EditUser },
   setup() {
     return {};
   },

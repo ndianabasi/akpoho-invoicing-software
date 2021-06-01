@@ -3,8 +3,10 @@ import User from 'App/Models/User'
 import CompanyFactory from './CompanyFactory'
 import UserProfileFactory from './UserProfileFactory'
 import { ROLES } from 'Database/data/roles'
-
 import Role from 'App/Models/Role'
+import { appendFile } from 'fs/promises'
+import Logger from '@ioc:Adonis/Core/Logger'
+import { DateTime } from 'luxon'
 
 const getRoles = async function () {
   const superAdminRole = await Role.findBy('name', ROLES.SUPERADMIN)
@@ -29,7 +31,14 @@ const UserFactory = Factory.define(User, async ({ faker }) => {
     is_email_verified: faker.datatype.boolean(),
   }
 
-  console.log(generatedUser)
+  // Log `generatedUser` to file
+  const NOW = DateTime.utc().toISO()
+  const data = `[${NOW}]\n` + JSON.stringify(generatedUser) + '\n\n'
+
+  const relativePath = 'database/data/seeded_users.txt'
+  appendFile(relativePath, data, { encoding: 'utf-8' }).catch((error) =>
+    Logger.error('Error after user creation: \nError:\n%j', error)
+  )
 
   return generatedUser
 })

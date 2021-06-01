@@ -4,12 +4,17 @@
   <div class="q-pa-md">
     <q-table
       v-model:selected="selected"
-      v-model:pagination="pagination"
+      v-model:pagination="paginationModel"
+      :grid="gridMode"
+      :hide-pagination="!usePagination"
       :rows="tableDataRows"
       :columns="columns"
       row-key="id"
-      selection="multiple"
-      :class="{ 'my-sticky-header-column-table': stickyTable }"
+      :selection="showSelections ? 'multiple' : 'none'"
+      :class="{
+        'my-sticky-header-column-table': stickyTable,
+        'no-border no-box-shadow': gridMode,
+      }"
       :visible-columns="visibleColumns"
       :loading="loading"
       :filter="filter"
@@ -20,10 +25,141 @@
       :rows-per-page-options="rosPerPageOptions"
       @request="processTableRequest"
     >
-      <template #top-right>
+      <template #top="props">
+        <div
+          class="
+            col-md-2 col-xl-2 col-sm-12 col-xs-12
+            q-mb-sm-xl q-mb-xs-xl
+            q-table__title
+          "
+        >
+          <span v-if="!embedMode">{{ nameOfTable }}</span>
+          <slot name="topAddNew">
+            <q-btn
+              v-if="
+                showNewRouteButton &&
+                newRouteObject &&
+                newRouteObject.routeName &&
+                resourcePermissions.canCreate
+              "
+              :to="{
+                name: newRouteObject.routeName,
+              }"
+              flat
+              round
+              color="primary"
+              :icon="newRouteObject.icon"
+              :title="newRouteObject.title"
+            />
+          </slot>
+        </div>
+
+        <q-space />
+
+        <q-select
+          v-if="useVisibleColumns"
+          v-model="visibleColumns"
+          multiple
+          dense
+          options-dense
+          :display-value="$q.lang.table.columns"
+          emit-value
+          map-options
+          :options="visibleColumnsObjects"
+          option-value="name"
+          options-cover
+          style="min-width: 200px"
+        />
+
+        <q-btn
+          v-if="!embedMode"
+          flat
+          round
+          dense
+          :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+          class="q-ml-md"
+          @click="props.toggleFullscreen"
+        />
+
+        <q-separator />
+
+        <div v-if="useMultiFilter" class="col-12 q-mt-md">
+          <q-expansion-item
+            v-model="filterPanelExpanded"
+            icon="tune"
+            label="Filters"
+          >
+            <q-card>
+              <q-card-section>
+                <div class="q-gutter-md row items-start">
+                  <template v-for="column in filterableColumns">
+                    <q-input
+                      v-if="column.filterInputType === 'text'"
+                      :key="'filter_text_input_' + column.name"
+                      v-model="filterForm[column.name]"
+                      :label="column.label"
+                      dense
+                      class="q-mb-md"
+                      clearable
+                    >
+                    </q-input>
+                    <q-select
+                      v-else-if="column.filterInputType === 'select'"
+                      :key="'filter_select_input_' + column.name"
+                      v-model="filterForm[column.name]"
+                      :options="column?.filterOptions ?? []"
+                      :label="column.label"
+                      options-dense
+                      dense
+                      use-input
+                      emit-value
+                      map-options
+                      class="q-mb-md"
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                    </q-select>
+                    <q-input
+                      v-else
+                      :key="'filter_date_input_' + column.name"
+                      v-model="filterForm[column.name]"
+                      type="date"
+                      :label="column.label"
+                      stack-label
+                      dense
+                    />
+                  </template>
+                </div>
+                <q-btn
+                  type="submit"
+                  :loading="filterSubmitting"
+                  label="Submit"
+                  class="q-mt-md"
+                  color="primary"
+                  icon-right="send"
+                  @click.prevent="submitFilter"
+                >
+                  <!-- eslint-disable-next-line vue/v-slot-style -->
+                  <template #loading>
+                    <q-spinner-facebook color="white" />
+                  </template>
+                </q-btn>
+                <q-btn
+                  type="submit"
+                  label="Clear All"
+                  class="q-mt-md q-ml-md"
+                  color="warning"
+                  @click.prevent="clearFilter"
+                >
+                </q-btn>
+              </q-card-section>
+            </q-card>
+          </q-expansion-item>
+        </div>
+
         <q-input
+          v-if="gridMode"
           v-model="filter"
-          borderless
           dense
           debounce="300"
           placeholder="Search"
@@ -34,52 +170,10 @@
         </q-input>
       </template>
 
-      <template #top="props">
-        <div class="col-2 q-table__title">{{ nameOfTable }}</div>
-
-        <q-space />
-
-        <!--
-            Using v-if directive will make the toggle or select dropdown disappear when all columns are unselected
-          -->
-        <div v-if="$q.screen.gt.xs" class="col">
-          <q-toggle
-            v-for="column in visibleColumnsObjects"
-            :key="column.name"
-            v-model="visibleColumns"
-            :val="column.name"
-            :label="column.label"
-          />
-        </div>
-        <q-select
-          v-else
-          v-model="visibleColumns"
-          multiple
-          borderless
-          dense
-          options-dense
-          :display-value="$q.lang.table.columns"
-          emit-value
-          map-options
-          :options="visibleColumns"
-          option-value="name"
-          style="min-width: 150px"
-        />
-
-        <q-btn
-          flat
-          round
-          dense
-          :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-          class="q-ml-md"
-          @click="props.toggleFullscreen"
-        />
-      </template>
-
       <template #header="props">
         <q-tr :props="props">
           <q-th auto-width />
-          <q-th v-if="showSelections_" auto-width>
+          <q-th v-if="showSelections" auto-width>
             <q-checkbox v-model="props.selected" />
           </q-th>
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -87,6 +181,10 @@
           </q-th>
           <q-th v-if="showActions_" auto-width> Actions </q-th>
         </q-tr>
+      </template>
+
+      <template v-if="gridMode" #item="props">
+        <slot name="grideModeItems" v-bind="props"> </slot>
       </template>
 
       <template #body="props">
@@ -101,7 +199,7 @@
               @click="props.expand = !props.expand"
             />
           </q-td>
-          <q-td v-if="showSelections_" auto-width>
+          <q-td v-if="showSelections" auto-width>
             <q-checkbox v-model="props.selected" />
           </q-td>
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -111,16 +209,16 @@
             <q-btn-dropdown split class="glossy" color="accent" label="Actions">
               <q-list>
                 <q-item
+                  v-if="resourcePermissions?.canView ?? false"
                   v-close-popup
                   clickable
-                  @click="onActionItemClick(props, 'view')"
+                  :to="{
+                    name: rowViewRouteName,
+                    params: { [routeParam]: props.row.id },
+                  }"
                 >
                   <q-item-section avatar>
-                    <q-avatar
-                      icon="remove_red_eye"
-                      color="primary"
-                      text-color="white"
-                    />
+                    <q-icon name="remove_red_eye" color="primary" size="md" />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>View</q-item-label>
@@ -128,12 +226,16 @@
                 </q-item>
 
                 <q-item
+                  v-if="resourcePermissions?.canEdit ?? false"
                   v-close-popup
                   clickable
-                  @click="onActionItemClick(props, 'edit')"
+                  :to="{
+                    name: rowEditRouteName,
+                    params: { [routeParam]: props.row.id },
+                  }"
                 >
                   <q-item-section avatar>
-                    <q-avatar icon="edit" color="primary" text-color="white" />
+                    <q-icon size="md" name="edit" color="primary" />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>Edit</q-item-label>
@@ -141,16 +243,13 @@
                 </q-item>
 
                 <q-item
+                  v-if="resourcePermissions?.canDelete ?? false"
                   v-close-popup
                   clickable
-                  @click="onActionItemClick(props, 'delete')"
+                  @click="deleteRow(props.row.id)"
                 >
                   <q-item-section avatar>
-                    <q-avatar
-                      icon="delete_forever"
-                      color="warning"
-                      text-color="white"
-                    />
+                    <q-icon size="md" name="delete_forever" color="primary" />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>Delete</q-item-label>
@@ -203,12 +302,14 @@ import {
   TableRow,
   GenericTableData,
   TableRequestInterface,
-  RequestParams,
-  RowProps,
-} from '../../src/types/table';
+  PaginationParams,
+  PropObject,
+} from '../types/table';
 import { useQuasar } from 'quasar';
 import { ResponseData } from '../store/types';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import useResourcePermissions from '../composables/useResourcePermissions';
+import { isEmpty } from '../helpers/utils';
 
 export default defineComponent({
   name: 'QuasarTable',
@@ -221,6 +322,26 @@ export default defineComponent({
     showSelections: {
       type: Boolean,
       default: false,
+    },
+    gridMode: {
+      type: Boolean,
+      default: false,
+    },
+    embedMode: {
+      type: Boolean,
+      default: false,
+    },
+    useMultiFilter: {
+      type: Boolean,
+      default: true,
+    },
+    usePagination: {
+      type: Boolean,
+      default: true,
+    },
+    useVisibleColumns: {
+      type: Boolean,
+      default: true,
     },
     showActions: {
       type: Boolean,
@@ -251,7 +372,7 @@ export default defineComponent({
     },
     entityName: {
       type: String,
-      required: false,
+      required: true,
       default: 'Resource',
     },
     noResultsLabel: {
@@ -262,9 +383,40 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    routeParam: {
+      type: String,
+      required: false,
+      default: '',
+    },
     defaultSort: {
       type: Object,
       required: true,
+    },
+    newRouteObject: {
+      type: Object,
+      required: false,
+      default: () => {
+        return {};
+      },
+      validator: (value: PropObject) => {
+        if (isEmpty(value)) return true;
+        return ['routeName', 'icon', 'title'].every((prop) =>
+          Object.prototype.hasOwnProperty.call(value, prop)
+        );
+      },
+    },
+    resourceActionPermissions: {
+      type: Object,
+      required: true,
+      validator: (value: PropObject) => {
+        return ['new', 'view', 'edit', 'delete'].every((prop) =>
+          Object.prototype.hasOwnProperty.call(value, prop)
+        );
+      },
+    },
+    showNewRouteButton: {
+      type: Boolean,
+      default: false,
     },
     rosPerPageOptions: {
       type: Array,
@@ -278,6 +430,7 @@ export default defineComponent({
     const loading = ref(false);
     const store = useStore();
     const router = useRouter();
+    const route = useRoute();
     const selected = ref([]);
     const tableRows: Ref<GenericTableData> = ref([]);
     const pagination = ref({
@@ -287,6 +440,7 @@ export default defineComponent({
       rowsPerPage: 10,
       rowsNumber: 10,
     });
+    const filterSubmitting = ref(false);
 
     const visibleColumnsObjects = function () {
       const columns = props.tableColumns as TableRow[];
@@ -297,38 +451,102 @@ export default defineComponent({
       );
     };
 
+    const columns = props.tableColumns as TableRow[];
+    const filterableColumns = ref(
+      [...columns].filter(
+        (column) => column.filterable && column.filterInputType
+      )
+    );
+
+    const existingQueryString = route.query as { [index: string]: string };
+    console.log(existingQueryString);
+
+    const filterFormArray: string[] = filterableColumns.value.map(
+      (col) => col.name as string
+    );
+    let filterForm: { [index: string]: string | boolean } = reactive({});
+    filterFormArray.forEach((name) => {
+      if (!isEmpty(existingQueryString)) {
+        const value = existingQueryString[name];
+        let normalisedValue;
+        if (value) {
+          if (value === 'true') normalisedValue = true;
+          if (value === 'false') normalisedValue = false;
+          else normalisedValue = value;
+          filterForm[name] = normalisedValue;
+        }
+      } else filterForm[name] = '';
+    });
+
+    const clearFilter = async function () {
+      filterFormArray.forEach((name) => {
+        filterForm[name] = '';
+      });
+
+      // clear query string
+      void router.push({ query: {} });
+
+      const { page, rowsPerPage, sortBy, descending } = pagination.value;
+
+      await fetchTableData({
+        paginationParams: {
+          page,
+          descending,
+          perPage: rowsPerPage,
+          sortBy,
+        },
+        queryObject: {},
+      });
+    };
+
     const visibleColumns = ref([]);
 
     const processTableRequest = async function (
       requestProps: TableRequestInterface
     ) {
-      console.log(requestProps);
       const { page, rowsPerPage, sortBy, descending } = requestProps.pagination;
-      const filter = requestProps.filter;
 
       await fetchTableData({
-        search: filter,
-        page,
-        descending,
-        perPage: rowsPerPage,
-        sortBy,
+        paginationParams: {
+          page,
+          descending,
+          perPage: rowsPerPage,
+          sortBy,
+        },
+        queryObject: filterForm,
       });
     };
 
-    const fetchTableData = async function (
-      requestParams?: RequestParams
+    interface FetchTableDataInterface {
+      (options?: {
+        paginationParams?: PaginationParams;
+        queryObject?: { [index: string]: string | boolean };
+      }): Promise<void>;
+    }
+
+    const fetchTableData: FetchTableDataInterface = async function (
+      options
     ): Promise<void> {
+      const paginationParams = options?.paginationParams;
+      const queryObject = options?.queryObject;
+      console.log(queryObject);
+
       loading.value = true;
+
       await store
         .dispatch('quasar_tables/FETCH_TABLE_DATA', {
-          requestParams: {
-            search: requestParams?.search ?? '',
-            page: requestParams?.page ?? null,
-            descending: requestParams?.descending ?? false,
-            perPage: requestParams?.perPage ?? null,
-            sortBy: requestParams?.sortBy ?? '',
-          },
+          paginationParams: props.usePagination
+            ? {
+                page: paginationParams?.page ?? pagination.value.page,
+                descending:
+                  paginationParams?.descending ?? pagination.value.descending,
+                perPage:
+                  paginationParams?.perPage ?? pagination.value.rowsPerPage,
+                sortBy: paginationParams?.sortBy ?? pagination.value.sortBy,
+              }
+            : {},
           entityEndPoint: props.tableDataFetchEndPoint,
+          queryObject: props.useMultiFilter ? queryObject : {},
         })
         .then((response: ResponseData) => {
           void nextTick(() => {
@@ -343,7 +561,6 @@ export default defineComponent({
             tableRows.value = data;
 
             const meta = response?.data?.meta;
-            console.log(response.data);
 
             if (meta) {
               pagination.value.page = meta.current_page;
@@ -351,13 +568,13 @@ export default defineComponent({
               pagination.value.rowsNumber = meta.total;
             } else {
               pagination.value.page =
-                requestParams?.page || pagination.value.page;
+                paginationParams?.page || pagination.value.page;
               pagination.value.rowsPerPage =
-                requestParams?.perPage || pagination.value.rowsPerPage;
+                paginationParams?.perPage || pagination.value.rowsPerPage;
             }
             pagination.value.sortBy =
-              requestParams?.sortBy || pagination.value.sortBy;
-            pagination.value.descending = requestParams?.descending;
+              paginationParams?.sortBy || pagination.value.sortBy;
+            pagination.value.descending = paginationParams?.descending;
 
             loading.value = false;
           });
@@ -370,29 +587,48 @@ export default defineComponent({
         });
     };
 
+    const submitFilter = async () => {
+      const { page, rowsPerPage, sortBy, descending } = pagination.value;
+
+      let activeFilter: { [index: string]: string } = {};
+      if (!isEmpty(filterForm)) {
+        for (const item in filterForm) {
+          const value = filterForm[item];
+          if (value !== undefined && value !== null && value !== '') {
+            activeFilter[item] = <string>value;
+          }
+        }
+      }
+      console.log({ activeFilter });
+
+      // clear query string
+      void router.push({ query: activeFilter });
+
+      filterSubmitting.value = true;
+      await fetchTableData({
+        paginationParams: {
+          page,
+          descending,
+          perPage: rowsPerPage,
+          sortBy,
+        },
+        queryObject: activeFilter,
+      })
+        .then(() => {
+          filterSubmitting.value = false;
+        })
+        .catch(() => {
+          filterSubmitting.value = false;
+        });
+    };
+
     const data = reactive({
       columns: props.tableColumns,
       stickyTable: false,
     });
 
-    const onActionItemClick = (rowProps: RowProps, action: string) => {
-      const id = rowProps.row.id;
-      //console.log(id);
-      if (action === 'view') {
-        void router.push({
-          name: props.rowViewRouteName,
-          params: { userId: id },
-        });
-      }
-
-      if (action === 'edit') {
-        void router.push({
-          name: props.rowEditRouteName,
-          params: { userId: id },
-        });
-      }
-
-      if (action === 'delete') {
+    const deleteRow = (id: string | number) => {
+      if (props.rowDeleteActionType) {
         $q.dialog({
           title: 'Deletion Warning',
           message: `You are about to delete this ${props.entityName}. Please type 'DELETE' to confirm your action.`,
@@ -417,15 +653,17 @@ export default defineComponent({
             .then(() => {
               deleteProgressDialog.hide();
 
-              $q.notify({
-                type: 'positive',
-                message: 'Customer was successfully deleted!',
-                position: 'top',
-              });
+              void fetchTableData({ queryObject: filterForm });
             })
             .catch(() => {
               deleteProgressDialog.hide();
             });
+        });
+      } else {
+        $q.notify({
+          type: 'negative',
+          message: 'Deletion type is not set for this table',
+          position: 'top',
         });
       }
     };
@@ -435,7 +673,7 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      await fetchTableData();
+      await fetchTableData({ queryObject: filterForm });
     });
 
     const currentCompany = computed(
@@ -444,8 +682,31 @@ export default defineComponent({
 
     // Reactively watch for changes in the currentCompany and update the table
     watch(currentCompany, async () => {
-      await fetchTableData();
+      await fetchTableData({ queryObject: filterForm });
     });
+    // Watch for changes in the querystring object
+    watch(
+      () => route.query as { [index: string]: string },
+      async (newQueryString: { [index: string]: string }) => {
+        if (!isEmpty(newQueryString)) {
+          for (const item in newQueryString) {
+            const value = newQueryString[item];
+            let normalisedValue;
+            if (value !== undefined && value !== null && value !== '') {
+              console.log(value, typeof value);
+
+              if (value === 'true') normalisedValue = true;
+              if (value === 'false') normalisedValue = false;
+              else normalisedValue = value;
+              filterForm[item] = normalisedValue;
+            } else filterForm[item] = '';
+          }
+        }
+
+        await fetchTableData({ queryObject: newQueryString });
+      },
+      { deep: true }
+    );
 
     return {
       nameOfTable: ref(props.tableName),
@@ -453,7 +714,7 @@ export default defineComponent({
       visibleColumns,
       visibleColumnsObjects: visibleColumnsObjects(),
       columns: ref(props.tableColumns),
-      pagination,
+      paginationModel: props.usePagination ? pagination : null,
       pagesNumber: computed(() => {
         return Math.ceil(
           tableRows?.value?.length ?? 1 / pagination.value.rowsPerPage
@@ -465,9 +726,17 @@ export default defineComponent({
       processTableRequest,
       filter,
       noResultsLabel_: ref(props.noResultsLabel),
-      showSelections_: ref(props.showSelections),
       showActions_: ref(props.showActions),
-      onActionItemClick,
+      deleteRow,
+      filterPanelExpanded: ref(false),
+      filterableColumns,
+      filterForm,
+      submitFilter,
+      clearFilter,
+      filterSubmitting,
+      resourcePermissions: useResourcePermissions(
+        props.resourceActionPermissions
+      ),
     };
   },
 });

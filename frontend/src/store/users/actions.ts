@@ -29,7 +29,7 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
         .then((res: HttpResponse) => {
           commit('SET_CURRENTLY_VIEWED_USER', res.data.data);
 
-          resolve(res.data);
+          return resolve(res.data);
         })
         .catch((error: HttpError) => {
           Notify.create({
@@ -47,7 +47,39 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
             ],
           });
 
-          reject(error);
+          return reject(error);
+        });
+    });
+  },
+
+  async CREATE_USER({ rootGetters }, { form }: { form: UserFormShape }) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      await $http
+        .post(`/${currentCompany.id}/users`, { ...form })
+        .then((res: HttpResponse) => {
+          Notify.create({
+            message: 'User was successfully created',
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
         });
     });
   },
@@ -65,8 +97,6 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
       await $http
         .patch(`/${currentCompany.id}/users/${userId}`, { ...form })
         .then((res: HttpResponse) => {
-          resolve(res.data);
-
           Notify.create({
             message: 'User was successfully edited',
             type: 'positive',
@@ -80,14 +110,16 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
               },
             ],
           });
+
+          return resolve(res.data);
         })
         .catch((error: HttpError) => {
-          reject(error);
+          return reject(error);
         });
     });
   },
 
-  async DELETE_USER({ rootGetters }, { userId }: { userId: string }) {
+  async DELETE_USER({ rootGetters }, userId: string) {
     return new Promise(async (resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const currentCompany = rootGetters[
@@ -97,12 +129,10 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
       await $http
         .delete(`/${currentCompany.id}/users/${userId}`)
         .then((res: HttpResponse) => {
-          resolve(res.data);
-
           Notify.create({
             message: 'User was successfully deleted',
             type: 'positive',
-            position: 'bottom',
+            position: 'top',
             progress: true,
             timeout: 5000,
             actions: [
@@ -112,9 +142,11 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
               },
             ],
           });
+
+          return resolve(res.data.data);
         })
         .catch((error: HttpError) => {
-          reject(error);
+          return reject(error);
         });
     });
   },

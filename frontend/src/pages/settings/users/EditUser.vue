@@ -1,191 +1,205 @@
 <template>
   <div class="q-pa-md">
-    <div class="row justify-center">
-      <div class="col-md-6 col-sm-12 col-xs-12">
-        <view-card
-          v-if="user"
-          :title-info="titleInfo"
-          show-avatar
-          show-title-panel-side
-        >
-          <template #body-panel>
-            <form class="q-pa-md" @submit.prevent="submitForm">
-              <q-input
-                v-model="form$.email.$model"
-                filled
-                clearable
-                bottom-slots
-                label="Email Address"
-                :dense="dense"
-                class="q-mb-md"
-                type="email"
-                :error="form$.email.$error"
-              >
-                <template #before>
-                  <q-icon name="email" />
-                </template>
+    <view-card
+      v-if="creationMode || user"
+      :title-info="titleInfo"
+      show-avatar
+      show-title-panel-side
+    >
+      <template #body-panel>
+        <form class="q-pa-md" @submit.prevent="submitForm">
+          <q-input
+            v-model="form$.email.$model"
+            filled
+            clearable
+            bottom-slots
+            label="Email Address"
+            :dense="dense"
+            class="q-mb-md"
+            type="email"
+            :error="form$.email.$invalid"
+          >
+            <template #before>
+              <q-icon name="email" />
+            </template>
 
-                <template #error>
-                  {{
-                    form$.email.$silentErrors
+            <template #error>
+              {{
+                form$.email.$silentErrors
+                  .map((error) => error.$message)
+                  .join(', ')
+              }}
+            </template>
+          </q-input>
+
+          <q-select
+            v-model="form.role_id"
+            filled
+            :options="roles"
+            label="Role"
+            clearable
+            bottom-slots
+            options-dense
+            use-input
+            emit-value
+            map-options
+            class="q-mb-md"
+            transition-show="scale"
+            transition-hide="scale"
+            :error="form$.role_id.$invalid"
+          >
+            <template #before>
+              <q-icon name="person" />
+            </template>
+
+            <template #error>
+              {{
+                form$.role_id.$silentErrors
+                  .map((error) => error.$message)
+                  .join(', ')
+              }}
+            </template>
+          </q-select>
+
+          <q-input
+            v-for="field in profileTextFields"
+            :key="'profileTextField_' + field.name"
+            v-model="form[field.name]"
+            filled
+            clearable
+            bottom-slots
+            :label="field.label"
+            :dense="dense"
+            :error="form$?.[field.name]?.$invalid ?? false"
+            class="q-mb-md"
+          >
+            <template #before>
+              <q-icon name="person" />
+            </template>
+
+            <template #error>
+              {{
+                form$ && form$[field.name]
+                  ? form$[field.name].$silentErrors
                       .map((error) => error.$message)
                       .join(', ')
-                  }}
-                </template>
-              </q-input>
+                  : ''
+              }}
+            </template>
+          </q-input>
 
-              <q-select
-                v-model="form.role_id"
-                filled
-                :options="roles"
-                label="Role"
-                clearable
-                bottom-slots
-                options-dense
-                use-input
-                emit-value
-                map-options
-                class="q-mb-md"
-                transition-show="scale"
-                transition-hide="scale"
-                :error="form$.role_id.$invalid"
+          <q-select
+            v-model="form.country_id"
+            filled
+            :options="plainCountries"
+            label="Country"
+            name="country_id"
+            clearable
+            bottom-slots
+            options-dense
+            use-input
+            input-debounce="0"
+            class="q-mb-md"
+            transition-show="scale"
+            transition-hide="scale"
+            emit-value
+            map-options
+            @filter="selectFilterFn"
+            ><template #before>
+              <q-icon name="business" />
+            </template>
+          </q-select>
+
+          <q-select
+            v-model="form.state_id"
+            filled
+            :disable="!form.country_id"
+            :options="plainCountryStates"
+            label="State"
+            name="state_id"
+            clearable
+            bottom-slots
+            options-dense
+            use-input
+            input-debounce="0"
+            class="q-mb-md"
+            transition-show="scale"
+            transition-hide="scale"
+            emit-value
+            map-options
+            @filter="selectFilterFn"
+            ><template #before>
+              <q-icon name="business" />
+            </template>
+          </q-select>
+
+          <q-toggle
+            v-model="form.login_status"
+            checked-icon="check"
+            unchecked-icon="clear"
+            color="primary"
+            :label="form.login_status ? 'Can login' : 'Cannot login'"
+          />
+        </form>
+      </template>
+
+      <template #footer-panel>
+        <div class="row justify-center q-mb-xl">
+          <q-btn
+            type="submit"
+            :loading="submitting"
+            label="Submit"
+            class="q-mt-md"
+            color="primary"
+            icon-right="send"
+            @click.prevent="submitForm"
+          >
+            <!-- eslint-disable-next-line vue/v-slot-style -->
+            <template #loading>
+              <q-spinner-facebook color="white" />
+            </template>
+          </q-btn>
+        </div>
+      </template>
+
+      <template v-if="!creationMode" #title-panel-side>
+        <q-btn flat color="primary" icon="more_vert">
+          <q-menu
+            anchor="bottom right"
+            self="top end"
+            transition-show="flip-right"
+            transition-hide="flip-left"
+          >
+            <q-list class="text-primary">
+              <q-item
+                v-if="resourcePermissions.canView"
+                :to="{
+                  name: 'view_user',
+                  params: { userId: userId }, //userId from route props
+                }"
               >
-                <template #before>
-                  <q-icon name="person" />
-                </template>
+                <q-item-section>
+                  <q-btn flat icon="visibility" />
+                </q-item-section>
+                <q-item-section>View User</q-item-section>
+              </q-item>
 
-                <template #error>
-                  {{
-                    form$.role_id.$silentErrors
-                      .map((error) => error.$message)
-                      .join(', ')
-                  }}
-                </template>
-              </q-select>
-
-              <q-input
-                v-for="field in profileTextFields"
-                :key="'profileTextField_' + field.name"
-                v-model="form[field.name]"
-                filled
-                clearable
-                bottom-slots
-                :label="field.label"
-                :dense="dense"
-                :error="form$?.[field.name]?.$invalid ?? false"
-                class="q-mb-md"
+              <q-item
+                v-if="resourcePermissions.canList"
+                :to="{
+                  name: 'all_users',
+                }"
               >
-                <template #before>
-                  <q-icon name="person" />
-                </template>
-
-                <template #error>
-                  {{
-                    form$ && form$[field.name]
-                      ? form$[field.name].$silentErrors
-                          .map((error) => error.$message)
-                          .join(', ')
-                      : ''
-                  }}
-                </template>
-              </q-input>
-
-              <q-select
-                v-model="form.country_id"
-                filled
-                :options="plainCountries"
-                label="Country"
-                name="country_id"
-                clearable
-                bottom-slots
-                options-dense
-                use-input
-                input-debounce="0"
-                class="q-mb-md"
-                transition-show="scale"
-                transition-hide="scale"
-                emit-value
-                map-options
-                @filter="selectFilterFn"
-                ><template #before>
-                  <q-icon name="business" />
-                </template>
-
-                <template #hint> Field hint </template>
-                <template #error> <div>Sorry! Invalid input</div> </template>
-              </q-select>
-
-              <q-select
-                v-model="form.state_id"
-                filled
-                :disable="!form.country_id"
-                :options="plainCountryStates"
-                label="State"
-                name="state_id"
-                clearable
-                bottom-slots
-                options-dense
-                use-input
-                input-debounce="0"
-                class="q-mb-md"
-                transition-show="scale"
-                transition-hide="scale"
-                emit-value
-                map-options
-                @filter="selectFilterFn"
-                ><template #before>
-                  <q-icon name="business" />
-                </template>
-
-                <template #hint> Field hint </template>
-                <template #error> <div>Sorry! Invalid input</div> </template>
-              </q-select>
-
-              <q-toggle
-                v-model="form.login_status"
-                checked-icon="check"
-                unchecked-icon="clear"
-                color="primary"
-                :label="form.login_status ? 'Can login' : 'Cannot login'"
-              />
-            </form>
-          </template>
-
-          <template #footer-panel>
-            <div class="row justify-center q-mb-xl">
-              <q-btn
-                type="submit"
-                :loading="submitting"
-                label="Submit"
-                class="q-mt-md"
-                color="primary"
-                icon-right="send"
-                @click.prevent="submitForm"
-              >
-                <!-- eslint-disable-next-line vue/v-slot-style -->
-                <template #loading>
-                  <q-spinner-facebook color="white" />
-                </template>
-              </q-btn>
-            </div>
-          </template>
-
-          <template #title-panel-side>
-            <q-btn
-              :to="{
-                name: 'view_user',
-                params: { userId: userId }, //userId from route props
-              }"
-              flat
-              round
-              color="primary"
-              icon="remove_red_eye"
-              title="Edit user"
-            />
-          </template>
-        </view-card>
-      </div>
-    </div>
+                <q-item-section>
+                  <q-btn flat icon="view_list" />
+                </q-item-section>
+                <q-item-section>All Users</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+      </template>
+    </view-card>
   </div>
 </template>
 
@@ -203,7 +217,6 @@ import {
   unref,
   Ref,
   ComputedRef,
-  nextTick,
   reactive,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
@@ -211,10 +224,12 @@ import { required, email, helpers } from '@vuelidate/validators';
 import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
 import { store } from '../../../store';
+import useResourcePermissions from '../../../composables/useResourcePermissions';
 import {
   CurrentlyViewedUser,
   SelectionOption,
   UserFormShape,
+  PERMISSION,
 } from '../../../store/types';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
@@ -232,18 +247,26 @@ export default defineComponent({
       required: false,
       default: '',
     },
+    creationMode: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   setup(props) {
     const submitting = ref(false);
     const router = useRouter();
 
-    let currentUser: Ref<CurrentlyViewedUser>;
+    let currentUser: Ref<CurrentlyViewedUser | null>;
 
-    currentUser = computed(
-      () =>
-        store.getters['users/GET_CURRENTLY_VIEWED_USER'] as CurrentlyViewedUser
-    );
+    currentUser = !props.creationMode
+      ? computed(
+          () =>
+            store.getters[
+              'users/GET_CURRENTLY_VIEWED_USER'
+            ] as CurrentlyViewedUser
+        )
+      : ref(null);
 
     const form: UserFormShape = reactive({
       first_name: '',
@@ -279,22 +302,40 @@ export default defineComponent({
       if (!form$.value.$invalid) {
         submitting.value = true;
 
-        void store
-          .dispatch('users/EDIT_USER', {
-            userId: props.userId,
-            form: form,
-          })
-          .then(() => {
-            submitting.value = false;
-            void router.push({
-              name: 'view_user',
-              params: { userId: props.userId },
+        if (!props.creationMode) {
+          void store
+            .dispatch('users/EDIT_USER', {
+              userId: props.userId,
+              form: form,
+            })
+            .then(() => {
+              submitting.value = false;
+              void router.push({
+                name: 'view_user',
+                params: { userId: props.userId },
+              });
+              return;
+            })
+            .catch(() => {
+              submitting.value = false;
             });
-            return;
-          })
-          .catch(() => {
-            submitting.value = false;
-          });
+        } else {
+          store
+            .dispatch('users/CREATE_USER', {
+              form: form,
+            })
+            .then((userId: string) => {
+              submitting.value = false;
+              void router.push({
+                name: 'view_user',
+                params: { userId },
+              });
+              return;
+            })
+            .catch(() => {
+              submitting.value = false;
+            });
+        }
       } else {
         Notify.create({
           message: 'Errors exist on the form!',
@@ -357,40 +398,51 @@ export default defineComponent({
       () => store.getters['roles/GET_ROLES_FOR_SELECT'] as SelectionOption[]
     );
 
-    const titleInfo = useTitleInfo({
-      title: `${currentUser?.value?.profile?.first_name ?? ''} ${
-        currentUser?.value?.profile?.last_name ?? ''
-      }`,
-      avatar: currentUser?.value?.profile?.profile_picture ?? '',
-    });
+    const titleInfo =
+      currentUser && currentUser.value
+        ? useTitleInfo({
+            title: `${currentUser.value.profile?.first_name ?? ''} ${
+              currentUser.value.profile?.last_name ?? ''
+            }`,
+            avatar: currentUser.value.profile?.profile_picture ?? '',
+          })
+        : props.creationMode
+        ? useTitleInfo({
+            title: 'New User',
+            avatar: '',
+          })
+        : ref(null);
 
     const stopFetchCurrentlyViewedUser = watchEffect(() => {
-      void store
-        .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
-          userId: props.userId,
-        })
-        .then(() => {
-          currentUser.value = unref(
-            computed(
-              () =>
-                store.getters[
-                  'users/GET_CURRENTLY_VIEWED_USER'
-                ] as CurrentlyViewedUser
-            )
-          );
+      if (!props.creationMode) {
+        void store
+          .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
+            userId: props.userId,
+          })
+          .then(() => {
+            currentUser.value = unref(
+              computed(
+                () =>
+                  store.getters[
+                    'users/GET_CURRENTLY_VIEWED_USER'
+                  ] as CurrentlyViewedUser
+              )
+            );
 
-          form.first_name = currentUser?.value?.profile.first_name;
-          form.last_name = currentUser?.value?.profile.last_name;
-          form.middle_name = currentUser?.value?.profile.middle_name;
-          form.phone_number = currentUser?.value?.profile.phone_number;
-          form.address = currentUser?.value?.profile.address;
-          form.city = currentUser?.value?.profile.city;
-          form.email = currentUser?.value?.email;
-          form.role_id = currentUser?.value.role.id;
-          form.state_id = currentUser?.value?.profile.userState?.id ?? null;
-          form.country_id = currentUser?.value?.profile.userCountry?.id ?? null;
-          form.login_status = Boolean(currentUser?.value.login_status);
-        });
+            form.first_name = currentUser?.value?.profile.first_name;
+            form.last_name = currentUser?.value?.profile.last_name;
+            form.middle_name = currentUser?.value?.profile.middle_name;
+            form.phone_number = currentUser?.value?.profile.phone_number;
+            form.address = currentUser?.value?.profile.address;
+            form.city = currentUser?.value?.profile.city;
+            form.email = currentUser?.value?.email;
+            form.role_id = currentUser?.value.role.id;
+            form.state_id = currentUser?.value?.profile.userState?.id ?? null;
+            form.country_id =
+              currentUser?.value?.profile.userCountry?.id ?? null;
+            form.login_status = Boolean(currentUser?.value.login_status);
+          });
+      }
     });
 
     const stopFetchCountriesForSelect = watchEffect(() => {
@@ -478,6 +530,10 @@ export default defineComponent({
       plainCountryStates,
       selectFilterFn,
       roles,
+      resourcePermissions: useResourcePermissions({
+        view: PERMISSION.CAN_VIEW_USERS,
+        list: PERMISSION.CAN_LIST_USERS,
+      }),
     };
   },
 });

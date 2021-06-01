@@ -26,6 +26,7 @@
               dark
               bottom-slots
               clearable
+              type="email"
               :error="form$.email.$invalid"
               label="Email"
               color="white"
@@ -33,7 +34,7 @@
               bg-color="transparent"
               autofocus
             >
-              <template v-slot:hint> Field hint </template>
+              <template v-slot:hint> </template>
               <template v-slot:error>
                 {{
                   form$.email.$silentErrors
@@ -50,13 +51,13 @@
               clearable
               :error="form$.password.$invalid"
               label="Password"
-              type="password"
+              :type="showPassword ? 'text' : 'password'"
               color="white"
               label-color="white"
               bg-color="transparent"
               class="q-mt-md"
             >
-              <template v-slot:hint> Field hint </template>
+              <template v-slot:hint> </template>
               <template v-slot:error>
                 {{
                   form$.password.$silentErrors
@@ -64,14 +65,16 @@
                     .join(', ')
                 }}
               </template>
+              <template v-slot:append>
+                <q-icon
+                  v-if="form.password"
+                  :name="showPassword ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="showPassword = !showPassword"
+                />
+              </template>
             </q-input>
-            <div class="q-gutter-sm q-mt-lg">
-              <q-checkbox
-                v-model="form.remember_me"
-                color="green"
-                label="Remember me"
-              />
-            </div>
+
             <div class="q-gutter-sm flex justify-center q-mt-md">
               <q-btn
                 :loading="submitting"
@@ -100,7 +103,7 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { defineComponent, reactive, ref, nextTick } from 'vue';
+import { defineComponent, reactive, ref, nextTick, Ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import {
   required,
@@ -110,7 +113,7 @@ import {
   maxLength,
 } from '@vuelidate/validators';
 import { useStore } from 'vuex';
-//import { useQuasar } from 'quasar';
+import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
 //const strongPassword = helpers.regex('strongPassword', //)
 
@@ -123,7 +126,6 @@ export default defineComponent({
     const router = useRouter();
 
     const form = reactive({
-      remember_me: false,
       email: '',
       password: '',
     });
@@ -155,30 +157,46 @@ export default defineComponent({
       },
     };
 
-    const form$ = useVuelidate(rules, form);
+    const form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
 
     async function handleLogin() {
       console.log('handling login');
-      submitting.value = true;
+      if (!form$.value.$invalid) {
+        submitting.value = true;
 
-      await nextTick(() => {
-        void store
-          .dispatch('auth/LOGIN_USER', form)
-          .catch(() => {
-            submitting.value = false;
-          })
-          .then(() => {
-            submitting.value = false;
-            void nextTick(() => {
-              const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
-              console.log(isLoggedIn);
+        await nextTick(() => {
+          void store
+            .dispatch('auth/LOGIN_USER', form)
+            .catch(() => {
+              submitting.value = false;
+            })
+            .then(() => {
+              submitting.value = false;
+              void nextTick(() => {
+                const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
+                console.log(isLoggedIn);
 
-              if (isLoggedIn) {
-                void router.push({ name: 'Home' });
-              }
+                if (isLoggedIn) {
+                  void router.push({ name: 'Home' });
+                }
+              });
             });
-          });
-      });
+        });
+      } else {
+        Notify.create({
+          message: 'Errors exist on the form!',
+          type: 'negative',
+          position: 'bottom',
+          progress: true,
+          timeout: 2500,
+          actions: [
+            {
+              label: 'Dismiss',
+              color: 'white',
+            },
+          ],
+        });
+      }
     }
 
     return {
@@ -189,6 +207,7 @@ export default defineComponent({
       form,
       handleLogin,
       form$,
+      showPassword: ref(false),
     };
   },
 });

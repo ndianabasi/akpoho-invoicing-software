@@ -104,12 +104,19 @@ export interface HttpError extends AxiosError {
   response?: HttpResponse;
 }
 
-export type SelectOption = {
+export interface SelectOption {
+  label: string;
+  value: string | boolean | number | null;
+  icon?: string;
+  description?: string;
+}
+
+export interface StringSelectOption extends SelectOption {
   label: string;
   value: string;
   icon?: string;
   description?: string;
-};
+}
 
 export type CurrentlyViewedUser = {
   profile: {
@@ -128,6 +135,35 @@ export type CurrentlyViewedUser = {
   role: StringIDNameInterface;
 };
 
+interface CurrentCustomerBaseInterface {
+  first_name: string;
+  last_name: string;
+  middle_name: string | null;
+  email: string;
+  phone_number: string;
+  is_corporate: boolean;
+  corporate_has_rep: boolean;
+  company_name: string | null;
+  company_phone: string | null;
+  company_email: string | null;
+}
+
+export interface CurrentlyViewedCustomer extends CurrentCustomerBaseInterface {
+  title?: {
+    id: number | null | undefined;
+    name: string | null | undefined;
+  };
+}
+
+export interface CustomerFormShape extends CurrentCustomerBaseInterface {
+  title: number | null;
+  is_billing_shipping_addresses_same: boolean;
+  shipping_country: number | null;
+  shipping_state: number | null;
+  billing_country: number | null;
+  billing_state: number | null;
+}
+
 export interface SelectionOption {
   label: string;
   value: string & number & boolean;
@@ -135,7 +171,7 @@ export interface SelectionOption {
 
 export interface TitleInfo extends Object {
   title: string;
-  avatar: string;
+  avatar?: string;
 }
 
 export interface UserFormShape extends Object {
@@ -150,4 +186,17 @@ export interface UserFormShape extends Object {
   state_id: number | null;
   country_id: number | null;
   login_status: boolean;
+}
+
+export enum PERMISSION {
+  CAN_LIST_USERS = 'can_list_users',
+  CAN_CREATE_USERS = 'can_create_users',
+  CAN_VIEW_USERS = 'can_view_users',
+  CAN_EDIT_USERS = 'can_edit_users',
+  CAN_DELETE_USERS = 'can_delete_users',
+  CAN_LIST_CUSTOMERS = 'can_list_customers',
+  CAN_CREATE_CUSTOMERS = 'can_create_customers',
+  CAN_VIEW_CUSTOMERS = 'can_view_customers',
+  CAN_EDIT_CUSTOMERS = 'can_edit_customers',
+  CAN_DELETE_CUSTOMERS = 'can_delete_customers',
 }

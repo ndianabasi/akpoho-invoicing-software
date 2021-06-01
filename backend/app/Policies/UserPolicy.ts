@@ -10,7 +10,10 @@ export default class UserPolicy extends BasePolicy {
     return await accessCompanyUser(resourcePermission, authUser, requestedCompany, requestedUser)
   }
 
-  public async create(user: User) {}
+  public async create(user: User, company: Company) {
+    const resourcePermission = 'can_create_users'
+    return await accessCompany(resourcePermission, user, company)
+  }
 
   public async edit(authUser: User, requestedCompany: Company, requestedUser: User) {
     const resourcePermission = 'can_edit_users'

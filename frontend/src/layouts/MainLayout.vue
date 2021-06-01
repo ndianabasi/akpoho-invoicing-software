@@ -118,6 +118,10 @@ export default defineComponent({
 
     watchEffect(() => void store.dispatch('auth/FETCH_AUTH_PROFILE'));
 
+    watchEffect(
+      () => void store.dispatch('permissions/FETCH_USER_PERMISSIONS')
+    );
+
     onMounted(() => {
       /* console.log('route matched', route.matched);
       const matchedRoutes = route.matched;

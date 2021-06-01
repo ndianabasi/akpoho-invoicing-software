@@ -1,6 +1,6 @@
 import { MutationTree } from 'vuex';
 import { AuthStateInterface } from './state';
-import { LoginUserData, SelectOption, LoginData } from '../types';
+import { LoginUserData, LoginData, StringSelectOption } from '../types';
 
 type Token = {
   token: string;
@@ -20,7 +20,10 @@ const mutation: MutationTree<AuthStateInterface> = {
     state.token = '';
   },
 
-  SET_CURRENT_COMPANY: (state: AuthStateInterface, payload: SelectOption) => {
+  SET_CURRENT_COMPANY: (
+    state: AuthStateInterface,
+    payload: StringSelectOption
+  ) => {
     state.currentCompany = { id: payload.value, name: payload.label };
   },
 

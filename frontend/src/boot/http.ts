@@ -53,7 +53,7 @@ export default boot(
         return response;
       },
       async (error: HttpError) => {
-        //console.log(error.response);
+        console.log(error.response);
         if (error?.response?.status === 401) {
           setAuthHeader('');
           void (await store.dispatch('auth/LOGOUT_USER'));
@@ -66,6 +66,20 @@ export default boot(
             position: 'top',
             progress: true,
             timeout: 10000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+        } else if (error?.response?.status === 403) {
+          Notify.create({
+            message: 'You are not permitted to perform the requested action',
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
             actions: [
               {
                 label: 'Dismiss',
@@ -95,6 +109,45 @@ export default boot(
               ],
             });
           }
+        } else if (error?.response?.status === 404) {
+          Notify.create({
+            message:
+              error?.response?.data?.message ??
+              (error?.response?.data as string) ??
+              'Request resource was not found!',
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+        } else if (
+          error &&
+          error.response &&
+          error.response.status &&
+          error.response.status >= 500
+        ) {
+          Notify.create({
+            message:
+              error?.response?.data?.message ??
+              (error?.response?.data as string) ??
+              'Internal Server Error',
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
         }
 
         return Promise.reject(error);
