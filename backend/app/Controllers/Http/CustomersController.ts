@@ -1,5 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
 import Customer from 'App/Models/Customer'
+import CustomerAddress from 'App/Models/CustomerAddress'
 import CustomerTitle from 'App/Models/CustomerTitle'
 import CustomerValidator from 'App/Validators/CustomerValidator'
 
@@ -92,6 +94,37 @@ export default class CustomersController {
     await requestedCustomer?.load('title')
 
     return response.ok({ data: requestedCustomer })
+  }
+
+  public async showAddresses({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    bouncer,
+  }: HttpContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('view', requestedCompany!, requestedCustomer!)
+
+    const addresses = await Database.from('customer_addresses')
+      .select(
+        'customer_addresses.address_type',
+        'customer_addresses.city',
+        'customer_addresses.created_at',
+        'customer_addresses.id',
+        'customer_addresses.postal_code',
+        'customer_addresses.street_address',
+        'customer_addresses.updated_at',
+        'countries.name as country',
+        'states.name as state'
+      )
+      .leftJoin('countries', (query) => {
+        query.on('countries.id', '=', 'customer_addresses.country_id')
+      })
+      .leftJoin('states', (query) => {
+        query.on('states.id', '=', 'customer_addresses.state_id')
+      })
+      .where('customer_addresses.customer_id', requestedCustomer?.id!)
+
+    return response.ok({ data: addresses })
   }
 
   public async update({

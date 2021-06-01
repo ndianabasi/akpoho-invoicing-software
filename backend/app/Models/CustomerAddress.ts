@@ -14,7 +14,7 @@ export default class CustomerAddress extends BaseModel {
   @column()
   public streetAddress: string
 
-  @column()
+  @column({ serializeAs: null })
   public customerId: string
 
   @column()
@@ -26,10 +26,10 @@ export default class CustomerAddress extends BaseModel {
   @column()
   public addressType: string
 
-  @column()
+  @column({ serializeAs: null })
   public stateId: number
 
-  @column()
+  @column({ serializeAs: null })
   public countryId: number
 
   @column.dateTime({ autoCreate: true })

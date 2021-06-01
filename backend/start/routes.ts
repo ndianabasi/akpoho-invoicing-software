@@ -63,6 +63,10 @@ Route.group(() => {
   Route.get('/:company_id/customers/:customer_id', 'CustomersController.show').middleware(
     'findRequestedCustomer'
   )
+  Route.get(
+    '/:company_id/customers/:customer_id/customer-addresses',
+    'CustomersController.showAddresses'
+  ).middleware('findRequestedCustomer')
   Route.delete('/:company_id/customers/:customer_id', 'CustomersController.destroy').middleware(
     'findRequestedCustomer'
   )

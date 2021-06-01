@@ -1,209 +1,205 @@
 <template>
   <div class="q-pa-md">
-    <div class="row justify-center">
-      <div class="col-md-6 col-sm-12 col-xs-12">
-        <view-card
-          v-if="creationMode || user"
-          :title-info="titleInfo"
-          show-avatar
-          show-title-panel-side
-        >
-          <template #body-panel>
-            <form class="q-pa-md" @submit.prevent="submitForm">
-              <q-input
-                v-model="form$.email.$model"
-                filled
-                clearable
-                bottom-slots
-                label="Email Address"
-                :dense="dense"
-                class="q-mb-md"
-                type="email"
-                :error="form$.email.$invalid"
-              >
-                <template #before>
-                  <q-icon name="email" />
-                </template>
+    <view-card
+      v-if="creationMode || user"
+      :title-info="titleInfo"
+      show-avatar
+      show-title-panel-side
+    >
+      <template #body-panel>
+        <form class="q-pa-md" @submit.prevent="submitForm">
+          <q-input
+            v-model="form$.email.$model"
+            filled
+            clearable
+            bottom-slots
+            label="Email Address"
+            :dense="dense"
+            class="q-mb-md"
+            type="email"
+            :error="form$.email.$invalid"
+          >
+            <template #before>
+              <q-icon name="email" />
+            </template>
 
-                <template #error>
-                  {{
-                    form$.email.$silentErrors
+            <template #error>
+              {{
+                form$.email.$silentErrors
+                  .map((error) => error.$message)
+                  .join(', ')
+              }}
+            </template>
+          </q-input>
+
+          <q-select
+            v-model="form.role_id"
+            filled
+            :options="roles"
+            label="Role"
+            clearable
+            bottom-slots
+            options-dense
+            use-input
+            emit-value
+            map-options
+            class="q-mb-md"
+            transition-show="scale"
+            transition-hide="scale"
+            :error="form$.role_id.$invalid"
+          >
+            <template #before>
+              <q-icon name="person" />
+            </template>
+
+            <template #error>
+              {{
+                form$.role_id.$silentErrors
+                  .map((error) => error.$message)
+                  .join(', ')
+              }}
+            </template>
+          </q-select>
+
+          <q-input
+            v-for="field in profileTextFields"
+            :key="'profileTextField_' + field.name"
+            v-model="form[field.name]"
+            filled
+            clearable
+            bottom-slots
+            :label="field.label"
+            :dense="dense"
+            :error="form$?.[field.name]?.$invalid ?? false"
+            class="q-mb-md"
+          >
+            <template #before>
+              <q-icon name="person" />
+            </template>
+
+            <template #error>
+              {{
+                form$ && form$[field.name]
+                  ? form$[field.name].$silentErrors
                       .map((error) => error.$message)
                       .join(', ')
-                  }}
-                </template>
-              </q-input>
+                  : ''
+              }}
+            </template>
+          </q-input>
 
-              <q-select
-                v-model="form.role_id"
-                filled
-                :options="roles"
-                label="Role"
-                clearable
-                bottom-slots
-                options-dense
-                use-input
-                emit-value
-                map-options
-                class="q-mb-md"
-                transition-show="scale"
-                transition-hide="scale"
-                :error="form$.role_id.$invalid"
+          <q-select
+            v-model="form.country_id"
+            filled
+            :options="plainCountries"
+            label="Country"
+            name="country_id"
+            clearable
+            bottom-slots
+            options-dense
+            use-input
+            input-debounce="0"
+            class="q-mb-md"
+            transition-show="scale"
+            transition-hide="scale"
+            emit-value
+            map-options
+            @filter="selectFilterFn"
+            ><template #before>
+              <q-icon name="business" />
+            </template>
+          </q-select>
+
+          <q-select
+            v-model="form.state_id"
+            filled
+            :disable="!form.country_id"
+            :options="plainCountryStates"
+            label="State"
+            name="state_id"
+            clearable
+            bottom-slots
+            options-dense
+            use-input
+            input-debounce="0"
+            class="q-mb-md"
+            transition-show="scale"
+            transition-hide="scale"
+            emit-value
+            map-options
+            @filter="selectFilterFn"
+            ><template #before>
+              <q-icon name="business" />
+            </template>
+          </q-select>
+
+          <q-toggle
+            v-model="form.login_status"
+            checked-icon="check"
+            unchecked-icon="clear"
+            color="primary"
+            :label="form.login_status ? 'Can login' : 'Cannot login'"
+          />
+        </form>
+      </template>
+
+      <template #footer-panel>
+        <div class="row justify-center q-mb-xl">
+          <q-btn
+            type="submit"
+            :loading="submitting"
+            label="Submit"
+            class="q-mt-md"
+            color="primary"
+            icon-right="send"
+            @click.prevent="submitForm"
+          >
+            <!-- eslint-disable-next-line vue/v-slot-style -->
+            <template #loading>
+              <q-spinner-facebook color="white" />
+            </template>
+          </q-btn>
+        </div>
+      </template>
+
+      <template v-if="!creationMode" #title-panel-side>
+        <q-btn flat color="primary" icon="more_vert">
+          <q-menu
+            anchor="bottom right"
+            self="top end"
+            transition-show="flip-right"
+            transition-hide="flip-left"
+          >
+            <q-list class="text-primary">
+              <q-item
+                v-if="resourcePermissions.canView"
+                :to="{
+                  name: 'view_user',
+                  params: { userId: userId }, //userId from route props
+                }"
               >
-                <template #before>
-                  <q-icon name="person" />
-                </template>
+                <q-item-section>
+                  <q-btn flat icon="visibility" />
+                </q-item-section>
+                <q-item-section>View User</q-item-section>
+              </q-item>
 
-                <template #error>
-                  {{
-                    form$.role_id.$silentErrors
-                      .map((error) => error.$message)
-                      .join(', ')
-                  }}
-                </template>
-              </q-select>
-
-              <q-input
-                v-for="field in profileTextFields"
-                :key="'profileTextField_' + field.name"
-                v-model="form[field.name]"
-                filled
-                clearable
-                bottom-slots
-                :label="field.label"
-                :dense="dense"
-                :error="form$?.[field.name]?.$invalid ?? false"
-                class="q-mb-md"
+              <q-item
+                v-if="resourcePermissions.canList"
+                :to="{
+                  name: 'all_users',
+                }"
               >
-                <template #before>
-                  <q-icon name="person" />
-                </template>
-
-                <template #error>
-                  {{
-                    form$ && form$[field.name]
-                      ? form$[field.name].$silentErrors
-                          .map((error) => error.$message)
-                          .join(', ')
-                      : ''
-                  }}
-                </template>
-              </q-input>
-
-              <q-select
-                v-model="form.country_id"
-                filled
-                :options="plainCountries"
-                label="Country"
-                name="country_id"
-                clearable
-                bottom-slots
-                options-dense
-                use-input
-                input-debounce="0"
-                class="q-mb-md"
-                transition-show="scale"
-                transition-hide="scale"
-                emit-value
-                map-options
-                @filter="selectFilterFn"
-                ><template #before>
-                  <q-icon name="business" />
-                </template>
-              </q-select>
-
-              <q-select
-                v-model="form.state_id"
-                filled
-                :disable="!form.country_id"
-                :options="plainCountryStates"
-                label="State"
-                name="state_id"
-                clearable
-                bottom-slots
-                options-dense
-                use-input
-                input-debounce="0"
-                class="q-mb-md"
-                transition-show="scale"
-                transition-hide="scale"
-                emit-value
-                map-options
-                @filter="selectFilterFn"
-                ><template #before>
-                  <q-icon name="business" />
-                </template>
-              </q-select>
-
-              <q-toggle
-                v-model="form.login_status"
-                checked-icon="check"
-                unchecked-icon="clear"
-                color="primary"
-                :label="form.login_status ? 'Can login' : 'Cannot login'"
-              />
-            </form>
-          </template>
-
-          <template #footer-panel>
-            <div class="row justify-center q-mb-xl">
-              <q-btn
-                type="submit"
-                :loading="submitting"
-                label="Submit"
-                class="q-mt-md"
-                color="primary"
-                icon-right="send"
-                @click.prevent="submitForm"
-              >
-                <!-- eslint-disable-next-line vue/v-slot-style -->
-                <template #loading>
-                  <q-spinner-facebook color="white" />
-                </template>
-              </q-btn>
-            </div>
-          </template>
-
-          <template v-if="!creationMode" #title-panel-side>
-            <q-btn flat color="primary" icon="more_vert">
-              <q-menu
-                anchor="bottom right"
-                self="top end"
-                transition-show="flip-right"
-                transition-hide="flip-left"
-              >
-                <q-list class="text-primary">
-                  <q-item
-                    v-if="resourcePermissions.canView"
-                    :to="{
-                      name: 'view_user',
-                      params: { userId: userId }, //userId from route props
-                    }"
-                  >
-                    <q-item-section>
-                      <q-btn flat icon="visibility" />
-                    </q-item-section>
-                    <q-item-section>View User</q-item-section>
-                  </q-item>
-
-                  <q-item
-                    v-if="resourcePermissions.canList"
-                    :to="{
-                      name: 'all_users',
-                    }"
-                  >
-                    <q-item-section>
-                      <q-btn flat icon="view_list" />
-                    </q-item-section>
-                    <q-item-section>All Users</q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-btn>
-          </template>
-        </view-card>
-      </div>
-    </div>
+                <q-item-section>
+                  <q-btn flat icon="view_list" />
+                </q-item-section>
+                <q-item-section>All Users</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+      </template>
+    </view-card>
   </div>
 </template>
 

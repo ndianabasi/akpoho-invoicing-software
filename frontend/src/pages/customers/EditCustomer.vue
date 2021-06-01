@@ -1,159 +1,155 @@
 <template>
   <div class="q-pa-md">
-    <div class="row justify-center">
-      <div class="col-md-6 col-sm-12 col-xs-12">
-        <view-card :title-info="titleInfo" show-avatar show-title-panel-side>
-          <template #body-panel>
-            <form class="q-pa-md" @submit.prevent="submitForm">
-              <div class="row q-mx-auto">
-                <div class="column col-6">
-                  <q-toggle
-                    v-model="form.is_corporate"
-                    checked-icon="check"
-                    color="green"
-                    unchecked-icon="clear"
-                    label="This is a corporate customer"
-                    class="q-ml-lg q-mb-md"
-                  />
-                </div>
-                <div v-if="form.is_corporate" class="column col-6">
-                  <q-toggle
-                    v-model="form.corporate_has_rep"
-                    checked-icon="check"
-                    color="green"
-                    unchecked-icon="clear"
-                    label="Corporate customer has a representative"
-                    class="q-ml-lg q-mb-md"
-                  />
-                </div>
-              </div>
-
-              <template v-for="field in customerFormSchema">
-                <q-input
-                  v-if="field.componentType === 'input' && field.isVisible"
-                  :key="`field_${field.name}_${field.componentType}`"
-                  v-model="form[field.name]"
-                  :type="field.inputType"
-                  filled
-                  clearable
-                  bottom-slots
-                  :label="field.label"
-                  :dense="dense"
-                  :error="form$?.[field.name]?.$invalid ?? false"
-                  class="q-mb-md"
-                >
-                  <template #before>
-                    <q-icon :name="field?.icon ?? ''" />
-                  </template>
-
-                  <template #error>
-                    {{
-                      form$ && form$[field.name]
-                        ? form$[field.name].$silentErrors
-                            .map((error) => error.$message)
-                            .join(', ')
-                        : ''
-                    }}
-                  </template>
-                </q-input>
-
-                <q-select
-                  v-if="field.componentType === 'select' && field.isVisible"
-                  :key="`field_${field.name}_${field.componentType}`"
-                  :ref="field.name"
-                  v-model="form[field.name]"
-                  filled
-                  :options="field.options"
-                  :label="field.label"
-                  :name="field.name"
-                  clearable
-                  bottom-slots
-                  options-dense
-                  use-input
-                  input-debounce="0"
-                  class="q-mb-md"
-                  transition-show="scale"
-                  transition-hide="scale"
-                  emit-value
-                  map-options
-                  @filter="selectFilterFn"
-                  ><template #before>
-                    <q-icon :name="field?.icon ?? ''" />
-                  </template>
-                </q-select>
-              </template>
-
+    <view-card :title-info="titleInfo" show-avatar show-title-panel-side>
+      <template #body-panel>
+        <form class="q-pa-md" @submit.prevent="submitForm">
+          <div class="row q-mx-auto">
+            <div class="column col-6">
               <q-toggle
-                v-if="creationMode"
-                v-model="form.is_billing_shipping_addresses_same"
+                v-model="form.is_corporate"
                 checked-icon="check"
                 color="green"
                 unchecked-icon="clear"
-                label="Use billing address as delivery address?"
+                label="This is a corporate customer"
                 class="q-ml-lg q-mb-md"
               />
-            </form>
-          </template>
-
-          <template #footer-panel>
-            <div class="row justify-center q-mb-xl">
-              <q-btn
-                type="submit"
-                :loading="submitting"
-                label="Submit"
-                class="q-mt-md"
-                color="primary"
-                icon-right="send"
-                @click.prevent="submitForm"
-              >
-                <!-- eslint-disable-next-line vue/v-slot-style -->
-                <template #loading>
-                  <q-spinner-facebook color="white" />
-                </template>
-              </q-btn>
             </div>
+            <div v-if="form.is_corporate" class="column col-6">
+              <q-toggle
+                v-model="form.corporate_has_rep"
+                checked-icon="check"
+                color="green"
+                unchecked-icon="clear"
+                label="Corporate customer has a representative"
+                class="q-ml-lg q-mb-md"
+              />
+            </div>
+          </div>
+
+          <template v-for="field in customerFormSchema">
+            <q-input
+              v-if="field.componentType === 'input' && field.isVisible"
+              :key="`field_${field.name}_${field.componentType}`"
+              v-model="form[field.name]"
+              :type="field.inputType"
+              filled
+              clearable
+              bottom-slots
+              :label="field.label"
+              :dense="dense"
+              :error="form$?.[field.name]?.$invalid ?? false"
+              class="q-mb-md"
+            >
+              <template #before>
+                <q-icon :name="field?.icon ?? ''" />
+              </template>
+
+              <template #error>
+                {{
+                  form$ && form$[field.name]
+                    ? form$[field.name].$silentErrors
+                        .map((error) => error.$message)
+                        .join(', ')
+                    : ''
+                }}
+              </template>
+            </q-input>
+
+            <q-select
+              v-if="field.componentType === 'select' && field.isVisible"
+              :key="`field_${field.name}_${field.componentType}`"
+              :ref="field.name"
+              v-model="form[field.name]"
+              filled
+              :options="field.options"
+              :label="field.label"
+              :name="field.name"
+              clearable
+              bottom-slots
+              options-dense
+              use-input
+              input-debounce="0"
+              class="q-mb-md"
+              transition-show="scale"
+              transition-hide="scale"
+              emit-value
+              map-options
+              @filter="selectFilterFn"
+              ><template #before>
+                <q-icon :name="field?.icon ?? ''" />
+              </template>
+            </q-select>
           </template>
 
-          <template v-if="!creationMode" #title-panel-side>
-            <q-btn flat color="primary" icon="more_vert">
-              <q-menu
-                anchor="bottom right"
-                self="top end"
-                transition-show="flip-right"
-                transition-hide="flip-left"
+          <q-toggle
+            v-if="creationMode"
+            v-model="form.is_billing_shipping_addresses_same"
+            checked-icon="check"
+            color="green"
+            unchecked-icon="clear"
+            label="Use billing address as delivery address?"
+            class="q-ml-lg q-mb-md"
+          />
+        </form>
+      </template>
+
+      <template #footer-panel>
+        <div class="row justify-center q-mb-xl">
+          <q-btn
+            type="submit"
+            :loading="submitting"
+            label="Submit"
+            class="q-mt-md"
+            color="primary"
+            icon-right="send"
+            @click.prevent="submitForm"
+          >
+            <!-- eslint-disable-next-line vue/v-slot-style -->
+            <template #loading>
+              <q-spinner-facebook color="white" />
+            </template>
+          </q-btn>
+        </div>
+      </template>
+
+      <template v-if="!creationMode" #title-panel-side>
+        <q-btn flat color="primary" icon="more_vert">
+          <q-menu
+            anchor="bottom right"
+            self="top end"
+            transition-show="flip-right"
+            transition-hide="flip-left"
+          >
+            <q-list class="text-primary">
+              <q-item
+                v-if="resourcePermissions.canView"
+                :to="{
+                  name: 'view_customer',
+                  params: { customerId: customerId }, //customerId from route props
+                }"
               >
-                <q-list class="text-primary">
-                  <q-item
-                    v-if="resourcePermissions.canView"
-                    :to="{
-                      name: 'view_customer',
-                      params: { customerId: customerId }, //customerId from route props
-                    }"
-                  >
-                    <q-item-section>
-                      <q-btn flat icon="visibility" />
-                    </q-item-section>
-                    <q-item-section>View Customer</q-item-section>
-                  </q-item>
+                <q-item-section>
+                  <q-btn flat icon="visibility" />
+                </q-item-section>
+                <q-item-section>View Customer</q-item-section>
+              </q-item>
 
-                  <q-item
-                    v-if="resourcePermissions.canList"
-                    :to="{
-                      name: 'customers',
-                    }"
-                  >
-                    <q-item-section>
-                      <q-btn flat icon="view_list" />
-                    </q-item-section>
-                    <q-item-section>All Customers</q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-btn>
-          </template>
-        </view-card>
-      </div>
-    </div>
+              <q-item
+                v-if="resourcePermissions.canList"
+                :to="{
+                  name: 'customers',
+                }"
+              >
+                <q-item-section>
+                  <q-btn flat icon="view_list" />
+                </q-item-section>
+                <q-item-section>All Customers</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+      </template>
+    </view-card>
   </div>
 </template>
 

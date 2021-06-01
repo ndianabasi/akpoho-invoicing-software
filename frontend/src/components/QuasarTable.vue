@@ -1,10 +1,10 @@
 <!-- eslint-disable vue/no-v-html -->
 <!-- eslint-disable vue/no-v-model-argument -->
 <template>
-  <div :class="q - pa - md">
+  <div class="q-pa-md">
     <q-table
       v-model:selected="selected"
-      v-model:pagination="pagination"
+      v-model:pagination="paginationModel"
       :grid="gridMode"
       :hide-pagination="!usePagination"
       :rows="tableDataRows"
@@ -33,23 +33,25 @@
             q-table__title
           "
         >
-          <span v-if="!embedMode">{{ nameOfTable }}</span
-          ><q-btn
-            v-if="
-              showNewRouteButton &&
-              newRouteObject &&
-              newRouteObject.routeName &&
-              resourcePermissions.canCreate
-            "
-            :to="{
-              name: newRouteObject.routeName,
-            }"
-            flat
-            round
-            color="primary"
-            :icon="newRouteObject.icon"
-            :title="newRouteObject.title"
-          />
+          <span v-if="!embedMode">{{ nameOfTable }}</span>
+          <slot name="topAddNew">
+            <q-btn
+              v-if="
+                showNewRouteButton &&
+                newRouteObject &&
+                newRouteObject.routeName &&
+                resourcePermissions.canCreate
+              "
+              :to="{
+                name: newRouteObject.routeName,
+              }"
+              flat
+              round
+              color="primary"
+              :icon="newRouteObject.icon"
+              :title="newRouteObject.title"
+            />
+          </slot>
         </div>
 
         <q-space />
@@ -158,7 +160,6 @@
         <q-input
           v-if="gridMode"
           v-model="filter"
-          borderless
           dense
           debounce="300"
           placeholder="Search"
@@ -183,69 +184,7 @@
       </template>
 
       <template v-if="gridMode" #item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-12 col-md-12">
-          <!-- <q-card>
-            <q-card-section class="text-center">
-              Calories for
-              <br />
-              <strong>{{ props.row.first_name }}</strong>
-            </q-card-section>
-            <q-separator />
-            <q-card-section
-              class="flex flex-center"
-              :style="{ fontSize: props.row.last_name + 'px' }"
-            >
-              <div>{{ props.row.last_name }} g</div>
-            </q-card-section>
-          </q-card> -->
-          <q-list bordered class="rounded-borders" style="max-width: 600px">
-            <q-item>
-              <q-item-section avatar middle>
-                <q-icon name="local_shipping" color="black" size="34px" />
-              </q-item-section>
-
-              <q-item-section middle class="col-2 gt-sm">
-                <q-item-label lines="2" class="q-mt-sm"
-                  >Address Type</q-item-label
-                >
-              </q-item-section>
-
-              <q-item-section middle>
-                <q-item-label lines="2">
-                  <span class="text-weight-medium">Address Line 1</span>
-                </q-item-label>
-                <q-item-label caption lines="1"> City: xxx </q-item-label>
-                <q-item-label caption lines="1"> City: xxx </q-item-label>
-                <q-item-label caption lines="1">
-                  Postal Code: xxx
-                </q-item-label>
-                <q-item-label caption lines="1"> State: xxx </q-item-label>
-                <q-item-label caption lines="1"> Country: xxx </q-item-label>
-              </q-item-section>
-
-              <q-item-section middle side>
-                <div class="text-grey-8 q-gutter-xs">
-                  <q-btn
-                    class="gt-xs"
-                    size="12px"
-                    flat
-                    dense
-                    round
-                    icon="edit"
-                  />
-                  <q-btn
-                    class="gt-xs"
-                    size="12px"
-                    flat
-                    dense
-                    round
-                    icon="delete"
-                  />
-                </div>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </div>
+        <slot name="grideModeItems" v-bind="props"> </slot>
       </template>
 
       <template #body="props">
@@ -460,6 +399,7 @@ export default defineComponent({
         return {};
       },
       validator: (value: PropObject) => {
+        if (isEmpty(value)) return true;
         return ['routeName', 'icon', 'title'].every((prop) =>
           Object.prototype.hasOwnProperty.call(value, prop)
         );
@@ -595,15 +535,18 @@ export default defineComponent({
 
       await store
         .dispatch('quasar_tables/FETCH_TABLE_DATA', {
-          paginationParams: {
-            page: paginationParams?.page ?? pagination.value.page,
-            descending:
-              paginationParams?.descending ?? pagination.value.descending,
-            perPage: paginationParams?.perPage ?? pagination.value.rowsPerPage,
-            sortBy: paginationParams?.sortBy ?? pagination.value.sortBy,
-          },
+          paginationParams: props.usePagination
+            ? {
+                page: paginationParams?.page ?? pagination.value.page,
+                descending:
+                  paginationParams?.descending ?? pagination.value.descending,
+                perPage:
+                  paginationParams?.perPage ?? pagination.value.rowsPerPage,
+                sortBy: paginationParams?.sortBy ?? pagination.value.sortBy,
+              }
+            : {},
           entityEndPoint: props.tableDataFetchEndPoint,
-          queryObject,
+          queryObject: props.useMultiFilter ? queryObject : {},
         })
         .then((response: ResponseData) => {
           void nextTick(() => {

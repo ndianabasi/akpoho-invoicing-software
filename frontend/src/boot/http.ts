@@ -114,7 +114,29 @@ export default boot(
             message:
               error?.response?.data?.message ??
               (error?.response?.data as string) ??
-              'Not found',
+              'Request resource was not found!',
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+        } else if (
+          error &&
+          error.response &&
+          error.response.status &&
+          error.response.status >= 500
+        ) {
+          Notify.create({
+            message:
+              error?.response?.data?.message ??
+              (error?.response?.data as string) ??
+              'Internal Server Error',
             type: 'negative',
             position: 'top',
             progress: true,
