@@ -27,287 +27,66 @@
                     checked-icon="check"
                     color="green"
                     unchecked-icon="clear"
-                    label="Corporate customer has a rep."
+                    label="Corporate customer has a representative"
                     class="q-ml-lg q-mb-md"
                   />
                 </div>
               </div>
-              <template v-if="form.corporate_has_rep || !form.is_corporate">
-                <q-select
-                  v-model="form.title"
+
+              <template v-for="field in customerFormSchema">
+                <q-input
+                  v-if="field.componentType === 'input' && field.isVisible"
+                  :key="`field_${field.name}_${field.componentType}`"
+                  v-model="form[field.name]"
+                  :type="field.inputType"
                   filled
-                  :options="customerTitles"
-                  label="Title"
+                  clearable
+                  bottom-slots
+                  :label="field.label"
+                  :dense="dense"
+                  :error="form$?.[field.name]?.$invalid ?? false"
+                  class="q-mb-md"
+                >
+                  <template #before>
+                    <q-icon :name="field?.icon ?? ''" />
+                  </template>
+
+                  <template #error>
+                    {{
+                      form$ && form$[field.name]
+                        ? form$[field.name].$silentErrors
+                            .map((error) => error.$message)
+                            .join(', ')
+                        : ''
+                    }}
+                  </template>
+                </q-input>
+
+                <q-select
+                  v-if="field.componentType === 'select' && field.isVisible"
+                  :key="`field_${field.name}_${field.componentType}`"
+                  :ref="field.name"
+                  v-model="form[field.name]"
+                  filled
+                  :options="field.options"
+                  :label="field.label"
+                  :name="field.name"
                   clearable
                   bottom-slots
                   options-dense
                   use-input
-                  emit-value
-                  map-options
+                  input-debounce="0"
                   class="q-mb-md"
                   transition-show="scale"
                   transition-hide="scale"
+                  emit-value
+                  map-options
+                  @filter="selectFilterFn"
                   ><template #before>
-                    <q-icon name="person" />
+                    <q-icon :name="field?.icon ?? ''" />
                   </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error> Sorry! Invalid input </template>
                 </q-select>
-
-                <q-input
-                  v-model="form.first_name"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="First Name"
-                  :dense="dense"
-                  class="q-mb-md"
-                >
-                  <template #before>
-                    <q-icon name="person" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error> Sorry! Invalid input </template>
-                </q-input>
-                <q-input
-                  v-model="form.middle_name"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="Middle Name"
-                  :dense="dense"
-                  class="q-mb-md"
-                >
-                  <template #before>
-                    <q-icon name="person" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error> Sorry! Invalid input </template>
-                </q-input>
-
-                <q-input
-                  v-model="form.last_name"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="Last Name"
-                  :dense="dense"
-                  class="q-mb-md"
-                >
-                  <template #before>
-                    <q-icon name="person" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                </q-input>
-
-                <q-input
-                  v-model="form.phone_number"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="Phone Number"
-                  :dense="dense"
-                  class="q-mb-md"
-                  type="tel"
-                >
-                  <template #before>
-                    <q-icon name="smartphone" />
-                  </template>
-                </q-input>
-
-                <q-input
-                  v-model="form$.email.$model"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="Email Address"
-                  :dense="dense"
-                  class="q-mb-md"
-                  type="email"
-                  :error="form$.email.$error"
-                >
-                  <template #before>
-                    <q-icon name="email" />
-                  </template>
-
-                  <template #error
-                    ><small
-                      v-for="(error, index) in form$.email.$errors"
-                      :key="'email_addresses_error_' + index"
-                      >{{ error.$message }}</small
-                    ></template
-                  >
-                </q-input>
               </template>
-
-              <template
-                v-if="form.is_corporate"
-                transition-show="slide-down"
-                transition-hide="slide-up"
-              >
-                <q-input
-                  v-model="form.company_name"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="Company Name"
-                  :dense="dense"
-                  autogrow
-                  class="q-mb-md"
-                >
-                  <template #before>
-                    <q-icon name="business" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error> Sorry! Invalid input </template>
-                </q-input>
-
-                <q-input
-                  v-model="form.company_email"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="Company Email Address"
-                  :dense="dense"
-                  class="q-mb-md"
-                  type="email"
-                >
-                  <template #before>
-                    <q-icon name="email" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error> Sorry! Invalid input </template>
-                </q-input>
-
-                <q-input
-                  v-model="form.company_phone"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="Company Phone Number"
-                  :dense="dense"
-                  class="q-mb-md"
-                  type="email"
-                >
-                  <template #before>
-                    <q-icon name="email" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error> Sorry! Invalid input </template>
-                </q-input>
-              </template>
-
-              <q-input
-                v-model="form.billing_address"
-                filled
-                clearable
-                bottom-slots
-                label="Billing Address"
-                :dense="dense"
-                type="textarea"
-                autogrow
-                class="q-mb-md"
-              >
-                <template #before>
-                  <q-icon name="local_shipping" />
-                </template>
-
-                <template #hint> Field hint </template>
-                <template #error> Sorry! Invalid input </template>
-              </q-input>
-
-              <q-input
-                v-model="form.billing_lga"
-                filled
-                clearable
-                bottom-slots
-                label="Billing LGA/County"
-                :dense="dense"
-                class="q-mb-md"
-              >
-                <template #before>
-                  <q-icon name="local_shipping" />
-                </template>
-
-                <template #hint> Field hint </template>
-                <template #error> Sorry! Invalid input </template>
-              </q-input>
-
-              <q-input
-                v-model="form.billing_postal_code"
-                filled
-                clearable
-                bottom-slots
-                label="Billing Postal Code"
-                :dense="dense"
-                type="textarea"
-                autogrow
-                class="q-mb-md"
-              >
-                <template #before>
-                  <q-icon name="local_shipping" />
-                </template>
-
-                <template #hint> Field hint </template>
-                <template #error> Sorry! Invalid input </template>
-              </q-input>
-
-              <q-select
-                v-model="form.billing_country"
-                filled
-                :options="countriesList"
-                label="Billing Country"
-                clearable
-                bottom-slots
-                class="q-mb-md"
-                transition-show="scale"
-                transition-hide="scale"
-                emit-value
-                map-options
-                @update:modelValue="processSelect('billing_country', $event)"
-                ><template #before>
-                  <q-icon name="local_shipping" />
-                </template>
-
-                <template #hint> Field hint </template>
-                <template #error> Sorry! Invalid input </template>
-              </q-select>
-
-              <q-select
-                v-model="form.billing_state"
-                filled
-                :disable="!form.billing_country"
-                :placeholder="
-                  !form.billing_country ? 'Please select the country first' : ''
-                "
-                :options="
-                  form.billing_country
-                    ? countries[`${form.billing_country}`]
-                    : []
-                "
-                label="Billing State"
-                clearable
-                bottom-slots
-                class="q-mb-md"
-                transition-show="scale"
-                transition-hide="scale"
-                emit-value
-                map-options
-                @update:modelValue="processSelect('billing_state', $event)"
-                ><template #before>
-                  <q-icon name="local_shipping" />
-                </template>
-
-                <template #hint> Field hint </template>
-                <template #error><div>Sorry! Invalid input</div></template>
-              </q-select>
 
               <q-toggle
                 v-model="form.is_billing_shipping_addresses_same"
@@ -317,115 +96,6 @@
                 label="Use billing address as delivery address?"
                 class="q-ml-lg q-mb-md"
               />
-
-              <template v-if="!form.is_billing_shipping_addresses_same">
-                <q-input
-                  v-model="form.shipping_address"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="Shipping Address"
-                  :dense="dense"
-                  type="textarea"
-                  autogrow
-                  class="q-mb-md"
-                >
-                  <template #before>
-                    <q-icon name="local_shipping" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error> Sorry! Invalid input </template>
-                </q-input>
-
-                <q-input
-                  v-model="form.shipping_lga"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="Shipping LGA/County"
-                  :dense="dense"
-                  class="q-mb-md"
-                >
-                  <template #before>
-                    <q-icon name="local_shipping" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error> Sorry! Invalid input </template>
-                </q-input>
-
-                <q-input
-                  v-model="form.shipping_postal_code"
-                  filled
-                  clearable
-                  bottom-slots
-                  label="Shipping Postal Code"
-                  :dense="dense"
-                  type="textarea"
-                  autogrow
-                  class="q-mb-md"
-                >
-                  <template #before>
-                    <q-icon name="local_shipping" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error> Sorry! Invalid input </template>
-                </q-input>
-
-                <q-select
-                  v-model="form.shipping_country"
-                  filled
-                  :options="countriesList"
-                  label="Shipping Country"
-                  clearable
-                  bottom-slots
-                  class="q-mb-md"
-                  transition-show="scale"
-                  transition-hide="scale"
-                  emit-value
-                  map-options
-                  @update:modelValue="processSelect('shipping_country', $event)"
-                  ><template #before>
-                    <q-icon name="local_shipping" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error> Sorry! Invalid input </template>
-                </q-select>
-
-                <q-select
-                  v-model="form.shipping_state"
-                  filled
-                  :disable="!form.shipping_country"
-                  :placeholder="
-                    !form.shipping_country
-                      ? 'Please select the country first'
-                      : ''
-                  "
-                  :options="
-                    form.shipping_country
-                      ? countries[`${form.shipping_country}`]
-                      : []
-                  "
-                  label="Shipping State"
-                  clearable
-                  bottom-slots
-                  class="q-mb-md"
-                  transition-show="scale"
-                  transition-hide="scale"
-                  emit-value
-                  map-options
-                  @update:modelValue="processSelect('shipping_state', $event)"
-                  ><template #before>
-                    <q-icon name="local_shipping" />
-                  </template>
-
-                  <template #hint> Field hint </template>
-                  <template #error><div>Sorry! Invalid input</div></template>
-                </q-select>
-              </template>
             </form>
           </template>
 
@@ -516,7 +186,6 @@ import useResourcePermissions from '../../composables/useResourcePermissions';
 import {
   CurrentlyViewedUser,
   SelectionOption,
-  UserFormShape,
   PERMISSION,
 } from '../../store/types';
 import { Notify } from 'quasar';
@@ -556,6 +225,27 @@ export default defineComponent({
         )
       : ref(null);
 
+    const countries = computed(
+      () =>
+        store.getters[
+          'countries_states/GET_COUNTRIES_FOR_SELECT'
+        ] as SelectionOption[]
+    );
+
+    const countryStates = computed(
+      () =>
+        store.getters[
+          'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
+        ] as SelectionOption[]
+    );
+
+    const customerTitles = computed(
+      () =>
+        store.getters[
+          'customers/GET_CUSTOMER_TITLES_FOR_SELECT'
+        ] as SelectionOption[]
+    );
+
     const form = reactive({
       title: '',
       first_name: '',
@@ -582,6 +272,238 @@ export default defineComponent({
       billing_state: '',
       billing_country: '',
     });
+
+    interface SelectCallback {
+      (
+        val: string,
+        update: (fn: () => void, ref?: (ref: { name: string }) => void) => void
+      ): void;
+    }
+
+    const plainBillingCountries = ref(unref(countries));
+    const plainShippingCountries = ref(unref(countries));
+    const plainBillingCountryStates = ref(unref(countryStates));
+    const plainShippingCountryStates = ref(unref(countryStates));
+
+    const selectFilterFn: SelectCallback = function (val, update) {
+      let plainBillingOptions: Ref<SelectionOption[]>;
+      let plainShippingOptions: Ref<SelectionOption[]>;
+      let computedBillingOptions: ComputedRef<SelectionOption[]>;
+      let computedShippingOptions: ComputedRef<SelectionOption[]>;
+
+      update(
+        () => {
+          // here you have access to "ref" which
+          // is the Vue reference of the QSelect
+        },
+        (ref) => {
+          const refName = ref.name;
+          if (refName === 'shipping_country') {
+            plainShippingOptions = plainShippingCountries;
+            computedShippingOptions = countries;
+          } else if (refName === 'shipping_state') {
+            plainShippingOptions = plainShippingCountryStates;
+            computedShippingOptions = countryStates;
+          } else if (refName === 'billing_country') {
+            plainBillingOptions = plainBillingCountries;
+            computedBillingOptions = countries;
+          } else if (refName === 'billing_state') {
+            plainBillingOptions = plainBillingCountryStates;
+            computedBillingOptions = countryStates;
+          }
+
+          if (val === '') {
+            if (
+              refName === 'shipping_country' ||
+              refName === 'shipping_state'
+            ) {
+              plainShippingOptions.value = computedShippingOptions.value;
+            }
+            if (refName === 'billing_state' || refName === 'billing_country') {
+              plainBillingOptions.value = computedBillingOptions.value;
+            }
+          } else {
+            const needle = val.toLowerCase();
+            if (
+              refName === 'shipping_country' ||
+              refName === 'shipping_state'
+            ) {
+              plainShippingOptions.value = computedShippingOptions.value.filter(
+                (v) => v.label.toLowerCase().indexOf(needle) > -1
+              );
+            }
+            if (refName === 'billing_state' || refName === 'billing_country') {
+              plainBillingOptions.value = computedBillingOptions.value.filter(
+                (v) => v.label.toLowerCase().indexOf(needle) > -1
+              );
+            }
+          }
+        }
+      );
+
+      return;
+    };
+
+    const customerFormSchema = computed(() => [
+      {
+        name: 'title',
+        label: 'Title',
+        default: null,
+        componentType: 'select',
+        options: unref(customerTitles) ,
+        isVisible:
+          (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
+      },
+      {
+        name: 'first_name',
+        label: 'First Name',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible:
+          (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
+      },
+      {
+        name: 'middle_name',
+        label: 'Middle Name',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible:
+          (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
+      },
+      {
+        name: 'last_name',
+        label: 'Last Name',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible:
+          (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
+      },
+      {
+        name: 'email',
+        label: 'Email Address',
+        default: '',
+        componentType: 'input',
+        inputType: 'email',
+        isVisible:
+          (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
+      },
+      {
+        name: 'phone_number',
+        label: 'Phone Number',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible:
+          (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
+      },
+      {
+        name: 'company_name',
+        label: 'Company Name',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible: form.is_corporate,
+      },
+      {
+        name: 'company_phone',
+        label: 'Company Phone Number',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible: form.is_corporate,
+      },
+      {
+        name: 'company_email',
+        label: 'Company Email Address',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible: form.is_corporate,
+      },
+      {
+        name: 'shipping_address',
+        label: 'Shipping Street',
+        default: '',
+        componentType: 'input',
+        inputType: 'textarea',
+        isVisible: true,
+      },
+      {
+        name: 'shipping_lga',
+        label: 'Shipping LGA/County',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible: true,
+      },
+      {
+        name: 'shipping_postal_code',
+        label: 'Shipping Postal Code',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible: true,
+      },
+      {
+        name: 'shipping_country',
+        label: 'Shipping Country',
+        default: null,
+        componentType: 'select',
+        options: unref(plainShippingCountries),
+        isVisible: true,
+      },
+      {
+        name: 'shipping_state',
+        label: 'Shipping State/Region',
+        default: null,
+        componentType: 'select',
+        options: unref(plainShippingCountryStates),
+        isVisible: true,
+      },
+      {
+        name: 'billing_address',
+        label: 'Billing Street',
+        default: '',
+        componentType: 'input',
+        inputType: 'textarea',
+        isVisible: !form.is_billing_shipping_addresses_same,
+      },
+      {
+        name: 'billing_lga',
+        label: 'Billing LGA/County',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible: !form.is_billing_shipping_addresses_same,
+      },
+      {
+        name: 'billing_postal_code',
+        label: 'Billing Postal Code',
+        default: '',
+        componentType: 'input',
+        inputType: 'text',
+        isVisible: !form.is_billing_shipping_addresses_same,
+      },
+      {
+        name: 'billing_country',
+        label: 'Billing Country',
+        default: null,
+        componentType: 'select',
+        options: unref(plainBillingCountries),
+        isVisible: !form.is_billing_shipping_addresses_same,
+      },
+      {
+        name: 'billing_state',
+        label: 'Billing State/Region',
+        default: null,
+        componentType: 'select',
+        options: unref(plainBillingCountryStates),
+        isVisible: !form.is_billing_shipping_addresses_same,
+      },
+    ]);
 
     const rules = {
       first_name: {
@@ -658,54 +580,6 @@ export default defineComponent({
       }
     }
 
-    const profileTextFields = ref([
-      {
-        name: 'first_name',
-        label: 'First Name',
-      },
-      {
-        name: 'middle_name',
-        label: 'Middle Name',
-      },
-      {
-        name: 'last_name',
-        label: 'Last Name',
-      },
-      {
-        name: 'phone_number',
-        label: 'Phone Number',
-      },
-      {
-        name: 'address',
-        label: 'Address',
-      },
-      {
-        name: 'city',
-        label: 'City',
-      },
-    ]);
-
-    const countries = computed(
-      () =>
-        store.getters[
-          'countries_states/GET_COUNTRIES_FOR_SELECT'
-        ] as SelectionOption[]
-    );
-
-    const countryStates = computed(
-      () =>
-        store.getters[
-          'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-        ] as SelectionOption[]
-    );
-
-    const customerTitles = computed(
-      () =>
-        store.getters[
-          'customers/GET_CUSTOMER_TITLES_FOR_SELECT'
-        ] as SelectionOption[]
-    );
-
     const titleInfo =
       currentUser && currentUser.value
         ? useTitleInfo({
@@ -753,66 +627,32 @@ export default defineComponent({
       void store.dispatch('customers/FETCH_CUSTOMER_TITLES_FOR_SELECT');
     });
 
-    /* watch(
-      () => form.country_id,
-      (country) => {
-        if (country) {
-          form.state_id = null;
-          void store.dispatch(
-            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: country }
-          );
-        }
+    watch(
+      () => form.shipping_country,
+      (newValue) => {
+        form.shipping_state = '';
+        void store.dispatch(
+          'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
+          { countryId: newValue }
+        );
       }
-    ); */
+    );
+    watch(
+      () => form.billing_country,
+      (newValue) => {
+        form.billing_state = '';
+        void store.dispatch(
+          'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
+          { countryId: newValue }
+        );
+      }
+    );
 
     onBeforeMount(() => {
       stopFetchCurrentlyViewedUser();
       stopFetchCountriesForSelect();
       stopFetchCustomerTitlesForSelect();
     });
-
-    interface SelectCallback {
-      (
-        val: string,
-        update: (fn: () => void, ref?: (ref: { name: string }) => void) => void
-      ): void;
-    }
-
-    const plainCountries = ref(unref(countries));
-    const plainCountryStates = ref(unref(countryStates));
-
-    const selectFilterFn: SelectCallback = function (val, update) {
-      let plainOptions: Ref<SelectionOption[]>;
-      let computedOptions: ComputedRef<SelectionOption[]>;
-
-      update(
-        () => {
-          // here you have access to "ref" which
-          // is the Vue reference of the QSelect
-        },
-        (ref) => {
-          const refName = ref.name;
-          if (refName === 'country_id') {
-            plainOptions = plainCountries;
-            computedOptions = countries;
-          } else if (refName === 'state_id') {
-            plainOptions = plainCountryStates;
-            computedOptions = countryStates;
-          }
-
-          if (val === '') plainOptions.value = computedOptions.value;
-          else {
-            const needle = val.toLowerCase();
-            plainOptions.value = computedOptions.value.filter(
-              (v) => v.label.toLowerCase().indexOf(needle) > -1
-            );
-          }
-        }
-      );
-
-      return;
-    };
 
     return {
       user: currentUser,
@@ -824,10 +664,8 @@ export default defineComponent({
       form,
       submitForm,
       form$,
-      profileTextFields,
+      customerFormSchema,
       titleInfo,
-      plainCountries,
-      plainCountryStates,
       selectFilterFn,
       customerTitles,
       resourcePermissions: useResourcePermissions({
