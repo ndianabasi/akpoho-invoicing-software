@@ -42,7 +42,7 @@ const routes: CustomRouteRecord[] = [
           },
           {
             path: ':customerId/view',
-            component: () => import('../pages/customers/Customer.vue'),
+            component: () => import('../pages/customers/ViewCustomer.vue'),
             props: true,
             name: 'view_customer',
             meta: {

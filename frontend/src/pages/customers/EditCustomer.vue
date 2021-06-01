@@ -174,7 +174,7 @@ import {
   reactive,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
-import { required, email, helpers, requiredIf } from '@vuelidate/validators';
+import { email, helpers } from '@vuelidate/validators';
 import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import { store } from '../../store';
@@ -592,21 +592,23 @@ export default defineComponent({
       }
     }
 
-    const titleInfo =
-      currentCustomer && currentCustomer.value
-        ? useTitleInfo({
-            title: !form.is_corporate
-              ? `${currentCustomer.value.first_name ?? ''} ${
-                  currentCustomer.value.last_name ?? ''
-                }`
-              : `${currentCustomer.value.company_name}`,
-          })
-        : props.creationMode
-        ? useTitleInfo({
-            title: 'New Customer',
-            avatar: '',
-          })
-        : ref(null);
+    let titleInfo;
+    watchEffect(() => {
+      titleInfo =
+        currentCustomer && currentCustomer.value
+          ? useTitleInfo({
+              title: !currentCustomer.value.is_corporate
+                ? `${currentCustomer?.value?.title?.name ?? ''} ${
+                    currentCustomer.value.first_name ?? ''
+                  } ${currentCustomer.value.last_name ?? ''}`
+                : `${currentCustomer.value.company_name} (Corporate)`,
+            })
+          : props.creationMode
+          ? useTitleInfo({
+              title: 'New Customer',
+            })
+          : ref(null);
+    });
 
     const stopFetchCurrentlyViewedCustomer = watchEffect(() => {
       if (!props.creationMode) {

@@ -1,6 +1,5 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { UUID_REGEX } from 'App/Helpers/utils'
 
 export default class CustomerValidator {
   constructor(protected ctx: HttpContextContract) {}
