@@ -1,5 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Customer from 'App/Models/Customer'
+import CustomerTitle from 'App/Models/CustomerTitle'
 
 export default class CustomersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -44,10 +45,7 @@ export default class CustomersController {
         'updated_at',
         'corporate_has_rep',
         'company_name',
-        'company_email',
-        'company_street_address',
-        'company_postal_code',
-        'company_city'
+        'company_email'
       )
       .where({ company_id: requestedCompany?.id })
 
@@ -99,6 +97,23 @@ export default class CustomersController {
     return response.ok({
       message: 'Customer was deleted successfully.',
       data: requestedCustomer?.id,
+    })
+  }
+
+  public async customerTitlesForSelect({ response, isGlobalUser, authRole }: HttpContextContract) {
+    const titles = await CustomerTitle.query()
+      .orderBy('name', 'asc')
+      .select(...['id', 'name'])
+
+    const transformedTitles = titles.map((role) => {
+      return {
+        label: role.name,
+        value: role.id,
+      }
+    })
+
+    return response.ok({
+      data: transformedTitles,
     })
   }
 }

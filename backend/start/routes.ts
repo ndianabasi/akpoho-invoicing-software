@@ -46,6 +46,11 @@ Route.group(() => {
 
   // Permissions routes
   Route.get('/permissions/user-permissions', 'PermissionsController.userPermissions')
+
+  Route.get(
+    '/customer-titles/customer-titles-for-select',
+    'CustomersController.customerTitlesForSelect'
+  )
 })
   .prefix('/v1')
   .middleware('auth')

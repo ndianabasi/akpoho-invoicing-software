@@ -8,7 +8,8 @@ export type CustomersGetterInterface = GetterTree<
 >;
 
 const getters: CustomersGetterInterface = {
-  GET_ALL_CUSTOMERS: (state: CustomersStateInterface) => state.customers,
+  GET_CUSTOMER_TITLES_FOR_SELECT: (state: CustomersStateInterface) =>
+    state.customerTitlesForSelect,
 };
 
 export default getters;

@@ -1,10 +1,13 @@
 import { MutationTree } from 'vuex';
+import { SelectOption } from '../types';
 import { CustomersStateInterface } from './state';
-import { Customer } from './state';
 
 const mutation: MutationTree<CustomersStateInterface> = {
-  SET_ALL_CUSTOMERS(state: CustomersStateInterface, payload: Array<Customer>) {
-    state.customers = payload;
+  SET_CUSTOMER_TITLES_FOR_SELECT(
+    state: CustomersStateInterface,
+    payload: SelectOption[]
+  ) {
+    state.customerTitlesForSelect = payload;
   },
 };
 

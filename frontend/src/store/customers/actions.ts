@@ -82,6 +82,18 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
         });
     });
   },
+
+  async FETCH_CUSTOMER_TITLES_FOR_SELECT({ commit }) {
+    return new Promise(async (resolve) => {
+      await $http
+        .get('/customer-titles/customer-titles-for-select')
+        .then((res: HttpResponse) => {
+          commit('SET_CUSTOMER_TITLES_FOR_SELECT', res.data.data);
+
+          resolve(res.data);
+        });
+    });
+  },
 };
 
 export default actions;

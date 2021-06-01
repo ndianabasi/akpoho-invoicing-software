@@ -28,7 +28,6 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import { Customer } from '../../store/customers/state';
 import { PERMISSION } from '../../store/types';
 import customerColumns from '../../components/data/table-definitions/customers';
 import QuasarTable from '../../components/QuasarTable.vue';
@@ -56,7 +55,6 @@ export default defineComponent({
 
     const data = reactive({
       columns: customerColumns,
-      rows: store.getters['customers/GET_ALL_CUSTOMERS'] as Array<Customer>,
       stickyTable: false,
     });
 

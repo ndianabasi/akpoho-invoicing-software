@@ -36,10 +36,14 @@
                 <q-select
                   v-model="form.title"
                   filled
-                  :options="titles"
+                  :options="customerTitles"
                   label="Title"
                   clearable
                   bottom-slots
+                  options-dense
+                  use-input
+                  emit-value
+                  map-options
                   class="q-mb-md"
                   transition-show="scale"
                   transition-hide="scale"
@@ -695,8 +699,11 @@ export default defineComponent({
         ] as SelectionOption[]
     );
 
-    const roles = computed(
-      () => store.getters['roles/GET_ROLES_FOR_SELECT'] as SelectionOption[]
+    const customerTitles = computed(
+      () =>
+        store.getters[
+          'customers/GET_CUSTOMER_TITLES_FOR_SELECT'
+        ] as SelectionOption[]
     );
 
     const titleInfo =
@@ -742,8 +749,8 @@ export default defineComponent({
       void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
     });
 
-    const stopFetchRolesForSelect = watchEffect(() => {
-      void store.dispatch('roles/FETCH_ROLES_FOR_SELECT');
+    const stopFetchCustomerTitlesForSelect = watchEffect(() => {
+      void store.dispatch('customers/FETCH_CUSTOMER_TITLES_FOR_SELECT');
     });
 
     /* watch(
@@ -762,7 +769,7 @@ export default defineComponent({
     onBeforeMount(() => {
       stopFetchCurrentlyViewedUser();
       stopFetchCountriesForSelect();
-      stopFetchRolesForSelect();
+      stopFetchCustomerTitlesForSelect();
     });
 
     interface SelectCallback {
@@ -822,10 +829,10 @@ export default defineComponent({
       plainCountries,
       plainCountryStates,
       selectFilterFn,
-      roles,
+      customerTitles,
       resourcePermissions: useResourcePermissions({
-        view: PERMISSION.CAN_VIEW_USERS,
-        list: PERMISSION.CAN_LIST_USERS,
+        view: PERMISSION.CAN_VIEW_CUSTOMERS,
+        list: PERMISSION.CAN_LIST_CUSTOMERS,
       }),
     };
   },
