@@ -275,6 +275,8 @@ import {
   onBeforeMount,
   watchEffect,
   computed,
+  watch,
+  onMounted,
 } from 'vue';
 import ViewCard from '../../components/ViewCard.vue';
 import CustomerAddresses from '../../pages/customers/CustomerAddresses.vue';
@@ -307,13 +309,31 @@ export default defineComponent({
         ] as CurrentlyViewedCustomer
     );
 
-    const titleInfo = useTitleInfo({
-      title: !currentCustomer.value.is_corporate
-        ? `${currentCustomer?.value?.title?.name ?? ''} ${
-            currentCustomer.value.first_name ?? ''
-          } ${currentCustomer.value.last_name ?? ''}`
-        : `${currentCustomer.value.company_name} (Corporate)`,
+    let titleInfo = ref({});
+
+    onMounted(() => {
+      titleInfo.value = useTitleInfo({
+        title: !currentCustomer.value.is_corporate
+          ? `${currentCustomer?.value?.title?.name ?? ''} ${
+              currentCustomer.value.first_name ?? ''
+            } ${currentCustomer.value.last_name ?? ''}`
+          : `${currentCustomer.value.company_name} (Corporate)`,
+      }).value;
     });
+
+    watch(
+      currentCustomer,
+      () => {
+        titleInfo.value = useTitleInfo({
+          title: !currentCustomer.value.is_corporate
+            ? `${currentCustomer?.value?.title?.name ?? ''} ${
+                currentCustomer.value.first_name ?? ''
+              } ${currentCustomer.value.last_name ?? ''}`
+            : `${currentCustomer.value.company_name} (Corporate)`,
+        }).value;
+      },
+      { deep: true }
+    );
 
     const stopFetchCurrentlyViewedCustomer = watchEffect(() => {
       void store.dispatch('customers/FETCH_CURRENTLY_VIEWED_CUSTOMER', {

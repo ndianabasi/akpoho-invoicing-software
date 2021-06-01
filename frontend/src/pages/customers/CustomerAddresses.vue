@@ -40,20 +40,6 @@
       }"
     >
       <div class="q-pa-xs col-xs-12 col-sm-12 col-md-12">
-        <!-- <q-card>
-            <q-card-section class="text-center">
-              Calories for
-              <br />
-              <strong>{{ props.row.first_name }}</strong>
-            </q-card-section>
-            <q-separator />
-            <q-card-section
-              class="flex flex-center"
-              :style="{ fontSize: props.row.last_name + 'px' }"
-            >
-              <div>{{ props.row.last_name }} g</div>
-            </q-card-section>
-          </q-card> -->
         <q-list bordered class="rounded-borders">
           <q-item class="q-my-lg">
             <q-item-section avatar middle>
