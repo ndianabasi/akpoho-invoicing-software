@@ -176,84 +176,8 @@
                 </q-tab-panel>
 
                 <q-tab-panel name="customer_addresses">
-                  <!-- <q-list padding>
-                    <q-item>
-                      <q-item-section>
-                        <q-item-label class="text-uppercase"
-                          >First Name</q-item-label
-                        >
-                        <q-item-label caption lines="2">{{
-                          customer.profile.first_name
-                        }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-
-                    <q-item>
-                      <q-item-section>
-                        <q-item-label class="text-uppercase"
-                          >Middle Name</q-item-label
-                        >
-                        <q-item-label caption lines="2">{{
-                          customer.profile.middle_name
-                        }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-
-                    <q-item>
-                      <q-item-section>
-                        <q-item-label class="text-uppercase"
-                          >Last Name</q-item-label
-                        >
-                        <q-item-label caption lines="2">{{
-                          customer.profile.last_name
-                        }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-
-                    <q-item>
-                      <q-item-section>
-                        <q-item-label class="text-uppercase"
-                          >Phone Number</q-item-label
-                        >
-                        <q-item-label caption lines="2">{{
-                          customer.profile.phone_number
-                        }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-
-                    <q-item>
-                      <q-item-section>
-                        <q-item-label class="text-uppercase"
-                          >Street Address</q-item-label
-                        >
-                        <q-item-label caption lines="2">{{
-                          customer.profile.address
-                        }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-
-                    <q-item>
-                      <q-item-section>
-                        <q-item-label class="text-uppercase"
-                          >Profile Creation Date</q-item-label
-                        >
-                        <q-item-label caption lines="2">{{
-                          customer.profile.created_at
-                        }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-
-                    <q-item>
-                      <q-item-section>
-                        <q-item-label class="text-uppercase"
-                          >Last Update Date</q-item-label
-                        >
-                        <q-item-label caption lines="2">{{
-                          customer.profile.updated_at
-                        }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </q-list> -->
+                  <!-- Customer Addresses -->
+                  <customer-addresses />
                 </q-tab-panel>
               </q-tab-panels>
 
@@ -364,6 +288,7 @@ import {
   computed,
 } from 'vue';
 import ViewCard from '../../components/ViewCard.vue';
+import CustomerAddresses from '../../pages/customers/CustomerAddresses.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import useResourcePermissions from '../../composables/useResourcePermissions';
 import { CurrentlyViewedCustomer, PERMISSION } from '../../store/types';
@@ -374,6 +299,7 @@ export default defineComponent({
 
   components: {
     ViewCard,
+    CustomerAddresses,
   },
 
   props: {

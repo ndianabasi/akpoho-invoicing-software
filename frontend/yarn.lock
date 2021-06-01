@@ -5612,10 +5612,10 @@ qs@^6.10.1:
   dependencies:
     side-channel "^1.0.4"
 
-quasar@^2.0.0-beta.16:
-  version "2.0.0-beta.16"
-  resolved "https://registry.yarnpkg.com/quasar/-/quasar-2.0.0-beta.16.tgz#9d94329a574976037d583efff9cab23ec2a5091b"
-  integrity sha512-NHrASRVLkDO9LoNeLcT9tXOrXewL/rDquAFAOiF0kFzM/oTSx/WElGjWSnYHFLc++/buPkZLWoS/gHhJrYoxPQ==
+quasar@^2.0.0-beta.19:
+  version "2.0.0-beta.19"
+  resolved "https://registry.yarnpkg.com/quasar/-/quasar-2.0.0-beta.19.tgz#2de898ce3fd99398ea9964296abb070a56742cb9"
+  integrity sha512-0h+HMytYpWkmsRldFzJlPlfSoUjxKoCZB8dpK4UTsFdOfN3OLOEhHxxqfViC1MRqU4NnnO4/6PcP9khJiy9esQ==
 
 querystring@0.2.0:
   version "0.2.0"

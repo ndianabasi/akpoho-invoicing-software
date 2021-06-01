@@ -1,15 +1,20 @@
 <!-- eslint-disable vue/no-v-html -->
 <!-- eslint-disable vue/no-v-model-argument -->
 <template>
-  <div class="q-pa-md">
+  <div :class="q - pa - md">
     <q-table
       v-model:selected="selected"
       v-model:pagination="pagination"
+      :grid="gridMode"
+      :hide-pagination="!usePagination"
       :rows="tableDataRows"
       :columns="columns"
       row-key="id"
-      selection="multiple"
-      :class="{ 'my-sticky-header-column-table': stickyTable }"
+      :selection="showSelections ? 'multiple' : 'none'"
+      :class="{
+        'my-sticky-header-column-table': stickyTable,
+        'no-border no-box-shadow': gridMode,
+      }"
       :visible-columns="visibleColumns"
       :loading="loading"
       :filter="filter"
@@ -20,20 +25,6 @@
       :rows-per-page-options="rosPerPageOptions"
       @request="processTableRequest"
     >
-      <template #top-right>
-        <q-input
-          v-model="filter"
-          borderless
-          dense
-          debounce="300"
-          placeholder="Search"
-        >
-          <template #append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </template>
-
       <template #top="props">
         <div
           class="
@@ -42,7 +33,7 @@
             q-table__title
           "
         >
-          <span>{{ nameOfTable }}</span
+          <span v-if="!embedMode">{{ nameOfTable }}</span
           ><q-btn
             v-if="
               showNewRouteButton &&
@@ -64,6 +55,7 @@
         <q-space />
 
         <q-select
+          v-if="useVisibleColumns"
           v-model="visibleColumns"
           multiple
           dense
@@ -78,6 +70,7 @@
         />
 
         <q-btn
+          v-if="!embedMode"
           flat
           round
           dense
@@ -88,7 +81,7 @@
 
         <q-separator />
 
-        <div class="col-12 q-mt-md">
+        <div v-if="useMultiFilter" class="col-12 q-mt-md">
           <q-expansion-item
             v-model="filterPanelExpanded"
             icon="tune"
@@ -161,12 +154,25 @@
             </q-card>
           </q-expansion-item>
         </div>
+
+        <q-input
+          v-if="gridMode"
+          v-model="filter"
+          borderless
+          dense
+          debounce="300"
+          placeholder="Search"
+        >
+          <template #append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
       </template>
 
       <template #header="props">
         <q-tr :props="props">
           <q-th auto-width />
-          <q-th v-if="showSelections_" auto-width>
+          <q-th v-if="showSelections" auto-width>
             <q-checkbox v-model="props.selected" />
           </q-th>
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -174,6 +180,72 @@
           </q-th>
           <q-th v-if="showActions_" auto-width> Actions </q-th>
         </q-tr>
+      </template>
+
+      <template v-if="gridMode" #item="props">
+        <div class="q-pa-xs col-xs-12 col-sm-12 col-md-12">
+          <!-- <q-card>
+            <q-card-section class="text-center">
+              Calories for
+              <br />
+              <strong>{{ props.row.first_name }}</strong>
+            </q-card-section>
+            <q-separator />
+            <q-card-section
+              class="flex flex-center"
+              :style="{ fontSize: props.row.last_name + 'px' }"
+            >
+              <div>{{ props.row.last_name }} g</div>
+            </q-card-section>
+          </q-card> -->
+          <q-list bordered class="rounded-borders" style="max-width: 600px">
+            <q-item>
+              <q-item-section avatar middle>
+                <q-icon name="local_shipping" color="black" size="34px" />
+              </q-item-section>
+
+              <q-item-section middle class="col-2 gt-sm">
+                <q-item-label lines="2" class="q-mt-sm"
+                  >Address Type</q-item-label
+                >
+              </q-item-section>
+
+              <q-item-section middle>
+                <q-item-label lines="2">
+                  <span class="text-weight-medium">Address Line 1</span>
+                </q-item-label>
+                <q-item-label caption lines="1"> City: xxx </q-item-label>
+                <q-item-label caption lines="1"> City: xxx </q-item-label>
+                <q-item-label caption lines="1">
+                  Postal Code: xxx
+                </q-item-label>
+                <q-item-label caption lines="1"> State: xxx </q-item-label>
+                <q-item-label caption lines="1"> Country: xxx </q-item-label>
+              </q-item-section>
+
+              <q-item-section middle side>
+                <div class="text-grey-8 q-gutter-xs">
+                  <q-btn
+                    class="gt-xs"
+                    size="12px"
+                    flat
+                    dense
+                    round
+                    icon="edit"
+                  />
+                  <q-btn
+                    class="gt-xs"
+                    size="12px"
+                    flat
+                    dense
+                    round
+                    icon="delete"
+                  />
+                </div>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </div>
       </template>
 
       <template #body="props">
@@ -188,7 +260,7 @@
               @click="props.expand = !props.expand"
             />
           </q-td>
-          <q-td v-if="showSelections_" auto-width>
+          <q-td v-if="showSelections" auto-width>
             <q-checkbox v-model="props.selected" />
           </q-td>
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -311,6 +383,26 @@ export default defineComponent({
     showSelections: {
       type: Boolean,
       default: false,
+    },
+    gridMode: {
+      type: Boolean,
+      default: false,
+    },
+    embedMode: {
+      type: Boolean,
+      default: false,
+    },
+    useMultiFilter: {
+      type: Boolean,
+      default: true,
+    },
+    usePagination: {
+      type: Boolean,
+      default: true,
+    },
+    useVisibleColumns: {
+      type: Boolean,
+      default: true,
     },
     showActions: {
       type: Boolean,
@@ -679,7 +771,7 @@ export default defineComponent({
       visibleColumns,
       visibleColumnsObjects: visibleColumnsObjects(),
       columns: ref(props.tableColumns),
-      pagination,
+      paginationModel: props.usePagination ? pagination : null,
       pagesNumber: computed(() => {
         return Math.ceil(
           tableRows?.value?.length ?? 1 / pagination.value.rowsPerPage
@@ -691,7 +783,6 @@ export default defineComponent({
       processTableRequest,
       filter,
       noResultsLabel_: ref(props.noResultsLabel),
-      showSelections_: ref(props.showSelections),
       showActions_: ref(props.showActions),
       deleteRow,
       filterPanelExpanded: ref(false),
