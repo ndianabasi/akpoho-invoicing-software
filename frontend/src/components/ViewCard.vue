@@ -62,7 +62,7 @@ export default defineComponent({
     },
   },
 
-  setup(props) {
+  setup(/* props */) {
     return {};
   },
 });

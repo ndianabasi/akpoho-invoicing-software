@@ -41,13 +41,23 @@ const routes: CustomRouteRecord[] = [
             },
           },
           {
-            path: ':customerId',
+            path: ':customerId/view',
             component: () => import('../pages/customers/Customer.vue'),
             props: true,
             name: 'view_customer',
             meta: {
               label: 'View Customer',
               permission: 'can_view_customers',
+            },
+          },
+          {
+            path: ':customerId/edit',
+            component: () => import('../pages/customers/CreateCustomer.vue'),
+            props: true,
+            name: 'edit_customer',
+            meta: {
+              label: 'View Customer',
+              permission: 'can_edit_customers',
             },
           },
           {

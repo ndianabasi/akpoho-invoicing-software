@@ -201,7 +201,10 @@
                   v-if="resourcePermissions?.canView ?? false"
                   v-close-popup
                   clickable
-                  @click="onActionItemClick(props, 'view')"
+                  :to="{
+                    name: rowViewRouteName,
+                    params: { [routeParam]: props.row.id },
+                  }"
                 >
                   <q-item-section avatar>
                     <q-icon name="remove_red_eye" color="primary" size="md" />
@@ -215,7 +218,10 @@
                   v-if="resourcePermissions?.canEdit ?? false"
                   v-close-popup
                   clickable
-                  @click="onActionItemClick(props, 'edit')"
+                  :to="{
+                    name: rowEditRouteName,
+                    params: { [routeParam]: props.row.id },
+                  }"
                 >
                   <q-item-section avatar>
                     <q-icon size="md" name="edit" color="primary" />
@@ -229,7 +235,7 @@
                   v-if="resourcePermissions?.canDelete ?? false"
                   v-close-popup
                   clickable
-                  @click="onActionItemClick(props, 'delete')"
+                  @click="deleteRow(props.row.id)"
                 >
                   <q-item-section avatar>
                     <q-icon size="md" name="delete_forever" color="primary" />
@@ -286,7 +292,6 @@ import {
   GenericTableData,
   TableRequestInterface,
   PaginationParams,
-  RowProps,
   PropObject,
 } from '../types/table';
 import { useQuasar } from 'quasar';
@@ -346,6 +351,11 @@ export default defineComponent({
     tableDataGetterType: {
       type: String,
       required: true,
+    },
+    routeParam: {
+      type: String,
+      required: false,
+      default: '',
     },
     defaultSort: {
       type: Object,
@@ -582,62 +592,44 @@ export default defineComponent({
       stickyTable: false,
     });
 
-    const onActionItemClick = (rowProps: RowProps, action: string) => {
-      const id = rowProps.row.id;
-      console.log(id);
-      if (action === 'view') {
-        void router.push({
-          name: props.rowViewRouteName,
-          params: { userId: id },
-        });
-      }
-
-      if (action === 'edit') {
-        void router.push({
-          name: props.rowEditRouteName,
-          params: { userId: id },
-        });
-      }
-
-      if (action === 'delete') {
-        if (props.rowDeleteActionType) {
-          $q.dialog({
-            title: 'Deletion Warning',
-            message: `You are about to delete this ${props.entityName}. Please type 'DELETE' to confirm your action.`,
-            prompt: {
-              model: '',
-              isValid: (val: string) => val.trim().toLowerCase() === 'delete',
-              type: 'text',
-            },
-            cancel: true,
+    const deleteRow = (id: string | number) => {
+      if (props.rowDeleteActionType) {
+        $q.dialog({
+          title: 'Deletion Warning',
+          message: `You are about to delete this ${props.entityName}. Please type 'DELETE' to confirm your action.`,
+          prompt: {
+            model: '',
+            isValid: (val: string) => val.trim().toLowerCase() === 'delete',
+            type: 'text',
+          },
+          cancel: true,
+          persistent: true,
+        }).onOk(async () => {
+          const deleteProgressDialog = $q.dialog({
+            title: 'In Progress',
+            message: 'Software at work!',
+            progress: true,
+            ok: false,
+            cancel: false,
             persistent: true,
-          }).onOk(async () => {
-            const deleteProgressDialog = $q.dialog({
-              title: 'In Progress',
-              message: 'Software at work!',
-              progress: true,
-              ok: false,
-              cancel: false,
-              persistent: true,
-            });
-            await store
-              .dispatch(props.rowDeleteActionType, id)
-              .then(() => {
-                deleteProgressDialog.hide();
+          });
+          await store
+            .dispatch(props.rowDeleteActionType, id)
+            .then(() => {
+              deleteProgressDialog.hide();
 
-                void fetchTableData({ queryObject: filterForm });
-              })
-              .catch(() => {
-                deleteProgressDialog.hide();
-              });
-          });
-        } else {
-          $q.notify({
-            type: 'negative',
-            message: 'Deletion type is not set for this table',
-            position: 'top',
-          });
-        }
+              void fetchTableData({ queryObject: filterForm });
+            })
+            .catch(() => {
+              deleteProgressDialog.hide();
+            });
+        });
+      } else {
+        $q.notify({
+          type: 'negative',
+          message: 'Deletion type is not set for this table',
+          position: 'top',
+        });
       }
     };
 
@@ -701,7 +693,7 @@ export default defineComponent({
       noResultsLabel_: ref(props.noResultsLabel),
       showSelections_: ref(props.showSelections),
       showActions_: ref(props.showActions),
-      onActionItemClick,
+      deleteRow,
       filterPanelExpanded: ref(false),
       filterableColumns,
       filterForm,

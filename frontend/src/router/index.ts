@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { route } from 'quasar/wrappers';
+//import { route } from 'quasar/wrappers';
 import {
   createMemoryHistory,
   createRouter,
@@ -11,11 +11,7 @@ import {
 } from 'vue-router';
 import routes /* CustomRouteRecord */ from './routes';
 //import qs from 'qs';
-
-/* const actions = {
-  ...mapActions('auth', ['logoutUser']),
-};
-const logoutUser = actions.logoutUser; */
+import { store } from '../store/index';
 
 /*
  * If not building with SSR mode, you can
@@ -26,7 +22,7 @@ const logoutUser = actions.logoutUser; */
  * with the Router instance.
  */
 
-export default route(function ({ store /* ssrContext */ }) {
+export default function () {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const createHistory =
     process.env.MODE === 'ssr'
@@ -90,4 +86,4 @@ export default route(function ({ store /* ssrContext */ }) {
   });
 
   return Router;
-});
+}

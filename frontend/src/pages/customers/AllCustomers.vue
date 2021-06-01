@@ -18,6 +18,7 @@
     entity-name="Customer"
     table-data-fetch-end-point="customers"
     show-selections
+    route-param="customerId"
   ></quasar-table>
 </template>
 

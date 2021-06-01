@@ -7,6 +7,7 @@
     no-results-label="Sorry! No users were found. Please check your filters too."
     row-view-route-name="view_user"
     row-edit-route-name="edit_user"
+    route-param="userId"
     row-delete-action-type="users/DELETE_USER"
     entity-name="User"
     table-data-fetch-end-point="users"
