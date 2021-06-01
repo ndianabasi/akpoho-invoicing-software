@@ -66,6 +66,9 @@ Route.group(() => {
   Route.delete('/:company_id/customers/:customer_id', 'CustomersController.destroy').middleware(
     'findRequestedCustomer'
   )
+  Route.patch('/:company_id/customers/:customer_id', 'CustomersController.update').middleware(
+    'findRequestedCustomer'
+  )
 
   // Users routes
   Route.get('/:company_id/users', 'UsersController.index')

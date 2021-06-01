@@ -2,12 +2,7 @@
   <div class="q-pa-md">
     <div class="row justify-center">
       <div class="col-md-6 col-sm-12 col-xs-12">
-        <view-card
-          v-if="creationMode || user"
-          :title-info="titleInfo"
-          show-avatar
-          show-title-panel-side
-        >
+        <view-card :title-info="titleInfo" show-avatar show-title-panel-side>
           <template #body-panel>
             <form class="q-pa-md" @submit.prevent="submitForm">
               <div class="row q-mx-auto">
@@ -89,6 +84,7 @@
               </template>
 
               <q-toggle
+                v-if="creationMode"
                 v-model="form.is_billing_shipping_addresses_same"
                 checked-icon="check"
                 color="green"
@@ -130,26 +126,26 @@
                   <q-item
                     v-if="resourcePermissions.canView"
                     :to="{
-                      name: 'view_user',
-                      params: { userId: userId }, //userId from route props
+                      name: 'view_customer',
+                      params: { customerId: customerId }, //customerId from route props
                     }"
                   >
                     <q-item-section>
                       <q-btn flat icon="visibility" />
                     </q-item-section>
-                    <q-item-section>View User</q-item-section>
+                    <q-item-section>View Customer</q-item-section>
                   </q-item>
 
                   <q-item
                     v-if="resourcePermissions.canList"
                     :to="{
-                      name: 'all_users',
+                      name: 'customers',
                     }"
                   >
                     <q-item-section>
                       <q-btn flat icon="view_list" />
                     </q-item-section>
-                    <q-item-section>All Users</q-item-section>
+                    <q-item-section>All Customers</q-item-section>
                   </q-item>
                 </q-list>
               </q-menu>
@@ -178,15 +174,16 @@ import {
   reactive,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
-import { required, email, helpers } from '@vuelidate/validators';
+import { required, email, helpers, requiredIf } from '@vuelidate/validators';
 import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import { store } from '../../store';
 import useResourcePermissions from '../../composables/useResourcePermissions';
 import {
-  CurrentlyViewedUser,
+  CurrentlyViewedCustomer,
   SelectionOption,
   PERMISSION,
+  CustomerFormShape,
 } from '../../store/types';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
@@ -199,7 +196,7 @@ export default defineComponent({
   },
 
   props: {
-    userId: {
+    customerId: {
       type: String,
       required: false,
       default: '',
@@ -214,14 +211,14 @@ export default defineComponent({
     const submitting = ref(false);
     const router = useRouter();
 
-    let currentUser: Ref<CurrentlyViewedUser | null>;
+    let currentCustomer: Ref<CurrentlyViewedCustomer | null>;
 
-    currentUser = !props.creationMode
+    currentCustomer = !props.creationMode
       ? computed(
           () =>
             store.getters[
-              'users/GET_CURRENTLY_VIEWED_USER'
-            ] as CurrentlyViewedUser
+              'customers/GET_CURRENTLY_VIEWED_CUSTOMER'
+            ] as CurrentlyViewedCustomer
         )
       : ref(null);
 
@@ -246,8 +243,8 @@ export default defineComponent({
         ] as SelectionOption[]
     );
 
-    const form = reactive({
-      title: '',
+    const form: CustomerFormShape = reactive({
+      title: null,
       first_name: '',
       last_name: '',
       middle_name: '',
@@ -261,16 +258,16 @@ export default defineComponent({
       shipping_address: '',
       shipping_lga: '',
       shipping_postal_code: '',
-      shipping_state: '',
-      shipping_country: '',
+      shipping_state: null,
+      shipping_country: null,
       // This is not persisted but used to create an identical billing address
       // from the shipping address
       is_billing_shipping_addresses_same: true,
       billing_address: '',
       billing_lga: '',
       billing_postal_code: '',
-      billing_state: '',
-      billing_country: '',
+      billing_state: null,
+      billing_country: null,
     });
 
     interface SelectCallback {
@@ -350,7 +347,7 @@ export default defineComponent({
         label: 'Title',
         default: null,
         componentType: 'select',
-        options: unref(customerTitles) ,
+        options: unref(customerTitles),
         isVisible:
           (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
       },
@@ -383,7 +380,7 @@ export default defineComponent({
       },
       {
         name: 'email',
-        label: 'Email Address',
+        label: 'Personal Email Address',
         default: '',
         componentType: 'input',
         inputType: 'email',
@@ -392,7 +389,7 @@ export default defineComponent({
       },
       {
         name: 'phone_number',
-        label: 'Phone Number',
+        label: 'Personal Phone Number',
         default: '',
         componentType: 'input',
         inputType: 'text',
@@ -429,7 +426,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'textarea',
-        isVisible: true,
+        isVisible: props.creationMode,
       },
       {
         name: 'shipping_lga',
@@ -437,7 +434,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'text',
-        isVisible: true,
+        isVisible: props.creationMode,
       },
       {
         name: 'shipping_postal_code',
@@ -445,7 +442,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'text',
-        isVisible: true,
+        isVisible: props.creationMode,
       },
       {
         name: 'shipping_country',
@@ -453,7 +450,7 @@ export default defineComponent({
         default: null,
         componentType: 'select',
         options: unref(plainShippingCountries),
-        isVisible: true,
+        isVisible: props.creationMode,
       },
       {
         name: 'shipping_state',
@@ -461,7 +458,7 @@ export default defineComponent({
         default: null,
         componentType: 'select',
         options: unref(plainShippingCountryStates),
-        isVisible: true,
+        isVisible: props.creationMode,
       },
       {
         name: 'billing_address',
@@ -469,7 +466,8 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'textarea',
-        isVisible: !form.is_billing_shipping_addresses_same,
+        isVisible:
+          !form.is_billing_shipping_addresses_same && props.creationMode,
       },
       {
         name: 'billing_lga',
@@ -477,7 +475,8 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'text',
-        isVisible: !form.is_billing_shipping_addresses_same,
+        isVisible:
+          !form.is_billing_shipping_addresses_same && props.creationMode,
       },
       {
         name: 'billing_postal_code',
@@ -485,7 +484,8 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'text',
-        isVisible: !form.is_billing_shipping_addresses_same,
+        isVisible:
+          !form.is_billing_shipping_addresses_same && props.creationMode,
       },
       {
         name: 'billing_country',
@@ -493,7 +493,8 @@ export default defineComponent({
         default: null,
         componentType: 'select',
         options: unref(plainBillingCountries),
-        isVisible: !form.is_billing_shipping_addresses_same,
+        isVisible:
+          !form.is_billing_shipping_addresses_same && props.creationMode,
       },
       {
         name: 'billing_state',
@@ -501,27 +502,19 @@ export default defineComponent({
         default: null,
         componentType: 'select',
         options: unref(plainBillingCountryStates),
-        isVisible: !form.is_billing_shipping_addresses_same,
+        isVisible:
+          !form.is_billing_shipping_addresses_same && props.creationMode,
       },
     ]);
 
-    const rules = {
-      first_name: {
-        required: helpers.withMessage('First name is required.', required),
-      },
-      last_name: {
-        required: helpers.withMessage('Last name is required.', required),
-      },
-      role_id: { required: helpers.withMessage('Role is required.', required) },
+    const rules = computed(() => ({
       email: {
         email: helpers.withMessage('Email is not valid.', email),
-        required: helpers.withMessage('Email is required.', required),
       },
       company_email: {
         email: helpers.withMessage('Company Email is not valid.', email),
-        required: helpers.withMessage('Company Email is required.', required),
       },
-    };
+    }));
 
     const form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
 
@@ -529,39 +522,58 @@ export default defineComponent({
       if (!form$.value.$invalid) {
         submitting.value = true;
 
-        if (!props.creationMode) {
-          void store
-            .dispatch('users/EDIT_USER', {
-              userId: props.userId,
-              form: form,
-            })
-            .then(() => {
-              submitting.value = false;
-              void router.push({
-                name: 'view_user',
-                params: { userId: props.userId },
+        try {
+          if (!props.creationMode) {
+            void store
+              .dispatch('customers/EDIT_CUSTOMER', {
+                customerId: props.customerId,
+                form: form,
+              })
+              .then(() => {
+                submitting.value = false;
+                void router.push({
+                  name: 'view_customer',
+                  params: { customerId: props.customerId },
+                });
+                return;
+              })
+              .catch(() => {
+                submitting.value = false;
               });
-              return;
-            })
-            .catch(() => {
-              submitting.value = false;
-            });
-        } else {
-          store
-            .dispatch('users/CREATE_USER', {
-              form: form,
-            })
-            .then((userId: string) => {
-              submitting.value = false;
-              void router.push({
-                name: 'view_user',
-                params: { userId },
+          } else {
+            store
+              .dispatch('customers/CREATE_CUSTOMER', {
+                form: form,
+              })
+              .then((customerId: string) => {
+                submitting.value = false;
+                void router.push({
+                  name: 'view_customer',
+                  params: { customerId },
+                });
+                return;
+              })
+              .catch(() => {
+                submitting.value = false;
               });
-              return;
-            })
-            .catch(() => {
-              submitting.value = false;
-            });
+          }
+        } catch (error: unknown) {
+          submitting.value = false;
+          console.error(error);
+
+          Notify.create({
+            message: 'Unknown error occured',
+            type: 'negative',
+            position: 'bottom',
+            progress: true,
+            timeout: 2500,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
         }
       } else {
         Notify.create({
@@ -581,12 +593,13 @@ export default defineComponent({
     }
 
     const titleInfo =
-      currentUser && currentUser.value
+      currentCustomer && currentCustomer.value
         ? useTitleInfo({
-            title: `${currentUser.value.profile?.first_name ?? ''} ${
-              currentUser.value.profile?.last_name ?? ''
-            }`,
-            avatar: currentUser.value.profile?.profile_picture ?? '',
+            title: !form.is_corporate
+              ? `${currentCustomer.value.first_name ?? ''} ${
+                  currentCustomer.value.last_name ?? ''
+                }`
+              : `${currentCustomer.value.company_name}`,
           })
         : props.creationMode
         ? useTitleInfo({
@@ -595,26 +608,34 @@ export default defineComponent({
           })
         : ref(null);
 
-    const stopFetchCurrentlyViewedUser = watchEffect(() => {
+    const stopFetchCurrentlyViewedCustomer = watchEffect(() => {
       if (!props.creationMode) {
         void store
-          .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
-            userId: props.userId,
+          .dispatch('customers/FETCH_CURRENTLY_VIEWED_CUSTOMER', {
+            customerId: props.customerId,
           })
           .then(() => {
-            currentUser.value = unref(
-              computed(
-                () =>
-                  store.getters[
-                    'users/GET_CURRENTLY_VIEWED_USER'
-                  ] as CurrentlyViewedUser
-              )
+            currentCustomer = computed(
+              () =>
+                store.getters[
+                  'customers/GET_CURRENTLY_VIEWED_CUSTOMER'
+                ] as CurrentlyViewedCustomer
             );
 
-            form.first_name = currentUser?.value?.profile.first_name;
-            form.last_name = currentUser?.value?.profile.last_name;
-            form.middle_name = currentUser?.value?.profile.middle_name;
-            form.phone_number = currentUser?.value?.profile.phone_number;
+            form.first_name = currentCustomer?.value?.first_name ?? '';
+            form.last_name = currentCustomer?.value?.last_name ?? '';
+            form.middle_name = currentCustomer?.value?.middle_name ?? '';
+            form.phone_number = currentCustomer?.value?.phone_number ?? '';
+            form.email = currentCustomer?.value?.email ?? '';
+            form.company_email = currentCustomer?.value?.company_email ?? '';
+            form.company_name = currentCustomer?.value?.company_name ?? '';
+            form.title = currentCustomer?.value?.title?.id ?? null;
+            form.is_corporate = Boolean(
+              currentCustomer?.value?.is_corporate ?? false
+            );
+            form.corporate_has_rep = Boolean(
+              currentCustomer?.value?.corporate_has_rep ?? false
+            );
           });
       }
     });
@@ -630,7 +651,7 @@ export default defineComponent({
     watch(
       () => form.shipping_country,
       (newValue) => {
-        form.shipping_state = '';
+        form.shipping_state = null;
         void store.dispatch(
           'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
           { countryId: newValue }
@@ -640,7 +661,7 @@ export default defineComponent({
     watch(
       () => form.billing_country,
       (newValue) => {
-        form.billing_state = '';
+        form.billing_state = null;
         void store.dispatch(
           'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
           { countryId: newValue }
@@ -649,13 +670,13 @@ export default defineComponent({
     );
 
     onBeforeMount(() => {
-      stopFetchCurrentlyViewedUser();
+      stopFetchCurrentlyViewedCustomer();
       stopFetchCountriesForSelect();
       stopFetchCustomerTitlesForSelect();
     });
 
     return {
-      user: currentUser,
+      customer: currentCustomer,
       text: ref(''),
       ph: ref(''),
       dense: ref(false),

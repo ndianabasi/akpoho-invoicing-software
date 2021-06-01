@@ -1,6 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Customer from 'App/Models/Customer'
 import CustomerTitle from 'App/Models/CustomerTitle'
+import CustomerValidator from 'App/Validators/CustomerValidator'
 
 export default class CustomersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -80,9 +81,61 @@ export default class CustomersController {
 
   public async store({}: HttpContextContract) {}
 
-  public async show({}: HttpContextContract) {}
+  public async show({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    bouncer,
+  }: HttpContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('view', requestedCompany!, requestedCustomer!)
 
-  public async update({}: HttpContextContract) {}
+    await requestedCustomer?.load('title')
+
+    return response.ok({ data: requestedCustomer })
+  }
+
+  public async update({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    request,
+    bouncer,
+  }: HttpContextContract) {
+    await request.validate(CustomerValidator)
+
+    await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
+
+    const {
+      title,
+      first_name,
+      last_name,
+      middle_name,
+      email,
+      phone_number,
+      is_corporate,
+      corporate_has_rep,
+      company_name,
+      company_phone,
+      company_email,
+    } = request.body()
+
+    requestedCustomer?.merge({
+      customerTitleId: title,
+      firstName: first_name,
+      lastName: last_name,
+      middleName: middle_name,
+      email,
+      phoneNumber: phone_number,
+      isCorporate: is_corporate,
+      corporateHasRep: corporate_has_rep,
+      companyName: company_name,
+      companyPhone: company_phone,
+      companyEmail: company_email,
+    })
+    await requestedCustomer?.save()
+
+    return response.created({ data: requestedCustomer?.id })
+  }
 
   public async destroy({
     response,

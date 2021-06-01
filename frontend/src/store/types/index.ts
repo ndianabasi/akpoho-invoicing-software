@@ -135,6 +135,35 @@ export type CurrentlyViewedUser = {
   role: StringIDNameInterface;
 };
 
+interface CurrentCustomerBaseInterface {
+  first_name: string;
+  last_name: string;
+  middle_name: string | null;
+  email: string;
+  phone_number: string;
+  is_corporate: boolean;
+  corporate_has_rep: boolean;
+  company_name: string | null;
+  company_phone: string | null;
+  company_email: string | null;
+}
+
+export interface CurrentlyViewedCustomer extends CurrentCustomerBaseInterface {
+  title?: {
+    id: number | null | undefined;
+    name: string | null | undefined;
+  };
+}
+
+export interface CustomerFormShape extends CurrentCustomerBaseInterface {
+  title: number | null;
+  is_billing_shipping_addresses_same: boolean;
+  shipping_country: number | null;
+  shipping_state: number | null;
+  billing_country: number | null;
+  billing_state: number | null;
+}
+
 export interface SelectionOption {
   label: string;
   value: string & number & boolean;
@@ -142,7 +171,7 @@ export interface SelectionOption {
 
 export interface TitleInfo extends Object {
   title: string;
-  avatar: string;
+  avatar?: string;
 }
 
 export interface UserFormShape extends Object {

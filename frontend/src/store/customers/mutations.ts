@@ -1,5 +1,5 @@
 import { MutationTree } from 'vuex';
-import { SelectOption } from '../types';
+import { CurrentlyViewedCustomer, SelectOption } from '../types';
 import { CustomersStateInterface } from './state';
 
 const mutation: MutationTree<CustomersStateInterface> = {
@@ -8,6 +8,13 @@ const mutation: MutationTree<CustomersStateInterface> = {
     payload: SelectOption[]
   ) {
     state.customerTitlesForSelect = payload;
+  },
+
+  SET_CURRENTLY_VIEWED_CUSTOMER(
+    state: CustomersStateInterface,
+    payload: CurrentlyViewedCustomer
+  ) {
+    state.currentlyViewedCustomer = payload;
   },
 };
 
