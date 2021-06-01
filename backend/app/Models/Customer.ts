@@ -14,6 +14,7 @@ import UUIDHook from './Hooks/UUIDHook'
 import Country from 'App/Models/Country'
 import State from 'App/Models/State'
 import { STANDARD_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import CustomerTitle from './CustomerTitle'
 
 export default class Customer extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -113,4 +114,7 @@ export default class Customer extends BaseModel {
 
   @hasMany(() => CustomerAddress)
   public addresses: HasMany<typeof CustomerAddress>
+
+  @belongsTo(() => CustomerTitle)
+  public title: BelongsTo<typeof CustomerTitle>
 }

@@ -52,11 +52,11 @@ const routes: CustomRouteRecord[] = [
           },
           {
             path: ':customerId/edit',
-            component: () => import('../pages/customers/CreateCustomer.vue'),
+            component: () => import('../pages/customers/EditCustomer.vue'),
             props: true,
             name: 'edit_customer',
             meta: {
-              label: 'View Customer',
+              label: 'Edit Customer',
               permission: 'can_edit_customers',
             },
           },
