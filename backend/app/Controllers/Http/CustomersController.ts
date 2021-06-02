@@ -133,24 +133,19 @@ export default class CustomersController {
     response,
     requestedCompany,
     requestedCustomer,
+    requestedCustomerAddress,
     bouncer,
-    params,
   }: HttpContextContract) {
     await bouncer.with('CustomerPolicy').authorize('view', requestedCompany!, requestedCustomer!)
 
-    const { customer_address_id } = params
-    if (!customer_address_id)
-      return response.badRequest({ message: 'No Customer Address was specified' })
+    await requestedCustomerAddress?.load('addressCountry', (countryQuery) =>
+      countryQuery.select('id', 'name')
+    )
+    await requestedCustomerAddress?.load('addressState', (stateQuery) =>
+      stateQuery.select('id', 'name')
+    )
 
-    await requestedCustomer?.load('addresses', (addressesQuery) => {
-      addressesQuery.where('id', customer_address_id)
-      addressesQuery.preload('addressCountry', (countryQuery) => countryQuery.select('id', 'name'))
-      addressesQuery.preload('addressState', (stateQuery) => stateQuery.select('id', 'name'))
-    })
-
-    const address = requestedCustomer?.addresses
-
-    return response.ok({ data: address?.[0] ?? {} })
+    return response.ok({ data: requestedCustomerAddress })
   }
 
   public async update({
@@ -200,22 +195,17 @@ export default class CustomersController {
     response,
     requestedCompany,
     requestedCustomer,
+    requestedCustomerAddress,
     bouncer,
-    params,
     request,
   }: HttpContextContract) {
     await request.validate(CustomerAddressValidator)
 
     await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
 
-    const { customer_address_id } = params
-    if (!customer_address_id) {
-      return response.badRequest({ message: 'No Customer Address was specified' })
-    }
     const { address, lga, postal_code, state, country, type } = request.body()
 
-    const editedAddress = await CustomerAddress.findOrFail(customer_address_id)
-    editedAddress.merge({
+    requestedCustomerAddress?.merge({
       addressType: type,
       streetAddress: address,
       city: lga,
@@ -223,9 +213,9 @@ export default class CustomersController {
       stateId: state,
       postalCode: postal_code,
     })
-    await editedAddress.save()
+    await requestedCustomerAddress?.save()
 
-    return response.ok({ data: editedAddress.id })
+    return response.ok({ data: requestedCustomerAddress?.id })
   }
 
   public async storeAddress({
@@ -242,9 +232,11 @@ export default class CustomersController {
 
     const { address, lga, postal_code, state, country, type } = request.body()
 
+    console.log(type, typeof type)
+
     if (type === 'both') {
       const addressTypes: Array<CustomerAddressTypes> = ['shipping_address', 'billing_address']
-      for (let i = 0; i < addressTypes.length - 1; i++) {
+      for (let i = 0; i < addressTypes.length; i++) {
         const addressType = addressTypes[i]
 
         await requestedCustomer?.related('addresses').create({
@@ -286,7 +278,24 @@ export default class CustomersController {
     })
   }
 
-  public async customerTitlesForSelect({ response, isGlobalUser, authRole }: HttpContextContract) {
+  public async destroyAddress({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    requestedCustomerAddress,
+    bouncer,
+  }: HttpContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('delete', requestedCompany!, requestedCustomer!)
+
+    await requestedCustomerAddress?.delete()
+
+    return response.ok({
+      message: 'Customer address was deleted successfully.',
+      data: requestedCustomerAddress?.id,
+    })
+  }
+
+  public async customerTitlesForSelect({ response }: HttpContextContract) {
     const titles = await CustomerTitle.query()
       .orderBy('name', 'asc')
       .select(...['id', 'name'])

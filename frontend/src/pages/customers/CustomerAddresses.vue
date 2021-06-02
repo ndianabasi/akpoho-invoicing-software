@@ -98,7 +98,14 @@
                   icon="edit"
                   @click.stop.prevent="showAddressDialog(rowId)"
                 />
-                <q-btn size="12px" flat dense round icon="delete" />
+                <q-btn
+                  size="12px"
+                  flat
+                  dense
+                  round
+                  icon="delete"
+                  @click.prevent="deleteAddress(rowId, fetch)"
+                />
               </div>
             </q-item-section>
           </q-item>
@@ -134,7 +141,9 @@ import { useStore } from 'vuex';
 import customerAddressesColumns from '../../components/data/table-definitions/customer_addresses';
 import QuasarTable from '../../components/QuasarTable.vue';
 import { PERMISSION } from '../../store/types';
+import { FetchTableDataInterface } from '../../types/table';
 import CustomerAddressEdit from './CustomerAddressEdit.vue';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'CustomerAddresses',
@@ -150,7 +159,9 @@ export default defineComponent({
     },
   },
 
-  setup() {
+  setup(props) {
+    const $q = useQuasar();
+
     const tableName = ref('All Users');
     const editAddressDialog: { [index: string]: boolean } = reactive({});
     const createAddressDialog = ref(false);
@@ -179,6 +190,46 @@ export default defineComponent({
       createAddressDialog.value = true;
     };
 
+    const deleteAddress = function (
+      customerAddressId: string,
+      postUpdate: FetchTableDataInterface
+    ) {
+      $q.dialog({
+        title: 'Deletion Warning',
+        message:
+          "You are about to delete this customer address. Please type 'DELETE' to confirm your action.",
+        prompt: {
+          model: '',
+          isValid: (val: string) => val.trim().toLowerCase() === 'delete',
+          type: 'text',
+        },
+        cancel: true,
+        persistent: true,
+      }).onOk(async () => {
+        const deleteProgressDialog = $q.dialog({
+          title: 'Processing',
+          message: 'Software at work!',
+          progress: true,
+          ok: false,
+          cancel: false,
+          persistent: true,
+        });
+        await store
+          .dispatch('customers/DELETE_CUSTOMER_ADDRESS', {
+            customerId: props.customerId,
+            customerAddressId: customerAddressId,
+          })
+          .then(async () => {
+            await postUpdate();
+            deleteProgressDialog.hide();
+            return;
+          })
+          .catch(() => {
+            deleteProgressDialog.hide();
+          });
+      });
+    };
+
     return {
       tableName,
       columns: data.columns,
@@ -198,6 +249,7 @@ export default defineComponent({
       createAddressDialog,
       showCreateAddressDialog,
       createAddressDialogRef,
+      deleteAddress,
     };
   },
 });

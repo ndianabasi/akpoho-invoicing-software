@@ -233,11 +233,16 @@ export default defineComponent({
         label: 'Address Type',
         default: null,
         componentType: 'select',
-        options: [
-          { label: 'Billing', value: 'billing_address' },
-          { label: 'Shipping', value: 'shipping_address' },
-          { label: 'Both', value: 'both' },
-        ],
+        options: props.creationMode
+          ? [
+              { label: 'Billing', value: 'billing_address' },
+              { label: 'Shipping', value: 'shipping_address' },
+              { label: 'Both', value: 'both' },
+            ]
+          : [
+              { label: 'Billing', value: 'billing_address' },
+              { label: 'Shipping', value: 'shipping_address' },
+            ],
         isVisible: true,
         autocomplete: 'off',
       },
