@@ -197,6 +197,11 @@ export default defineComponent({
       required: false,
       default: '',
     },
+    customerAddressId: {
+      type: String,
+      required: false,
+      default: '',
+    },
     creationMode: {
       type: Boolean,
       default: false,

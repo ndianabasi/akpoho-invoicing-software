@@ -13,6 +13,9 @@ const getters: CustomersGetterInterface = {
 
   GET_CURRENTLY_VIEWED_CUSTOMER: (state: CustomersStateInterface) =>
     state.currentlyViewedCustomer,
+
+  GET_CURRENTLY_VIEWED_ADDRESS: (state: CustomersStateInterface) =>
+    state.currentlyViewedAddress,
 };
 
 export default getters;

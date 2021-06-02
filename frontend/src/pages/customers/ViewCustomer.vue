@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-md q-px-sm-none">
     <view-card
       v-if="customer"
       :title-info="titleInfo"
@@ -26,8 +26,9 @@
             animated
             transition-prev="scale"
             transition-next="scale"
+            class="q-px-sm-none"
           >
-            <q-tab-panel name="customer_details">
+            <q-tab-panel class="q-px-none" name="customer_details">
               <q-list padding>
                 <template
                   v-if="
@@ -166,59 +167,9 @@
               </q-list>
             </q-tab-panel>
 
-            <q-tab-panel name="customer_addresses">
+            <q-tab-panel class="q-px-none" name="customer_addresses">
               <!-- Customer Addresses -->
               <customer-addresses :customer-id="customerId" />
-            </q-tab-panel>
-          </q-tab-panels>
-
-          <q-tab-panels
-            v-model="tab"
-            animated
-            transition-prev="fade"
-            transition-next="fade"
-            class="bg-orange text-white text-center"
-          >
-            <q-tab-panel name="mails">
-              <div class="text-h6">Mails</div>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            </q-tab-panel>
-
-            <q-tab-panel name="alarms">
-              <div class="text-h6">Alarms</div>
-              Ad molestiae non facere animi nobis, similique nemo velit
-              reiciendis corporis impedit nam in.
-            </q-tab-panel>
-
-            <q-tab-panel name="movies">
-              <div class="text-h6">Movies</div>
-              Nostrum necessitatibus expedita dolores? Voluptatem repudiandae
-              magni ea.
-            </q-tab-panel>
-          </q-tab-panels>
-
-          <q-tab-panels
-            v-model="tab"
-            animated
-            transition-prev="jump-up"
-            transition-next="jump-down"
-            class="bg-teal text-white text-center"
-          >
-            <q-tab-panel name="mails">
-              <div class="text-h6">Mails</div>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            </q-tab-panel>
-
-            <q-tab-panel name="alarms">
-              <div class="text-h6">Alarms</div>
-              Ad molestiae non facere animi nobis, similique nemo velit
-              reiciendis corporis impedit nam in.
-            </q-tab-panel>
-
-            <q-tab-panel name="movies">
-              <div class="text-h6">Movies</div>
-              Nostrum necessitatibus expedita dolores? Voluptatem repudiandae
-              magni ea.
             </q-tab-panel>
           </q-tab-panels>
         </div>
@@ -282,7 +233,7 @@ import ViewCard from '../../components/ViewCard.vue';
 import CustomerAddresses from '../../pages/customers/CustomerAddresses.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import useResourcePermissions from '../../composables/useResourcePermissions';
-import { CurrentlyViewedCustomer, PERMISSION } from '../../store/types';
+import { PERMISSION, CurrentlyViewedCustomer } from '../../store/types';
 import { store } from '../../store';
 
 export default defineComponent({

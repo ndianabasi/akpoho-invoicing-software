@@ -23,12 +23,12 @@
         round
         color="primary"
         icon="add_location"
-        title="New Customer Address"
+        title="New Address"
         >New Address</q-btn
       >
     </template>
     <template
-      #grideModeItems="{
+      #gridModeItems="{
         row: {
           address_type,
           city,
@@ -36,6 +36,7 @@
           state,
           postal_code,
           street_address,
+          id: rowId,
         },
       }"
     >
@@ -74,20 +75,36 @@
 
             <q-item-section middle side>
               <div class="text-grey-8 q-gutter-xs">
-                <q-btn class="gt-xs" size="12px" flat dense round icon="edit" />
                 <q-btn
-                  class="gt-xs"
                   size="12px"
                   flat
                   dense
                   round
-                  icon="delete"
+                  icon="edit"
+                  @click.stop.prevent="showAddressDialog(rowId)"
                 />
+                <q-btn size="12px" flat dense round icon="delete" />
               </div>
             </q-item-section>
           </q-item>
         </q-list>
       </div>
+      <q-dialog
+        :ref="
+          (el) => {
+            if (el) dialogRefs[rowId] = el;
+          }
+        "
+        v-model="editAddressDialog[`${rowId}`]"
+        persistent
+        position="right"
+      >
+        <customer-address-edit
+          :customer-id="customerId"
+          :customer-address-id="rowId"
+          :current-dialog-ref="dialogRefs[rowId]"
+        />
+      </q-dialog>
     </template>
   </quasar-table>
 </template>
@@ -101,11 +118,13 @@ import { useStore } from 'vuex';
 import customerAddressesColumns from '../../components/data/table-definitions/customer_addresses';
 import QuasarTable from '../../components/QuasarTable.vue';
 import { PERMISSION } from '../../store/types';
+import CustomerAddressEdit from './CustomerAddressEdit.vue';
 
 export default defineComponent({
   name: 'CustomerAddresses',
   components: {
     QuasarTable,
+    CustomerAddressEdit,
   },
 
   props: {
@@ -117,6 +136,8 @@ export default defineComponent({
 
   setup() {
     const tableName = ref('All Users');
+    const editAddressDialog: { [index: string]: boolean } = reactive({});
+    const dialogRefs = ref({});
     const store = useStore();
 
     const defaultSort = {
@@ -136,6 +157,10 @@ export default defineComponent({
       stickyTable: false,
     });
 
+    const showAddressDialog = function (id: string) {
+      editAddressDialog[id] = true;
+    };
+
     return {
       tableName,
       columns: data.columns,
@@ -150,6 +175,9 @@ export default defineComponent({
         edit: PERMISSION.CAN_EDIT_CUSTOMERS,
         delete: PERMISSION.CAN_DELETE_CUSTOMERS,
       }),
+      showAddressDialog,
+      editAddressDialog,
+      dialogRefs,
     };
   },
 });

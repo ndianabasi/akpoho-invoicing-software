@@ -188,6 +188,30 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
         });
     });
   },
+
+  async FETCH_CURRENTLY_VIEWED_ADDRESS(
+    { commit, rootGetters },
+    {
+      customerId,
+      customerAddressId,
+    }: { customerId: string; customerAddressId: string }
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const currentCompany = rootGetters[
+      'auth/GET_CURRENT_COMPANY'
+    ] as StringIDNameInterface;
+    return new Promise(async (resolve) => {
+      await $http
+        .get(
+          `/${currentCompany.id}/customers/${customerId}/customer-addresses/${customerAddressId}`
+        )
+        .then((res: HttpResponse) => {
+          commit('SET_CURRENTLY_VIEWED_ADDRESS', res.data.data);
+
+          resolve(res.data);
+        });
+    });
+  },
 };
 
 export default actions;

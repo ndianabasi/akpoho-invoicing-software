@@ -1,5 +1,9 @@
 import { MutationTree } from 'vuex';
-import { CurrentlyViewedCustomer, SelectOption } from '../types';
+import {
+  CurrentlyViewedAddress,
+  CurrentlyViewedCustomer,
+  SelectOption,
+} from '../types';
 import { CustomersStateInterface } from './state';
 
 const mutation: MutationTree<CustomersStateInterface> = {
@@ -15,6 +19,13 @@ const mutation: MutationTree<CustomersStateInterface> = {
     payload: CurrentlyViewedCustomer
   ) {
     state.currentlyViewedCustomer = payload;
+  },
+
+  SET_CURRENTLY_VIEWED_ADDRESS(
+    state: CustomersStateInterface,
+    payload: CurrentlyViewedAddress
+  ) {
+    state.currentlyViewedAddress = payload;
   },
 };
 

@@ -127,6 +127,30 @@ export default class CustomersController {
     return response.ok({ data: addresses })
   }
 
+  public async showAddress({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    bouncer,
+    params,
+  }: HttpContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('view', requestedCompany!, requestedCustomer!)
+
+    const { customer_address_id } = params
+    if (!customer_address_id)
+      return response.badRequest({ message: 'No Customer Address was specified' })
+
+    await requestedCustomer?.load('addresses', (addressesQuery) => {
+      addressesQuery.where('id', customer_address_id)
+      addressesQuery.preload('addressCountry', (countryQuery) => countryQuery.select('id', 'name'))
+      addressesQuery.preload('addressState', (stateQuery) => stateQuery.select('id', 'name'))
+    })
+
+    const address = requestedCustomer?.addresses
+
+    return response.ok({ data: address?.[0] ?? {} })
+  }
+
   public async update({
     response,
     requestedCompany,

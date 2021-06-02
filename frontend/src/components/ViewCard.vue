@@ -1,7 +1,7 @@
 <template>
   <div class="row justify-center">
     <div class="col-md-6 col-sm-12 col-xs-12">
-      <q-card class="my-card" flat bordered>
+      <q-card flat bordered>
         <slot name="title-panel">
           <q-item v-if="titleInfo">
             <q-item-section v-if="showAvatar" avatar>
@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, ref } from 'vue';
 import { TitleInfo } from '../store/types';
 
 export default defineComponent({

@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/no-v-html -->
 <!-- eslint-disable vue/no-v-model-argument -->
 <template>
-  <div class="q-pa-md">
+  <div :class="{ 'q-pa-md': !embedMode }">
     <q-table
       v-model:selected="selected"
       v-model:pagination="paginationModel"
@@ -184,7 +184,7 @@
       </template>
 
       <template v-if="gridMode" #item="props">
-        <slot name="grideModeItems" v-bind="props"> </slot>
+        <slot name="gridModeItems" v-bind="props"> </slot>
       </template>
 
       <template #body="props">
