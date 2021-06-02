@@ -9,23 +9,35 @@
     :table-columns="columns"
     :table-name="tableName"
     :table-data-getter-type="tableDataGetterType"
-    :default-sort="defaultSort"
     no-results-label="Sorry! No addresses were found for this customer"
     entity-name="CustomerAddress"
     :table-data-fetch-end-point="`customers/${customerId}/customer-addresses`"
     show-new-route-button
     :resource-action-permissions="resourceActionPermissions"
   >
-    <template #topAddNew>
+    <template #topAddNew="{ fetch }">
       <q-btn
         v-if="resourceActionPermissions.new"
         flat
-        round
         color="primary"
         icon="add_location"
         title="New Address"
+        @click.stop.prevent="showCreateAddressDialog()"
         >New Address</q-btn
       >
+      <q-dialog
+        ref="createAddressDialogRef"
+        v-model="createAddressDialog"
+        persistent
+        position="right"
+      >
+        <customer-address-edit
+          creation-mode
+          :customer-id="customerId"
+          :current-dialog-ref="createAddressDialogRef"
+          :post-update="fetch"
+        />
+      </q-dialog>
     </template>
     <template
       #gridModeItems="{
@@ -141,13 +153,11 @@ export default defineComponent({
   setup() {
     const tableName = ref('All Users');
     const editAddressDialog: { [index: string]: boolean } = reactive({});
+    const createAddressDialog = ref(false);
+    const createAddressDialogRef = ref(null);
+
     const dialogRefs = ref({});
     const store = useStore();
-
-    const defaultSort = {
-      sortBy: 'email',
-      descending: false,
-    };
 
     const tableDataFetchActionType = ref('customers/FETCH_ALL_CUSTOMERS');
     const tableDataGetterType = ref('customers/GET_ALL_CUSTOMERS');
@@ -165,6 +175,10 @@ export default defineComponent({
       editAddressDialog[id] = true;
     };
 
+    const showCreateAddressDialog = function () {
+      createAddressDialog.value = true;
+    };
+
     return {
       tableName,
       columns: data.columns,
@@ -172,7 +186,6 @@ export default defineComponent({
       stickyTable: data.stickyTable,
       tableDataFetchActionType,
       tableDataGetterType,
-      defaultSort,
       resourceActionPermissions: ref({
         new: PERMISSION.CAN_CREATE_CUSTOMERS,
         view: PERMISSION.CAN_VIEW_CUSTOMERS,
@@ -182,6 +195,9 @@ export default defineComponent({
       showAddressDialog,
       editAddressDialog,
       dialogRefs,
+      createAddressDialog,
+      showCreateAddressDialog,
+      createAddressDialogRef,
     };
   },
 });

@@ -34,7 +34,7 @@
           "
         >
           <span v-if="!embedMode">{{ nameOfTable }}</span>
-          <slot name="topAddNew">
+          <slot name="topAddNew" v-bind="{ fetch: fetchTableData }">
             <q-btn
               v-if="
                 showNewRouteButton &&
@@ -392,7 +392,8 @@ export default defineComponent({
     },
     defaultSort: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => ({}),
     },
     newRouteObject: {
       type: Object,

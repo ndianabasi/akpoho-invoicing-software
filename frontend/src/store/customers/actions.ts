@@ -258,6 +258,50 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
         });
     });
   },
+
+  async CREATE_CUSTOMER_ADDRESS(
+    { rootGetters },
+    {
+      customerId,
+      form,
+    }: {
+      customerId: string;
+      form: CustomerFormShape;
+    }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      await $http
+        .post(
+          `/${currentCompany.id}/customers/${customerId}/customer-addresses`,
+          { ...form }
+        )
+        .then((res: HttpResponse) => {
+          Notify.create({
+            message: 'Address was successfully created',
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
 };
 
 export default actions;

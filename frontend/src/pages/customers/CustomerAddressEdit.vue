@@ -8,15 +8,27 @@
             v-if="field.componentType === 'input' && field.isVisible"
             :key="`field_${field.name}_${field.componentType}`"
             v-model="form[field.name]"
+            :error="form$?.[field.name]?.$invalid ?? false"
             :type="field.inputType"
             :autogrow="field.inputType === 'textarea'"
             filled
+            :aria-autocomplete="field.autocomplete"
+            :autocomplete="field.autocomplete"
             clearable
             bottom-slots
             :label="field.label"
             :dense="dense"
             class="q-mb-md"
           >
+            <template #error>
+              {{
+                form$ && form$[field.name]
+                  ? form$[field.name].$silentErrors
+                      .map((error) => error.$message)
+                      .join(', ')
+                  : ''
+              }}
+            </template>
           </q-input>
 
           <q-select
@@ -24,10 +36,13 @@
             :key="`field_${field.name}_${field.componentType}`"
             :ref="field.name"
             v-model="form[field.name]"
+            :error="form$?.[field.name]?.$invalid ?? false"
             filled
             :options="field.options"
             :label="field.label"
             :name="field.name"
+            aria-autocomplete="off"
+            autocomplete="off"
             clearable
             bottom-slots
             options-dense
@@ -40,6 +55,15 @@
             map-options
             @filter="selectFilterFn"
           >
+            <template #error>
+              {{
+                form$ && form$[field.name]
+                  ? form$[field.name].$silentErrors
+                      .map((error) => error.$message)
+                      .join(', ')
+                  : ''
+              }}
+            </template>
           </q-select>
         </template>
       </form>
@@ -76,9 +100,12 @@ import {
   SelectionOption,
   PERMISSION,
   CustomerAddressInterface,
+  FormSchema,
 } from '../../store/types';
 import { Notify } from 'quasar';
 import { FetchTableDataInterface } from '../../types/table';
+import useVuelidate from '@vuelidate/core';
+import { helpers, required } from '@vuelidate/validators';
 
 export default defineComponent({
   name: 'EditCustomerAddress',
@@ -169,8 +196,8 @@ export default defineComponent({
     const plainCountryStates = ref(unref(countryStates));
 
     const selectFilterFn: SelectCallback = function (val, update) {
-      let plainOptions: Ref<SelectionOption[]>;
-      let computedOptions: ComputedRef<SelectionOption[]>;
+      let plainOptions: Ref<SelectionOption[]> = ref([]);
+      let computedOptions: ComputedRef<SelectionOption[]> = computed(() => []);
 
       update(
         () => {
@@ -187,7 +214,7 @@ export default defineComponent({
             computedOptions = countryStates;
           }
 
-          if (val === '') plainOptions.value = computedOptions.value;
+          if (val === '') plainOptions.value = computedOptions?.value;
           else {
             const needle = val.toLowerCase();
             plainOptions.value = computedOptions.value.filter(
@@ -200,7 +227,7 @@ export default defineComponent({
       return;
     };
 
-    const customerFormSchema = computed(() => [
+    const customerFormSchema: ComputedRef<FormSchema[]> = computed(() => [
       {
         name: 'type',
         label: 'Address Type',
@@ -209,8 +236,10 @@ export default defineComponent({
         options: [
           { label: 'Billing', value: 'billing_address' },
           { label: 'Shipping', value: 'shipping_address' },
+          { label: 'Both', value: 'both' },
         ],
         isVisible: true,
+        autocomplete: 'off',
       },
       {
         name: 'address',
@@ -219,6 +248,7 @@ export default defineComponent({
         componentType: 'input',
         inputType: 'textarea',
         isVisible: true,
+        autocomplete: 'street-address',
       },
       {
         name: 'lga',
@@ -227,6 +257,7 @@ export default defineComponent({
         componentType: 'input',
         inputType: 'text',
         isVisible: true,
+        autocomplete: 'address-level2',
       },
       {
         name: 'postal_code',
@@ -235,6 +266,7 @@ export default defineComponent({
         componentType: 'input',
         inputType: 'text',
         isVisible: true,
+        autocomplete: 'postal-code',
       },
       {
         name: 'country',
@@ -243,6 +275,7 @@ export default defineComponent({
         componentType: 'select',
         options: unref(plainCountries),
         isVisible: true,
+        autocomplete: 'country',
       },
       {
         name: 'state',
@@ -251,51 +284,85 @@ export default defineComponent({
         componentType: 'select',
         options: unref(plainCountryStates),
         isVisible: true,
+        autocomplete: 'address-level1',
       },
     ]);
 
+    const rules = computed(() => ({
+      address: {
+        required: helpers.withMessage('Address is required', required),
+      },
+      lga: {
+        required: helpers.withMessage('City/LGA is required', required),
+      },
+      type: {
+        required: helpers.withMessage('Address type is required', required),
+      },
+      country: {
+        required: helpers.withMessage('Country is required', required),
+      },
+    }));
+
+    const form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
+
     function submitForm() {
-      submitting.value = true;
+      if (!form$.value.$invalid) {
+        submitting.value = true;
 
-      try {
-        if (!props.creationMode) {
-          void store
-            .dispatch('customers/EDIT_CUSTOMER_ADDRESS', {
-              customerId: props.customerId,
-              customerAddressId: props.customerAddressId,
-              form: form,
-            })
-            .then(async () => {
-              submitting.value = false;
-              await props.postUpdate();
-              props.currentDialogRef.hide();
-              return;
-            })
-            .catch(() => {
-              submitting.value = false;
-            });
-        } else {
-          store
-            .dispatch('customers/CREATE_CUSTOMER_ADDRESS', {
-              customerId: props.customerId,
-              form: form,
-            })
-            .then(async () => {
-              submitting.value = false;
-              await props.postUpdate();
-              props.currentDialogRef.hide();
-              return;
-            })
-            .catch(() => {
-              submitting.value = false;
-            });
+        try {
+          if (!props.creationMode) {
+            void store
+              .dispatch('customers/EDIT_CUSTOMER_ADDRESS', {
+                customerId: props.customerId,
+                customerAddressId: props.customerAddressId,
+                form: form,
+              })
+              .then(async () => {
+                submitting.value = false;
+                await props.postUpdate();
+                props.currentDialogRef.hide();
+                return;
+              })
+              .catch(() => {
+                submitting.value = false;
+              });
+          } else {
+            store
+              .dispatch('customers/CREATE_CUSTOMER_ADDRESS', {
+                customerId: props.customerId,
+                form: form,
+              })
+              .then(async () => {
+                submitting.value = false;
+                await props.postUpdate();
+                props.currentDialogRef.hide();
+                return;
+              })
+              .catch(() => {
+                submitting.value = false;
+              });
+          }
+        } catch (error: unknown) {
+          submitting.value = false;
+          console.error(error);
+
+          Notify.create({
+            message: 'Unknown error occured',
+            type: 'negative',
+            position: 'bottom',
+            progress: true,
+            timeout: 2500,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
         }
-      } catch (error: unknown) {
-        submitting.value = false;
-        console.error(error);
-
+      } else {
         Notify.create({
-          message: 'Unknown error occured',
+          message: 'Errors exist on the form!',
           type: 'negative',
           position: 'bottom',
           progress: true,
@@ -382,6 +449,7 @@ export default defineComponent({
       customerFormSchema,
       selectFilterFn,
       customerTitles,
+      form$,
       resourcePermissions: useResourcePermissions({
         view: PERMISSION.CAN_VIEW_CUSTOMERS,
         list: PERMISSION.CAN_LIST_CUSTOMERS,

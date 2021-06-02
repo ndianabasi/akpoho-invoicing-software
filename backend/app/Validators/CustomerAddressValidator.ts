@@ -10,7 +10,7 @@ export default class CustomerValidator {
     postal_code: schema.string.optional({ escape: true, trim: true }),
     state: schema.number.optional([rules.unsigned()]),
     country: schema.number.optional([rules.unsigned()]),
-    type: schema.enum(['shipping_address', 'billing_address']),
+    type: schema.enum(['shipping_address', 'billing_address', 'both']),
   })
 
   public messages = {}

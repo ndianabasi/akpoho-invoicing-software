@@ -14,7 +14,11 @@ export const dateSortFn = function (a: string, b: string) {
   return aDate - bDate;
 };
 
-export function isEmpty(obj: { [index: string]: unknown }) {
+interface ObjectInterface<T> {
+  [index: string]: unknown | string | number | T;
+}
+
+export function isEmpty<T>(obj: ObjectInterface<T>) {
   return Object.keys(obj).length === 0;
 }
 

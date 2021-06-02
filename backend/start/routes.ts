@@ -59,24 +59,36 @@ Route.group(() => {
 // Authenticated company-specific routes
 Route.group(() => {
   // Customers routes
+  // Get all customers within a company. Returns paginated result
   Route.get('/:company_id/customers', 'CustomersController.index')
+  // Get a specific customer within a company
   Route.get('/:company_id/customers/:customer_id', 'CustomersController.show').middleware(
     'findRequestedCustomer'
   )
+  // Get all addresses of a specific customer within a company
   Route.get(
     '/:company_id/customers/:customer_id/customer-addresses',
     'CustomersController.showAddresses'
   ).middleware('findRequestedCustomer')
+  // Get a specific address details of a specific customer within a company
   Route.get(
     '/:company_id/customers/:customer_id/customer-addresses/:customer_address_id',
     'CustomersController.showAddress'
   ).middleware('findRequestedCustomer')
+  // Create a new address for a specific customer within a company
+  Route.post(
+    '/:company_id/customers/:customer_id/customer-addresses',
+    'CustomersController.storeAddress'
+  ).middleware('findRequestedCustomer')
+  // Delete a specific customer within a company
   Route.delete('/:company_id/customers/:customer_id', 'CustomersController.destroy').middleware(
     'findRequestedCustomer'
   )
+  // Update a specific customer within a company
   Route.patch('/:company_id/customers/:customer_id', 'CustomersController.update').middleware(
     'findRequestedCustomer'
   )
+  // Update a specific address of a specific customer within a company
   Route.patch(
     '/:company_id/customers/:customer_id/customer-addresses/:customer_address_id',
     'CustomersController.updateAddress'

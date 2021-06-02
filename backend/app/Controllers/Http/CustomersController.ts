@@ -5,6 +5,7 @@ import CustomerAddress from 'App/Models/CustomerAddress'
 import CustomerTitle from 'App/Models/CustomerTitle'
 import CustomerAddressValidator from 'App/Validators/CustomerAddressValidator'
 import CustomerValidator from 'App/Validators/CustomerValidator'
+import { CustomerAddressTypes } from '../types'
 
 export default class CustomersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -225,6 +226,48 @@ export default class CustomersController {
     await editedAddress.save()
 
     return response.ok({ data: editedAddress.id })
+  }
+
+  public async storeAddress({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    bouncer,
+    request,
+  }: HttpContextContract) {
+    await request.validate(CustomerAddressValidator)
+
+    // This is part of the editing operation for the customer
+    await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
+
+    const { address, lga, postal_code, state, country, type } = request.body()
+
+    if (type === 'both') {
+      const addressTypes: Array<CustomerAddressTypes> = ['shipping_address', 'billing_address']
+      for (let i = 0; i < addressTypes.length - 1; i++) {
+        const addressType = addressTypes[i]
+
+        await requestedCustomer?.related('addresses').create({
+          addressType,
+          streetAddress: address,
+          city: lga,
+          countryId: country,
+          stateId: state,
+          postalCode: postal_code,
+        })
+      }
+    } else {
+      await requestedCustomer?.related('addresses').create({
+        addressType: type,
+        streetAddress: address,
+        city: lga,
+        countryId: country,
+        stateId: state,
+        postalCode: postal_code,
+      })
+    }
+
+    return response.created()
   }
 
   public async destroy({

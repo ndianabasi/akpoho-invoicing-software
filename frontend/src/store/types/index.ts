@@ -233,3 +233,15 @@ export enum PERMISSION {
   CAN_EDIT_CUSTOMERS = 'can_edit_customers',
   CAN_DELETE_CUSTOMERS = 'can_delete_customers',
 }
+
+type InputComponentType = 'select' | 'input' | 'date';
+
+export interface FormSchema {
+  name: string;
+  label: string;
+  default: string | number | boolean | null;
+  componentType: InputComponentType;
+  options?: { label: string; value: string | number | boolean }[];
+  isVisible: boolean;
+  autocomplete?: string;
+}
