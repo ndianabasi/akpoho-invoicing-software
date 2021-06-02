@@ -38,21 +38,25 @@ export default class CustomersController {
       updated_at: updated_at ? updated_at : null,
     }
 
-    let subquery = Customer.query()
+    let subquery = Database.from('customers')
       .select(
-        'id',
-        'first_name',
-        'last_name',
-        'email',
-        'phone_number',
-        'is_corporate',
-        'created_at',
-        'updated_at',
-        'corporate_has_rep',
-        'company_name',
-        'company_email'
+        'customers.id',
+        'customers.first_name',
+        'customers.last_name',
+        'customers.email',
+        'customers.phone_number',
+        'customers.is_corporate',
+        'customers.created_at',
+        'customers.updated_at',
+        'customers.corporate_has_rep',
+        'customers.company_name',
+        'customers.company_email',
+        'customer_titles.name as title'
       )
       .where({ company_id: requestedCompany?.id })
+      .leftJoin('customer_titles', (query) =>
+        query.on('customer_titles.id', '=', 'customers.customer_title_id')
+      )
 
     if (sortBy) {
       subquery = subquery.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
