@@ -29,15 +29,18 @@
     </template>
     <template
       #gridModeItems="{
-        row: {
-          address_type,
-          city,
-          country,
-          state,
-          postal_code,
-          street_address,
-          id: rowId,
+        props: {
+          row: {
+            address_type,
+            city,
+            country,
+            state,
+            postal_code,
+            street_address,
+            id: rowId,
+          },
         },
+        fetch,
       }"
     >
       <div class="q-pa-xs col-xs-12 col-sm-12 col-md-12">
@@ -103,6 +106,7 @@
           :customer-id="customerId"
           :customer-address-id="rowId"
           :current-dialog-ref="dialogRefs[rowId]"
+          :post-update="fetch"
         />
       </q-dialog>
     </template>

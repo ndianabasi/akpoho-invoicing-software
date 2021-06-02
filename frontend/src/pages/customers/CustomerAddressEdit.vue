@@ -78,7 +78,7 @@ import {
   CustomerAddressInterface,
 } from '../../store/types';
 import { Notify } from 'quasar';
-import { useRouter } from 'vue-router';
+import { FetchTableDataInterface } from '../../types/table';
 
 export default defineComponent({
   name: 'EditCustomerAddress',
@@ -100,6 +100,14 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    postUpdate: {
+      type: Function as PropType<FetchTableDataInterface>,
+      default: () => {
+        return () => {
+          /** */
+        };
+      },
+    },
     currentDialogRef: {
       type: Object as PropType<{ hide: () => void }>,
       default: () => ({}),
@@ -108,7 +116,6 @@ export default defineComponent({
 
   setup(props) {
     const submitting = ref(false);
-    const router = useRouter();
 
     let currentAddress: Ref<CurrentlyViewedAddress | null>;
 
@@ -158,16 +165,12 @@ export default defineComponent({
       ): void;
     }
 
-    const plainBillingCountries = ref(unref(countries));
-    const plainShippingCountries = ref(unref(countries));
-    const plainBillingCountryStates = ref(unref(countryStates));
-    const plainShippingCountryStates = ref(unref(countryStates));
+    const plainCountries = ref(unref(countries));
+    const plainCountryStates = ref(unref(countryStates));
 
     const selectFilterFn: SelectCallback = function (val, update) {
-      let plainBillingOptions: Ref<SelectionOption[]>;
-      let plainShippingOptions: Ref<SelectionOption[]>;
-      let computedBillingOptions: ComputedRef<SelectionOption[]>;
-      let computedShippingOptions: ComputedRef<SelectionOption[]>;
+      let plainOptions: Ref<SelectionOption[]>;
+      let computedOptions: ComputedRef<SelectionOption[]>;
 
       update(
         () => {
@@ -176,45 +179,20 @@ export default defineComponent({
         },
         (ref) => {
           const refName = ref.name;
-          if (refName === 'shipping_country') {
-            plainShippingOptions = plainShippingCountries;
-            computedShippingOptions = countries;
-          } else if (refName === 'shipping_state') {
-            plainShippingOptions = plainShippingCountryStates;
-            computedShippingOptions = countryStates;
-          } else if (refName === 'billing_country') {
-            plainBillingOptions = plainBillingCountries;
-            computedBillingOptions = countries;
-          } else if (refName === 'billing_state') {
-            plainBillingOptions = plainBillingCountryStates;
-            computedBillingOptions = countryStates;
+          if (refName === 'country') {
+            plainOptions = plainCountries;
+            computedOptions = countries;
+          } else if (refName === 'state') {
+            plainOptions = plainCountryStates;
+            computedOptions = countryStates;
           }
 
-          if (val === '') {
-            if (
-              refName === 'shipping_country' ||
-              refName === 'shipping_state'
-            ) {
-              plainShippingOptions.value = computedShippingOptions.value;
-            }
-            if (refName === 'billing_state' || refName === 'billing_country') {
-              plainBillingOptions.value = computedBillingOptions.value;
-            }
-          } else {
+          if (val === '') plainOptions.value = computedOptions.value;
+          else {
             const needle = val.toLowerCase();
-            if (
-              refName === 'shipping_country' ||
-              refName === 'shipping_state'
-            ) {
-              plainShippingOptions.value = computedShippingOptions.value.filter(
-                (v) => v.label.toLowerCase().indexOf(needle) > -1
-              );
-            }
-            if (refName === 'billing_state' || refName === 'billing_country') {
-              plainBillingOptions.value = computedBillingOptions.value.filter(
-                (v) => v.label.toLowerCase().indexOf(needle) > -1
-              );
-            }
+            plainOptions.value = computedOptions.value.filter(
+              (v) => v.label.toLowerCase().indexOf(needle) > -1
+            );
           }
         }
       );
@@ -263,7 +241,7 @@ export default defineComponent({
         label: 'Country',
         default: null,
         componentType: 'select',
-        options: unref(plainShippingCountries),
+        options: unref(plainCountries),
         isVisible: true,
       },
       {
@@ -271,7 +249,7 @@ export default defineComponent({
         label: 'State/Region',
         default: null,
         componentType: 'select',
-        options: unref(plainShippingCountryStates),
+        options: unref(plainCountryStates),
         isVisible: true,
       },
     ]);
@@ -287,8 +265,9 @@ export default defineComponent({
               customerAddressId: props.customerAddressId,
               form: form,
             })
-            .then(() => {
+            .then(async () => {
               submitting.value = false;
+              await props.postUpdate();
               props.currentDialogRef.hide();
               return;
             })
@@ -301,8 +280,9 @@ export default defineComponent({
               customerId: props.customerId,
               form: form,
             })
-            .then(() => {
+            .then(async () => {
               submitting.value = false;
+              await props.postUpdate();
               props.currentDialogRef.hide();
               return;
             })
@@ -349,8 +329,16 @@ export default defineComponent({
             form.type = currentAddress?.value?.address_type ?? '';
             form.lga = currentAddress?.value?.city ?? '';
             form.postal_code = currentAddress?.value?.postal_code ?? '';
-            form.state = currentAddress?.value?.addressState?.id ?? null;
             form.country = currentAddress?.value?.addressCountry?.id ?? null;
+            // Fetch the states for the current country
+            void store
+              .dispatch('countries_states/FETCH_COUNTRY_STATES_FOR_SELECT', {
+                countryId: form.country,
+              })
+              .then(() => {
+                // Then update the current state
+                form.state = currentAddress?.value?.addressState?.id ?? null;
+              });
           });
       }
     });
@@ -367,20 +355,12 @@ export default defineComponent({
       () => form.country,
       (newValue) => {
         form.state = null;
-        void store.dispatch(
-          'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-          { countryId: newValue }
-        );
-      }
-    );
-    watch(
-      () => form.country,
-      (newValue) => {
-        form.state = null;
-        void store.dispatch(
-          'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-          { countryId: newValue }
-        );
+        if (newValue) {
+          void store.dispatch(
+            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
+            { countryId: newValue }
+          );
+        }
       }
     );
 

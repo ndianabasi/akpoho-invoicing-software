@@ -77,6 +77,10 @@ Route.group(() => {
   Route.patch('/:company_id/customers/:customer_id', 'CustomersController.update').middleware(
     'findRequestedCustomer'
   )
+  Route.patch(
+    '/:company_id/customers/:customer_id/customer-addresses/:customer_address_id',
+    'CustomersController.updateAddress'
+  ).middleware('findRequestedCustomer')
 
   // Users routes
   Route.get('/:company_id/users', 'UsersController.index')

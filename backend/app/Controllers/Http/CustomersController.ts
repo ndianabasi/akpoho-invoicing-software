@@ -3,6 +3,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import Customer from 'App/Models/Customer'
 import CustomerAddress from 'App/Models/CustomerAddress'
 import CustomerTitle from 'App/Models/CustomerTitle'
+import CustomerAddressValidator from 'App/Validators/CustomerAddressValidator'
 import CustomerValidator from 'App/Validators/CustomerValidator'
 
 export default class CustomersController {
@@ -192,6 +193,38 @@ export default class CustomersController {
     await requestedCustomer?.save()
 
     return response.created({ data: requestedCustomer?.id })
+  }
+
+  public async updateAddress({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    bouncer,
+    params,
+    request,
+  }: HttpContextContract) {
+    await request.validate(CustomerAddressValidator)
+
+    await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
+
+    const { customer_address_id } = params
+    if (!customer_address_id) {
+      return response.badRequest({ message: 'No Customer Address was specified' })
+    }
+    const { address, lga, postal_code, state, country, type } = request.body()
+
+    const editedAddress = await CustomerAddress.findOrFail(customer_address_id)
+    editedAddress.merge({
+      addressType: type,
+      streetAddress: address,
+      city: lga,
+      countryId: country,
+      stateId: state,
+      postalCode: postal_code,
+    })
+    await editedAddress.save()
+
+    return response.ok({ data: editedAddress.id })
   }
 
   public async destroy({

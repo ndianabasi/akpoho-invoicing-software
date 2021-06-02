@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { TitleInfo } from '../store/types';
 
 export default defineComponent({

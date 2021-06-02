@@ -56,3 +56,10 @@ export interface RowProps {
 export interface PropObject {
   [index: string]: string;
 }
+
+export interface FetchTableDataInterface {
+  (options?: {
+    paginationParams?: PaginationParams;
+    queryObject?: { [index: string]: string | boolean };
+  }): Promise<void>;
+}

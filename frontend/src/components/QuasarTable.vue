@@ -184,7 +184,8 @@
       </template>
 
       <template v-if="gridMode" #item="props">
-        <slot name="gridModeItems" v-bind="props"> </slot>
+        <slot name="gridModeItems" v-bind="{ props, fetch: fetchTableData }">
+        </slot>
       </template>
 
       <template #body="props">
@@ -304,6 +305,7 @@ import {
   TableRequestInterface,
   PaginationParams,
   PropObject,
+  FetchTableDataInterface,
 } from '../types/table';
 import { useQuasar } from 'quasar';
 import { ResponseData } from '../store/types';
@@ -516,13 +518,6 @@ export default defineComponent({
         queryObject: filterForm,
       });
     };
-
-    interface FetchTableDataInterface {
-      (options?: {
-        paginationParams?: PaginationParams;
-        queryObject?: { [index: string]: string | boolean };
-      }): Promise<void>;
-    }
 
     const fetchTableData: FetchTableDataInterface = async function (
       options
@@ -737,6 +732,7 @@ export default defineComponent({
       resourcePermissions: useResourcePermissions(
         props.resourceActionPermissions
       ),
+      fetchTableData,
     };
   },
 });
