@@ -303,7 +303,6 @@ import {
   TableRow,
   GenericTableData,
   TableRequestInterface,
-  PaginationParams,
   PropObject,
   FetchTableDataInterface,
 } from '../types/table';

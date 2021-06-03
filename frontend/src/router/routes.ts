@@ -24,7 +24,7 @@ const routes: CustomRouteRecord[] = [
       { path: '', component: () => import('../pages/Index.vue') },
       {
         path: 'customers',
-        component: () => import('../pages/customers/Index.vue'),
+        component: () => import('../pages/customers/CustomerIndex.vue'),
         meta: {
           label: 'Customers',
           icon: 'people',

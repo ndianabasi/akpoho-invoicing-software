@@ -9,7 +9,7 @@
 /* eslint-env node */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers');
-import { QSpinnerHourglass } from 'quasar';
+const { QSpinnerHourglass } = require('quasar');
 
 module.exports = configure(function (/* ctx */) {
   return {
