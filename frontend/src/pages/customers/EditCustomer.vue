@@ -55,7 +55,7 @@
               </template>
             </q-input>
 
-            <q-select
+            <quasar-select
               v-if="field.componentType === 'select' && field.isVisible"
               :key="`field_${field.name}_${field.componentType}`"
               :ref="field.name"
@@ -68,17 +68,16 @@
               bottom-slots
               options-dense
               use-input
-              input-debounce="0"
-              class="q-mb-md"
+              :input-debounce="200"
+              :classes="['q-mb-md']"
               transition-show="scale"
               transition-hide="scale"
               emit-value
               map-options
-              @filter="selectFilterFn"
               ><template #before>
                 <q-icon :name="field?.icon ?? ''" />
               </template>
-            </q-select>
+            </quasar-select>
           </template>
 
           <q-toggle
@@ -183,12 +182,14 @@ import {
 } from '../../store/types';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
+import QuasarSelect from '../../components/QuasarSelect.vue';
 
 export default defineComponent({
   name: 'EditCustomer',
 
   components: {
     ViewCard,
+    QuasarSelect,
   },
 
   props: {
