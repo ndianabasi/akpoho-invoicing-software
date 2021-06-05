@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/no-v-html -->
 <!-- eslint-disable vue/no-v-model-argument -->
 <template>
-  <div class="q-pa-md">
+  <div :class="{ 'q-pa-md': !embedMode }">
     <q-table
       v-model:selected="selected"
       v-model:pagination="paginationModel"
@@ -34,7 +34,7 @@
           "
         >
           <span v-if="!embedMode">{{ nameOfTable }}</span>
-          <slot name="topAddNew">
+          <slot name="topAddNew" v-bind="{ fetch: fetchTableData }">
             <q-btn
               v-if="
                 showNewRouteButton &&
@@ -184,7 +184,8 @@
       </template>
 
       <template v-if="gridMode" #item="props">
-        <slot name="grideModeItems" v-bind="props"> </slot>
+        <slot name="gridModeItems" v-bind="{ props, fetch: fetchTableData }">
+        </slot>
       </template>
 
       <template #body="props">
@@ -302,8 +303,8 @@ import {
   TableRow,
   GenericTableData,
   TableRequestInterface,
-  PaginationParams,
   PropObject,
+  FetchTableDataInterface,
 } from '../types/table';
 import { useQuasar } from 'quasar';
 import { ResponseData } from '../store/types';
@@ -390,7 +391,8 @@ export default defineComponent({
     },
     defaultSort: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => ({}),
     },
     newRouteObject: {
       type: Object,
@@ -516,13 +518,6 @@ export default defineComponent({
         queryObject: filterForm,
       });
     };
-
-    interface FetchTableDataInterface {
-      (options?: {
-        paginationParams?: PaginationParams;
-        queryObject?: { [index: string]: string | boolean };
-      }): Promise<void>;
-    }
 
     const fetchTableData: FetchTableDataInterface = async function (
       options
@@ -737,6 +732,7 @@ export default defineComponent({
       resourcePermissions: useResourcePermissions(
         props.resourceActionPermissions
       ),
+      fetchTableData,
     };
   },
 });

@@ -48,4 +48,5 @@ Server.middleware.registerNamed({
   findRequestedCustomer: 'App/Middleware/FindRequestedCustomer',
   findRequestedUser: 'App/Middleware/FindRequestedUser',
   findAuthRole: 'App/Middleware/FindAuthRole',
+  findRequestedCustomerAddress: 'App/Middleware/FindRequestedCustomerAddress',
 })

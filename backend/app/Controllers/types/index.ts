@@ -19,3 +19,5 @@ export interface SortSearchParams {
   perPage: number
   sortBy: string
 }
+
+export type CustomerAddressTypes = 'shipping_address' | 'billing_address'

@@ -9,6 +9,7 @@
 /* eslint-env node */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers');
+const { QSpinnerHourglass } = require('quasar');
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -94,7 +95,17 @@ module.exports = configure(function (/* ctx */) {
             closeBtn: true,
           },
         },
+        loading: {
+          message: 'Processing',
+          delay: 400,
+          spinner: QSpinnerHourglass,
+          spinnerColor: 'deep-orange',
+          spinnerSize: '3em',
+          backgroundColor: 'grey-2',
+          messageColor: 'blue-grey-10',
+        },
       },
+      cssAddon: true,
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -107,7 +118,7 @@ module.exports = configure(function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Notify', 'Meta', 'Dialog'],
+      plugins: ['Notify', 'Meta', 'Dialog', 'Loading'],
     },
 
     // animations: 'all', // --- includes all animations

@@ -155,13 +155,48 @@ export interface CurrentlyViewedCustomer extends CurrentCustomerBaseInterface {
   };
 }
 
+export interface CurrentlyViewedAddress {
+  id: string;
+  address_type: string;
+  city: string;
+  created_at: string;
+  postal_code: string;
+  street_address: string;
+  updated_at: string;
+  addressCountry: {
+    id: number;
+    name: string;
+  };
+  addressState: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface CustomerAddressInterface {
+  [key: string]: boolean | number | SelectOption | string | null | undefined;
+  country: number | null;
+  type: string | null;
+  state: number | null;
+  address: string | null;
+  lga: string | null;
+  postal_code: string | null;
+}
+
 export interface CustomerFormShape extends CurrentCustomerBaseInterface {
+  [key: string]: boolean | number | SelectOption | string | null | undefined;
   title: number | null;
   is_billing_shipping_addresses_same: boolean;
   shipping_country: number | null;
   shipping_state: number | null;
   billing_country: number | null;
   billing_state: number | null;
+  shipping_address: string | null;
+  shipping_lga: string | null;
+  shipping_postal_code: string | null;
+  billing_address: string | null;
+  billing_lga: string | null;
+  billing_postal_code: string | null;
 }
 
 export interface SelectionOption {
@@ -199,4 +234,16 @@ export enum PERMISSION {
   CAN_VIEW_CUSTOMERS = 'can_view_customers',
   CAN_EDIT_CUSTOMERS = 'can_edit_customers',
   CAN_DELETE_CUSTOMERS = 'can_delete_customers',
+}
+
+type InputComponentType = 'select' | 'input' | 'date';
+
+export interface FormSchema {
+  name: string;
+  label: string;
+  default: string | number | boolean | null;
+  componentType: InputComponentType;
+  options?: { label: string; value: string | number | boolean }[];
+  isVisible: boolean;
+  autocomplete?: string;
 }

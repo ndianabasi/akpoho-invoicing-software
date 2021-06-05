@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-md q-px-sm-none">
     <view-card
       v-if="customer"
       :title-info="titleInfo"
@@ -26,8 +26,9 @@
             animated
             transition-prev="scale"
             transition-next="scale"
+            class="q-px-sm-none"
           >
-            <q-tab-panel name="customer_details">
+            <q-tab-panel class="q-px-none" name="customer_details">
               <q-list padding>
                 <template
                   v-if="
@@ -46,7 +47,11 @@
 
                   <q-item>
                     <q-item-section>
-                      <q-item-label class="text-uppercase">Title</q-item-label>
+                      <q-item-label class="text-uppercase"
+                        >Title{{
+                          corporateHasRep ? ' (REP)' : ''
+                        }}</q-item-label
+                      >
                       <q-item-label caption lines="2">{{
                         customer.title?.name ?? ''
                       }}</q-item-label>
@@ -67,7 +72,9 @@
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-uppercase"
-                        >Middle Name</q-item-label
+                        >Middle Name{{
+                          corporateHasRep ? ' (REP)' : ''
+                        }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
                         customer.middle_name
@@ -78,7 +85,9 @@
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-uppercase"
-                        >Last Name</q-item-label
+                        >Last Name{{
+                          corporateHasRep ? ' (REP)' : ''
+                        }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
                         customer.last_name
@@ -89,7 +98,9 @@
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-uppercase"
-                        >Personal Email Address</q-item-label
+                        >Personal Email Address{{
+                          corporateHasRep ? ' (REP)' : ''
+                        }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
                         customer.email
@@ -100,7 +111,9 @@
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-uppercase"
-                        >Personal Phone Number</q-item-label
+                        >Personal Phone Number{{
+                          corporateHasRep ? ' (REP)' : ''
+                        }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
                         customer.phone_number
@@ -166,59 +179,9 @@
               </q-list>
             </q-tab-panel>
 
-            <q-tab-panel name="customer_addresses">
+            <q-tab-panel class="q-px-none" name="customer_addresses">
               <!-- Customer Addresses -->
               <customer-addresses :customer-id="customerId" />
-            </q-tab-panel>
-          </q-tab-panels>
-
-          <q-tab-panels
-            v-model="tab"
-            animated
-            transition-prev="fade"
-            transition-next="fade"
-            class="bg-orange text-white text-center"
-          >
-            <q-tab-panel name="mails">
-              <div class="text-h6">Mails</div>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            </q-tab-panel>
-
-            <q-tab-panel name="alarms">
-              <div class="text-h6">Alarms</div>
-              Ad molestiae non facere animi nobis, similique nemo velit
-              reiciendis corporis impedit nam in.
-            </q-tab-panel>
-
-            <q-tab-panel name="movies">
-              <div class="text-h6">Movies</div>
-              Nostrum necessitatibus expedita dolores? Voluptatem repudiandae
-              magni ea.
-            </q-tab-panel>
-          </q-tab-panels>
-
-          <q-tab-panels
-            v-model="tab"
-            animated
-            transition-prev="jump-up"
-            transition-next="jump-down"
-            class="bg-teal text-white text-center"
-          >
-            <q-tab-panel name="mails">
-              <div class="text-h6">Mails</div>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            </q-tab-panel>
-
-            <q-tab-panel name="alarms">
-              <div class="text-h6">Alarms</div>
-              Ad molestiae non facere animi nobis, similique nemo velit
-              reiciendis corporis impedit nam in.
-            </q-tab-panel>
-
-            <q-tab-panel name="movies">
-              <div class="text-h6">Movies</div>
-              Nostrum necessitatibus expedita dolores? Voluptatem repudiandae
-              magni ea.
             </q-tab-panel>
           </q-tab-panels>
         </div>
@@ -282,7 +245,7 @@ import ViewCard from '../../components/ViewCard.vue';
 import CustomerAddresses from '../../pages/customers/CustomerAddresses.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import useResourcePermissions from '../../composables/useResourcePermissions';
-import { CurrentlyViewedCustomer, PERMISSION } from '../../store/types';
+import { PERMISSION, CurrentlyViewedCustomer } from '../../store/types';
 import { store } from '../../store';
 
 export default defineComponent({
@@ -308,6 +271,11 @@ export default defineComponent({
           'customers/GET_CURRENTLY_VIEWED_CUSTOMER'
         ] as CurrentlyViewedCustomer
     );
+
+    const corporateHasRep = computed(() => {
+      const customer = currentCustomer.value;
+      return customer && customer.is_corporate && customer.corporate_has_rep;
+    });
 
     let titleInfo = ref({});
 
@@ -349,6 +317,7 @@ export default defineComponent({
       customer: currentCustomer,
       tab: ref('customer_details'),
       titleInfo,
+      corporateHasRep,
       resourcePermissions: useResourcePermissions({
         edit: PERMISSION.CAN_EDIT_CUSTOMERS,
         list: PERMISSION.CAN_LIST_CUSTOMERS,

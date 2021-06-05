@@ -3,7 +3,9 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import Customer from 'App/Models/Customer'
 import CustomerAddress from 'App/Models/CustomerAddress'
 import CustomerTitle from 'App/Models/CustomerTitle'
+import CustomerAddressValidator from 'App/Validators/CustomerAddressValidator'
 import CustomerValidator from 'App/Validators/CustomerValidator'
+import { CustomerAddressTypes } from '../types'
 
 export default class CustomersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -23,7 +25,6 @@ export default class CustomersController {
       created_at,
       updated_at,
     } = request.qs()
-    //console.log(search, page, descending, perPage, sortBy)
 
     const searchQuery = {
       id: id ? id : null,
@@ -36,21 +37,25 @@ export default class CustomersController {
       updated_at: updated_at ? updated_at : null,
     }
 
-    let subquery = Customer.query()
+    let subquery = Database.from('customers')
       .select(
-        'id',
-        'first_name',
-        'last_name',
-        'email',
-        'phone_number',
-        'is_corporate',
-        'created_at',
-        'updated_at',
-        'corporate_has_rep',
-        'company_name',
-        'company_email'
+        'customers.id',
+        'customers.first_name',
+        'customers.last_name',
+        'customers.email',
+        'customers.phone_number',
+        'customers.is_corporate',
+        'customers.created_at',
+        'customers.updated_at',
+        'customers.corporate_has_rep',
+        'customers.company_name',
+        'customers.company_email',
+        'customer_titles.name as title'
       )
       .where({ company_id: requestedCompany?.id })
+      .leftJoin('customer_titles', (query) =>
+        query.on('customer_titles.id', '=', 'customers.customer_title_id')
+      )
 
     if (sortBy) {
       subquery = subquery.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
@@ -65,7 +70,6 @@ export default class CustomersController {
               if (value === 'true') value = true
               if (value === 'false') value = false
 
-              //console.log(param, value)
               query.where(param, value)
               if (typeof value === 'string') {
                 query.orWhere(param, 'like', `%${value}%`)
@@ -81,7 +85,86 @@ export default class CustomersController {
     return response.ok({ data: customers })
   }
 
-  public async store({}: HttpContextContract) {}
+  public async store({ response, requestedCompany, request, bouncer }: HttpContextContract) {
+    await request.validate(CustomerValidator)
+
+    await bouncer.with('CustomerPolicy').authorize('create', requestedCompany!)
+
+    const {
+      title,
+      first_name,
+      last_name,
+      middle_name,
+      email,
+      phone_number,
+      is_corporate,
+      corporate_has_rep,
+      company_name,
+      company_phone,
+      company_email,
+      is_billing_shipping_addresses_same,
+      billing_address,
+      billing_country,
+      billing_lga,
+      billing_postal_code,
+      billing_state,
+      shipping_address,
+      shipping_country,
+      shipping_lga,
+      shipping_postal_code,
+      shipping_state,
+    } = request.body()
+
+    const newCustomer = await requestedCompany?.related('customers').create({
+      customerTitleId: title,
+      firstName: first_name,
+      lastName: last_name,
+      middleName: middle_name,
+      email,
+      phoneNumber: phone_number,
+      isCorporate: is_corporate,
+      corporateHasRep: corporate_has_rep,
+      companyName: company_name,
+      companyPhone: company_phone,
+      companyEmail: company_email,
+    })
+
+    if (is_billing_shipping_addresses_same) {
+      const addressTypes: Array<CustomerAddressTypes> = ['shipping_address', 'billing_address']
+      for (let i = 0; i < addressTypes.length; i++) {
+        const addressType = addressTypes[i]
+
+        await newCustomer?.related('addresses').create({
+          addressType,
+          streetAddress: shipping_address,
+          city: shipping_lga,
+          countryId: shipping_country,
+          stateId: shipping_state,
+          postalCode: shipping_postal_code,
+        })
+      }
+    } else {
+      await newCustomer?.related('addresses').create({
+        addressType: 'shipping_address',
+        streetAddress: shipping_address,
+        city: shipping_lga,
+        countryId: shipping_country,
+        stateId: shipping_state,
+        postalCode: shipping_postal_code,
+      })
+
+      await newCustomer?.related('addresses').create({
+        addressType: 'billing_address',
+        streetAddress: billing_address,
+        city: billing_lga,
+        countryId: billing_country,
+        stateId: billing_state,
+        postalCode: billing_postal_code,
+      })
+    }
+
+    return response.created({ data: newCustomer?.id })
+  }
 
   public async show({
     response,
@@ -127,6 +210,25 @@ export default class CustomersController {
     return response.ok({ data: addresses })
   }
 
+  public async showAddress({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    requestedCustomerAddress,
+    bouncer,
+  }: HttpContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('view', requestedCompany!, requestedCustomer!)
+
+    await requestedCustomerAddress?.load('addressCountry', (countryQuery) =>
+      countryQuery.select('id', 'name')
+    )
+    await requestedCustomerAddress?.load('addressState', (stateQuery) =>
+      stateQuery.select('id', 'name')
+    )
+
+    return response.ok({ data: requestedCustomerAddress })
+  }
+
   public async update({
     response,
     requestedCompany,
@@ -170,6 +272,75 @@ export default class CustomersController {
     return response.created({ data: requestedCustomer?.id })
   }
 
+  public async updateAddress({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    requestedCustomerAddress,
+    bouncer,
+    request,
+  }: HttpContextContract) {
+    await request.validate(CustomerAddressValidator)
+
+    await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
+
+    const { address, lga, postal_code, state, country, type } = request.body()
+
+    requestedCustomerAddress?.merge({
+      addressType: type,
+      streetAddress: address,
+      city: lga,
+      countryId: country,
+      stateId: state,
+      postalCode: postal_code,
+    })
+    await requestedCustomerAddress?.save()
+
+    return response.ok({ data: requestedCustomerAddress?.id })
+  }
+
+  public async storeAddress({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    bouncer,
+    request,
+  }: HttpContextContract) {
+    await request.validate(CustomerAddressValidator)
+
+    // This is part of the editing operation for the customer
+    await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
+
+    const { address, lga, postal_code, state, country, type } = request.body()
+
+    if (type === 'both') {
+      const addressTypes: Array<CustomerAddressTypes> = ['shipping_address', 'billing_address']
+      for (let i = 0; i < addressTypes.length; i++) {
+        const addressType = addressTypes[i]
+
+        await requestedCustomer?.related('addresses').create({
+          addressType,
+          streetAddress: address,
+          city: lga,
+          countryId: country,
+          stateId: state,
+          postalCode: postal_code,
+        })
+      }
+    } else {
+      await requestedCustomer?.related('addresses').create({
+        addressType: type,
+        streetAddress: address,
+        city: lga,
+        countryId: country,
+        stateId: state,
+        postalCode: postal_code,
+      })
+    }
+
+    return response.created()
+  }
+
   public async destroy({
     response,
     requestedCompany,
@@ -186,7 +357,24 @@ export default class CustomersController {
     })
   }
 
-  public async customerTitlesForSelect({ response, isGlobalUser, authRole }: HttpContextContract) {
+  public async destroyAddress({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    requestedCustomerAddress,
+    bouncer,
+  }: HttpContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('delete', requestedCompany!, requestedCustomer!)
+
+    await requestedCustomerAddress?.delete()
+
+    return response.ok({
+      message: 'Customer address was deleted successfully.',
+      data: requestedCustomerAddress?.id,
+    })
+  }
+
+  public async customerTitlesForSelect({ response }: HttpContextContract) {
     const titles = await CustomerTitle.query()
       .orderBy('name', 'asc')
       .select(...['id', 'name'])

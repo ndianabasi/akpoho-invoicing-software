@@ -10,6 +10,7 @@ import {
   HttpError,
   StringIDNameInterface,
   CustomerFormShape,
+  CustomerAddressInterface,
 } from '../types';
 import { PaginationParams } from '../../types/table';
 import { Notify } from 'quasar';
@@ -32,7 +33,7 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
         .then((res: HttpResponse) => {
           commit('SET_ALL_CUSTOMERS', res.data.data);
 
-          resolve(res.data);
+          return resolve(res.data);
         })
         .catch((error: HttpError) => {
           Notify.create({
@@ -50,7 +51,7 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
             ],
           });
 
-          reject(error);
+          return reject(error);
         });
     });
   },
@@ -65,25 +66,10 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
       await $http
         .delete(`/${currentCompany.id}/customers/${ID}`)
         .then((res: HttpResponse) => {
-          resolve(res.data);
+          return resolve(res.data);
         })
         .catch((error: HttpError) => {
-          Notify.create({
-            message:
-              error?.response?.data?.message ?? 'An unknown error occurred!',
-            type: 'negative',
-            position: 'top',
-            progress: true,
-            timeout: 10000,
-            actions: [
-              {
-                label: 'Dismiss',
-                color: 'white',
-              },
-            ],
-          });
-
-          reject(error);
+          return reject(error);
         });
     });
   },
@@ -95,7 +81,7 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
         .then((res: HttpResponse) => {
           commit('SET_CUSTOMER_TITLES_FOR_SELECT', res.data.data);
 
-          resolve(res.data);
+          return resolve(res.data);
         });
     });
   },
@@ -181,6 +167,166 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
             ],
           });
 
+          return resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  async FETCH_CURRENTLY_VIEWED_ADDRESS(
+    { commit, rootGetters },
+    {
+      customerId,
+      customerAddressId,
+    }: { customerId: string; customerAddressId: string }
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const currentCompany = rootGetters[
+      'auth/GET_CURRENT_COMPANY'
+    ] as StringIDNameInterface;
+    return new Promise(async (resolve, reject) => {
+      await $http
+        .get(
+          `/${currentCompany.id}/customers/${customerId}/customer-addresses/${customerAddressId}`
+        )
+        .then((res: HttpResponse) => {
+          commit('SET_CURRENTLY_VIEWED_ADDRESS', res.data.data);
+          return resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  async EDIT_CUSTOMER_ADDRESS(
+    { rootGetters },
+    {
+      customerId,
+      form,
+      customerAddressId,
+    }: {
+      customerId: string;
+      form: CustomerFormShape;
+      customerAddressId: string;
+    }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      await $http
+        .patch(
+          `/${currentCompany.id}/customers/${customerId}/customer-addresses/${customerAddressId}`,
+          { ...form }
+        )
+        .then((res: HttpResponse) => {
+          Notify.create({
+            message: 'Address was successfully edited',
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  async CREATE_CUSTOMER_ADDRESS(
+    { rootGetters },
+    {
+      customerId,
+      form,
+    }: {
+      customerId: string;
+      form: CustomerAddressInterface;
+    }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      await $http
+        .post(
+          `/${currentCompany.id}/customers/${customerId}/customer-addresses`,
+          { ...form }
+        )
+        .then((res: HttpResponse) => {
+          Notify.create({
+            message: `${
+              form.type === 'both' ? 'Addresses were' : 'Address was'
+            } successfully created`,
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  async DELETE_CUSTOMER_ADDRESS(
+    { rootGetters },
+    {
+      customerId,
+      customerAddressId,
+    }: {
+      customerId: string;
+      customerAddressId: string;
+    }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      await $http
+        .delete(
+          `/${currentCompany.id}/customers/${customerId}/customer-addresses/${customerAddressId}`
+        )
+        .then((res: HttpResponse) => {
+          Notify.create({
+            message: 'Address was successfully deleted',
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
           return resolve(res.data);
         })
         .catch((error: HttpError) => {

@@ -59,30 +59,69 @@ Route.group(() => {
 // Authenticated company-specific routes
 Route.group(() => {
   // Customers routes
+  // Get all customers within a company. Returns paginated result
   Route.get('/:company_id/customers', 'CustomersController.index')
+  // Create a new customer within a company.
+  Route.post('/:company_id/customers', 'CustomersController.store')
+  // Get a specific customer within a company
   Route.get('/:company_id/customers/:customer_id', 'CustomersController.show').middleware(
     'findRequestedCustomer'
   )
+  // Delete a specific customer within a company
+  Route.delete('/:company_id/customers/:customer_id', 'CustomersController.destroy').middleware(
+    'findRequestedCustomer'
+  )
+
+  // Get all addresses of a specific customer within a company
   Route.get(
     '/:company_id/customers/:customer_id/customer-addresses',
     'CustomersController.showAddresses'
   ).middleware('findRequestedCustomer')
-  Route.delete('/:company_id/customers/:customer_id', 'CustomersController.destroy').middleware(
-    'findRequestedCustomer'
+  // Get a specific address details of a specific customer within a company
+  Route.get(
+    '/:company_id/customers/:customer_id/customer-addresses/:customer_address_id',
+    'CustomersController.showAddress'
   )
+    .middleware('findRequestedCustomer')
+    .middleware('findRequestedCustomerAddress')
+  // Create a new address for a specific customer within a company
+  Route.post(
+    '/:company_id/customers/:customer_id/customer-addresses',
+    'CustomersController.storeAddress'
+  ).middleware('findRequestedCustomer')
+  // Update a specific address of a specific customer within a company
+  Route.patch(
+    '/:company_id/customers/:customer_id/customer-addresses/:customer_address_id',
+    'CustomersController.updateAddress'
+  )
+    .middleware('findRequestedCustomer')
+    .middleware('findRequestedCustomerAddress')
+  // Delete a specific customer address of a specific customer within a company
+  Route.delete(
+    '/:company_id/customers/:customer_id/customer-addresses/:customer_address_id',
+    'CustomersController.destroyAddress'
+  )
+    .middleware('findRequestedCustomer')
+    .middleware('findRequestedCustomerAddress')
+
+  // Update a specific customer within a company
   Route.patch('/:company_id/customers/:customer_id', 'CustomersController.update').middleware(
     'findRequestedCustomer'
   )
 
   // Users routes
   Route.get('/:company_id/users', 'UsersController.index')
+
   Route.get('/:company_id/users/:user_id', 'UsersController.show').middleware('findRequestedUser')
+
   Route.patch('/:company_id/users/:user_id', 'UsersController.update').middleware(
     'findRequestedUser'
   )
+
   Route.delete('/:company_id/users/:user_id', 'UsersController.destroy').middleware(
     'findRequestedUser'
   )
+
   Route.post('/:company_id/users', 'UsersController.store')
 })
   .prefix('/v1')

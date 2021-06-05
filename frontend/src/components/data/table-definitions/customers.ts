@@ -15,6 +15,7 @@ enum CustomerColumns {
   is_corporate = 'is_corporate',
   created_at = 'created_at',
   updated_at = 'updated_at',
+  title = 'title',
 }
 
 const columns: Array<CustomerHeaders> = [
@@ -28,13 +29,21 @@ const columns: Array<CustomerHeaders> = [
     filterInputType: 'text',
   },
   {
+    name: CustomerColumns.title,
+    required: true,
+    label: 'Title',
+    align: 'center',
+    field: CustomerColumns.title,
+    sortable: false,
+    filterable: false,
+  },
+  {
     name: CustomerColumns.first_name,
     required: true,
     label: 'First Name',
     align: 'center',
     field: CustomerColumns.first_name,
     sortable: true,
-    sort: (a: string, b: string) => stringSortFn(a, b),
     filterable: true,
     filterInputType: 'text',
   },
