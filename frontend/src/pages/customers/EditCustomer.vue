@@ -180,7 +180,6 @@ import {
   SelectionOption,
   PERMISSION,
   CustomerFormShape,
-  SelectOption,
 } from '../../store/types';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';

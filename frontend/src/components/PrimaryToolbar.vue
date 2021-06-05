@@ -13,7 +13,7 @@
       "
     />
 
-    <router-link class="cursor-point no-underline" :to="{ name: 'Home' }"
+    <router-link class="cursor-point no-underline" :to="{ name: 'Dashboard' }"
       ><q-toolbar-title
         v-if="$q.screen.gt.sm"
         shrink

@@ -12,19 +12,29 @@ export type CustomRouteRecord = RouteRecordRaw & {
 const routes: CustomRouteRecord[] = [
   {
     path: '/',
-    component: () => import('../layouts/MainLayout.vue'),
-    name: 'Home',
+    name: 'home',
+    redirect: '/dashboard',
     meta: {
       label: 'Home',
       icon: 'home',
       requiresAuth: true,
-      permission: 'can_view_company_dashboard',
     },
+    component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('../pages/Index.vue') },
+      {
+        path: '/dashboard',
+        component: () => import('pages/Index.vue'),
+        name: 'Dashboard',
+        meta: {
+          label: 'Dashboard',
+          icon: 'dashboard',
+          requiresAuth: true,
+          permission: 'can_view_company_dashboard',
+        },
+      },
       {
         path: 'customers',
-        component: () => import('../pages/customers/CustomerIndex.vue'),
+        component: () => import('pages/customers/CustomerIndex.vue'),
         meta: {
           label: 'Customers',
           icon: 'people',
@@ -33,7 +43,7 @@ const routes: CustomRouteRecord[] = [
         children: [
           {
             path: '',
-            component: () => import('../pages/customers/AllCustomers.vue'),
+            component: () => import('pages/customers/AllCustomers.vue'),
             name: 'customers',
             meta: {
               label: 'All Customers',
@@ -42,7 +52,7 @@ const routes: CustomRouteRecord[] = [
           },
           {
             path: ':customerId/view',
-            component: () => import('../pages/customers/ViewCustomer.vue'),
+            component: () => import('pages/customers/ViewCustomer.vue'),
             props: true,
             name: 'view_customer',
             meta: {
@@ -52,7 +62,7 @@ const routes: CustomRouteRecord[] = [
           },
           {
             path: ':customerId/edit',
-            component: () => import('../pages/customers/EditCustomer.vue'),
+            component: () => import('pages/customers/EditCustomer.vue'),
             props: true,
             name: 'edit_customer',
             meta: {
@@ -62,7 +72,7 @@ const routes: CustomRouteRecord[] = [
           },
           {
             path: 'new',
-            component: () => import('../pages/customers/CreateCustomer.vue'),
+            component: () => import('pages/customers/CreateCustomer.vue'),
             name: 'create_customer',
             meta: {
               label: 'New Customer',
@@ -74,7 +84,7 @@ const routes: CustomRouteRecord[] = [
       {
         path: 'quotations',
         name: 'quotations',
-        component: () => import('../pages/quotations/Index.vue'),
+        component: () => import('pages/quotations/Index.vue'),
         meta: {
           label: 'All Quotations',
           icon: 'request_page',
@@ -83,7 +93,7 @@ const routes: CustomRouteRecord[] = [
       },
       {
         path: '/quotations/new',
-        component: () => import('../pages/quotations/CreateQuotation.vue'),
+        component: () => import('pages/quotations/CreateQuotation.vue'),
         name: 'create_quotation',
         meta: {
           label: 'New Quotation',
@@ -93,7 +103,7 @@ const routes: CustomRouteRecord[] = [
       {
         path: 'invoices',
         name: 'invoices',
-        component: () => import('../pages/invoices/Index.vue'),
+        component: () => import('pages/invoices/Index.vue'),
         meta: {
           label: 'All Invoices',
           icon: 'list_alt',
@@ -102,7 +112,7 @@ const routes: CustomRouteRecord[] = [
       },
       {
         path: '/invoices/new',
-        component: () => import('../pages/invoices/CreateInvoice.vue'),
+        component: () => import('pages/invoices/CreateInvoice.vue'),
         name: 'create_invoice',
         meta: {
           label: 'New Invoice',
@@ -112,7 +122,7 @@ const routes: CustomRouteRecord[] = [
       {
         path: 'receipts',
         name: 'receipts',
-        component: () => import('../pages/receipts/Index.vue'),
+        component: () => import('pages/receipts/Index.vue'),
         meta: {
           label: 'All Receipts',
           icon: 'receipt',
@@ -121,7 +131,7 @@ const routes: CustomRouteRecord[] = [
       },
       {
         path: '/receipts/new',
-        component: () => import('../pages/receipts/CreateReceipt.vue'),
+        component: () => import('pages/receipts/CreateReceipt.vue'),
         name: 'create_receipt',
         meta: {
           label: 'New Receipt',
@@ -130,7 +140,7 @@ const routes: CustomRouteRecord[] = [
       },
       {
         path: 'settings',
-        component: () => import('../pages/settings/Index.vue'),
+        component: () => import('pages/settings/Index.vue'),
         meta: {
           label: 'Settings',
           icon: 'settings',
@@ -139,7 +149,7 @@ const routes: CustomRouteRecord[] = [
         children: [
           {
             path: '',
-            component: () => import('../pages/settings/AllSettings.vue'),
+            component: () => import('pages/settings/AllSettings.vue'),
             name: 'all_settings',
             meta: {
               label: 'All Settings',
@@ -148,7 +158,7 @@ const routes: CustomRouteRecord[] = [
           },
           {
             path: 'users',
-            component: () => import('../pages/settings/users/Index.vue'),
+            component: () => import('pages/settings/users/Index.vue'),
             meta: {
               label: 'Users',
               permission: 'can_list_users',
@@ -156,7 +166,7 @@ const routes: CustomRouteRecord[] = [
             children: [
               {
                 path: '',
-                component: () => import('../pages/settings/users/AllUsers.vue'),
+                component: () => import('pages/settings/users/AllUsers.vue'),
                 name: 'all_users',
                 meta: {
                   label: 'All Users',
@@ -164,8 +174,7 @@ const routes: CustomRouteRecord[] = [
               },
               {
                 path: 'new',
-                component: () =>
-                  import('../pages/settings/users/CreateUser.vue'),
+                component: () => import('pages/settings/users/CreateUser.vue'),
                 name: 'add_user',
                 meta: {
                   label: 'New User',
@@ -175,7 +184,7 @@ const routes: CustomRouteRecord[] = [
               {
                 path: ':userId/view',
                 props: true,
-                component: () => import('../pages/settings/users/User.vue'),
+                component: () => import('pages/settings/users/User.vue'),
                 name: 'view_user',
                 meta: {
                   label: 'View User',
@@ -185,7 +194,7 @@ const routes: CustomRouteRecord[] = [
               {
                 path: ':userId/edit',
                 props: true,
-                component: () => import('../pages/settings/users/EditUser.vue'),
+                component: () => import('pages/settings/users/EditUser.vue'),
                 name: 'edit_user',
                 meta: {
                   label: 'Edit User',
@@ -200,7 +209,7 @@ const routes: CustomRouteRecord[] = [
   },
   {
     path: '/login',
-    component: () => import('../pages/Login.vue'),
+    component: () => import('pages/Login.vue'),
     name: 'Login',
     meta: {
       label: 'Login',
@@ -211,7 +220,7 @@ const routes: CustomRouteRecord[] = [
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('../pages/Error404.vue'),
+    component: () => import('pages/Error404.vue'),
   },
 ];
 

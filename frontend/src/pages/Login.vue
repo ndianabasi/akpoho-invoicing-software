@@ -177,7 +177,7 @@ export default defineComponent({
                 console.log(isLoggedIn);
 
                 if (isLoggedIn) {
-                  void router.push({ name: 'Home' });
+                  void router.push({ name: 'Dashboard' });
                 }
               });
             });
