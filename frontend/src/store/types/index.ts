@@ -183,6 +183,7 @@ export interface CustomerAddressInterface {
 }
 
 export interface CustomerFormShape extends CurrentCustomerBaseInterface {
+  [key: string]: boolean | number | SelectOption | string | null | undefined;
   title: number | null;
   is_billing_shipping_addresses_same: boolean;
   shipping_country: number | null;

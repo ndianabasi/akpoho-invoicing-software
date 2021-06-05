@@ -74,6 +74,7 @@
               transition-hide="scale"
               emit-value
               map-options
+              @update:model-value="processSelect($event, field.name)"
               ><template #before>
                 <q-icon :name="field?.icon ?? ''" />
               </template>
@@ -165,7 +166,6 @@ import {
   computed,
   unref,
   Ref,
-  ComputedRef,
   reactive,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
@@ -179,10 +179,11 @@ import {
   SelectionOption,
   PERMISSION,
   CustomerFormShape,
+  SelectOption,
 } from '../../store/types';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
-import QuasarSelect from '../../components/QuasarSelect.vue';
+import QuasarSelect from '../../components/QuasarSelect';
 
 export default defineComponent({
   name: 'EditCustomer',
@@ -271,77 +272,6 @@ export default defineComponent({
       billing_state: null,
       billing_country: null,
     });
-
-    interface SelectCallback {
-      (
-        val: string,
-        update: (fn: () => void, ref?: (ref: { name: string }) => void) => void
-      ): void;
-    }
-
-    const plainBillingCountries = ref(unref(countries));
-    const plainShippingCountries = ref(unref(countries));
-    const plainBillingCountryStates = ref(unref(countryStates));
-    const plainShippingCountryStates = ref(unref(countryStates));
-
-    const selectFilterFn: SelectCallback = function (val, update) {
-      let plainBillingOptions: Ref<SelectionOption[]>;
-      let plainShippingOptions: Ref<SelectionOption[]>;
-      let computedBillingOptions: ComputedRef<SelectionOption[]>;
-      let computedShippingOptions: ComputedRef<SelectionOption[]>;
-
-      update(
-        () => {
-          // here you have access to "ref" which
-          // is the Vue reference of the QSelect
-        },
-        (ref) => {
-          const refName = ref.name;
-          if (refName === 'shipping_country') {
-            plainShippingOptions = plainShippingCountries;
-            computedShippingOptions = countries;
-          } else if (refName === 'shipping_state') {
-            plainShippingOptions = plainShippingCountryStates;
-            computedShippingOptions = countryStates;
-          } else if (refName === 'billing_country') {
-            plainBillingOptions = plainBillingCountries;
-            computedBillingOptions = countries;
-          } else if (refName === 'billing_state') {
-            plainBillingOptions = plainBillingCountryStates;
-            computedBillingOptions = countryStates;
-          }
-
-          if (val === '') {
-            if (
-              refName === 'shipping_country' ||
-              refName === 'shipping_state'
-            ) {
-              plainShippingOptions.value = computedShippingOptions.value;
-            }
-            if (refName === 'billing_state' || refName === 'billing_country') {
-              plainBillingOptions.value = computedBillingOptions.value;
-            }
-          } else {
-            const needle = val.toLowerCase();
-            if (
-              refName === 'shipping_country' ||
-              refName === 'shipping_state'
-            ) {
-              plainShippingOptions.value = computedShippingOptions.value.filter(
-                (v) => v.label.toLowerCase().indexOf(needle) > -1
-              );
-            }
-            if (refName === 'billing_state' || refName === 'billing_country') {
-              plainBillingOptions.value = computedBillingOptions.value.filter(
-                (v) => v.label.toLowerCase().indexOf(needle) > -1
-              );
-            }
-          }
-        }
-      );
-
-      return;
-    };
 
     const customerFormSchema = computed(() => [
       {
@@ -451,7 +381,7 @@ export default defineComponent({
         label: 'Shipping Country',
         default: null,
         componentType: 'select',
-        options: unref(plainShippingCountries),
+        options: unref(countries),
         isVisible: props.creationMode,
       },
       {
@@ -459,7 +389,7 @@ export default defineComponent({
         label: 'Shipping State/Region',
         default: null,
         componentType: 'select',
-        options: unref(plainShippingCountryStates),
+        options: unref(countryStates),
         isVisible: props.creationMode,
       },
       {
@@ -494,7 +424,7 @@ export default defineComponent({
         label: 'Billing Country',
         default: null,
         componentType: 'select',
-        options: unref(plainBillingCountries),
+        options: unref(countries),
         isVisible:
           !form.is_billing_shipping_addresses_same && props.creationMode,
       },
@@ -503,7 +433,7 @@ export default defineComponent({
         label: 'Billing State/Region',
         default: null,
         componentType: 'select',
-        options: unref(plainBillingCountryStates),
+        options: unref(countryStates),
         isVisible:
           !form.is_billing_shipping_addresses_same && props.creationMode,
       },
@@ -523,13 +453,14 @@ export default defineComponent({
     function submitForm() {
       if (!form$.value.$invalid) {
         submitting.value = true;
+        // Try to by-pass issue with object being emitted in QuasarSelect
 
         try {
           if (!props.creationMode) {
             void store
               .dispatch('customers/EDIT_CUSTOMER', {
                 customerId: props.customerId,
-                form: form,
+                form: {},
               })
               .then(() => {
                 submitting.value = false;
@@ -656,21 +587,25 @@ export default defineComponent({
       () => form.shipping_country,
       (newValue) => {
         form.shipping_state = null;
+        if (!newValue) return;
         void store.dispatch(
           'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
           { countryId: newValue }
         );
-      }
+      },
+      { deep: true }
     );
     watch(
       () => form.billing_country,
       (newValue) => {
         form.billing_state = null;
+        if (!newValue) return;
         void store.dispatch(
           'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
           { countryId: newValue }
         );
-      }
+      },
+      { deep: true }
     );
 
     onBeforeMount(() => {
@@ -678,6 +613,10 @@ export default defineComponent({
       stopFetchCountriesForSelect();
       stopFetchCustomerTitlesForSelect();
     });
+
+    const processSelect = (event: SelectOption, field: string) => {
+      form[field] = event.value;
+    };
 
     return {
       customer: currentCustomer,
@@ -691,12 +630,12 @@ export default defineComponent({
       form$,
       customerFormSchema,
       titleInfo,
-      selectFilterFn,
       customerTitles,
       resourcePermissions: useResourcePermissions({
         view: PERMISSION.CAN_VIEW_CUSTOMERS,
         list: PERMISSION.CAN_LIST_CUSTOMERS,
       }),
+      processSelect,
     };
   },
 });

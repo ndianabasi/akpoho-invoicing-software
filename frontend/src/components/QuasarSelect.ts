@@ -1,37 +1,13 @@
-<template>
-  <q-select
-    v-model="model"
-    :value="modelValue"
-    :filled="filled"
-    :options="filteredOptions"
-    :label="label"
-    :clearable="clearable"
-    :bottom-slots="bottomSlots"
-    :options-dense="optionDense"
-    :use-input="useInput"
-    :input-debounce="inputDebounce"
-    :class="classes"
-    :transition-show="transitionShow"
-    :transition-hide="transitionHide"
-    :emit-value="emitValue"
-    :map-options="mapOptions"
-    v-bind="attrsToBeBound"
-    @filter="selectFilterFn"
-  >
-    <template v-for="(_, slot) of slots" #[slot]="scope">
-      <slot :name="slot" v-bind="scope" />
-    </template>
-  </q-select>
-</template>
-
-<script lang="ts">
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { defineComponent, ref, Ref, PropType, computed } from 'vue';
-import { SelectOption } from '../store/types';
+import { defineComponent, ref, PropType, Ref, computed, h } from 'vue';
+import { QSelect } from 'quasar';
+
+interface SelectCallback {
+  (val: string, update: (fn?: () => void) => void): void;
+}
 
 export default defineComponent({
   name: 'QuasarSelect',
-
   props: {
     label: {
       type: String,
@@ -59,7 +35,7 @@ export default defineComponent({
       default: 'scale',
     },
     modelValue: {
-      type: [Number, String, Boolean],
+      type: [Number, String, Boolean, Object],
       required: false,
       default: null,
     },
@@ -73,7 +49,7 @@ export default defineComponent({
       default: true,
     },
     options: {
-      type: Array as PropType<Array<SelectOption>>,
+      type: Array as PropType<Array<{ [index: string]: string }>>,
       default: () => [],
     },
     emitValue: {
@@ -90,7 +66,7 @@ export default defineComponent({
     },
     optionLabel: {
       type: String,
-      default: 'description',
+      default: 'label',
     },
     useInput: {
       type: Boolean,
@@ -114,26 +90,8 @@ export default defineComponent({
     },
   },
 
-  emits: ['update:modelValue'],
-
   setup(props, { attrs, slots, emit }) {
-    interface SelectCallback {
-      (val: string, update: (fn?: () => void) => void): void;
-    }
-
     const filter = ref('');
-
-    const attrsToBeBound = computed(() => {
-      const {
-        modelValue,
-        'onUpdate:modelValue': onUpdateModalValue,
-        options,
-        onFilter,
-        classes,
-        ...restOfAttrs
-      } = attrs;
-      return restOfAttrs;
-    });
 
     const normalize = (text: string) => {
       if (!text) return '';
@@ -155,28 +113,20 @@ export default defineComponent({
       );
     });
 
-    const model = computed({
-      get: () => props.modelValue,
-      set: (value: unknown) => {
-        emit('update:modelValue', value);
-      },
-    });
-
     const selectFilterFn: SelectCallback = function (val, update) {
       console.log(val);
       filter.value = val;
       update();
-      return;
     };
 
-    return {
-      selectFilterFn,
-      filteredOptions,
-      model,
-      attrsToBeBound,
-      slots,
-      filter,
+    return () => {
+      const options = {
+        ...props,
+        ...attrs,
+        options: filteredOptions.value,
+        onFilter: selectFilterFn,
+      };
+      return h(QSelect, options, slots);
     };
   },
 });
-</script>
