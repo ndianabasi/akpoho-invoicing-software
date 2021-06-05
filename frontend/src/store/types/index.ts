@@ -1,6 +1,29 @@
 import { AxiosResponse, AxiosError } from 'axios';
 import { DataRows } from '../quasar_tables/state';
 
+export interface RootState {
+  baseURL: string;
+  rootURL: string;
+  gtmID: string;
+  httpTimeout: number;
+  currentYear: number | null;
+  message: AlertInterface;
+  tokenRefreshTime: number;
+  darkMode: boolean;
+}
+
+export interface AlertInterface {
+  type: string;
+  content: string;
+  status: number | null;
+  statusText: string;
+  activity: string;
+}
+
+export enum RootMutationTypes {
+  SET_DARK_MODE = 'SET_DARK_MODE',
+}
+
 export type LoginData = {
   username: string;
   password: string;

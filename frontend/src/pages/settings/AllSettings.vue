@@ -6,7 +6,7 @@
         :key="setting.link"
         class="col-sm-6 col-xs-12 col-lg-3 col-md-4"
       >
-        <q-card flat bordered class="my-card bg-grey-1">
+        <q-card flat bordered>
           <q-card-section>
             <div class="row items-center no-wrap">
               <div class="col">

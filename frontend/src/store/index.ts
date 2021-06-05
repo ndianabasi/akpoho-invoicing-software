@@ -2,8 +2,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 //import { store } from 'quasar/wrappers';
-import { createStore, GetterTree, useStore as baseUseStore, Store } from 'vuex';
+import {
+  createStore,
+  GetterTree,
+  useStore as baseUseStore,
+  Store,
+  MutationTree,
+} from 'vuex';
 import { InjectionKey } from 'vue';
+
+import { RootState, AlertInterface } from './types/index';
 
 import auth from './auth';
 import { AuthStateInterface } from './auth/state';
@@ -51,16 +59,6 @@ const ls = new SecureLS({ isCompression: false });
  * async/await or return a Promise which resolves
  * with the Store instance.
  */
-
-interface RootState {
-  baseURL: string;
-  rootURL: string;
-  gtmID: string;
-  httpTimeout: number;
-  currentYear: number | null;
-  message: AlertInterface;
-  tokenRefreshTime: number;
-}
 
 type HttpOptions = {
   baseURL: string;
@@ -111,20 +109,13 @@ export interface StoreGettersInterface {
 
 export type StoreGetters = RootGetterInterface & StoreGettersInterface;
 
-interface AlertInterface {
-  type: string;
-  content: string;
-  status: number | null;
-  statusText: string;
-  activity: string;
-}
-
 export type StoreElements = RootState & StateInterface;
 export interface StoreInterface {
   strict?: boolean;
   state: RootState;
   modules: StateInterface;
   getters: GetterTree<RootState, StateInterface>;
+  mutations: MutationTree<RootState>;
 }
 
 // define your own `useStore` composition function
@@ -160,6 +151,11 @@ export default function (/* { ssrContext } */) {
       tokenRefreshTime: 120,
       darkMode: false,
     }),
+
+    mutations: {
+      SET_DARK_MODE: (state, payload: boolean) => (state.darkMode = payload),
+    },
+
     getters: {
       getHttpProtocol() {
         return window.location.hostname === 'localhost' ||
@@ -193,7 +189,9 @@ export default function (/* { ssrContext } */) {
       },
       getMessage: (state) => state.message,
       getTokenRefreshTime: (state) => state.tokenRefreshTime,
+      GET_DARK_MODE: (state) => state.darkMode,
     },
+
     modules: {
       menus,
       auth,
@@ -204,6 +202,7 @@ export default function (/* { ssrContext } */) {
       roles,
       permissions,
     },
+
     plugins:
       process.env.NODE_ENV !== 'production'
         ? [createPersistedState()]

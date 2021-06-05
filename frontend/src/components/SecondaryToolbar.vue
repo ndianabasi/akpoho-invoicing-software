@@ -1,6 +1,11 @@
 <template>
-  <q-page-sticky expand position="top" style="z-index: 10">
-    <q-toolbar class="bg-white text-primary q-pl-lg">
+  <q-page-sticky
+    class="AIS__secondary_toolbar"
+    expand
+    position="top"
+    style="z-index: 10"
+  >
+    <q-toolbar class="q-pl-lg">
       <q-btn
         flat
         round

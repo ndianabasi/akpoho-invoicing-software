@@ -8,7 +8,7 @@
     @input="TOGGLE_LEFT_DRAWER()"
   >
     <q-scroll-area class="fit">
-      <q-toolbar class="AGIS__toolbar">
+      <q-toolbar class="AIS__toolbar">
         <q-toolbar-title class="row items-center text-grey-8">
           <!-- <img
               class="q-pl-md"
@@ -45,7 +45,7 @@
             v-for="link in links1"
             :key="link.title"
             clickable
-            class="AGIS__drawer-item"
+            class="AIS__drawer-item"
             :to="{ name: link.link }"
           >
             <q-item-section avatar>
@@ -63,7 +63,7 @@
             v-for="link in links2"
             :key="link.title"
             clickable
-            class="AGIS__drawer-item"
+            class="AIS__drawer-item"
             :to="{ name: link.link }"
           >
             <q-item-section avatar>
@@ -81,7 +81,7 @@
             v-for="link in links3"
             :key="link.title"
             clickable
-            class="AGIS__drawer-item"
+            class="AIS__drawer-item"
             :to="{ name: link.link }"
           >
             <q-item-section avatar>
@@ -95,7 +95,7 @@
 
         <!--<q-separator class="q-my-md" /> <q-item
             clickable
-            class="AGIS__drawer-item AGIS__drawer-item--storage"
+            class="AIS__drawer-item AIS__drawer-item--storage"
           >
             <q-item-section avatar>
               <q-icon name="cloud" />

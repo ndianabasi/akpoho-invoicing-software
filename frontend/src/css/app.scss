@@ -1,1 +1,41 @@
 // app global css in SCSS form
+.no-underline {
+  text-decoration: none;
+}
+
+.body--dark {
+  .AIS__toolbar {
+    color: $grey-3;
+    background-color: $dark;
+
+    .q-toolbar__title {
+      color: $grey-3;
+    }
+  }
+
+  .AIS__secondary_toolbar {
+    color: $grey-3;
+    background-color: $dark;
+
+    .q-toolbar__title {
+      color: $grey-3;
+    }
+  }
+
+  .sticky-sidebar {
+    .q-btn {
+      color: $grey-3;
+    }
+  }
+}
+
+.AIS__secondary_toolbar {
+  color: var(--q-primary);
+  background-color: var(--q-white);
+}
+
+.sticky-sidebar {
+  .q-btn {
+    color: $grey-9;
+  }
+}

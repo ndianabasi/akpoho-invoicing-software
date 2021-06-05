@@ -1,5 +1,5 @@
 <template>
-  <q-toolbar class="AGIS__toolbar" style="height: 64px">
+  <q-toolbar :class="{ AIS__toolbar: true, dark: isDark }" style="height: 64px">
     <q-btn
       flat
       dense
@@ -30,7 +30,7 @@
 
     <q-input
       v-model="search"
-      class="AGIS__toolbar-input"
+      class="AIS__toolbar-input"
       dense
       standout="bg-primary"
       placeholder="Search"
@@ -197,17 +197,13 @@
                 >
                   <q-item-section avatar>
                     <q-icon
-                      :name="
-                        isDarkModeActive ? 'brightness_low' : 'brightness_2'
-                      "
+                      :name="isDark ? 'brightness_low' : 'brightness_2'"
                     />
                   </q-item-section>
 
                   <q-item-section
                     >Switch to
-                    {{
-                      isDarkModeActive ? 'Bright Mode' : 'Dark Moe'
-                    }}</q-item-section
+                    {{ isDark ? 'Bright Mode' : 'Dark Moe' }}</q-item-section
                   >
                 </q-item>
 
@@ -236,7 +232,7 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-call -->
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, watchEffect } from 'vue';
 import CreateMenu from './CreateMenu.vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -269,11 +265,19 @@ export default defineComponent({
     const router = useRouter();
     const $q = useQuasar();
 
+    const isDark = ref(false);
+
     const toggleDarkMode = function () {
       $q.dark.toggle();
+      store.commit('SET_DARK_MODE', $q.dark.isActive);
     };
 
-    const isDarkModeActive = computed(() => $q.dark.isActive);
+    watchEffect(() => {
+      const isDarkStore = computed(
+        () => store.getters.GET_DARK_MODE as boolean
+      );
+      isDark.value = isDarkStore.value;
+    });
 
     const TOGGLE_LEFT_DRAWER = () => {
       leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -314,14 +318,8 @@ export default defineComponent({
       link,
       authRole: ref(authRole),
       toggleDarkMode,
-      isDarkModeActive,
+      isDark,
     };
   },
 });
 </script>
-
-<style lang="scss">
-.no-underline {
-  text-decoration: none;
-}
-</style>

@@ -1,6 +1,6 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-return -->
 <template>
-  <q-layout view="lHh Lpr fff" class="bg-grey-1">
+  <q-layout view="lHh Lpr fff" class="AIS__Layout">
     <q-header reveal elevated class="bg-white text-grey-8" height-hint="64">
       <primary-toolbar @update:leftDrawerOpen="TOGGLE_LEFT_DRAWER($event)" />
     </q-header>
@@ -13,7 +13,7 @@
 
     <sticky-sidebar />
 
-    <q-page-container class="AGIS__page-container q-my-xl q-mx-lg">
+    <q-page-container class="AIS__page-container q-my-xl q-mx-lg">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -160,7 +160,7 @@ export default defineComponent({
 </script>
 
 <style lang="sass">
-.AGIS
+.AIS
   &__toolbar
     height: 64px
   &__toolbar-input

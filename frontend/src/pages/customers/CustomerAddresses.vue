@@ -19,7 +19,6 @@
       <q-btn
         v-if="resourceActionPermissions.new"
         flat
-        color="primary"
         icon="add_location"
         title="New Address"
         @click.stop.prevent="showCreateAddressDialog()"
@@ -65,7 +64,6 @@
                     ? 'local_shipping'
                     : 'credit_card'
                 "
-                color="black"
                 size="34px"
               />
             </q-item-section>
