@@ -32,11 +32,13 @@
             </template>
           </q-input>
 
-          <q-select
+          <quasar-select
             v-model="form.role_id"
             filled
             :options="roles"
             label="Role"
+            aria-autocomplete="off"
+            autocomplete="off"
             clearable
             bottom-slots
             options-dense
@@ -59,7 +61,7 @@
                   .join(', ')
               }}
             </template>
-          </q-select>
+          </quasar-select>
 
           <q-input
             v-for="field in profileTextFields"
@@ -88,12 +90,13 @@
             </template>
           </q-input>
 
-          <q-select
+          <quasar-select
             v-model="form.country_id"
             filled
-            :options="plainCountries"
+            :options="countries"
             label="Country"
             name="country_id"
+            aria-autocomplete="off"
             clearable
             bottom-slots
             options-dense
@@ -108,15 +111,16 @@
             ><template #before>
               <q-icon name="business" />
             </template>
-          </q-select>
+          </quasar-select>
 
-          <q-select
+          <quasar-select
             v-model="form.state_id"
             filled
             :disable="!form.country_id"
-            :options="plainCountryStates"
+            :options="countryStates"
             label="State"
             name="state_id"
+            autocomplete="off"
             clearable
             bottom-slots
             options-dense
@@ -131,7 +135,7 @@
             ><template #before>
               <q-icon name="business" />
             </template>
-          </q-select>
+          </quasar-select>
 
           <q-toggle
             v-model="form.login_status"
@@ -233,12 +237,14 @@ import {
 } from '../../../store/types';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
+import QuasarSelect from '../../../components/QuasarSelect';
 
 export default defineComponent({
   name: 'EditUser',
 
   components: {
     ViewCard,
+    QuasarSelect,
   },
 
   props: {
@@ -419,7 +425,7 @@ export default defineComponent({
           .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
             userId: props.userId,
           })
-          .then(() => {
+          .then(async () => {
             currentUser.value = unref(
               computed(
                 () =>
@@ -437,9 +443,23 @@ export default defineComponent({
             form.city = currentUser?.value?.profile.city;
             form.email = currentUser?.value?.email;
             form.role_id = currentUser?.value.role.id;
-            form.state_id = currentUser?.value?.profile.userState?.id ?? null;
             form.country_id =
               currentUser?.value?.profile.userCountry?.id ?? null;
+            // Fetch the states for the current country
+            if (form.country_id) {
+              await store
+                .dispatch('countries_states/FETCH_COUNTRY_STATES_FOR_SELECT', {
+                  countryId: form.country_id,
+                })
+                .then(() => {
+                  // Then update the current state
+                  form.state_id =
+                    currentUser?.value?.profile.userState?.id ?? null;
+                });
+            } else {
+              // Then update the current state
+              form.state_id = currentUser?.value?.profile.userState?.id ?? null;
+            }
             form.login_status = Boolean(currentUser?.value.login_status);
           });
       }
@@ -472,48 +492,6 @@ export default defineComponent({
       stopFetchRolesForSelect();
     });
 
-    interface SelectCallback {
-      (
-        val: string,
-        update: (fn: () => void, ref?: (ref: { name: string }) => void) => void
-      ): void;
-    }
-
-    const plainCountries = ref(unref(countries));
-    const plainCountryStates = ref(unref(countryStates));
-
-    const selectFilterFn: SelectCallback = function (val, update) {
-      let plainOptions: Ref<SelectionOption[]>;
-      let computedOptions: ComputedRef<SelectionOption[]>;
-
-      update(
-        () => {
-          // here you have access to "ref" which
-          // is the Vue reference of the QSelect
-        },
-        (ref) => {
-          const refName = ref.name;
-          if (refName === 'country_id') {
-            plainOptions = plainCountries;
-            computedOptions = countries;
-          } else if (refName === 'state_id') {
-            plainOptions = plainCountryStates;
-            computedOptions = countryStates;
-          }
-
-          if (val === '') plainOptions.value = computedOptions.value;
-          else {
-            const needle = val.toLowerCase();
-            plainOptions.value = computedOptions.value.filter(
-              (v) => v.label.toLowerCase().indexOf(needle) > -1
-            );
-          }
-        }
-      );
-
-      return;
-    };
-
     return {
       user: currentUser,
       text: ref(''),
@@ -526,9 +504,8 @@ export default defineComponent({
       form$,
       profileTextFields,
       titleInfo,
-      plainCountries,
-      plainCountryStates,
-      selectFilterFn,
+      countries,
+      countryStates,
       roles,
       resourcePermissions: useResourcePermissions({
         view: PERMISSION.CAN_VIEW_USERS,

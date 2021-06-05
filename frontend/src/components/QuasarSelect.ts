@@ -39,11 +39,6 @@ export default defineComponent({
       required: false,
       default: null,
     },
-    classes: {
-      type: Array as PropType<Array<string> | string>,
-      required: false,
-      default: null,
-    },
     filled: {
       type: Boolean,
       default: true,
@@ -60,13 +55,13 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
-    optionValue: {
-      type: String,
-      default: 'id',
-    },
     optionLabel: {
       type: String,
       default: 'label',
+    },
+    optionValue: {
+      type: String,
+      default: 'value',
     },
     useInput: {
       type: Boolean,
@@ -114,7 +109,6 @@ export default defineComponent({
     });
 
     const selectFilterFn: SelectCallback = function (val, update) {
-      console.log(val);
       filter.value = val;
       update();
     };

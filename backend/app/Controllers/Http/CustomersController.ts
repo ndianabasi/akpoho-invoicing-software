@@ -25,7 +25,6 @@ export default class CustomersController {
       created_at,
       updated_at,
     } = request.qs()
-    //console.log(search, page, descending, perPage, sortBy)
 
     const searchQuery = {
       id: id ? id : null,
@@ -71,7 +70,6 @@ export default class CustomersController {
               if (value === 'true') value = true
               if (value === 'false') value = false
 
-              //console.log(param, value)
               query.where(param, value)
               if (typeof value === 'string') {
                 query.orWhere(param, 'like', `%${value}%`)
@@ -235,8 +233,6 @@ export default class CustomersController {
     await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
 
     const { address, lga, postal_code, state, country, type } = request.body()
-
-    console.log(type, typeof type)
 
     if (type === 'both') {
       const addressTypes: Array<CustomerAddressTypes> = ['shipping_address', 'billing_address']

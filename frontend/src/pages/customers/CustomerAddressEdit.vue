@@ -31,7 +31,7 @@
             </template>
           </q-input>
 
-          <q-select
+          <quasar-select
             v-if="field.componentType === 'select' && field.isVisible"
             :key="`field_${field.name}_${field.componentType}`"
             :ref="field.name"
@@ -47,13 +47,12 @@
             bottom-slots
             options-dense
             use-input
-            input-debounce="0"
+            :input-debounce="200"
             class="q-mb-md"
             transition-show="scale"
             transition-hide="scale"
             emit-value
             map-options
-            @filter="selectFilterFn"
           >
             <template #error>
               {{
@@ -64,7 +63,7 @@
                   : ''
               }}
             </template>
-          </q-select>
+          </quasar-select>
         </template>
       </form>
     </q-card-section>
@@ -106,11 +105,12 @@ import { Notify } from 'quasar';
 import { FetchTableDataInterface } from '../../types/table';
 import useVuelidate from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
+import QuasarSelect from '../../components/QuasarSelect';
 
 export default defineComponent({
   name: 'EditCustomerAddress',
 
-  components: {},
+  components: { QuasarSelect },
 
   props: {
     customerId: {
@@ -185,48 +185,6 @@ export default defineComponent({
       type: null,
     });
 
-    interface SelectCallback {
-      (
-        val: string,
-        update: (fn: () => void, ref?: (ref: { name: string }) => void) => void
-      ): void;
-    }
-
-    const plainCountries = ref(unref(countries));
-    const plainCountryStates = ref(unref(countryStates));
-
-    const selectFilterFn: SelectCallback = function (val, update) {
-      let plainOptions: Ref<SelectionOption[]> = ref([]);
-      let computedOptions: ComputedRef<SelectionOption[]> = computed(() => []);
-
-      update(
-        () => {
-          // here you have access to "ref" which
-          // is the Vue reference of the QSelect
-        },
-        (ref) => {
-          const refName = ref.name;
-          if (refName === 'country') {
-            plainOptions = plainCountries;
-            computedOptions = countries;
-          } else if (refName === 'state') {
-            plainOptions = plainCountryStates;
-            computedOptions = countryStates;
-          }
-
-          if (val === '') plainOptions.value = computedOptions?.value;
-          else {
-            const needle = val.toLowerCase();
-            plainOptions.value = computedOptions.value.filter(
-              (v) => v.label.toLowerCase().indexOf(needle) > -1
-            );
-          }
-        }
-      );
-
-      return;
-    };
-
     const customerFormSchema: ComputedRef<FormSchema[]> = computed(() => [
       {
         name: 'type',
@@ -278,7 +236,7 @@ export default defineComponent({
         label: 'Country',
         default: null,
         componentType: 'select',
-        options: unref(plainCountries),
+        options: unref(countries),
         isVisible: true,
         autocomplete: 'country',
       },
@@ -287,7 +245,7 @@ export default defineComponent({
         label: 'State/Region',
         default: null,
         componentType: 'select',
-        options: unref(plainCountryStates),
+        options: unref(countryStates),
         isVisible: true,
         autocomplete: 'address-level1',
       },
@@ -389,7 +347,7 @@ export default defineComponent({
             customerId: props.customerId,
             customerAddressId: props.customerAddressId,
           })
-          .then(() => {
+          .then(async () => {
             currentAddress = computed(
               () =>
                 store.getters[
@@ -403,14 +361,19 @@ export default defineComponent({
             form.postal_code = currentAddress?.value?.postal_code ?? '';
             form.country = currentAddress?.value?.addressCountry?.id ?? null;
             // Fetch the states for the current country
-            void store
-              .dispatch('countries_states/FETCH_COUNTRY_STATES_FOR_SELECT', {
-                countryId: form.country,
-              })
-              .then(() => {
-                // Then update the current state
-                form.state = currentAddress?.value?.addressState?.id ?? null;
-              });
+            if (form.country) {
+              await store
+                .dispatch('countries_states/FETCH_COUNTRY_STATES_FOR_SELECT', {
+                  countryId: form.country,
+                })
+                .then(() => {
+                  // Then update the current state
+                  form.state = currentAddress?.value?.addressState?.id ?? null;
+                });
+            } else {
+              // Attempt to update the state, irrespective
+              form.state = currentAddress?.value?.addressState?.id ?? null;
+            }
           });
       }
     });
@@ -452,7 +415,6 @@ export default defineComponent({
       form,
       submitForm,
       customerFormSchema,
-      selectFilterFn,
       customerTitles,
       form$,
       resourcePermissions: useResourcePermissions({

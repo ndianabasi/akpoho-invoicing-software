@@ -61,6 +61,8 @@
               :ref="field.name"
               v-model="form[field.name]"
               filled
+              aria-autocomplete="off"
+              autocomplete="off"
               :options="field.options"
               :label="field.label"
               :name="field.name"
@@ -69,12 +71,11 @@
               options-dense
               use-input
               :input-debounce="200"
-              :classes="['q-mb-md']"
+              class="q-mb-md"
               transition-show="scale"
               transition-hide="scale"
               emit-value
               map-options
-              @update:model-value="processSelect($event, field.name)"
               ><template #before>
                 <q-icon :name="field?.icon ?? ''" />
               </template>
@@ -592,8 +593,7 @@ export default defineComponent({
           'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
           { countryId: newValue }
         );
-      },
-      { deep: true }
+      }
     );
     watch(
       () => form.billing_country,
@@ -604,8 +604,7 @@ export default defineComponent({
           'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
           { countryId: newValue }
         );
-      },
-      { deep: true }
+      }
     );
 
     onBeforeMount(() => {
@@ -613,10 +612,6 @@ export default defineComponent({
       stopFetchCountriesForSelect();
       stopFetchCustomerTitlesForSelect();
     });
-
-    const processSelect = (event: SelectOption, field: string) => {
-      form[field] = event.value;
-    };
 
     return {
       customer: currentCustomer,
@@ -635,7 +630,6 @@ export default defineComponent({
         view: PERMISSION.CAN_VIEW_CUSTOMERS,
         list: PERMISSION.CAN_LIST_CUSTOMERS,
       }),
-      processSelect,
     };
   },
 });

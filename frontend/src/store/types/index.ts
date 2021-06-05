@@ -174,6 +174,7 @@ export interface CurrentlyViewedAddress {
 }
 
 export interface CustomerAddressInterface {
+  [key: string]: boolean | number | SelectOption | string | null | undefined;
   country: number | null;
   type: string | null;
   state: number | null;
