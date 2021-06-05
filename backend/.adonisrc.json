@@ -18,7 +18,15 @@
     "./start/routes",
     "./start/kernel",
     "./start/bouncer",
-    { "file": "./start/events", "optional": true, "environment": ["web", "console", "test"] }
+    {
+      "file": "./start/events",
+      "optional": true,
+      "environment": [
+        "web",
+        "console",
+        "test"
+      ]
+    }
   ],
   "providers": [
     "./providers/AppProvider",
@@ -29,7 +37,8 @@
     "@adonisjs/lucid",
     "@adonisjs/redis",
     "@adonisjs/shield",
-    "@adonisjs/bouncer"
+    "@adonisjs/bouncer",
+    "adonis5-cache"
   ],
   "metaFiles": [
     {
@@ -41,5 +50,7 @@
       "reloadServer": false
     }
   ],
-  "aceProviders": ["@adonisjs/repl"]
+  "aceProviders": [
+    "@adonisjs/repl"
+  ]
 }

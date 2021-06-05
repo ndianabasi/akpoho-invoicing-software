@@ -34,7 +34,8 @@
       "@adonisjs/lucid",
       "@adonisjs/redis",
       "@adonisjs/shield",
-      "@adonisjs/bouncer"
+      "@adonisjs/bouncer",
+      "adonis5-cache"
     ]
   }
 }
