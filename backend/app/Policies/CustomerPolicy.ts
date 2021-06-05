@@ -10,7 +10,10 @@ export default class CustomerPolicy extends BasePolicy {
     return await accessCompanyCustomer(resourcePermission, user, company, customer)
   }
 
-  public async create(user: User) {}
+  public async create(user: User, company: Company) {
+    const resourcePermission = 'can_create_customers'
+    return await accessCompany(resourcePermission, user, company)
+  }
 
   public async edit(user: User, company: Company, customer: Customer) {
     const resourcePermission = 'can_edit_customers'

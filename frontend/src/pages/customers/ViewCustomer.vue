@@ -47,7 +47,11 @@
 
                   <q-item>
                     <q-item-section>
-                      <q-item-label class="text-uppercase">Title</q-item-label>
+                      <q-item-label class="text-uppercase"
+                        >Title{{
+                          corporateHasRep ? ' (REP)' : ''
+                        }}</q-item-label
+                      >
                       <q-item-label caption lines="2">{{
                         customer.title?.name ?? ''
                       }}</q-item-label>
@@ -68,7 +72,9 @@
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-uppercase"
-                        >Middle Name</q-item-label
+                        >Middle Name{{
+                          corporateHasRep ? ' (REP)' : ''
+                        }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
                         customer.middle_name
@@ -79,7 +85,9 @@
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-uppercase"
-                        >Last Name</q-item-label
+                        >Last Name{{
+                          corporateHasRep ? ' (REP)' : ''
+                        }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
                         customer.last_name
@@ -90,7 +98,9 @@
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-uppercase"
-                        >Personal Email Address</q-item-label
+                        >Personal Email Address{{
+                          corporateHasRep ? ' (REP)' : ''
+                        }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
                         customer.email
@@ -101,7 +111,9 @@
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-uppercase"
-                        >Personal Phone Number</q-item-label
+                        >Personal Phone Number{{
+                          corporateHasRep ? ' (REP)' : ''
+                        }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
                         customer.phone_number
@@ -260,6 +272,11 @@ export default defineComponent({
         ] as CurrentlyViewedCustomer
     );
 
+    const corporateHasRep = computed(() => {
+      const customer = currentCustomer.value;
+      return customer && customer.is_corporate && customer.corporate_has_rep;
+    });
+
     let titleInfo = ref({});
 
     onMounted(() => {
@@ -300,6 +317,7 @@ export default defineComponent({
       customer: currentCustomer,
       tab: ref('customer_details'),
       titleInfo,
+      corporateHasRep,
       resourcePermissions: useResourcePermissions({
         edit: PERMISSION.CAN_EDIT_CUSTOMERS,
         list: PERMISSION.CAN_LIST_CUSTOMERS,

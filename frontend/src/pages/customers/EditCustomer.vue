@@ -461,7 +461,7 @@ export default defineComponent({
             void store
               .dispatch('customers/EDIT_CUSTOMER', {
                 customerId: props.customerId,
-                form: {},
+                form,
               })
               .then(() => {
                 submitting.value = false;
@@ -477,7 +477,7 @@ export default defineComponent({
           } else {
             store
               .dispatch('customers/CREATE_CUSTOMER', {
-                form: form,
+                form,
               })
               .then((customerId: string) => {
                 submitting.value = false;

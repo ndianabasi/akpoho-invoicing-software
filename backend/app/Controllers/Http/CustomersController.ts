@@ -85,7 +85,86 @@ export default class CustomersController {
     return response.ok({ data: customers })
   }
 
-  public async store({}: HttpContextContract) {}
+  public async store({ response, requestedCompany, request, bouncer }: HttpContextContract) {
+    await request.validate(CustomerValidator)
+
+    await bouncer.with('CustomerPolicy').authorize('create', requestedCompany!)
+
+    const {
+      title,
+      first_name,
+      last_name,
+      middle_name,
+      email,
+      phone_number,
+      is_corporate,
+      corporate_has_rep,
+      company_name,
+      company_phone,
+      company_email,
+      is_billing_shipping_addresses_same,
+      billing_address,
+      billing_country,
+      billing_lga,
+      billing_postal_code,
+      billing_state,
+      shipping_address,
+      shipping_country,
+      shipping_lga,
+      shipping_postal_code,
+      shipping_state,
+    } = request.body()
+
+    const newCustomer = await requestedCompany?.related('customers').create({
+      customerTitleId: title,
+      firstName: first_name,
+      lastName: last_name,
+      middleName: middle_name,
+      email,
+      phoneNumber: phone_number,
+      isCorporate: is_corporate,
+      corporateHasRep: corporate_has_rep,
+      companyName: company_name,
+      companyPhone: company_phone,
+      companyEmail: company_email,
+    })
+
+    if (is_billing_shipping_addresses_same) {
+      const addressTypes: Array<CustomerAddressTypes> = ['shipping_address', 'billing_address']
+      for (let i = 0; i < addressTypes.length; i++) {
+        const addressType = addressTypes[i]
+
+        await newCustomer?.related('addresses').create({
+          addressType,
+          streetAddress: shipping_address,
+          city: shipping_lga,
+          countryId: shipping_country,
+          stateId: shipping_state,
+          postalCode: shipping_postal_code,
+        })
+      }
+    } else {
+      await newCustomer?.related('addresses').create({
+        addressType: 'shipping_address',
+        streetAddress: shipping_address,
+        city: shipping_lga,
+        countryId: shipping_country,
+        stateId: shipping_state,
+        postalCode: shipping_postal_code,
+      })
+
+      await newCustomer?.related('addresses').create({
+        addressType: 'billing_address',
+        streetAddress: billing_address,
+        city: billing_lga,
+        countryId: billing_country,
+        stateId: billing_state,
+        postalCode: billing_postal_code,
+      })
+    }
+
+    return response.created({ data: newCustomer?.id })
+  }
 
   public async show({
     response,
