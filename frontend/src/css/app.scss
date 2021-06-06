@@ -61,3 +61,14 @@
     color: $grey-9;
   }
 }
+
+.q-page-scroller {
+  z-index: 5000;
+}
+
+.body--light {
+  background-color: $light;
+  .AIS__secondary_toolbar {
+    background-color: $purple-1;
+  }
+}
