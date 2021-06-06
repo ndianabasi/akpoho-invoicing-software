@@ -9,12 +9,12 @@
       <template #body-panel>
         <q-tabs v-model="tab" align="justify" narrow-indicator class="q-mb-lg">
           <q-tab
-            class="text-purple"
+            class="text-primary"
             name="customer_details"
             label="Customer Details"
           />
           <q-tab
-            class="text-orange"
+            class="text-secondary"
             name="customer_addresses"
             label="Customer Addresses"
           />

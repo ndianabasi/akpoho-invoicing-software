@@ -70,9 +70,13 @@ export default class CustomersController {
               if (value === 'true') value = true
               if (value === 'false') value = false
 
-              query.where(param, value)
-              if (typeof value === 'string') {
-                query.orWhere(param, 'like', `%${value}%`)
+              if (param === 'title') {
+                query.where('customer_titles.title', value)
+              } else {
+                query.where(`customers.${param}`, value)
+                if (typeof value === 'string') {
+                  query.orWhere(`customers.${param}`, 'like', `%${value}%`)
+                }
               }
             }
           }

@@ -71,4 +71,12 @@
   .AIS__secondary_toolbar {
     background-color: $purple-1;
   }
+
+  .q-btn {
+    color: var(--q-primary);
+  }
+
+  .q-list > .q-item {
+    color: var(--q-primary);
+  }
 }
