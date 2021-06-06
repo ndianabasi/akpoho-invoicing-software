@@ -36,19 +36,19 @@ const metaData = {
   // sets document title
   title: 'Index Page',
   // optional; sets final title as "Index Page - My Website", useful for multiple level meta
-  titleTemplate: (title: string) => `${title} - Agboho Invoicing Software`,
+  titleTemplate: (title: string) => `${title} - Akpoho Invoicing Software`,
 
   // meta tags
   meta: {
     description: {
       name: 'description',
       content:
-        'Agboho Invoicing Software is an open-source software which provides quotation, invoicing, and receipt functionalities for small businesses.',
+        'Akpoho Invoicing Software is an open-source software which provides quotation, invoicing, and receipt functionalities for small businesses.',
     },
     keywords: {
       name: 'keywords',
       content:
-        'invoice software, invoicing software, Agboho Invoicing Software, invoice',
+        'invoice software, invoicing software, Akpoho Invoicing Software, invoice',
     },
     equiv: {
       'http-equiv': 'Content-Type',
@@ -59,7 +59,7 @@ const metaData = {
       name: 'og:title',
       // optional; similar to titleTemplate, but allows templating with other meta properties
       template(ogTitle: string) {
-        return `${ogTitle} - Agboho Invoicing Software`;
+        return `${ogTitle} - Akpoho Invoicing Software`;
       },
     },
   },

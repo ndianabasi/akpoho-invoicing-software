@@ -9,12 +9,12 @@
   >
     <q-scroll-area class="fit">
       <q-toolbar class="AIS__toolbar">
-        <q-toolbar-title class="row items-center text-grey-8">
+        <q-toolbar-title class="row items-center">
           <!-- <img
               class="q-pl-md"
               src="https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_clr_74x24px.svg"
             /> -->
-          <span class="q-ml-sm">Agboho</span>
+          <span class="q-ml-sm">Akpoho</span>
         </q-toolbar-title>
       </q-toolbar>
 

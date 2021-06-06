@@ -22,7 +22,7 @@
         <!-- <img
             src="https://cdn.quasar.dev/img/layout-gallery/logo-google.svg"
           /> -->
-        <span class="q-ml-sm">Agboho</span>
+        <span class="q-ml-sm">Akpoho</span>
       </q-toolbar-title></router-link
     >
 

@@ -29,11 +29,14 @@
   } */
 
   .q-btn,
-  .sticky-sidebar .q-btn {
+  .sticky-sidebar .q-btn,
+  aside.q-drawer .q-icon {
     color: var(--q-primary);
   }
 
-  .AIS__side-btn__label {
+  .AIS__side-btn__label,
+  aside.q-drawer .q-item__label,
+  aside .q-toolbar__title {
     color: $grey-4;
   }
 
@@ -48,6 +51,15 @@
 
   .primary-toolbar-create-btn {
     color: $grey-3;
+  }
+
+  .q-btn[type='submit'] {
+    background-color: var(--q-accent);
+    color: $grey-3;
+  }
+
+  .q-card__actions .q-btn {
+    color: var(--q-secondary);
   }
 }
 
@@ -78,5 +90,9 @@
 
   .q-list > .q-item {
     color: var(--q-primary);
+  }
+
+  .q-drawer {
+    background-color: $light-solid;
   }
 }
