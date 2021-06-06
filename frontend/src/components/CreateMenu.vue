@@ -3,11 +3,10 @@
     flat
     dense
     no-wrap
-    color="primary"
     icon="add"
     no-caps
     :label="$q.screen.gt.md ? 'Create' : ''"
-    class="q-ml-sm q-px-md"
+    class="q-ml-sm q-px-md primary-toolbar-create-btn"
   >
     <q-menu>
       <q-list class="text-grey-8" style="min-width: 100px">

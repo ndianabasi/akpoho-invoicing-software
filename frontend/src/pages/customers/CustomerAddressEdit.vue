@@ -69,7 +69,7 @@
     </q-card-section>
 
     <q-card-actions align="right">
-      <q-btn flat color="primary" label="Submit" @click.prevent="submitForm" />
+      <q-btn flat label="Submit" @click.prevent="submitForm" />
       <q-btn v-close-popup flat color="negative" label="Cancel" />
     </q-card-actions>
   </q-card>

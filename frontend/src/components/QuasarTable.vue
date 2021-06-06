@@ -47,7 +47,6 @@
               }"
               flat
               round
-              color="primary"
               :icon="newRouteObject.icon"
               :title="newRouteObject.title"
             />
@@ -135,7 +134,6 @@
                   :loading="filterSubmitting"
                   label="Submit"
                   class="q-mt-md"
-                  color="primary"
                   icon-right="send"
                   @click.prevent="submitFilter"
                 >
@@ -219,7 +217,7 @@
                   }"
                 >
                   <q-item-section avatar>
-                    <q-icon name="remove_red_eye" color="primary" size="md" />
+                    <q-icon name="remove_red_eye" size="md" />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>View</q-item-label>
@@ -236,7 +234,7 @@
                   }"
                 >
                   <q-item-section avatar>
-                    <q-icon size="md" name="edit" color="primary" />
+                    <q-icon size="md" name="edit" />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>Edit</q-item-label>
@@ -250,7 +248,7 @@
                   @click="deleteRow(props.row.id)"
                 >
                   <q-item-section avatar>
-                    <q-icon size="md" name="delete_forever" color="primary" />
+                    <q-icon size="md" name="delete_forever" />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>Delete</q-item-label>

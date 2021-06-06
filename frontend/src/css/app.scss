@@ -22,10 +22,32 @@
     }
   }
 
-  .sticky-sidebar {
+  /* .sticky-sidebar {
     .q-btn {
       color: $grey-3;
     }
+  } */
+
+  .q-btn,
+  .sticky-sidebar .q-btn {
+    color: var(--q-primary);
+  }
+
+  .AIS__side-btn__label {
+    color: $grey-4;
+  }
+
+  .logout-btn {
+    color: $grey-4;
+    background-color: var(--q-primary);
+  }
+
+  .q-badge {
+    background-color: var(--q-secondary);
+  }
+
+  .primary-toolbar-create-btn {
+    color: $grey-3;
   }
 }
 

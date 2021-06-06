@@ -141,7 +141,6 @@
             v-model="form.login_status"
             checked-icon="check"
             unchecked-icon="clear"
-            color="primary"
             :label="form.login_status ? 'Can login' : 'Cannot login'"
           />
         </form>
@@ -154,7 +153,6 @@
             :loading="submitting"
             label="Submit"
             class="q-mt-md"
-            color="primary"
             icon-right="send"
             @click.prevent="submitForm"
           >
@@ -167,14 +165,14 @@
       </template>
 
       <template v-if="!creationMode" #title-panel-side>
-        <q-btn flat color="primary" icon="more_vert">
+        <q-btn flat icon="more_vert">
           <q-menu
             anchor="bottom right"
             self="top end"
             transition-show="flip-right"
             transition-hide="flip-left"
           >
-            <q-list class="text-primary">
+            <q-list>
               <q-item
                 v-if="resourcePermissions.canView"
                 :to="{

@@ -122,65 +122,15 @@
 
               <q-btn
                 v-close-popup
-                color="primary"
                 label="Logout"
                 push
                 size="sm"
+                class="logout-btn"
                 @click.prevent="handleLogout"
               />
 
-              <q-list class="text-primary q-mt-md">
-                <q-item
-                  v-ripple
-                  clickable
-                  :active="link === 'inbox'"
-                  active-class="my-menu-link"
-                  @click="link = 'inbox'"
-                >
-                  <q-item-section avatar class="q-pr-none">
-                    <q-icon name="inbox" />
-                  </q-item-section>
-
-                  <q-item-section>Inbox</q-item-section>
-                </q-item>
-
-                <q-item
-                  v-ripple
-                  clickable
-                  :active="link === 'outbox'"
-                  active-class="my-menu-link"
-                  @click="link = 'outbox'"
-                >
-                  <q-item-section avatar>
-                    <q-icon name="send" />
-                  </q-item-section>
-
-                  <q-item-section>Outbox</q-item-section>
-                </q-item>
-
-                <q-item
-                  v-ripple
-                  clickable
-                  :active="link === 'trash'"
-                  active-class="my-menu-link"
-                  @click="link = 'trash'"
-                >
-                  <q-item-section avatar>
-                    <q-icon name="delete" />
-                  </q-item-section>
-
-                  <q-item-section>Trash</q-item-section>
-                </q-item>
-
-                <q-separator spaced />
-
-                <q-item
-                  v-ripple
-                  clickable
-                  :active="link === 'settings'"
-                  active-class="my-menu-link"
-                  @click="link = 'settings'"
-                >
+              <q-list class="q-mt-md">
+                <q-item v-ripple clickable :to="{ name: 'all_settings' }">
                   <q-item-section avatar>
                     <q-icon name="settings" />
                   </q-item-section>
@@ -188,13 +138,7 @@
                   <q-item-section>Settings</q-item-section>
                 </q-item>
 
-                <q-item
-                  v-ripple
-                  clickable
-                  :active="link === 'settings'"
-                  active-class="my-menu-link"
-                  @click.prevent="toggleDarkMode"
-                >
+                <q-item v-ripple clickable @click.prevent="toggleDarkMode">
                   <q-item-section avatar>
                     <q-icon
                       :name="isDark ? 'brightness_low' : 'brightness_2'"
@@ -207,13 +151,7 @@
                   >
                 </q-item>
 
-                <q-item
-                  v-ripple
-                  clickable
-                  :active="link === 'help'"
-                  active-class="my-menu-link"
-                  @click="link = 'help'"
-                >
+                <q-item v-ripple clickable @click="link = 'help'">
                   <q-item-section avatar>
                     <q-icon name="help" />
                   </q-item-section>

@@ -322,14 +322,14 @@
       </template>
 
       <template #title-panel-side>
-        <q-btn flat color="primary" icon="more_vert">
+        <q-btn flat icon="more_vert">
           <q-menu
             anchor="bottom right"
             self="top end"
             transition-show="flip-right"
             transition-hide="flip-left"
           >
-            <q-list class="text-primary">
+            <q-list>
               <q-item
                 v-if="resourcePermissions.canEdit"
                 :to="{

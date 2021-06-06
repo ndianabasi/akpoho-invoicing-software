@@ -68,7 +68,7 @@
         :loading="submitting"
         :class="{
           'full-width': isSmallScreen,
-          'text-center flex align-center q-mt-lg q-mx-auto q-px-xl': true,
+          'text-center flex align-center q-mt-lg q-mx-auto q-px-xl half-width': true,
         }"
         color="accent"
         icon-right="send"
@@ -79,8 +79,24 @@
       </q-btn>
     </template>
 
-    <template #formFooter>
+    <template #formFooterLink>
       <router-link to="#">Forgot Password? </router-link>
+    </template>
+
+    <template #formFooterExtras>
+      <div class="col items-center">
+        <q-btn
+          color="light-green-10"
+          icon-right="send"
+          label="Log in with Google"
+        />
+      </div>
+      <div class="col items-center">
+        <q-btn color="blue-6" icon-right="send" label="Log in with Twitter" />
+      </div>
+      <div class="col items-center">
+        <q-btn color="blue-10" icon-right="send" label="Log in with Facebook" />
+      </div>
     </template>
   </auth-form>
 </template>

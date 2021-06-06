@@ -19,7 +19,10 @@
           ></slot>
 
           <div class="text-center q-py-lg text-white form-footer">
-            <slot name="formFooter"></slot>
+            <slot name="formFooterLink"></slot>
+            <div class="form-footer-extras column">
+              <slot name="formFooterExtras"></slot>
+            </div>
           </div>
         </q-card-section>
       </q-card>
@@ -99,6 +102,17 @@ export default defineComponent({
       border-bottom: 1px dotted $purple-10;
       padding-bottom: 2px;
     }
+  }
+}
+
+.half-width {
+  min-width: 50% !important;
+}
+
+.form-footer-extras {
+  margin-top: 1.5rem;
+  .col {
+    margin-top: 0.5rem;
   }
 }
 </style>
