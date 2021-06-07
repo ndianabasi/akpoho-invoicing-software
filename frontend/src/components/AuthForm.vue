@@ -21,7 +21,14 @@
           <div class="text-center q-py-lg text-white form-footer">
             <slot name="formFooterLink"></slot>
             <div class="form-footer-extras column">
-              <slot name="formFooterExtras"></slot>
+              <slot
+                name="formFooterExtras"
+                v-bind="{
+                  googleClientIdExist,
+                  GOOGLE_OAUTH_CLIENT_ID,
+                  GOOGLE_SIGN_IN,
+                }"
+              ></slot>
             </div>
           </div>
         </q-card-section>
@@ -34,7 +41,7 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, ref } from 'vue';
 import { useQuasar } from 'quasar';
 //const strongPassword = helpers.regex('strongPassword', //)
 
@@ -48,8 +55,31 @@ export default defineComponent({
       return $q.screen.lt.sm;
     });
 
+    const GOOGLE_OAUTH_CLIENT_ID = ref(process.env.GOOGLE_OAUTH_CLIENT_ID);
+    const googleClientIdExist = computed(() => !!GOOGLE_OAUTH_CLIENT_ID.value);
+
+    const ENABLE_GOOGLE_SIGN_IN = ref(process.env.ENABLE_GOOGLE_SIGN_IN);
+    const GOOGLE_SIGN_IN = computed(
+      () =>
+        ENABLE_GOOGLE_SIGN_IN.value && ENABLE_GOOGLE_SIGN_IN.value === 'true'
+    );
+
+    if (GOOGLE_SIGN_IN.value && googleClientIdExist) {
+      const googleSignInScript = document.createElement('script');
+      googleSignInScript.setAttribute(
+        'src',
+        'https://accounts.google.com/gsi/client'
+      );
+      googleSignInScript.setAttribute('async', 'true');
+      googleSignInScript.setAttribute('defer', 'true');
+      document.head.appendChild(googleSignInScript);
+    }
+
     return {
       isSmallScreen,
+      googleClientIdExist,
+      GOOGLE_OAUTH_CLIENT_ID,
+      GOOGLE_SIGN_IN,
     };
   },
 });

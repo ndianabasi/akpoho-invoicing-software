@@ -83,20 +83,41 @@
       <router-link to="#">Forgot Password? </router-link>
     </template>
 
-    <template #formFooterExtras>
-      <div class="col items-center">
-        <q-btn
-          color="light-green-10"
-          icon-right="send"
-          label="Log in with Google"
-        />
-      </div>
-      <div class="col items-center">
+    <template
+      #formFooterExtras="{
+        googleClientIdExist,
+        GOOGLE_OAUTH_CLIENT_ID,
+        GOOGLE_SIGN_IN,
+      }"
+    >
+      <template v-if="googleClientIdExist && GOOGLE_SIGN_IN">
+        <div
+          id="g_id_onload"
+          :data-client_id="GOOGLE_OAUTH_CLIENT_ID"
+          data-context="signin"
+          data-ux_mode="popup"
+          data-callback="handleCredentialResponse"
+          data-nonce=""
+          data-auto_prompt="false"
+        ></div>
+
+        <div
+          class="g_id_signin q-mx-auto"
+          data-type="standard"
+          data-shape="rectangular"
+          data-theme="outline"
+          data-text="continue_with"
+          data-size="large"
+          data-logo_alignment="left"
+        ></div>
+      </template>
+
+      <!-- <div class="col items-center">
         <q-btn color="blue-6" icon-right="send" label="Log in with Twitter" />
       </div>
       <div class="col items-center">
         <q-btn color="blue-10" icon-right="send" label="Log in with Facebook" />
-      </div>
+      </div> -->
     </template>
   </auth-form>
 </template>
@@ -202,6 +223,10 @@ export default defineComponent({
       }
     }
 
+    const handleCredentialResponse = function (response: unknown) {
+      console.log(response);
+    };
+
     return {
       ph: ref(''),
       dismissed: ref(false),
@@ -210,6 +235,7 @@ export default defineComponent({
       handleLogin,
       form$,
       showPassword: ref(false),
+      handleCredentialResponse,
     };
   },
 });
