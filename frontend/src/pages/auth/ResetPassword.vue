@@ -24,6 +24,16 @@
         @submit.prevent="handleReset"
       >
         <q-input
+          v-model="form$.email"
+          type="email"
+          aria-autocomplete="email"
+          autocomplete="email"
+          :hidden="true"
+          :aria-hidden="true"
+          class="hidden"
+        />
+
+        <q-input
           v-model="form$.newPassword"
           :dense="isSmallScreen"
           filled
@@ -63,6 +73,7 @@
             {{ form$.newPasswordErrors.join(', ') }}
           </template>
         </q-input>
+
         <q-input
           v-model="form$.confirmNewPassword"
           :dense="isSmallScreen"
@@ -138,19 +149,13 @@
 
 <script lang="ts">
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import {
-  defineComponent,
-  reactive,
-  ref,
-  nextTick,
-  onMounted,
-  computed,
-} from 'vue';
+import { defineComponent, ref, nextTick, onMounted, computed } from 'vue';
 import { useStore } from 'vuex';
 import { Notify } from 'quasar';
 import AuthForm from '../../components/AuthForm.vue';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
+import { useRouter } from 'vue-router';
 
 const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
 
@@ -171,6 +176,7 @@ export default defineComponent({
     const validationInProgresss = ref(true);
 
     const store = useStore();
+    const router = useRouter();
 
     const formSchema = computed(() =>
       yup.object({
@@ -226,10 +232,13 @@ export default defineComponent({
 
           await nextTick(async () => {
             await store
-              .dispatch('auth/REQUEST_PASSWORD_RESET', formSchema.value)
+              .dispatch('auth/RESET_PASSWORD', {
+                email: email.value,
+                newPassword: newPassword.value,
+                confirmNewPassword: confirmNewPassword.value,
+              })
               .then(() => {
-                submitting.value = false;
-                showResetValidationError.value = true;
+                void router.push({ name: 'home' });
                 return;
               })
               .catch(() => {

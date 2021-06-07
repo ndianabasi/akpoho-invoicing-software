@@ -140,6 +140,44 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         });
     });
   },
+
+  RESET_PASSWORD(
+    { commit },
+    form: { email: string; newPassword: string; confirmNewPassword: string }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      console.log(form);
+
+      await $httpNoAuth
+        .post('/auth/reset-password', { ...form })
+        .then((res: LoginHttpResponse & HttpResponse) => {
+          const data = res.data;
+          const token = data.token;
+          const userData = data.data;
+          commit('SET_TOKEN', token);
+          commit('SET_USER_DATA', userData);
+
+          Notify.create({
+            message: data?.message,
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 2000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
 };
 
 export default actions;
