@@ -10,7 +10,13 @@ export default class FindRequestedCustomer {
 
     if (!customer_id) throw new NoEntityDefinedException('No customer is provided!')
 
-    const customer = await Customer.findOrFail(customer_id)
+    let customer
+    try {
+      customer = customer = await Customer.findOrFail(customer_id)
+    } catch (error) {
+      return ctx.response.notFound({ message: 'Unknown customer was requested' })
+    }
+
     ctx.requestedCustomer = customer
 
     await next()

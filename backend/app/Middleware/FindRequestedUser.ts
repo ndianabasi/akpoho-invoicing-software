@@ -10,7 +10,13 @@ export default class FindRequestedUser {
 
     if (!user_id) throw new NoEntityDefinedException('No user is provided!')
 
-    const user = await User.findOrFail(user_id)
+    let user
+    try {
+      user = await User.findOrFail(user_id)
+    } catch (error) {
+      return ctx.response.notFound({ message: 'Unknown user was requested' })
+    }
+
     ctx.requestedUser = user
 
     await next()

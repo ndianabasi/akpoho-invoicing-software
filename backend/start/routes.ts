@@ -21,14 +21,16 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
-  Route.post('/login', 'AuthController.login')
+  Route.post('/auth/login', 'AuthController.login')
+  Route.post('/auth/request-password-reset', 'AuthController.requestPasswordReset')
 }).prefix('/v1')
 
 // General Authenticated routes
 Route.group(() => {
-  Route.get('/auth-profile', 'AuthController.authProfile')
-
-  Route.post('/logout', async ({ auth, response }) => {
+  // Get the profile of the user
+  Route.get('/auth/profile', 'AuthController.authProfile')
+  // logout a signed-in user
+  Route.post('/auth/logout', async ({ auth, response }) => {
     await auth.use('api').revoke()
     return response.ok({
       revoked: true,

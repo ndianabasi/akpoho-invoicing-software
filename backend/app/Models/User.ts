@@ -39,7 +39,7 @@ export default class User extends BaseModel {
   public activationCode: string
 
   @column()
-  public forgotPasswordCode: number
+  public forgotPasswordCode: string
 
   @column({
     serialize(value: number) {
@@ -79,49 +79,22 @@ export default class User extends BaseModel {
   })
   public rememberToken: boolean
 
-  @column({
-    serialize(value: DateTime) {
-      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
-    },
-  })
+  @column.dateTime()
   public lastLoginTime: DateTime
 
-  @column({
-    serialize(value: DateTime) {
-      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
-    },
-  })
+  @column.dateTime()
   public accountActivatedAt: DateTime
 
-  @column({
-    serialize(value: DateTime) {
-      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
-    },
-  })
+  @column.dateTime()
   public emailVerifiedAt: DateTime
 
-  @column({
-    serialize(value: DateTime) {
-      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
-    },
-  })
-  public forgotPasswordCodeExpiresAt: DateTime
-
-  @column({ prepare: (value) => value.toFormat('yyyy-LL-dd HH:mm:ss') })
+  @column.dateTime({ prepare: (value) => value.toFormat('yyyy-LL-dd HH:mm:ss') })
   public activationCodeExpiresAt: DateTime
 
-  @column({
-    serialize(value: DateTime) {
-      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
-    },
-  })
+  @column.dateTime()
   public loginCodeExpiresAt: DateTime
 
-  @column({
-    serialize(value: DateTime) {
-      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
-    },
-  })
+  @column.dateTime()
   public passwordLastChangedAt: DateTime
 
   @column()

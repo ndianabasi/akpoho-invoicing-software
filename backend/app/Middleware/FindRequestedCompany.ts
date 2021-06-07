@@ -10,7 +10,13 @@ export default class FindRequestedCompany {
 
     if (!company_id) throw new NoEntityDefinedException('No company is provided!')
 
-    const company = await Company.findOrFail(company_id)
+    let company
+    try {
+      company = await Company.findOrFail(company_id)
+    } catch (error) {
+      return ctx.response.notFound({ message: 'Unknown company was requested' })
+    }
+
     ctx.requestedCompany = company
 
     await next()

@@ -35,4 +35,9 @@ export default Env.rules({
   REDIS_HOST: Env.schema.string({ format: 'host' }),
   REDIS_PORT: Env.schema.number(),
   REDIS_PASSWORD: Env.schema.string.optional(),
+
+  // Customer variables
+  UUID_NAMESPACE: Env.schema.string(),
+  APP_URL: Env.schema.string({ format: 'url' }),
+  FRONTEND_URL: Env.schema.string({ format: 'url' }),
 })

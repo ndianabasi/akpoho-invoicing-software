@@ -9,7 +9,12 @@ export default class FindRequestedCustomerAddress {
     const { customer_address_id } = params
     if (!customer_address_id) throw new NoEntityDefinedException('No customer address is provided!')
 
-    const address = await CustomerAddress.findOrFail(customer_address_id)
+    let address
+    try {
+      address = address = await CustomerAddress.findOrFail(customer_address_id)
+    } catch (error) {
+      return ctx.response.notFound({ message: 'Unknown customer address was requested' })
+    }
 
     ctx.requestedCustomerAddress = address
 

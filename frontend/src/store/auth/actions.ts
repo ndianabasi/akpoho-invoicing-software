@@ -12,9 +12,8 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
   LOGIN_USER({ commit }, form) {
     return new Promise(async (resolve, reject) => {
       await $httpNoAuth
-        .post('login', form)
+        .post('/auth/login', form)
         .then((res: LoginHttpResponse & HttpResponse) => {
-          console.log(res.data);
           const data = res.data;
           const token = data.token;
           const userData = data.data;
@@ -48,7 +47,7 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
 
     return new Promise(async (resolve, reject) => {
       await $http
-        .post('logout')
+        .post('/auth/logout')
         .then((res: LoginHttpResponse) => {
           Notify.create({
             message: 'You have been logged out!',
@@ -75,13 +74,41 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
   FETCH_AUTH_PROFILE({ commit }, form) {
     return new Promise(async (resolve, reject) => {
       await $http
-        .get('auth-profile', form)
+        .get('/auth/profile', form)
         .then((res: LoginHttpResponse) => {
           commit('SET_USER_DATA', res.data.data);
           resolve(res.data);
         })
         .catch((error: HttpError) => {
           reject(error);
+        });
+    });
+  },
+
+  REQUEST_PASSWORD_RESET(_, form: { email: string }) {
+    return new Promise(async (resolve, reject) => {
+      await $httpNoAuth
+        .post('/auth/request-password-reset', { ...form })
+        .then((res: LoginHttpResponse & HttpResponse) => {
+          const data = res.data;
+          Notify.create({
+            message: data?.message,
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 2000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
         });
     });
   },

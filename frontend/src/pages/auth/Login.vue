@@ -80,7 +80,9 @@
     </template>
 
     <template #formFooterLink>
-      <router-link to="#">Forgot Password? </router-link>
+      <router-link :to="{ name: 'reset_password' }"
+        >Forgot Password?
+      </router-link>
     </template>
 
     <template
@@ -138,7 +140,7 @@ import {
 import { useStore } from 'vuex';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
-import AuthForm from '../components/AuthForm.vue';
+import AuthForm from '../../components/AuthForm.vue';
 //const strongPassword = helpers.regex('strongPassword', //)
 
 export default defineComponent({
@@ -191,9 +193,6 @@ export default defineComponent({
         await nextTick(() => {
           void store
             .dispatch('auth/LOGIN_USER', form)
-            .catch(() => {
-              submitting.value = false;
-            })
             .then(() => {
               submitting.value = false;
               void nextTick(() => {
@@ -204,6 +203,9 @@ export default defineComponent({
                   void router.push({ name: 'Dashboard' });
                 }
               });
+            })
+            .catch(() => {
+              submitting.value = false;
             });
         });
       } else {
@@ -228,7 +230,6 @@ export default defineComponent({
     };
 
     return {
-      ph: ref(''),
       dismissed: ref(false),
       submitting,
       form,

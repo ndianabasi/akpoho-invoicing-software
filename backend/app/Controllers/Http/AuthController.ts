@@ -1,8 +1,9 @@
 import User from 'App/Models/User'
-import Company from 'App/Models/Company'
+import Encryption from '@ioc:Adonis/Core/Encryption'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import NoLoginException from '../../Exceptions/NoLoginException'
+import Env from '@ioc:Adonis/Core/Env'
 
 export default class AuthController {
   public async register({ request, response }: HttpContextContract) {
@@ -29,7 +30,7 @@ export default class AuthController {
     user.password = userDetails.password
     await user.save()
 
-    return response.created(user.toJSON())
+    return response.created(user)
   }
 
   public async login({ request, auth, response }: HttpContextContract) {
@@ -105,17 +106,15 @@ export default class AuthController {
         response,
       }) */
 
-      return response.status(200).json({
+      return response.created({
         message: 'Login successful.',
         token: token,
         data: user,
-        status: 200,
-        statusText: 'OK',
       })
     }
   }
 
-  public async authProfile({ request, auth, response }: HttpContextContract) {
+  public async authProfile({ auth, response }: HttpContextContract) {
     /* Retrieve user with company information */
     const email = auth.user?.email!
 
@@ -139,5 +138,36 @@ export default class AuthController {
     return response.ok({
       data: user,
     })
+  }
+
+  public async requestPasswordReset({ request, response }: HttpContextContract) {
+    const { email } = request.body()
+
+    let user: User
+    try {
+      user = await User.findByOrFail('email', email)
+    } catch (error) {
+      return response.notFound({ message: 'This email was not found' })
+    }
+
+    // Step 1: generate encrypted string to be used for email
+    // This is not meant for storing in var(255) column as
+    // it is over 255 characters. 282 characters, actually
+    // Storing as text is not an option too due to indexing cost
+    // Best bet is to make this stateless
+    // So encrypted key will be embed in URL is sent via email without storing
+    const key = Encryption.encrypt(`password-reset-for-${user.id}`, '2 hours', String(user.id))
+
+    const FORGET_PASSWORD_URI = Env.get('FORGET_PASSWORD_URI', 'auth/reset-password')
+    const FRONTEND_URL = Env.get('FRONTEND_URL')
+    const passwordResetLink = `${FRONTEND_URL}${FORGET_PASSWORD_URI}/${key}`
+    console.info(
+      '\n\n==============\n',
+      'Use this link to reset your password:\n',
+      passwordResetLink,
+      '\n=============='
+    )
+
+    return response.ok({ id: user.email })
   }
 }

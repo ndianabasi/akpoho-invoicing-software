@@ -208,12 +208,39 @@ const routes: CustomRouteRecord[] = [
     ],
   },
   {
-    path: '/login',
-    component: () => import('pages/Login.vue'),
-    name: 'Login',
-    meta: {
-      label: 'Login',
-    },
+    path: '/auth',
+    redirect: '/auth/login',
+    component: () => import('pages/auth/AuthIndex.vue'),
+    name: 'auth',
+    children: [
+      {
+        path: 'login',
+        component: () => import('pages/auth/Login.vue'),
+        name: 'Login',
+        meta: {
+          label: 'Login',
+          requiresAuth: false,
+        },
+      },
+      {
+        path: 'forgot-password',
+        component: () => import('pages/auth/ForgotPassword.vue'),
+        name: 'reset_password',
+        meta: {
+          label: 'Reset Password',
+          requiresAuth: false,
+        },
+      },
+      {
+        path: 'reset-password/:key',
+        component: () => import('pages/auth/ResetPassword.vue'),
+        name: 'reset_password',
+        meta: {
+          label: 'Reset Password',
+          requiresAuth: false,
+        },
+      },
+    ],
   },
 
   // Always leave this as last one,
