@@ -12,6 +12,8 @@
           bottom-slots
           clearable
           type="email"
+          aria-autocomplete="email"
+          autocomplete="email"
           :error="form$.email.$invalid"
           label="Email"
           color="purple-10"
@@ -35,6 +37,8 @@
           bottom-slots
           counter
           clearable
+          aria-autocomplete="current-password"
+          autocomplete="current-password"
           :error="form$.password.$invalid"
           label="Password"
           :type="showPassword ? 'text' : 'password'"
@@ -80,7 +84,7 @@
     </template>
 
     <template #formFooterLink>
-      <router-link :to="{ name: 'reset_password' }"
+      <router-link :to="{ name: 'forgot_password' }"
         >Forgot Password?
       </router-link>
     </template>

@@ -37,11 +37,11 @@
       </form>
       <q-banner v-else rounded class="bg-light-solid text-positive">
         A password reset email has been sent. Email could take a couple of
-        minutes to be delivered.
+        minutes to be delivered. The reset link is only valid for 2 hours.
 
         <template v-slot:action>
           <q-btn
-            color="secondary"
+            color="primary"
             flat
             label="I didn't get the email"
             @click.prevent="showResetAlert = !showResetAlert"

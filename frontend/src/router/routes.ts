@@ -225,16 +225,17 @@ const routes: CustomRouteRecord[] = [
       {
         path: 'forgot-password',
         component: () => import('pages/auth/ForgotPassword.vue'),
-        name: 'reset_password',
+        name: 'forgot_password',
         meta: {
           label: 'Reset Password',
           requiresAuth: false,
         },
       },
       {
-        path: 'reset-password/:key',
+        path: 'reset-password/:verificationKey',
         component: () => import('pages/auth/ResetPassword.vue'),
         name: 'reset_password',
+        props: true,
         meta: {
           label: 'Reset Password',
           requiresAuth: false,

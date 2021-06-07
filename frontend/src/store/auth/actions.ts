@@ -90,9 +90,8 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
       await $httpNoAuth
         .post('/auth/request-password-reset', { ...form })
         .then((res: LoginHttpResponse & HttpResponse) => {
-          const data = res.data;
           Notify.create({
-            message: data?.message,
+            message: 'Password-reset email was sent',
             type: 'positive',
             position: 'top',
             progress: true,
@@ -106,6 +105,35 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
           });
 
           return resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  VERIFY_PASSWORD_RESET(_, key: string) {
+    return new Promise(async (resolve, reject) => {
+      console.log(key);
+
+      await $httpNoAuth
+        .post('/auth/verify-password-reset', { key })
+        .then((res: LoginHttpResponse & HttpResponse) => {
+          Notify.create({
+            message: 'Verified. Please reset your password!',
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.data);
         })
         .catch((error: HttpError) => {
           return reject(error);

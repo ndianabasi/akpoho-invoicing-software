@@ -23,6 +23,7 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.group(() => {
   Route.post('/auth/login', 'AuthController.login')
   Route.post('/auth/request-password-reset', 'AuthController.requestPasswordReset')
+  Route.post('/auth/verify-password-reset', 'AuthController.verifyPasswordReset')
 }).prefix('/v1')
 
 // General Authenticated routes

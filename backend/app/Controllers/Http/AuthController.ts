@@ -156,7 +156,7 @@ export default class AuthController {
     // Storing as text is not an option too due to indexing cost
     // Best bet is to make this stateless
     // So encrypted key will be embed in URL is sent via email without storing
-    const key = Encryption.encrypt(`password-reset-for-${user.id}`, '2 hours', String(user.id))
+    const key = Encryption.encrypt(`password-reset-for-${user.id}`, '2 hours', undefined)
 
     const FORGET_PASSWORD_URI = Env.get('FORGET_PASSWORD_URI', 'auth/reset-password')
     const FRONTEND_URL = Env.get('FRONTEND_URL')
@@ -169,5 +169,29 @@ export default class AuthController {
     )
 
     return response.ok({ id: user.email })
+  }
+
+  public async verifyPasswordReset({ request, response }: HttpContextContract) {
+    let { key } = request.body()
+    if (!key) {
+      return response.badRequest('Invalid request for password reset validation')
+    }
+
+    const decryptedKey: string = Encryption?.decrypt(key)!
+    if (!decryptedKey) return response.badRequest('Invalid request for password reset validation')
+    else {
+      console.log(decryptedKey)
+
+      const userId = decryptedKey.split('password-reset-for-')[1]
+
+      let user: User
+      try {
+        user = await User.findOrFail(userId)
+      } catch (error) {
+        return response.notFound({ message: 'Invalid user for password reset validation' })
+      }
+
+      return response.ok({ data: user.email })
+    }
   }
 }
