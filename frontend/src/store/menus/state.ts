@@ -1,4 +1,4 @@
-interface Menu {
+export interface Menu {
   icon: string;
   title: string;
   caption?: string;

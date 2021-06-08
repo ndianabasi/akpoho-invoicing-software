@@ -32,9 +32,25 @@
       elevated
       class="footer"
     >
-      <q-tabs mobile-arrows inline-label align="center">
+      <q-tabs mobile-arrows align="justify">
         <q-route-tab
-          v-for="link in links1"
+          v-for="link in firstTwoLinks"
+          :key="link.title"
+          :icon="link.icon"
+          :to="{ name: link.link }"
+          :label="link.title"
+        />
+        <q-btn
+          class="column flex-center"
+          align="center"
+          flat
+          @click="showCreateSheet"
+        >
+          <q-icon class="col block" center name="add_circle_outline" />
+          <div class="col block">New</div></q-btn
+        >
+        <q-route-tab
+          v-for="link in lastTwoLinks"
           :key="link.title"
           :icon="link.icon"
           :to="{ name: link.link }"
@@ -50,13 +66,15 @@
 <script lang="ts">
 //import EssentialLink from '../components/EssentialLink.vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import { defineComponent, ref, onMounted, computed, watchEffect } from 'vue';
 import SecondaryToolbar from '../components/SecondaryToolbar.vue';
 import StickySidebar from '../components/StickySidebar.vue';
 import GoToTop from '../components/GoToTop.vue';
 import SideDrawer from '../components/SideDrawer.vue';
 import PrimaryToolbar from '../components/PrimaryToolbar.vue';
-import { useMeta } from 'quasar';
+import { useMeta, useQuasar } from 'quasar';
+import { Menu } from '../store/menus/state';
 
 const metaData = {
   // sets document title
@@ -132,6 +150,8 @@ export default defineComponent({
   },
 
   setup() {
+    const $q = useQuasar();
+    const router = useRouter();
     useMeta(metaData);
     const store = useStore();
 
@@ -169,10 +189,48 @@ export default defineComponent({
       leftDrawerOpen.value = !leftDrawerOpen.value;
     };
 
+    const links1 = computed(
+      () => store.getters['menus/GET_LINKS1'] as Array<Menu>
+    );
+    const links2 = computed(
+      () => store.getters['menus/GET_LINKS2'] as Array<Menu>
+    );
+    const links3 = computed(
+      () => store.getters['menus/GET_LINKS3'] as Array<Menu>
+    );
+
+    const createMenu = computed(
+      () => store.getters['menus/GET_CREATE_MENU'] as Array<Menu>
+    );
+
+    const bottomSheetActions = createMenu.value.map((link) => ({
+      label: link.title,
+      icon: link.icon,
+      link: link.link,
+    }));
+
+    const showCreateSheet = (grid: boolean) => {
+      $q.bottomSheet({
+        message: 'Create',
+        grid,
+        actions: bottomSheetActions,
+      }).onOk((action: { label: string }) => {
+        const selectedLink = bottomSheetActions.filter(
+          (link) =>
+            link.label.trim().toLowerCase() === action.label.toLowerCase()
+        )[0];
+        void router.push({ name: selectedLink.link });
+      });
+    };
+
     return {
-      links1: computed(() => store.getters['menus/GET_LINKS1']),
-      links2: computed(() => store.getters['menus/GET_LINKS2']),
-      links3: computed(() => store.getters['menus/GET_LINKS3']),
+      links1,
+      links2,
+      links3,
+      firstTwoLinks: links1.value.filter((_, index) => index < 2),
+      lastTwoLinks: links1.value.filter(
+        (_, index, array) => index >= array.length - 2
+      ),
       TOGGLE_LEFT_DRAWER,
       search,
       storage,
@@ -180,6 +238,7 @@ export default defineComponent({
       mobileData: ref(true),
       bluetooth: ref(false),
       leftDrawerOpen,
+      showCreateSheet,
     };
   },
 });

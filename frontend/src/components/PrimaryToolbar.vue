@@ -47,7 +47,7 @@
       </template>
     </q-input>
 
-    <create-menu />
+    <create-menu v-if="$q.screen.gt.sm" />
 
     <q-space />
 

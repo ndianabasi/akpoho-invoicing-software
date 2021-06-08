@@ -61,6 +61,10 @@
   .q-card__actions .q-btn {
     color: var(--q-secondary);
   }
+
+  .footer {
+    background-color: $dark;
+  }
 }
 
 .AIS__secondary_toolbar {
@@ -94,5 +98,36 @@
 
   .q-drawer {
     background-color: $light-solid;
+  }
+}
+
+.q-footer {
+  .q-tabs {
+    .q-tab {
+      padding: 0 12px;
+
+      .q-tab__label {
+        font-size: 0.75rem;
+      }
+    }
+
+    .q-tabs__content {
+      justify-content: center !important;
+    }
+
+    button {
+      color: $grey-3;
+      .q-btn__content {
+        flex-direction: column;
+        & > i {
+          margin-right: 0px !important;
+          & ~ div {
+            font-size: 0.75rem;
+            align-items: center;
+            color: $grey-3;
+          }
+        }
+      }
+    }
   }
 }
