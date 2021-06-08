@@ -14,7 +14,14 @@
     <sticky-sidebar />
 
     <q-page-container class="AIS__page-container q-my-xl q-mx-lg">
-      <router-view />
+      <transition
+        appear
+        enter-active-class="animated slide-right"
+        leave-active-class="animated slide-left"
+        :duration="{ enter: 500, leave: 800 }"
+      >
+        <router-view />
+      </transition>
     </q-page-container>
   </q-layout>
 </template>

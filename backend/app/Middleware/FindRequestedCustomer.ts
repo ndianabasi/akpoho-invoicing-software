@@ -6,7 +6,6 @@ export default class FindRequestedCustomer {
   public async handle(ctx: CustomContextContract, next: () => Promise<void>) {
     // code for middleware goes here. ABOVE THE NEXT CALL
     const { customer_id } = ctx.params
-    //console.log(customer_id)
 
     if (!customer_id) throw new NoEntityDefinedException('No customer is provided!')
 

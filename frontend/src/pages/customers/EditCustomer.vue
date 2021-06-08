@@ -40,7 +40,7 @@
               :error="form$?.[field.name]?.$invalid ?? false"
               class="q-mb-md"
             >
-              <template #before>
+              <template v-if="field?.icon" #before>
                 <q-icon :name="field?.icon ?? ''" />
               </template>
 
@@ -76,7 +76,7 @@
               transition-hide="scale"
               emit-value
               map-options
-              ><template #before>
+              ><template v-if="field?.icon" #before>
                 <q-icon :name="field?.icon ?? ''" />
               </template>
             </quasar-select>

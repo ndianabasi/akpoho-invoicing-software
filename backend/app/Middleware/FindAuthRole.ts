@@ -6,7 +6,7 @@ export default class FindRequestedCompany {
     await ctx.auth.user?.load('role')
     const userRole = ctx.auth.user?.role
 
-    const isGlobalUser = userRole ? globalRoles.some((role) => role === userRole?.name) : null
+    const isGlobalUser = userRole ? globalRoles.some((role) => role === userRole?.name) : false
 
     ctx.authRole = userRole
     ctx.isGlobalUser = isGlobalUser

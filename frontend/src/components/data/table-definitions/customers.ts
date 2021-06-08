@@ -30,7 +30,7 @@ const columns: Array<CustomerHeaders> = [
   },
   {
     name: CustomerColumns.title,
-    required: true,
+    required: false,
     label: 'Title',
     align: 'center',
     field: CustomerColumns.title,
