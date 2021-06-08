@@ -1,6 +1,9 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-return -->
 <template>
-  <q-layout view="lHh Lpr fff" class="AIS__Layout">
+  <q-layout
+    :view="$q.screen.lt.md ? 'lHh Lpr fFf' : 'lHh Lpr fff'"
+    class="AIS__Layout"
+  >
     <q-header reveal elevated class="bg-white text-grey-8" height-hint="64">
       <primary-toolbar @update:leftDrawerOpen="TOGGLE_LEFT_DRAWER($event)" />
     </q-header>
@@ -23,6 +26,22 @@
         <router-view />
       </transition>
     </q-page-container>
+
+    <q-footer
+      v-if="$q.screen.lt.md && links1 && !!links1.length"
+      elevated
+      class="footer"
+    >
+      <q-tabs mobile-arrows inline-label align="center">
+        <q-route-tab
+          v-for="link in links1"
+          :key="link.title"
+          :icon="link.icon"
+          :to="{ name: link.link }"
+          :label="link.title"
+        />
+      </q-tabs>
+    </q-footer>
   </q-layout>
 </template>
 

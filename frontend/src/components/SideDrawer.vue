@@ -40,7 +40,7 @@
       </q-select>
 
       <q-list padding>
-        <template v-if="links1 && links1.length">
+        <template v-if="links1 && !!links1.length">
           <q-item
             v-for="link in links1"
             :key="link.title"
@@ -57,7 +57,7 @@
           </q-item>
         </template>
 
-        <template v-if="links2 && links2.length">
+        <template v-if="links2 && !!links2.length">
           <q-separator class="q-my-md" />
           <q-item
             v-for="link in links2"
@@ -75,7 +75,7 @@
           </q-item>
         </template>
 
-        <template v-if="links3 && links3.length">
+        <template v-if="links3 && !!links3.length">
           <q-separator class="q-my-md" />
           <q-item
             v-for="link in links3"
