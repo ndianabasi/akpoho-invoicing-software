@@ -16,7 +16,7 @@
 
     <sticky-sidebar />
 
-    <q-page-container class="AIS__page-container q-my-xl q-mx-lg">
+    <q-page-container class="AIS__page-container q-my-xl q-mx-sm-xs q-mx-lg-md">
       <transition
         appear
         enter-active-class="animated slide-right"

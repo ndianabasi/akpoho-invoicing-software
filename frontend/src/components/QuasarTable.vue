@@ -166,6 +166,16 @@
             <q-icon name="search" />
           </template>
         </q-input>
+
+        <div class="q-mt-md">
+          {{
+            paginationModel.rowsNumber > 1
+              ? `${paginationModel.rowsNumber} records were found`
+              : paginationModel.rowsNumber === 1
+              ? `${paginationModel.rowsNumber} record was found`
+              : 'No record was found'
+          }}
+        </div>
       </template>
 
       <template #header="props">
