@@ -24,6 +24,7 @@ Route.group(() => {
   Route.post('/auth/login', 'AuthController.login')
   Route.post('/auth/request-password-reset', 'AuthController.requestPasswordReset')
   Route.post('/auth/verify-password-reset', 'AuthController.verifyPasswordReset')
+  Route.post('/auth/reset-password', 'AuthController.ResetPassword')
 }).prefix('/v1')
 
 // General Authenticated routes

@@ -4,6 +4,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import NoLoginException from '../../Exceptions/NoLoginException'
 import Env from '@ioc:Adonis/Core/Env'
+import PasswordResetValidator from 'App/Validators/PasswordResetValidator'
 
 export default class AuthController {
   public async register({ request, response }: HttpContextContract) {
@@ -150,6 +151,33 @@ export default class AuthController {
       return response.notFound({ message: 'This email was not found' })
     }
 
+    // Check if user can log in.
+    // Get login status
+    const loginStatus = Boolean(user.loginStatus)
+    if (!loginStatus) {
+      throw new NoLoginException({
+        message: 'Log in is not permitted for this account!',
+      })
+    }
+
+    // Get activation status
+    const activationStatus = Boolean(user.isAccountActivated)
+    if (!activationStatus) {
+      throw new NoLoginException({
+        message:
+          'Your account is not activated. Please activate your account with the activation link sent to you via email.',
+      })
+    }
+
+    // Get email verification status
+    const emailVerificationStatus = Boolean(user.isEmailVerified)
+    if (!emailVerificationStatus) {
+      throw new NoLoginException({
+        message:
+          'Your email address is not verified. Please check your email inbox for a verification sent to you or request for a new verification email from your Church admin. If you are a Church admin, please contact us for assistance.',
+      })
+    }
+
     // Step 1: generate encrypted string to be used for email
     // This is not meant for storing in var(255) column as
     // it is over 255 characters. 282 characters, actually
@@ -193,5 +221,50 @@ export default class AuthController {
 
       return response.ok({ data: user.email })
     }
+  }
+
+  public async ResetPassword({ request, response, auth }: HttpContextContract) {
+    await request.validate(PasswordResetValidator)
+
+    let { email, newPassword } = request.body()
+
+    let user: User
+    try {
+      user = await User.findByOrFail('email', email)
+    } catch (error) {
+      return response.notFound({ message: 'Invalid user for password reset' })
+    }
+
+    user.merge({ password: newPassword })
+    await user.save()
+
+    const token = await auth.use('api').attempt(email, newPassword)
+    // Check if credentials are valid, else return error
+    if (!token) throw new NoLoginException({ message: 'Email address or password is not correct.' })
+
+    /* Retrieve user with company information */
+
+    const loginUser = await User.query()
+      .select(
+        'users.id',
+        'users.email',
+        'users.login_status',
+        'users.is_account_activated',
+        'users.is_email_verified',
+        'users.role_id'
+      )
+      .where('email', email)
+      .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
+      .preload('profile', (profileQuery) =>
+        profileQuery.select(...['id', 'first_name', 'last_name', 'profile_picture'])
+      )
+      .preload('role', (roleQuery) => roleQuery.select(...['name']))
+      .first()
+
+    return response.created({
+      message: 'Password change was successful.',
+      token: token,
+      data: loginUser,
+    })
   }
 }
