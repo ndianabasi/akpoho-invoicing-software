@@ -17,14 +17,16 @@
     <sticky-sidebar />
 
     <q-page-container class="AIS__page-container q-my-xl q-mx-sm-xs q-mx-lg-md">
-      <transition
-        appear
-        enter-active-class="animated slide-right"
-        leave-active-class="animated slide-left"
-        :duration="{ enter: 500, leave: 800 }"
-      >
-        <router-view />
-      </transition>
+      <router-view v-slot="{ Component }">
+        <transition
+          appear
+          enter-active-class="animated slide-right"
+          leave-active-class="animated slide-left"
+          :duration="{ enter: 500, leave: 800 }"
+        >
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </q-page-container>
 
     <q-footer
@@ -167,6 +169,8 @@ export default defineComponent({
     watchEffect(
       () => void store.dispatch('permissions/FETCH_USER_PERMISSIONS')
     );
+
+    watchEffect(() => void store.dispatch('roles/FETCH_GLOBAL_ROLES'));
 
     onMounted(() => {
       /* console.log('route matched', route.matched);

@@ -43,19 +43,14 @@
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
-  name: 'AllSettings',
+  name: 'AllPersonalSettings',
   components: {},
   setup() {
     const settings = ref([
       {
-        name: 'Users',
-        link: 'all_users',
-        description: 'View, edit, and delete users.',
-      },
-      {
-        name: 'My Personal Settings',
-        link: 'all_personal_settings',
-        description: 'View and edit your personal settings',
+        name: 'My Account',
+        link: 'my_account',
+        description: 'View and edit your account details',
       },
     ]);
     return {

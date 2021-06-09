@@ -17,6 +17,16 @@ const actions: ActionTree<RolesStateInterface, StateInterface> = {
       });
     });
   },
+
+  async FETCH_GLOBAL_ROLES({ commit }) {
+    return new Promise(async (resolve) => {
+      await $http.get('/roles/global-roles').then((res: HttpResponse) => {
+        commit('SET_GLOBAL_ROLES', res.data.data);
+
+        resolve(res.data);
+      });
+    });
+  },
 };
 
 export default actions;

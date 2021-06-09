@@ -47,6 +47,7 @@ Route.group(() => {
   )
 
   Route.get('/roles/roles-for-select', 'RolesController.rolesForSelect')
+  Route.get('/roles/global-roles', 'RolesController.globalRoles')
 
   // Permissions routes
   Route.get('/permissions/user-permissions', 'PermissionsController.userPermissions')

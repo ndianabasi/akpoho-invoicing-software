@@ -81,7 +81,6 @@ import { required, email, helpers } from '@vuelidate/validators';
 import { useStore } from 'vuex';
 import { Notify } from 'quasar';
 import AuthForm from '../../components/AuthForm.vue';
-import { HttpError } from '../../store/types';
 //const strongPassword = helpers.regex('strongPassword', //)
 
 export default defineComponent({

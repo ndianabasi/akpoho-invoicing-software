@@ -33,6 +33,7 @@
           </q-input>
 
           <quasar-select
+            v-if="CAN_EDIT_USERS"
             v-model="form.role_id"
             filled
             :options="roles"
@@ -52,6 +53,16 @@
           >
             <template #before>
               <q-icon name="person" />
+            </template>
+
+            <template #hint>
+              <div
+                v-if="CAN_EDIT_USERS && myAccountMode"
+                class="q-mb-sm text-warning"
+              >
+                <q-icon name="warning" color="warning" /> Be care and don't
+                downgrade your role, unless that is what you really want to do!
+              </div>
             </template>
 
             <template #error>
@@ -101,13 +112,12 @@
             bottom-slots
             options-dense
             use-input
-            input-debounce="0"
+            :input-debounce="0"
             class="q-mb-md"
             transition-show="scale"
             transition-hide="scale"
             emit-value
             map-options
-            @filter="selectFilterFn"
             ><template #before>
               <q-icon name="business" />
             </template>
@@ -125,24 +135,32 @@
             bottom-slots
             options-dense
             use-input
-            input-debounce="0"
+            :input-debounce="0"
             class="q-mb-md"
             transition-show="scale"
             transition-hide="scale"
             emit-value
             map-options
-            @filter="selectFilterFn"
             ><template #before>
               <q-icon name="business" />
             </template>
           </quasar-select>
 
           <q-toggle
+            v-if="CAN_EDIT_USERS"
             v-model="form.login_status"
             checked-icon="check"
             unchecked-icon="clear"
             :label="form.login_status ? 'Can login' : 'Cannot login'"
           />
+          <div
+            v-if="CAN_EDIT_USERS && myAccountMode"
+            class="q-mb-sm text-warning"
+            style="font-size: 0.75rem"
+          >
+            <q-icon name="warning" color="warning" /> Be care and don't disable
+            your login access, unless that is what you really want to do!
+          </div>
         </form>
       </template>
 
@@ -164,7 +182,7 @@
         </div>
       </template>
 
-      <template v-if="!creationMode" #title-panel-side>
+      <template v-if="!creationMode && !myAccountMode" #title-panel-side>
         <q-btn flat icon="more_vert">
           <q-menu
             anchor="bottom right"
@@ -205,10 +223,11 @@
   </div>
 </template>
 
-<!-- eslint-disable @typescript-eslint/no-unsafe-return -->
-<!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
-<!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import {
   defineComponent,
   ref,
@@ -231,6 +250,7 @@ import {
   SelectionOption,
   UserFormShape,
   PERMISSION,
+  TitleInfo,
 } from '../../../store/types';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
@@ -251,6 +271,10 @@ export default defineComponent({
       default: '',
     },
     creationMode: {
+      type: Boolean,
+      default: false,
+    },
+    myAccountMode: {
       type: Boolean,
       default: false,
     },
@@ -313,10 +337,13 @@ export default defineComponent({
             })
             .then(() => {
               submitting.value = false;
-              void router.push({
-                name: 'view_user',
-                params: { userId: props.userId },
-              });
+              if (!props.myAccountMode) {
+                void router.push({
+                  name: 'view_user',
+                  params: { userId: props.userId },
+                });
+              }
+
               return;
             })
             .catch(() => {
@@ -401,20 +428,30 @@ export default defineComponent({
       () => store.getters['roles/GET_ROLES_FOR_SELECT'] as SelectionOption[]
     );
 
-    const titleInfo =
-      currentUser && currentUser.value
-        ? useTitleInfo({
-            title: `${currentUser.value.profile?.first_name ?? ''} ${
-              currentUser.value.profile?.last_name ?? ''
-            }`,
-            avatar: currentUser.value.profile?.profile_picture ?? '',
-          })
-        : props.creationMode
-        ? useTitleInfo({
-            title: 'New User',
-            avatar: '',
-          })
-        : ref(null);
+    let titleInfo: Ref<TitleInfo | null> = ref(null);
+
+    watch(
+      currentUser,
+      () => {
+        const title =
+          currentUser && currentUser.value
+            ? useTitleInfo({
+                title: `${currentUser.value.profile?.first_name ?? ''} ${
+                  currentUser.value.profile?.last_name ?? ''
+                }`,
+                avatar: currentUser.value.profile?.profile_picture ?? '',
+              })
+            : props.creationMode
+            ? useTitleInfo({
+                title: 'New User',
+                avatar: '',
+              })
+            : ref(null);
+
+        titleInfo.value = title.value;
+      },
+      { deep: true }
+    );
 
     const stopFetchCurrentlyViewedUser = watchEffect(() => {
       if (!props.creationMode) {
@@ -483,6 +520,11 @@ export default defineComponent({
       }
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const CAN_EDIT_USERS = computed(() =>
+      store.getters['permissions/GET_USER_PERMISSION']('can_edit_users')
+    );
+
     onBeforeMount(() => {
       stopFetchCurrentlyViewedUser();
       stopFetchCountriesForSelect();
@@ -508,6 +550,7 @@ export default defineComponent({
         view: PERMISSION.CAN_VIEW_USERS,
         list: PERMISSION.CAN_LIST_USERS,
       }),
+      CAN_EDIT_USERS,
     };
   },
 });

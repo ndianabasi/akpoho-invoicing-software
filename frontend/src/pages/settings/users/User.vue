@@ -371,12 +371,18 @@ import {
   ref,
   onBeforeMount,
   watchEffect,
+  watch,
   computed,
+  Ref,
 } from 'vue';
 import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
 import useResourcePermissions from '../../../composables/useResourcePermissions';
-import { CurrentlyViewedUser, PERMISSION } from '../../../store/types';
+import {
+  CurrentlyViewedUser,
+  PERMISSION,
+  TitleInfo,
+} from '../../../store/types';
 import { store } from '../../../store';
 
 export default defineComponent({
@@ -400,12 +406,22 @@ export default defineComponent({
         store.getters['users/GET_CURRENTLY_VIEWED_USER'] as CurrentlyViewedUser
     );
 
-    const titleInfo = useTitleInfo({
-      title: `${currentUser?.value?.profile?.first_name ?? ''} ${
-        currentUser?.value?.profile?.last_name ?? ''
-      }`,
-      avatar: currentUser?.value?.profile?.profile_picture ?? '',
-    });
+    let titleInfo: Ref<TitleInfo | null> = ref(null);
+
+    watch(
+      currentUser,
+      () => {
+        const title = useTitleInfo({
+          title: `${currentUser?.value?.profile?.first_name ?? ''} ${
+            currentUser?.value?.profile?.last_name ?? ''
+          }`,
+          avatar: currentUser?.value?.profile?.profile_picture ?? '',
+        });
+
+        titleInfo.value = title.value;
+      },
+      { deep: true }
+    );
 
     const stopFetchCurrentlyViewedUser = watchEffect(() => {
       void store.dispatch('users/FETCH_CURRENTLY_VIEW_USER', {

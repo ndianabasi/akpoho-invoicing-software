@@ -203,6 +203,36 @@ const routes: CustomRouteRecord[] = [
               },
             ],
           },
+          {
+            path: 'personal-settings',
+            component: () =>
+              import('pages/settings/personal-settings/Index.vue'),
+            meta: {
+              label: 'Personal Settings',
+            },
+            children: [
+              {
+                path: '',
+                component: () =>
+                  import(
+                    'pages/settings/personal-settings/AllPersonalSettings.vue'
+                  ),
+                name: 'all_personal_settings',
+                meta: {
+                  label: 'All Personal Settings',
+                },
+              },
+              {
+                path: 'my-account',
+                component: () =>
+                  import('pages/settings/personal-settings/MyAccount.vue'),
+                name: 'my_account',
+                meta: {
+                  label: 'My Account',
+                },
+              },
+            ],
+          },
         ],
       },
     ],

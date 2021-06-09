@@ -4,8 +4,8 @@
     bordered
     mini
     behavior="mobile"
-    @click="TOGGLE_LEFT_DRAWER()"
-    @input="TOGGLE_LEFT_DRAWER()"
+    @click="TOGGLE_LEFT_DRAWER"
+    @input="TOGGLE_LEFT_DRAWER"
   >
     <q-scroll-area class="fit">
       <q-toolbar class="AIS__toolbar">

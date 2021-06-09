@@ -42,4 +42,10 @@ export default class RolesController {
       data: transformedRoles,
     })
   }
+
+  public async globalRoles({ response }: HttpContextContract) {
+    return response.ok({
+      data: globalRoles,
+    })
+  }
 }
