@@ -34,6 +34,8 @@
       dense
       standout="bg-primary"
       placeholder="Search"
+      aria-autocomplete="off"
+      autocomplete="off"
     >
       <!-- eslint-disable-next-line vue/v-slot-style -->
       <template v-slot:prepend>

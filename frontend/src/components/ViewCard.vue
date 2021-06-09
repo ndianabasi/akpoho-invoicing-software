@@ -2,7 +2,7 @@
   <div class="row justify-center">
     <div class="col-md-6 col-sm-12 col-xs-12">
       <q-card flat bordered>
-        <slot name="title-panel">
+        <slot v-if="showTitlePanel" name="title-panel">
           <q-item v-if="titleInfo">
             <q-item-section v-if="showAvatar" avatar>
               <q-avatar>
@@ -55,9 +55,15 @@ export default defineComponent({
       default: false,
     },
 
+    showTitlePanel: {
+      type: Boolean,
+      default: true,
+    },
+
     titleInfo: {
       type: Object as PropType<TitleInfo>,
-      required: true,
+      required: false,
+      default: () => ({ title: '', avatar: '' }),
       validator(value: TitleInfo) {
         return ['title', 'avatar'].every((prop) =>
           Object.prototype.hasOwnProperty.call(value, prop)

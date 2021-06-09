@@ -231,6 +231,17 @@ const routes: CustomRouteRecord[] = [
                   label: 'My Account',
                 },
               },
+              {
+                path: 'change-my-password',
+                component: () =>
+                  import(
+                    'pages/settings/personal-settings/ChangeMyPassword.vue'
+                  ),
+                name: 'change_my_password',
+                meta: {
+                  label: 'Change My Password',
+                },
+              },
             ],
           },
         ],

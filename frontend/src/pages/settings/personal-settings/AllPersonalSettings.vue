@@ -52,6 +52,11 @@ export default defineComponent({
         link: 'my_account',
         description: 'View and edit your account details',
       },
+      {
+        name: 'Change My Password',
+        link: 'change_my_password',
+        description: 'Change your login password',
+      },
     ]);
     return {
       settings,

@@ -3,6 +3,7 @@
   text-decoration: none;
 }
 
+// Dark mode starts
 .body--dark {
   .AIS__toolbar {
     color: $grey-3;
@@ -65,23 +66,16 @@
   .footer {
     background-color: $dark;
   }
-}
 
-.AIS__secondary_toolbar {
-  color: var(--q-primary);
-  background-color: var(--q-white);
-}
-
-.sticky-sidebar {
-  .q-btn {
-    color: $grey-9;
+  .q-stepper {
+    .q-stepper__caption {
+      color: $grey-3;
+    }
   }
 }
+// Dark mode ends
 
-.q-page-scroller {
-  z-index: 5000;
-}
-
+// Light mode starts
 .body--light {
   background-color: $light;
   .AIS__secondary_toolbar {
@@ -103,6 +97,28 @@
   .q-drawer {
     background-color: $light-solid;
   }
+
+  .q-stepper {
+    .q-stepper__caption {
+      color: $accent;
+    }
+  }
+}
+// Light mode ends
+
+.AIS__secondary_toolbar {
+  color: var(--q-primary);
+  background-color: var(--q-white);
+}
+
+.sticky-sidebar {
+  .q-btn {
+    color: $grey-9;
+  }
+}
+
+.q-page-scroller {
+  z-index: 5000;
 }
 
 .q-footer {
