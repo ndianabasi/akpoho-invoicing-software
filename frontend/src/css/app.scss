@@ -90,6 +90,10 @@
 
   .q-btn {
     color: var(--q-primary);
+    &[type='submit'] {
+      background-color: var(--q-primary);
+      color: $grey-3;
+    }
   }
 
   .q-list > .q-item {
