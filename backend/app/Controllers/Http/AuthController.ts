@@ -5,6 +5,10 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import NoLoginException from '../../Exceptions/NoLoginException'
 import Env from '@ioc:Adonis/Core/Env'
 import PasswordResetValidator from 'App/Validators/PasswordResetValidator'
+import { DateTime } from 'luxon'
+import Event from '@ioc:Adonis/Core/Event'
+import Hash from '@ioc:Adonis/Core/Hash'
+import PasswordChangeValidator from 'App/Validators/PasswordChangeValidator'
 
 export default class AuthController {
   public async register({ request, response }: HttpContextContract) {
@@ -265,6 +269,143 @@ export default class AuthController {
       message: 'Password change was successful.',
       token: token,
       data: loginUser,
+    })
+  }
+
+  public async confirmCurrentPassword({ request, response, auth }: HttpContextContract) {
+    let { currentPassword } = request.body()
+    if (!currentPassword) {
+      return response.badRequest('Invalid request. No current password provided!')
+    }
+
+    const user = auth.user
+    const userEmail = user?.email!
+
+    try {
+      // Check if credentials are valid, else throw an error
+      await auth.use('api').verifyCredentials(userEmail, currentPassword)
+    } catch (error) {
+      return response.badRequest({ message: 'Current password is not valid' })
+    }
+
+    // Create or update password change record for the user
+    // Most fields are auto-created/auto-updated in the PasswordChange model
+    // via the beforeSave hooks
+    await user?.related('passwordChange').updateOrCreate({ userId: user.id }, {})
+
+    // reload passwordChange relationship
+    await user?.load('passwordChange')
+    const passwordChange = user?.passwordChange
+
+    /**
+     * Fire event and send verification email
+     */
+    Event.emit('auth::send-code', { user: user!, type: 'password_change_code' })
+
+    return response.ok({
+      message:
+        'Current password is verified. Please check your email address for a confirmation code. Code is valid for only 2 hours.',
+      data: { secret: passwordChange?.secret },
+    })
+  }
+
+  public async confirmPasswordCode({ request, response, auth }: HttpContextContract) {
+    // Validate request
+    const validationSchema = schema.create({
+      code: schema.number([rules.required(), rules.unsigned(), rules.range(100000, 999999)]),
+      secret: schema.string({ trim: true }, [rules.uuid({ version: 5 }), rules.required()]),
+    })
+
+    const validationMessages = {
+      'code.required': 'Code is required!',
+      'code.unsigned': 'Code is invalid',
+      'code.range': 'Code is out of range',
+      'secret.uuid': 'Secret is invalid',
+      'secret.required': 'Secret is required',
+    }
+
+    await request.validate({
+      schema: validationSchema,
+      messages: validationMessages,
+    })
+
+    let { code, secret } = request.body()
+    const user = auth.user!
+
+    await user.load('passwordChange')
+    const passwordChange = user.passwordChange
+    if (!passwordChange) {
+      return response.badRequest({ message: 'Password change has not been initiated' })
+    }
+
+    if (passwordChange.verificationCode !== Number(code) || passwordChange.secret !== secret) {
+      return response.badRequest({ message: 'Invalid data provided' })
+    }
+
+    const NOW = DateTime.now()
+    const THEN = passwordChange.verificationCodeExpiresAt
+    if (THEN > NOW.plus({ hours: 2 })) {
+      return response.badRequest({
+        message: 'Verification code has expired. Please restart the process',
+      })
+    }
+
+    return response.ok({
+      message: 'Everything is green. Please reset your password',
+    })
+  }
+
+  public async submitNewPassword({ request, response, auth }: HttpContextContract) {
+    await request.validate(PasswordChangeValidator)
+
+    let { newPassword, secret } = request.body()
+    const user = auth.user!
+
+    await user.load('passwordChange')
+    const passwordChange = user.passwordChange
+    if (!passwordChange) {
+      return response.badRequest({ message: 'Password change has not been initiated' })
+    }
+
+    if (passwordChange.secret !== secret) {
+      return response.badRequest({ message: 'Invalid password-change session!' })
+    }
+
+    // Verify 'newPassword' against user's old passwords on
+    // the password_histories table.
+    await user.load('passwordHistories')
+    const passwordHistories = user.passwordHistories
+
+    for (const history of passwordHistories) {
+      if (await Hash.verify(history.oldPassword, newPassword)) {
+        return response.badGateway({
+          message:
+            'New password has been used already on Akpoho Software! Please try again with a unique password.',
+        })
+      }
+    }
+
+    /**
+     *  If all is green, update password on users table and store old password
+     *  on the password_histories table.
+     */
+    await user.related('passwordHistories').create({
+      oldPassword: user.password,
+    })
+
+    /**
+     * `newPassword` is not hashed here because hashing will be handled
+     * by the `beforeSave` hook on the User model.
+     */
+    user.merge({ password: newPassword })
+    await user.save()
+
+    // Future: flush user cache after this
+
+    Event.emit('auth::send-success-emails', { user, type: 'password_change_success' })
+
+    return response.status(201).json({
+      message: 'Your password was updated successfully. You can now login with it subsequently.',
     })
   }
 }

@@ -17,16 +17,7 @@
     <sticky-sidebar />
 
     <q-page-container class="AIS__page-container q-my-xl q-mx-sm-xs q-mx-lg-md">
-      <router-view v-slot="{ Component }">
-        <transition
-          appear
-          enter-active-class="animated slide-right"
-          leave-active-class="animated slide-left"
-          :duration="{ enter: 500, leave: 800 }"
-        >
-          <component :is="Component" />
-        </transition>
-      </router-view>
+      <router-view />
     </q-page-container>
 
     <q-footer
@@ -34,7 +25,7 @@
       elevated
       class="footer"
     >
-      <q-tabs mobile-arrows align="justify">
+      <q-tabs :dense="$q.screen.lt.sm" mobile-arrows align="justify">
         <q-route-tab
           v-for="link in firstTwoLinks"
           :key="link.title"

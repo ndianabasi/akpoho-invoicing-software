@@ -127,7 +127,8 @@
       padding: 0 12px;
 
       .q-tab__label {
-        font-size: 0.75rem;
+        font-size: 0.6rem;
+        font-kerning: normal;
       }
     }
 
@@ -142,7 +143,7 @@
         & > i {
           margin-right: 0px !important;
           & ~ div {
-            font-size: 0.75rem;
+            font-size: 0.6rem;
             align-items: center;
             color: $grey-3;
           }

@@ -38,6 +38,12 @@ Route.group(() => {
       revoked: true,
     })
   })
+  // Confirm the current password for password change by auth user
+  Route.post('/auth/confirm-current-password', 'AuthController.confirmCurrentPassword')
+  // Confirm the confirmation code for password change by auth user
+  Route.post('/auth/confirm-password-change-code', 'AuthController.confirmPasswordCode')
+  // Receive and update new password for auth user
+  Route.post('/auth/submit-new-password', 'AuthController.submitNewPassword')
 
   Route.get('/countries/countries-for-select', 'CountriesController.countriesForSelect')
 

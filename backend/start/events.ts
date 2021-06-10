@@ -16,3 +16,6 @@ Event.on('db:query', Database.prettyPrint)
 Event.on('db:query', function ({ sql, bindings }) {
   console.log(sql, bindings)
 })
+
+Event.on('auth::send-code', 'Auth.onSendCode')
+Event.on('auth::send-success-emails', 'Auth.onSendSuccessEmails')

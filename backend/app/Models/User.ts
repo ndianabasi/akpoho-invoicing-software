@@ -10,12 +10,16 @@ import {
   ManyToMany,
   hasOne,
   HasOne,
+  hasMany,
+  HasMany,
 } from '@ioc:Adonis/Lucid/Orm'
 import UserHook from 'App/Models/Hooks/UserHook'
 import Company from 'App/Models/Company'
 import Role from 'App/Models/Role'
 import UserProfile from 'App/Models/UserProfile'
 import { STANDARD_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import PasswordChange from 'App/Models/PasswordChange'
+import PasswordHistory from 'App/Models/PasswordHistory'
 
 export default class User extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -88,8 +92,12 @@ export default class User extends BaseModel {
   @column.dateTime()
   public emailVerifiedAt: DateTime
 
-  @column.dateTime({ prepare: (value) => value.toFormat('yyyy-LL-dd HH:mm:ss') })
+  @column.dateTime()
   public activationCodeExpiresAt: DateTime
+
+  // Also used when user is changing their password while logged in
+  @column.dateTime()
+  public forgotPasswordCodeExpiresAt: DateTime
 
   @column.dateTime()
   public loginCodeExpiresAt: DateTime
@@ -140,4 +148,10 @@ export default class User extends BaseModel {
 
   @hasOne(() => UserProfile)
   public profile: HasOne<typeof UserProfile>
+
+  @hasOne(() => PasswordChange)
+  public passwordChange: HasOne<typeof PasswordChange>
+
+  @hasMany(() => PasswordHistory)
+  public passwordHistories: HasMany<typeof PasswordHistory>
 }

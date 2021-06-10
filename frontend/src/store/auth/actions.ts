@@ -178,6 +178,109 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         });
     });
   },
+
+  CONFIRM_CURRENT_PASSWORD_FOR_PASSWORD_CHANGE(
+    _,
+    { currentPassword }: { currentPassword: string }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      await $http
+        .post('/auth/confirm-current-password', {
+          currentPassword,
+        })
+        .then((res: LoginHttpResponse & HttpResponse) => {
+          Notify.create({
+            message: res.data.message,
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  CONFIRM_CODE_FOR_PASSWORD_CHANGE(
+    _,
+    { code, secret }: { code: number; secret: string }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      await $http
+        .post('/auth/confirm-password-change-code', {
+          code,
+          secret,
+        })
+        .then((res: LoginHttpResponse & HttpResponse) => {
+          Notify.create({
+            message: res.data.message,
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  SUBMIT_NEW_PASSWORD(
+    _,
+    {
+      newPassword,
+      confirmNewPassword,
+      secret,
+    }: { newPassword: string; confirmNewPassword: string; secret: string }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      await $http
+        .post('/auth/submit-new-password', {
+          newPassword,
+          confirmNewPassword,
+          secret,
+        })
+        .then((res: LoginHttpResponse & HttpResponse) => {
+          Notify.create({
+            message: res.data.message,
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
 };
 
 export default actions;

@@ -27,7 +27,7 @@
               icon="lock"
               :done="step > 1"
               done-color="positive"
-              done-icon="positive"
+              done-icon="done"
               :caption="
                 'Password was last changed at: ' + dateOfLastPasswordChange
               "
@@ -89,32 +89,158 @@
               title="Enter code"
               icon="security"
               :done="step > 2"
+              done-color="positive"
+              done-icon="done"
             >
-              An ad group contains one or more ads which target a shared set of
-              keywords.
+              <q-input
+                v-model="form.changePasswordCode"
+                filled
+                clearable
+                bottom-slots
+                type="number"
+                aria-autocomplete="one-time-code"
+                autocomplete="one-time-code"
+                label="Enter code"
+                :dense="$q.screen.lt.sm"
+                :error="
+                  form.changePasswordCodeErrors &&
+                  !!form.changePasswordCodeErrors.length
+                "
+                class="q-mb-md"
+              >
+                <template #before>
+                  <q-icon name="security" />
+                </template>
+
+                <template #error>
+                  {{
+                    changePasswordCodeErrors &&
+                    !!changePasswordCodeErrors.length
+                      ? changePasswordCodeErrors.join(', ')
+                      : ''
+                  }}
+                </template>
+              </q-input>
 
               <q-stepper-navigation>
-                <q-btn color="primary" label="Continue" @click="step = 4" />
+                <q-btn
+                  color="primary"
+                  label="Continue"
+                  @click.prevent="submitPasswordChangeCode"
+                />
               </q-stepper-navigation>
             </q-step>
 
-            <q-step :name="4" title="Enter new password" icon="lock">
-              Try out different ad text to see what brings in the most
-              customers, and learn how to enhance your ads using features like
-              ad extensions. If you run into any problems with your ads, find
-              out how to tell if they're running and how to resolve approval
-              issues.
+            <q-step
+              :name="3"
+              title="Provide new password"
+              icon="lock"
+              :done="passwordChangeCompleted"
+              done-color="positive"
+              done-icon="done"
+            >
+              <q-input
+                v-model="form.newPassword"
+                filled
+                clearable
+                bottom-slots
+                :type="revealPasswords.newPassword ? 'text' : 'password'"
+                aria-autocomplete="new-password"
+                autocomplete="new-password"
+                label="Enter New Password"
+                :dense="$q.screen.lt.sm"
+                :error="
+                  form.newPasswordErrors && !!form.newPasswordErrors.length
+                "
+                class="q-mb-md"
+              >
+                <template #before>
+                  <q-icon name="lock" />
+                </template>
+
+                <template #append>
+                  <q-icon
+                    v-if="form.newPassword"
+                    :name="form.newPassword ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="
+                      revealPasswords.newPassword = !revealPasswords.newPassword
+                    "
+                  />
+                </template>
+
+                <template #error>
+                  {{
+                    newPasswordErrors && !!newPasswordErrors.length
+                      ? newPasswordErrors.join(', ')
+                      : ''
+                  }}
+                </template>
+              </q-input>
+              <q-input
+                v-model="form.confirmNewPassword"
+                filled
+                clearable
+                bottom-slots
+                :type="revealPasswords.confirmNewPassword ? 'text' : 'password'"
+                aria-autocomplete="new-password"
+                autocomplete="new-password"
+                label="Confirm New Password"
+                :dense="$q.screen.lt.sm"
+                :error="
+                  form.confirmNewPasswordErrors &&
+                  !!form.confirmNewPasswordErrors.length
+                "
+                class="q-mb-md"
+              >
+                <template #before>
+                  <q-icon name="lock" />
+                </template>
+
+                <template #append>
+                  <q-icon
+                    v-if="form.confirmNewPassword"
+                    :name="
+                      form.confirmNewPassword ? 'visibility_off' : 'visibility'
+                    "
+                    class="cursor-pointer"
+                    @click="
+                      revealPasswords.confirmNewPassword =
+                        !revealPasswords.confirmNewPassword
+                    "
+                  />
+                </template>
+
+                <template #error>
+                  {{
+                    confirmNewPasswordErrors &&
+                    !!confirmNewPasswordErrors.length
+                      ? confirmNewPasswordErrors.join(', ')
+                      : ''
+                  }}
+                </template>
+              </q-input>
 
               <q-stepper-navigation>
-                <q-btn color="primary" label="Finish" />
                 <q-btn
-                  flat
                   color="primary"
-                  label="Back"
-                  class="q-ml-sm"
-                  @click="step = 2"
+                  label="Finish"
+                  @click.prevent="submitNewPassword"
                 />
               </q-stepper-navigation>
+            </q-step>
+
+            <q-step
+              :name="4"
+              title="Success"
+              icon="done_all"
+              :done="passwordChangeCompleted"
+              done-color="positive"
+              done-icon="done_all"
+            >
+              <q-banner class="bg-positive text-white">
+                Congratulations your password was successfully changed
+              </q-banner>
             </q-step>
           </q-stepper>
         </form>
@@ -128,10 +254,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { defineComponent, ref, computed, reactive } from 'vue';
+import { defineComponent, ref, computed, reactive, Component, Ref } from 'vue';
 import ViewCard from '../../../components/ViewCard.vue';
 import { store } from '../../../store';
-import { Notify } from 'quasar';
+import { Notify, QStepper } from 'quasar';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 
@@ -139,7 +265,7 @@ const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
 const sixDigitCodeRegex = /^(\d){6}$/;
 
 export default defineComponent({
-  name: 'EditUser',
+  name: 'ChangeMyPassword',
 
   components: {
     ViewCard,
@@ -148,16 +274,18 @@ export default defineComponent({
   setup() {
     const submitting = ref(false);
     const step = ref(1);
-    const stepper = ref(null);
+    const stepper: Ref<QStepper | null> = ref(null);
     const revealPasswords = reactive({
       currentPassword: false,
       newPassword: false,
       confirmNewPassword: false,
     });
+    const passwordChangeCompleted = ref(false);
 
     const formSchema = computed(() =>
       yup.object({
         email: yup.string().email().optional(),
+        secret: yup.string().optional(),
         currentPassword: yup
           .string()
           .required('Current password is required')
@@ -179,32 +307,33 @@ export default defineComponent({
       })
     );
 
-    const { meta: formMeta } = useForm({ validationSchema: formSchema.value });
+    useForm({ validationSchema: formSchema.value });
 
-    const { value: email } = useField('email');
+    let { value: email } = useField('email');
+    let { value: secret } = useField('secret');
 
-    const {
+    let {
       value: currentPassword,
       meta: currentPasswordMeta,
       errors: currentPasswordErrors,
       handleInput: currentPasswordHandleInput,
     } = useField('currentPassword');
 
-    const {
+    let {
       value: changePasswordCode,
       meta: changePasswordCodeMeta,
       errors: changePasswordCodeErrors,
       handleInput: changePasswordCodeHandleInput,
     } = useField('changePasswordCode');
 
-    const {
+    let {
       value: newPassword,
       meta: newPasswordMeta,
       errors: newPasswordErrors,
       handleInput: newPasswordHandleInput,
     } = useField('newPassword');
 
-    const {
+    let {
       value: confirmNewPassword,
       meta: confirmNewPasswordMeta,
       errors: confirmNewPasswordErrors,
@@ -217,12 +346,84 @@ export default defineComponent({
 
         void store
           .dispatch('auth/CONFIRM_CURRENT_PASSWORD_FOR_PASSWORD_CHANGE', {
-            currentPassword,
+            currentPassword: currentPassword.value,
+          })
+          .then(({ secret: passwordChangeSecret }: { secret: string }) => {
+            submitting.value = false;
+            secret.value = passwordChangeSecret;
+            // programmatically move to next step
+            stepper?.value?.next();
+            return;
+          })
+          .catch(() => {
+            submitting.value = false;
+          });
+      } else {
+        Notify.create({
+          message: 'Errors exist on the form!',
+          type: 'negative',
+          position: 'bottom',
+          progress: true,
+          timeout: 2500,
+          actions: [
+            {
+              label: 'Dismiss',
+              color: 'white',
+            },
+          ],
+        });
+      }
+    }
+
+    function submitPasswordChangeCode() {
+      if (changePasswordCodeMeta.valid) {
+        submitting.value = true;
+
+        void store
+          .dispatch('auth/CONFIRM_CODE_FOR_PASSWORD_CHANGE', {
+            code: changePasswordCode.value,
+            secret: secret.value,
           })
           .then(() => {
             submitting.value = false;
             // programmatically move to next step
+            stepper?.value?.next();
+            return;
+          })
+          .catch(() => {
+            submitting.value = false;
+          });
+      } else {
+        Notify.create({
+          message: 'Errors exist on the form!',
+          type: 'negative',
+          position: 'bottom',
+          progress: true,
+          timeout: 2500,
+          actions: [
+            {
+              label: 'Dismiss',
+              color: 'white',
+            },
+          ],
+        });
+      }
+    }
 
+    function submitNewPassword() {
+      if (newPasswordMeta.valid && confirmNewPasswordMeta.valid) {
+        submitting.value = true;
+
+        void store
+          .dispatch('auth/SUBMIT_NEW_PASSWORD', {
+            newPassword: newPassword.value,
+            confirmNewPassword: confirmNewPassword.value,
+            secret: secret.value,
+          })
+          .then(() => {
+            submitting.value = false;
+            passwordChangeCompleted.value = true;
+            stepper?.value?.next();
             return;
           })
           .catch(() => {
@@ -258,6 +459,8 @@ export default defineComponent({
         currentPassword,
         currentPasswordErrors,
         currentPasswordHandleInput,
+        secret,
+        email,
         changePasswordCode,
         changePasswordCodeErrors,
         changePasswordCodeHandleInput,
@@ -271,6 +474,9 @@ export default defineComponent({
       submitCurrentPassword,
       revealPasswords,
       dateOfLastPasswordChange,
+      submitPasswordChangeCode,
+      passwordChangeCompleted,
+      submitNewPassword,
     };
   },
 });

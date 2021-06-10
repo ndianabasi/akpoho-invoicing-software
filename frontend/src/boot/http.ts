@@ -73,6 +73,26 @@ export default boot(
               },
             ],
           });
+        } else if (error?.response?.status === 400) {
+          console.log(error.response.data);
+
+          Notify.create({
+            message:
+              error?.response?.data?.message ??
+              (typeof error?.response?.data === 'string'
+                ? error?.response?.data
+                : 'You made a bad request.'),
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
         } else if (error?.response?.status === 403) {
           Notify.create({
             message: 'You are not permitted to perform the requested action',
