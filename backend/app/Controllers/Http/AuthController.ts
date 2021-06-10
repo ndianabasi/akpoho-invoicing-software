@@ -9,6 +9,7 @@ import { DateTime } from 'luxon'
 import Event from '@ioc:Adonis/Core/Event'
 import Hash from '@ioc:Adonis/Core/Hash'
 import PasswordChangeValidator from 'App/Validators/PasswordChangeValidator'
+import UserService from 'App/Services/UserServices'
 
 export default class AuthController {
   public async register({ request, response }: HttpContextContract) {
@@ -39,10 +40,13 @@ export default class AuthController {
   }
 
   public async login({ request, auth, response }: HttpContextContract) {
-    const { email, password, loginCode /* recaptchaResponseToken */ } = request.body()
+    const { password, loginCode /* recaptchaResponseToken */ } = request.body()
+    const email: string = request.body().email
     //const loginRecaptchaHelper = new LoginRecaptchaHelper(recaptchaResponseToken);
 
-    let user = await User.findBy('email', email)
+    const userService = new UserService({ email: email })
+
+    let user = await userService.getUserModel()
     if (!user) throw new NoLoginException({ message: 'Log in not allowed' })
     else {
       // Check if user can log in.
@@ -79,22 +83,7 @@ export default class AuthController {
 
       /* Retrieve user with company information */
 
-      user = await User.query()
-        .select(
-          'users.id',
-          'users.email',
-          'users.login_status',
-          'users.is_account_activated',
-          'users.is_email_verified',
-          'users.role_id'
-        )
-        .where('email', email)
-        .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
-        .preload('profile', (profileQuery) =>
-          profileQuery.select(...['id', 'first_name', 'last_name', 'profile_picture'])
-        )
-        .preload('role', (roleQuery) => roleQuery.select(...['name']))
-        .first()
+      const cachedUser = await userService.getUserSummary()
 
       //console.log(user)
 
@@ -114,7 +103,7 @@ export default class AuthController {
       return response.created({
         message: 'Login successful.',
         token: token,
-        data: user,
+        data: cachedUser,
       })
     }
   }
@@ -123,25 +112,12 @@ export default class AuthController {
     /* Retrieve user with company information */
     const email = auth.user?.email!
 
-    const user = await User.query()
-      .select(
-        'users.id',
-        'users.email',
-        'users.login_status',
-        'users.is_account_activated',
-        'users.is_email_verified',
-        'users.role_id'
-      )
-      .where('email', email)
-      .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
-      .preload('profile', (profilesQuery) =>
-        profilesQuery.select(...['id', 'first_name', 'last_name', 'profile_picture'])
-      )
-      .preload('role', (roleQuery) => roleQuery.select(...['name']))
-      .first()
+    const userService = new UserService({ email: email })
+
+    const cachedUser = await userService.getUserSummary()
 
     return response.ok({
-      data: user,
+      data: cachedUser,
     })
   }
 
@@ -247,28 +223,14 @@ export default class AuthController {
     if (!token) throw new NoLoginException({ message: 'Email address or password is not correct.' })
 
     /* Retrieve user with company information */
+    const userService = new UserService({ email: email })
 
-    const loginUser = await User.query()
-      .select(
-        'users.id',
-        'users.email',
-        'users.login_status',
-        'users.is_account_activated',
-        'users.is_email_verified',
-        'users.role_id'
-      )
-      .where('email', email)
-      .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
-      .preload('profile', (profileQuery) =>
-        profileQuery.select(...['id', 'first_name', 'last_name', 'profile_picture'])
-      )
-      .preload('role', (roleQuery) => roleQuery.select(...['name']))
-      .first()
+    const cachedUser = await userService.getUserSummary()
 
     return response.created({
       message: 'Password change was successful.',
       token: token,
-      data: loginUser,
+      data: cachedUser,
     })
   }
 
@@ -378,7 +340,7 @@ export default class AuthController {
 
     for (const history of passwordHistories) {
       if (await Hash.verify(history.oldPassword, newPassword)) {
-        return response.badGateway({
+        return response.badRequest({
           message:
             'New password has been used already on Akpoho Software! Please try again with a unique password.',
         })

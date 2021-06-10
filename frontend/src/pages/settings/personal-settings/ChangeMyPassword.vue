@@ -254,7 +254,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { defineComponent, ref, computed, reactive, Component, Ref } from 'vue';
+import { defineComponent, ref, computed, reactive, Ref } from 'vue';
 import ViewCard from '../../../components/ViewCard.vue';
 import { store } from '../../../store';
 import { Notify, QStepper } from 'quasar';

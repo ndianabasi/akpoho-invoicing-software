@@ -1,9 +1,9 @@
 import { CacheConfig } from '@ioc:Adonis/Addons/Adonis5-Cache'
 
 export default {
-  recordTTL: 60000, // record ttl in ms,
+  recordTTL: 30, // record ttl in days,
 
-  ttlUnits: 'ms', // time units for ttl record
+  ttlUnits: 'days', // time units for ttl record
 
   currentCacheStorage: 'redis', // storages which used as default cache storage
 
