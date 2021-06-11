@@ -73,7 +73,7 @@ export default class UserServices {
     const cacheKey = `${CACHE_TAGS.USER_SUMMARY_CACHE_KEY_PREFIX}:${user.id}`
     let userSummary: UserSummary | null = null
     await CacheHelper.get(cacheKey)
-      .then(async (result) => {
+      .then(async (result: UserSummary | null) => {
         if (result) {
           userSummary = result
         } else {
@@ -127,7 +127,7 @@ export default class UserServices {
 
     const cacheKey = `${CACHE_TAGS.USER_DETAILS_CACHE_KEY_PREFIX}:${this.id}`
     await CacheHelper.get(cacheKey)
-      .then(async (result) => {
+      .then(async (result: UserFullDetails | null) => {
         if (result) {
           userDetails = result
         } else {
