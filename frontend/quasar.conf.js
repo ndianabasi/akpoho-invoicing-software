@@ -105,6 +105,9 @@ module.exports = configure(function (/* ctx */) {
           backgroundColor: 'grey-2',
           messageColor: 'blue-grey-10',
         },
+        loadingBar: {
+          color: 'accent',
+        },
       },
       cssAddon: true,
 
@@ -119,7 +122,14 @@ module.exports = configure(function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Notify', 'Meta', 'Dialog', 'Loading', 'BottomSheet'],
+      plugins: [
+        'Notify',
+        'Meta',
+        'Dialog',
+        'Loading',
+        'BottomSheet',
+        'LoadingBar',
+      ],
     },
 
     // animations: 'all', // --- includes all animations
