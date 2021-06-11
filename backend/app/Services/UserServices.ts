@@ -1,39 +1,10 @@
 'use strict'
 
 import User from 'App/Models/User'
-import Cache from '@ioc:Adonis/Addons/Adonis5-Cache'
-
-interface UserOptions {
-  email?: User['email']
-  id?: User['id']
-}
-
-interface UserCompany {
-  id: string
-  name: string
-}
-
-interface UserProfileSummary {
-  id: string
-  first_name: string
-  last_name: string
-  profile_picture: string
-}
-interface UserRoleSummary {
-  name: string
-}
-
-interface UserSummary {
-  id: string
-  email: string
-  login_status: boolean
-  is_account_activated: boolean
-  is_email_verified: boolean
-  role_id: string
-  companies: Array<UserCompany>
-  profile: UserProfileSummary
-  role: UserRoleSummary
-}
+import Redis from '@ioc:Adonis/Addons/Redis'
+import { UserFullDetails, UserOptions, UserSummary } from './types/user_types'
+import Logger from '@ioc:Adonis/Core/Logger'
+import CacheHelper from 'App/Helpers/CacheHelper'
 
 export default class UserServices {
   protected email: string | undefined
@@ -85,8 +56,8 @@ export default class UserServices {
       companiesUsersCacheTags: string[] = []
 
     if (companies?.length) {
-      companiesCacheTags = companies?.map((com) => `company_cache_tag:${com.id}`)
-      companiesUsersCacheTags = companies?.map((com) => `company_users_cache_tag:${com.id}`)
+      companiesCacheTags = companies?.map((com) => `company_cache:${com.id}`)
+      companiesUsersCacheTags = companies?.map((com) => `company_users_cache:${com.id}`)
     }
 
     return [...companiesCacheTags, ...companiesUsersCacheTags]
@@ -96,47 +67,121 @@ export default class UserServices {
     try {
       const user = await this.getUserModel()
 
-      const cacheKey = `user:${user.id}`
-      let cachedUser: UserSummary | string = await Cache.get(cacheKey, async () => {
-        const user = await User.query()
-          .select(
-            'users.id',
-            'users.email',
-            'users.login_status',
-            'users.is_account_activated',
-            'users.is_email_verified',
-            'users.role_id'
-          )
-          .where('id', this.id!)
-          .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
-          .preload('profile', (profileQuery) =>
-            profileQuery.select(...['id', 'first_name', 'last_name', 'profile_picture'])
-          )
-          .preload('role', (roleQuery) => roleQuery.select(...['name']))
-          .first()
+      const cacheKey = `user_summary:${user.id}`
+      let userSummary: UserSummary | null = null
+      await Redis.get(cacheKey)
+        .then(async (result) => {
+          if (result) {
+            userSummary = JSON.parse(result)
+          } else {
+            // Compute and set a new key-value pair
+            const user = await User.query()
+              .select(
+                'users.id',
+                'users.email',
+                'users.login_status',
+                'users.is_account_activated',
+                'users.is_email_verified',
+                'users.role_id'
+              )
+              .where('id', this.id!)
+              .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
+              .preload('profile', (profileQuery) =>
+                profileQuery.select(...['id', 'first_name', 'last_name', 'profile_picture'])
+              )
+              .preload('role', (roleQuery) => roleQuery.select(...['name']))
+              .first()
 
-        const serialisedUser = user?.serialize()
+            const serialisedUser = user?.serialize()
 
-        const companiesTags = await this.getCompaniesCacheTags()
+            await CacheHelper.put(cacheKey, serialisedUser)
 
-        // Get the user's profile ID
-        await Cache.tags(
-          'all_companies_caches_tag',
-          ...companiesTags,
-          'all_users_caches_tag',
-          'all_users_summary_caches_tag',
-          `user_cache_tag:${user?.id}`,
-          `user_summary_cache_tag:${user?.id}`
-        ).put(cacheKey, JSON.stringify(serialisedUser))
+            // Add the `cacheKey` to sets
+            const companiesTags = await this.getCompaniesCacheTags()
+            const sets = [
+              'all_companies_caches',
+              ...companiesTags,
+              'all_users_caches',
+              'all_users_summary_caches',
+              `user_cache_tag:${user?.id}`,
+              `user_summary_cache:${user?.id}`,
+            ]
 
-        return JSON.parse(JSON.stringify(serialisedUser!))
-      })
+            await CacheHelper.tag(sets, cacheKey)
 
-      if (typeof cachedUser === 'string') {
-        cachedUser = JSON.parse(cachedUser)
-        return cachedUser as UserSummary
-      }
-      return cachedUser as UserSummary
+            userSummary = serialisedUser as UserSummary
+          }
+        })
+        .catch((error) => {
+          Logger.error('Error from App/Services/UserServices.getUserSummary: %j', error)
+        })
+
+      return userSummary!
+    } catch (error: unknown) {
+      throw new Error(JSON.stringify(error))
+    }
+  }
+
+  public async getFullUserDetails(): Promise<UserFullDetails> {
+    try {
+      const cacheKey = `user_details:${this.id}`
+
+      let userDetails: UserFullDetails | null = null
+      await Redis.get(cacheKey)
+        .then(async (result) => {
+          if (result) {
+            userDetails = JSON.parse(result)
+          } else {
+            // Compute and set a new key-value pair
+            const user = await User.query()
+              .preload('role', (roleQuery) => roleQuery.select('name', 'id'))
+              .preload('profile', (profileQuery) => {
+                profileQuery.preload('userCountry', (countryQuery) =>
+                  countryQuery.select('id', 'name')
+                )
+                profileQuery.preload('userState', (stateQuery) => stateQuery.select('id', 'name'))
+                profileQuery.select(
+                  'first_name',
+                  'last_name',
+                  'middle_name',
+                  'profile_picture',
+                  'phone_number',
+                  'address',
+                  'city',
+                  'created_at',
+                  'updated_at',
+                  'country_id',
+                  'state_id'
+                )
+              })
+              .where('id', this.id!)
+              .first()
+
+            const serialisedUserDetails = user?.serialize()
+
+            await CacheHelper.put(cacheKey, serialisedUserDetails)
+
+            // Add the `cacheKey` to sets
+            const companiesTags = await this.getCompaniesCacheTags()
+            const sets = [
+              'all_companies_caches',
+              ...companiesTags,
+              'all_users_caches',
+              'all_users_details_caches',
+              `user_cache_tag:${this.id}`,
+              `user_details_cache:${this.id}`,
+            ]
+
+            await CacheHelper.tag(sets, cacheKey)
+
+            userDetails = serialisedUserDetails as UserFullDetails
+          }
+        })
+        .catch((error) => {
+          Logger.error('Error from App/Services/UserServices.getFullUserDetails: %j', error)
+        })
+
+      return userDetails!
     } catch (error: unknown) {
       throw new Error(JSON.stringify(error))
     }

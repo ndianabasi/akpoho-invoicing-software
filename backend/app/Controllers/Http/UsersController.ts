@@ -1,6 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
-import User from 'App/Models/User'
+import UserServices from 'App/Services/UserServices'
 import UserValidator from 'App/Validators/UserValidator'
 import { ROLES } from 'Database/data/roles'
 
@@ -110,29 +110,11 @@ export default class UsersController {
   public async show({ response, requestedCompany, requestedUser, bouncer }: HttpContextContract) {
     await bouncer.with('UserPolicy').authorize('view', requestedCompany!, requestedUser!)
 
-    const user = await User.query()
-      .preload('role', (roleQuery) => roleQuery.select('name', 'id'))
-      .preload('profile', (profileQuery) => {
-        profileQuery.preload('userCountry', (countryQuery) => countryQuery.select('id', 'name'))
-        profileQuery.preload('userState', (stateQuery) => stateQuery.select('id', 'name'))
-        profileQuery.select(
-          'first_name',
-          'last_name',
-          'middle_name',
-          'profile_picture',
-          'phone_number',
-          'address',
-          'city',
-          'created_at',
-          'updated_at',
-          'country_id',
-          'state_id'
-        )
-      })
-      .where('id', requestedUser?.id!)
-      .first()
+    const userService = new UserServices({ id: requestedUser?.id })
 
-    return response.ok({ data: user })
+    const cachedUserDetails = await userService.getFullUserDetails()
+
+    return response.ok({ data: cachedUserDetails })
   }
 
   public async update({

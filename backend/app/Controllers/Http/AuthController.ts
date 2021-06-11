@@ -9,7 +9,7 @@ import { DateTime } from 'luxon'
 import Event from '@ioc:Adonis/Core/Event'
 import Hash from '@ioc:Adonis/Core/Hash'
 import PasswordChangeValidator from 'App/Validators/PasswordChangeValidator'
-import UserService from 'App/Services/UserServices'
+import UserServices from 'App/Services/UserServices'
 
 export default class AuthController {
   public async register({ request, response }: HttpContextContract) {
@@ -44,7 +44,7 @@ export default class AuthController {
     const email: string = request.body().email
     //const loginRecaptchaHelper = new LoginRecaptchaHelper(recaptchaResponseToken);
 
-    const userService = new UserService({ email: email })
+    const userService = new UserServices({ email: email })
 
     let user = await userService.getUserModel()
     if (!user) throw new NoLoginException({ message: 'Log in not allowed' })
@@ -112,7 +112,7 @@ export default class AuthController {
     /* Retrieve user with company information */
     const email = auth.user?.email!
 
-    const userService = new UserService({ email: email })
+    const userService = new UserServices({ email: email })
 
     const cachedUser = await userService.getUserSummary()
 
@@ -223,7 +223,7 @@ export default class AuthController {
     if (!token) throw new NoLoginException({ message: 'Email address or password is not correct.' })
 
     /* Retrieve user with company information */
-    const userService = new UserService({ email: email })
+    const userService = new UserServices({ email: email })
 
     const cachedUser = await userService.getUserSummary()
 

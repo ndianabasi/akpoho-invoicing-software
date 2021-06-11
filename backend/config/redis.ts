@@ -39,8 +39,8 @@ const redisConfig: RedisConfig = {
       host: Env.get('REDIS_HOST'),
       port: Env.get('REDIS_PORT'),
       password: Env.get('REDIS_PASSWORD', ''),
-      db: 0,
-      keyPrefix: '',
+      db: 10,
+      keyPrefix: 'akpoho_cache_',
     },
   },
 }

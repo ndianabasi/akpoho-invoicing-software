@@ -9,7 +9,7 @@ export default {
 
   enabledCacheStorages: ['redis'], // storages which will be loaded
 
-  cacheKeyPrefix: 'akpoho_data_cache_', // prefix for keys, which will be stored in cache storage
+  cacheKeyPrefix: 'akpoho_cache_', // prefix for keys, which will be stored in cache storage
 
   enabledEvents: {
     'cache-record:read': false,
