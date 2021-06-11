@@ -24,7 +24,9 @@ class CacheHelper {
 
   public async flushTag(setKey: string) {
     await Redis.smembers(setKey).then((cacheKeys) => {
-      this.flushKey(cacheKeys)
+      if (cacheKeys && !!cacheKeys.length) {
+        this.flushKey(cacheKeys)
+      }
     })
   }
 
