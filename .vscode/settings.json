@@ -9,5 +9,8 @@
   "vetur.validation.template": false,
   "eslint.workingDirectories": [
     "backend", "frontend"
+  ],
+  "cSpell.words": [
+    "Addressbar"
   ]
 }

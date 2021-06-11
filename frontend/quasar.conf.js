@@ -29,7 +29,13 @@ module.exports = configure(function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: ['i18n', 'http', 'httpNoAuth', 'global-components'],
+    boot: [
+      'i18n',
+      'http',
+      'httpNoAuth',
+      'global-components',
+      'addressbar-color',
+    ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ['app.scss'],
@@ -129,6 +135,7 @@ module.exports = configure(function (/* ctx */) {
         'Loading',
         'BottomSheet',
         'LoadingBar',
+        'AddressbarColor',
       ],
     },
 
