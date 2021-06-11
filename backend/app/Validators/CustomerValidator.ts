@@ -12,11 +12,11 @@ export default class CustomerValidator {
   public schema = schema.create({
     title: schema.number.optional(),
 
-    first_name: schema.string.optional({ escape: true, trim: true }, [rules.maxLength(20)]),
+    first_name: schema.string({ escape: true, trim: true }, [rules.maxLength(20)]),
 
     middle_name: schema.string.optional({ escape: true, trim: true }, [rules.maxLength(20)]),
 
-    last_name: schema.string.optional({ escape: true, trim: true }, [rules.maxLength(20)]),
+    last_name: schema.string({ escape: true, trim: true }, [rules.maxLength(20)]),
 
     email: schema.string.optional({ escape: true, trim: true }, [
       rules.email(),
@@ -62,8 +62,10 @@ export default class CustomerValidator {
 
   public messages = {
     'first_name.maxLength': 'First Name should be maximum of {{options.choices}} characters.',
+    'first_name.required': 'First Name is required.',
     'middle_name.maxLength': 'First Name should be maximum of {{options.choices}} characters.',
     'last_name.maxLength': 'First Name should be maximum of {{options.choices}} characters.',
+    'last_name.required': 'Last Name is required.',
     'email.email': 'Personal Email Address is not valid.',
     'email.unique': 'Personal Email Address is already used within your company.',
     'phone_number.mobile': 'Personal Phone number is not valid',

@@ -206,7 +206,11 @@ export default class UsersController {
     await requestedUserProfile?.save()
 
     // Clear the user's entire cache
-    const sets = [`${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${requestedUser?.id}`]
+    const sets = [
+      `${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${requestedUser?.id}`,
+      `${CACHE_TAGS.COMPANY_USERS_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
+      `${CACHE_TAGS.COMPANY_USERS_INDEX_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
+    ]
     await CacheHelper.flushTags(sets)
 
     return response.created()
@@ -246,6 +250,13 @@ export default class UsersController {
       countryId: country_id || null,
     })
 
+    // Clear relevant caches
+    const sets = [
+      `${CACHE_TAGS.COMPANY_USERS_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
+      `${CACHE_TAGS.COMPANY_USERS_INDEX_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
+    ]
+    await CacheHelper.flushTags(sets)
+
     return response.created({ data: newUser?.id })
   }
 
@@ -266,6 +277,8 @@ export default class UsersController {
         `${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${requestedUser?.id}`,
         `${CACHE_TAGS.USER_DETAILS_CACHE_TAG_PREFIX}:${requestedUser?.id}`,
         `${CACHE_TAGS.USER_SUMMARY_CACHE_TAG_PREFIX}:${requestedUser?.id}`,
+        `${CACHE_TAGS.COMPANY_USERS_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
+        `${CACHE_TAGS.COMPANY_USERS_INDEX_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
       ]
       await CacheHelper.nukeTags(sets)
 
