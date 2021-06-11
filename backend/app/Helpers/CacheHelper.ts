@@ -23,12 +23,15 @@ class CacheHelper {
   }
 
   public async flushKey(cacheKeys: string | Array<string>) {
-    const keys = Array.isArray(cacheKeys) ? cacheKeys.join(',') : cacheKeys
-    await Redis.del(keys)
+    if (Array.isArray(cacheKeys)) {
+      await Redis.del(cacheKeys)
+    } else await Redis.del(cacheKeys)
   }
 
   public async flushTag(setKey: string) {
     await Redis.smembers(setKey).then((cacheKeys) => {
+      console.log(cacheKeys)
+
       if (cacheKeys && !!cacheKeys.length) {
         this.flushKey(cacheKeys)
       }

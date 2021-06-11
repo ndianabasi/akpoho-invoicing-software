@@ -23,7 +23,7 @@ const routes: CustomRouteRecord[] = [
     children: [
       {
         path: '/dashboard',
-        component: () => import('pages/Index.vue'),
+        component: () => import('pages/PagesIndex.vue'),
         name: 'Dashboard',
         meta: {
           label: 'Dashboard',
@@ -84,7 +84,7 @@ const routes: CustomRouteRecord[] = [
       {
         path: 'quotations',
         name: 'quotations',
-        component: () => import('pages/quotations/Index.vue'),
+        component: () => import('pages/quotations/QuotationIndex.vue'),
         meta: {
           label: 'All Quotations',
           icon: 'request_page',
@@ -103,7 +103,7 @@ const routes: CustomRouteRecord[] = [
       {
         path: 'invoices',
         name: 'invoices',
-        component: () => import('pages/invoices/Index.vue'),
+        component: () => import('pages/invoices/InvoiceIndex.vue'),
         meta: {
           label: 'All Invoices',
           icon: 'list_alt',
@@ -122,7 +122,7 @@ const routes: CustomRouteRecord[] = [
       {
         path: 'receipts',
         name: 'receipts',
-        component: () => import('pages/receipts/Index.vue'),
+        component: () => import('pages/receipts/ReceiptIndex.vue'),
         meta: {
           label: 'All Receipts',
           icon: 'receipt',
