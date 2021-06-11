@@ -5,6 +5,8 @@ import UserServices from 'App/Services/UserServices'
 import UserValidator from 'App/Validators/UserValidator'
 import { CACHE_TAGS } from 'Contracts/cache'
 import { ROLES } from 'Database/data/roles'
+import querystring from 'querystring'
+import Logger from '@ioc:Adonis/Core/Logger'
 
 export default class UsersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -48,65 +50,98 @@ export default class UsersController {
       role: role ? role : null,
     }
 
-    let subquery = Database.from('users')
-      .select(
-        'users.id',
-        'users.email',
-        'users.login_status',
-        'users.is_account_activated',
-        'users.is_email_verified',
-        'users.lifetime_login',
-        'users.password_change_required',
-        'users.last_login_time',
-        'users.account_activated_at',
-        'users.email_verified_at',
-        'users.created_at',
-        'users.updated_at',
-        'user_profiles.first_name',
-        'user_profiles.last_name',
-        'roles.name as role'
-      )
-      .leftJoin('company_user', (query) => {
-        query.on('company_user.user_id', '=', 'users.id')
-      })
-      .leftJoin('user_profiles', (query) => {
-        query.on('user_profiles.user_id', '=', 'users.id')
-      })
-      .leftJoin('roles', (query) => {
-        query.on('roles.id', '=', 'users.role_id')
-      })
-      .where({ 'company_user.company_id': requestedCompany?.id })
+    const cacheQuerystring = querystring.stringify(request.qs())
+    const cacheKey = `company_users_index:${requestedCompany?.id}__`.concat(cacheQuerystring)
+    console.log(cacheKey)
 
-    if (sortBy) {
-      subquery = subquery.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
-    }
+    const sets = [
+      `${CACHE_TAGS.ALL_COMPANIES_CACHES_TAG}`,
+      `${CACHE_TAGS.ALL_USERS_CACHES_TAG}`,
+      `${CACHE_TAGS.COMPANY_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
+      `${CACHE_TAGS.COMPANY_USERS_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
+      `${CACHE_TAGS.COMPANY_USERS_INDEX_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
+    ]
 
-    if (searchQuery) {
-      subquery.where((query) => {
-        for (const param in searchQuery) {
-          if (Object.prototype.hasOwnProperty.call(searchQuery, param)) {
-            let value = searchQuery[param]
-            if (value) {
-              if (value === 'true') value = true
-              if (value === 'false') value = false
+    let usersIndex: { meta: any; data: any[] } | null = null
+    await CacheHelper.get(cacheKey)
+      .then(async (result) => {
+        if (result) {
+          usersIndex = result
+        } else {
+          // Compute and set a new key-value pair
+          let subquery = Database.from('users')
+            .select(
+              'users.id',
+              'users.email',
+              'users.login_status',
+              'users.is_account_activated',
+              'users.is_email_verified',
+              'users.lifetime_login',
+              'users.password_change_required',
+              'users.last_login_time',
+              'users.account_activated_at',
+              'users.email_verified_at',
+              'users.created_at',
+              'users.updated_at',
+              'user_profiles.first_name',
+              'user_profiles.last_name',
+              'roles.name as role'
+            )
+            .leftJoin('company_user', (query) => {
+              query.on('company_user.user_id', '=', 'users.id')
+            })
+            .leftJoin('user_profiles', (query) => {
+              query.on('user_profiles.user_id', '=', 'users.id')
+            })
+            .leftJoin('roles', (query) => {
+              query.on('roles.id', '=', 'users.role_id')
+            })
+            .where({ 'company_user.company_id': requestedCompany?.id })
 
-              if (param === 'role') query.where('role_id', value)
-              else {
-                //console.log(param, value)
-                query.where(param, value)
-                if (typeof value === 'string') {
-                  query.orWhere(param, 'like', `%${value}%`)
+          if (sortBy) {
+            subquery = subquery.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
+          }
+
+          if (searchQuery) {
+            subquery.where((query) => {
+              for (const param in searchQuery) {
+                if (Object.prototype.hasOwnProperty.call(searchQuery, param)) {
+                  let value = searchQuery[param]
+                  if (value) {
+                    if (value === 'true') value = true
+                    if (value === 'false') value = false
+
+                    if (param === 'role') query.where('role_id', value)
+                    else {
+                      //console.log(param, value)
+                      query.where(param, value)
+                      if (typeof value === 'string') {
+                        query.orWhere(param, 'like', `%${value}%`)
+                      }
+                    }
+                  }
                 }
               }
-            }
+            })
           }
+
+          const users = await subquery.paginate(page ? page : 1, perPage ? perPage : 20)
+
+          const serialisedUsers = users?.toJSON()
+
+          await CacheHelper.put(cacheKey, serialisedUsers)
+
+          // Add the `cacheKey` to sets
+          await CacheHelper.tag(sets, cacheKey)
+
+          usersIndex = serialisedUsers
         }
       })
-    }
+      .catch((error) => {
+        Logger.error('Error from App/Controllers/UsersController.index: %o', error)
+      })
 
-    const users = await subquery.paginate(page ? page : 1, perPage ? perPage : 20)
-
-    return response.ok({ data: users })
+    return response.ok({ data: usersIndex })
   }
 
   public async show({ response, requestedCompany, requestedUser, bouncer }: HttpContextContract) {

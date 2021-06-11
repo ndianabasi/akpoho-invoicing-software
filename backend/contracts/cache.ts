@@ -10,4 +10,5 @@ export enum CACHE_TAGS {
   USER_SUMMARY_CACHE_KEY_PREFIX = 'user_summary',
   COMPANY_CACHE_TAG_PREFIX = 'company_cache',
   COMPANY_USERS_CACHE_TAG_PREFIX = 'company_users_cache',
+  COMPANY_USERS_INDEX_CACHE_TAG_PREFIX = 'company_users_index_cache',
 }
