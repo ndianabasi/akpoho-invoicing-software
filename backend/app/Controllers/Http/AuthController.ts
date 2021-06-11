@@ -90,15 +90,13 @@ export default class AuthController {
       /**
        * Emit event to log login activity and
        * persist login meta information to DB
-       * Clean up login code information
+       * Also Clean up login code information
        */
-      /* const ip = request.ip()
-      Event.fire('new::login', {
+      const ip = request.ip()
+      Event.emit('auth::new-login', {
         ip: ip,
-        user_id: user.id,
-        time: null,
-        response,
-      }) */
+        user: user,
+      })
 
       return response.created({
         message: 'Login successful.',

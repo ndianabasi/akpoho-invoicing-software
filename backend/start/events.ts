@@ -19,3 +19,4 @@ Event.on('db:query', function ({ sql, bindings }) {
 
 Event.on('auth::send-code', 'Auth.onSendCode')
 Event.on('auth::send-success-emails', 'Auth.onSendSuccessEmails')
+Event.on('auth::new-login', 'Auth.onNewLogin')

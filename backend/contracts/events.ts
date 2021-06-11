@@ -6,6 +6,7 @@
  */
 
 import User from 'App/Models/User'
+import { DateTime } from 'luxon'
 
 declare module '@ioc:Adonis/Core/Event' {
   /*
@@ -30,5 +31,6 @@ declare module '@ioc:Adonis/Core/Event' {
   interface EventsList {
     'auth::send-code': { user: User; type: string }
     'auth::send-success-emails': { user: User; type: string }
+    'auth::new-login': { ip: string; user: User }
   }
 }

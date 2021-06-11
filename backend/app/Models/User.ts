@@ -20,6 +20,7 @@ import UserProfile from 'App/Models/UserProfile'
 import { STANDARD_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 import PasswordChange from 'App/Models/PasswordChange'
 import PasswordHistory from 'App/Models/PasswordHistory'
+import LoginRecord from 'App/Models/LoginRecord'
 
 export default class User extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -37,7 +38,7 @@ export default class User extends BaseModel {
   public roleId: string | null
 
   @column()
-  public loginCode: number
+  public loginCode: number | null
 
   @column()
   public activationCode: string
@@ -154,4 +155,7 @@ export default class User extends BaseModel {
 
   @hasMany(() => PasswordHistory)
   public passwordHistories: HasMany<typeof PasswordHistory>
+
+  @hasMany(() => LoginRecord)
+  public loginRecords: HasMany<typeof LoginRecord>
 }
