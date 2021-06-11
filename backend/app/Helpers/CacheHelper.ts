@@ -3,6 +3,11 @@
 import Redis from '@ioc:Adonis/Addons/Redis'
 
 class CacheHelper {
+  public async get(cacheKey: string): Promise<any | null> {
+    const cachedData = await Redis.get(cacheKey)
+    return cachedData ? JSON.parse(cachedData) : null
+  }
+
   public async put(cacheKey: string, cacheValue: any) {
     if (typeof cacheValue !== 'string') {
       cacheValue = JSON.stringify(cacheValue)

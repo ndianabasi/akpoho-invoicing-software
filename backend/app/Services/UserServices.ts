@@ -1,7 +1,6 @@
 'use strict'
 
 import User from 'App/Models/User'
-import Redis from '@ioc:Adonis/Addons/Redis'
 import { UserFullDetails, UserOptions, UserSummary } from './types/user_types'
 import Logger from '@ioc:Adonis/Core/Logger'
 import CacheHelper from 'App/Helpers/CacheHelper'
@@ -73,10 +72,10 @@ export default class UserServices {
 
     const cacheKey = `${CACHE_TAGS.USER_SUMMARY_CACHE_KEY_PREFIX}:${user.id}`
     let userSummary: UserSummary | null = null
-    await Redis.get(cacheKey)
+    await CacheHelper.get(cacheKey)
       .then(async (result) => {
         if (result) {
-          userSummary = JSON.parse(result)
+          userSummary = result
         } else {
           // Compute and set a new key-value pair
           const user = await User.query()
@@ -127,10 +126,10 @@ export default class UserServices {
     let userDetails: UserFullDetails | null = null
 
     const cacheKey = `${CACHE_TAGS.USER_DETAILS_CACHE_KEY_PREFIX}:${this.id}`
-    await Redis.get(cacheKey)
+    await CacheHelper.get(cacheKey)
       .then(async (result) => {
         if (result) {
-          userDetails = JSON.parse(result)
+          userDetails = result
         } else {
           // Compute and set a new key-value pair
           const user = await User.query()
