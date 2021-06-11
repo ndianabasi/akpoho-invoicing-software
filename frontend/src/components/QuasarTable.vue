@@ -654,7 +654,16 @@ export default defineComponent({
           await store
             .dispatch(props.rowDeleteActionType, id)
             .then(() => {
-              deleteProgressDialog.hide();
+              // Show success message before dialog is hidden programmatically
+              deleteProgressDialog.update({
+                title: 'Success',
+                message: `${props.entityName} was successfully deleted`,
+                progress: false,
+              });
+              // Avoid screen flicker for quick operations
+              setTimeout(() => {
+                deleteProgressDialog.hide();
+              }, 1500);
 
               void fetchTableData({ queryObject: filterForm });
             })
