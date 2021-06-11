@@ -114,7 +114,7 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-return -->
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue';
+import { defineComponent, computed, ref, watch, Ref, watchEffect } from 'vue';
 import { useStore } from 'vuex';
 import { SelectOption, StringIDNameInterface } from '../store/types';
 
@@ -130,32 +130,51 @@ export default defineComponent({
   setup(/* props */) {
     const store = useStore();
 
-    const selectedCompany = ref({ label: '', value: '' });
-    const currentCompany = computed(
+    const selectedCompany: Ref<SelectOption | null> = ref(null);
+    let currentCompany: Ref<StringIDNameInterface | null> = ref(null);
+    currentCompany = computed(
       () => store.getters['auth/GET_CURRENT_COMPANY'] as StringIDNameInterface
     );
 
-    const userCompanies = store.getters[
-      'auth/GET_USER_COMPANIES'
-    ] as StringIDNameInterface[];
-    const companies = userCompanies.map((company) => ({
-      label: company.name,
-      value: company.id,
-    }));
+    let companies: Ref<SelectOption[]> = ref([]);
+    watch(
+      () => store.getters['auth/GET_USER_COMPANIES'] as StringIDNameInterface[],
+      (newCompanies) => {
+        // Unwrap the proxy
+        newCompanies = [...newCompanies];
 
-    if (currentCompany.value) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      selectedCompany.value = {
-        label: currentCompany.value.name,
-        value: currentCompany.value.id,
-      };
-    } else if (companies.length === 1) {
-      selectedCompany.value = companies[0];
-      store.commit('auth/SET_CURRENT_COMPANY', selectedCompany.value);
-    } else {
-      selectedCompany.value = companies[0];
-      store.commit('auth/SET_CURRENT_COMPANY', selectedCompany.value);
-    }
+        companies.value = newCompanies.map((company) => ({
+          label: company.name,
+          value: company.id,
+        }));
+
+        currentCompany.value = {
+          name: newCompanies?.[0].name,
+          id: newCompanies?.[0].id,
+        };
+
+        if (currentCompany.value) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          selectedCompany.value = {
+            label: currentCompany.value.name,
+            value: currentCompany.value.id,
+          };
+
+          store.commit('auth/SET_CURRENT_COMPANY', selectedCompany.value);
+        } else {
+          if (companies.value && companies.value.length) {
+            selectedCompany.value = companies.value?.[0];
+            store.commit('auth/SET_CURRENT_COMPANY', selectedCompany.value);
+          }
+        }
+      },
+      { deep: true }
+    );
+
+    watchEffect(
+      () => store.getters['auth/GET_USER_COMPANIES'] as StringIDNameInterface[],
+      { flush: 'pre' }
+    );
 
     //const leftDrawerOpen = unref(GET_LEFT_DRAWER_OPEN) as boolean;
     const leftDrawerOpen = ref(false);
@@ -182,7 +201,7 @@ export default defineComponent({
       TOGGLE_LEFT_DRAWER,
       leftDrawerOpen,
       selectedCompany,
-      userCompanies: ref(companies),
+      userCompanies: companies,
       handleSelectedCompanyUpdate,
     };
   },

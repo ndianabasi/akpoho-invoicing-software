@@ -1,7 +1,9 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
+import CacheHelper from 'App/Helpers/CacheHelper'
 import UserServices from 'App/Services/UserServices'
 import UserValidator from 'App/Validators/UserValidator'
+import { CACHE_TAGS } from 'Contracts/cache'
 import { ROLES } from 'Database/data/roles'
 
 export default class UsersController {
@@ -168,6 +170,10 @@ export default class UsersController {
     })
     await requestedUserProfile?.save()
 
+    // Clear the user's entire cache
+    const sets = [`${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${requestedUser?.id}`]
+    await CacheHelper.flushTags(sets)
+
     return response.created()
   }
 
@@ -219,6 +225,15 @@ export default class UsersController {
     // Ensure that a SuperAdmin is not deleted
     if (requestedUser?.role?.name !== ROLES.SUPERADMIN) {
       requestedUser?.delete()
+
+      // Wipe off all caches for the user
+      const sets = [
+        `${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${requestedUser?.id}`,
+        `${CACHE_TAGS.USER_DETAILS_CACHE_TAG_PREFIX}:${requestedUser?.id}`,
+        `${CACHE_TAGS.USER_SUMMARY_CACHE_TAG_PREFIX}:${requestedUser?.id}`,
+      ]
+      await CacheHelper.nukeTags(sets)
+
       return response.created({ data: requestedUser?.id })
     } else {
       return response.badRequest({ message: 'User cannot be deleted!' })
