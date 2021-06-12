@@ -8,6 +8,12 @@
     >
       <template #body-panel>
         <form class="q-pa-md" @submit.prevent="submitForm">
+          <image-cropper
+            :input-max-file-size="5 * 1048576"
+            @finish-cropper="handleCropperFinish"
+          />
+          <!-- 5 MB max file size -->
+
           <q-input
             v-model="form$.email.$model"
             filled
@@ -255,6 +261,9 @@ import {
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
 import QuasarSelect from '../../../components/QuasarSelect';
+/* import { useForm, useField } from 'vee-validate';
+import * as yup from 'yup'; */
+import ImageCropper from '../../../components/ImageCropper.vue';
 
 export default defineComponent({
   name: 'EditUser',
@@ -262,6 +271,7 @@ export default defineComponent({
   components: {
     ViewCard,
     QuasarSelect,
+    ImageCropper,
   },
 
   props: {
@@ -295,7 +305,7 @@ export default defineComponent({
         )
       : ref(null);
 
-    const form: UserFormShape = reactive({
+    let form: UserFormShape = reactive({
       first_name: '',
       last_name: '',
       middle_name: '',
@@ -307,6 +317,7 @@ export default defineComponent({
       state_id: null,
       country_id: null,
       login_status: false,
+      profile_picture: null,
     });
 
     const rules = {
@@ -323,7 +334,9 @@ export default defineComponent({
       },
     };
 
-    const form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
+    let form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
+
+    //const profilePictureSchema = computed(() => yup.mixed().test('fileSize', ))
 
     function submitForm() {
       if (!form$.value.$invalid) {
@@ -525,6 +538,10 @@ export default defineComponent({
       store.getters['permissions/GET_USER_PERMISSION']('can_edit_users')
     );
 
+    const handleCropperFinish = function ({ file }: { file: File }) {
+      form.profile_picture = file;
+    };
+
     onBeforeMount(() => {
       stopFetchCurrentlyViewedUser();
       stopFetchCountriesForSelect();
@@ -551,6 +568,7 @@ export default defineComponent({
         list: PERMISSION.CAN_LIST_USERS,
       }),
       CAN_EDIT_USERS,
+      handleCropperFinish,
     };
   },
 });

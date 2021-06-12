@@ -244,6 +244,7 @@ export interface UserFormShape extends Object {
   state_id: number | null;
   country_id: number | null;
   login_status: boolean;
+  profile_picture: File | null;
 }
 
 export enum PERMISSION {

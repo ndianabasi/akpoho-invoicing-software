@@ -6,7 +6,6 @@
  */
 
 import User from 'App/Models/User'
-import { DateTime } from 'luxon'
 
 declare module '@ioc:Adonis/Core/Event' {
   /*

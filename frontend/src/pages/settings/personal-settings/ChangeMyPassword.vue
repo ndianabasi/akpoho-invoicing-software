@@ -293,7 +293,7 @@ export default defineComponent({
         changePasswordCode: yup
           .string()
           .required('Code is required')
-          .matches(sixDigitCodeRegex, 'Please provie valid code')
+          .matches(sixDigitCodeRegex, 'Please provide valid code')
           .nullable(),
         newPassword: yup
           .string()
