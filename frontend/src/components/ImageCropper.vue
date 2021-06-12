@@ -324,7 +324,7 @@ export default defineComponent({
             });
           });
         }
-      }, 'image/jpeg');
+      }, 'image/png');
 
       void nextTick(() => {
         launchDialogRef.value?.hide();

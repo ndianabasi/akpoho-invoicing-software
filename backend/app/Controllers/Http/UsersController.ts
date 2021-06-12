@@ -161,10 +161,6 @@ export default class UsersController {
     request,
     bouncer,
   }: HttpContextContract) {
-    await request.validate(UserValidator)
-
-    await bouncer.with('UserPolicy').authorize('edit', requestedCompany!, requestedUser!)
-
     const {
       first_name,
       last_name,
@@ -177,7 +173,9 @@ export default class UsersController {
       state_id,
       country_id,
       login_status,
-    } = request.body()
+    } = await request.validate(UserValidator)
+
+    await bouncer.with('UserPolicy').authorize('edit', requestedCompany!, requestedUser!)
 
     requestedUser?.merge({ email, loginStatus: login_status })
     await requestedUser?.save()
@@ -217,10 +215,6 @@ export default class UsersController {
   }
 
   public async store({ response, requestedCompany, request, bouncer }: HttpContextContract) {
-    await request.validate(UserValidator)
-
-    await bouncer.with('UserPolicy').authorize('create', requestedCompany!)
-
     const {
       first_name,
       last_name,
@@ -233,7 +227,9 @@ export default class UsersController {
       state_id,
       country_id,
       login_status,
-    } = request.body()
+    } = await request.validate(UserValidator)
+
+    await bouncer.with('UserPolicy').authorize('create', requestedCompany!)
 
     const newUser = await requestedCompany
       ?.related('users')

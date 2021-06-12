@@ -202,9 +202,7 @@ export default class AuthController {
   }
 
   public async ResetPassword({ request, response, auth }: HttpContextContract) {
-    await request.validate(PasswordResetValidator)
-
-    let { email, newPassword } = request.body()
+    let { email, newPassword } = await request.validate(PasswordResetValidator)
 
     let user: User
     try {
@@ -284,12 +282,11 @@ export default class AuthController {
       'secret.required': 'Secret is required',
     }
 
-    await request.validate({
+    let { code, secret } = await request.validate({
       schema: validationSchema,
       messages: validationMessages,
     })
 
-    let { code, secret } = request.body()
     const user = auth.user!
 
     await user.load('passwordChange')
@@ -316,9 +313,8 @@ export default class AuthController {
   }
 
   public async submitNewPassword({ request, response, auth }: HttpContextContract) {
-    await request.validate(PasswordChangeValidator)
+    let { newPassword, secret } = await request.validate(PasswordChangeValidator)
 
-    let { newPassword, secret } = request.body()
     const user = auth.user!
 
     await user.load('passwordChange')

@@ -47,7 +47,7 @@ export default class Customer extends BaseModel {
       return Boolean(value)
     },
   })
-  public isCorporate: number
+  public isCorporate: boolean
 
   @column({
     serializeAs: null,
@@ -59,7 +59,7 @@ export default class Customer extends BaseModel {
       return Boolean(value)
     },
   })
-  public corporateHasRep: number
+  public corporateHasRep: boolean
 
   @column()
   public companyName: string

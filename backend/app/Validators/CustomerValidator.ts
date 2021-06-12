@@ -58,6 +58,7 @@ export default class CustomerValidator {
     billing_postal_code: schema.string.optional({ escape: true, trim: true }),
     billing_state: schema.number.optional([rules.unsigned()]),
     billing_country: schema.number.optional([rules.unsigned()]),
+    is_billing_shipping_addresses_same: schema.boolean(),
   })
 
   public messages = {

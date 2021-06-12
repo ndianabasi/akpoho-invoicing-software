@@ -90,10 +90,6 @@ export default class CustomersController {
   }
 
   public async store({ response, requestedCompany, request, bouncer }: HttpContextContract) {
-    await request.validate(CustomerValidator)
-
-    await bouncer.with('CustomerPolicy').authorize('create', requestedCompany!)
-
     const {
       title,
       first_name,
@@ -117,7 +113,9 @@ export default class CustomersController {
       shipping_lga,
       shipping_postal_code,
       shipping_state,
-    } = request.body()
+    } = await request.validate(CustomerValidator)
+
+    await bouncer.with('CustomerPolicy').authorize('create', requestedCompany!)
 
     const newCustomer = await requestedCompany?.related('customers').create({
       customerTitleId: title,
@@ -240,10 +238,6 @@ export default class CustomersController {
     request,
     bouncer,
   }: HttpContextContract) {
-    await request.validate(CustomerValidator)
-
-    await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
-
     const {
       title,
       first_name,
@@ -256,7 +250,9 @@ export default class CustomersController {
       company_name,
       company_phone,
       company_email,
-    } = request.body()
+    } = await request.validate(CustomerValidator)
+
+    await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
 
     requestedCustomer?.merge({
       customerTitleId: title,
@@ -284,11 +280,11 @@ export default class CustomersController {
     bouncer,
     request,
   }: HttpContextContract) {
-    await request.validate(CustomerAddressValidator)
+    const { address, lga, postal_code, state, country, type } = await request.validate(
+      CustomerAddressValidator
+    )
 
     await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
-
-    const { address, lga, postal_code, state, country, type } = request.body()
 
     requestedCustomerAddress?.merge({
       addressType: type,
@@ -310,12 +306,12 @@ export default class CustomersController {
     bouncer,
     request,
   }: HttpContextContract) {
-    await request.validate(CustomerAddressValidator)
+    const { address, lga, postal_code, state, country, type } = await request.validate(
+      CustomerAddressValidator
+    )
 
     // This is part of the editing operation for the customer
     await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
-
-    const { address, lga, postal_code, state, country, type } = request.body()
 
     if (type === 'both') {
       const addressTypes: Array<CustomerAddressTypes> = ['shipping_address', 'billing_address']

@@ -18,28 +18,28 @@ export default class UserProfile extends BaseModel {
   public firstName: string
 
   @column()
-  public middleName: string
+  public middleName: string | null
 
   @column()
   public lastName: string
 
   @column()
-  public phoneNumber: string
+  public phoneNumber: string | null
 
   @column()
-  public address: string
+  public address: string | null
 
   @column()
-  public city: string
+  public city: string | null
 
   @column()
-  public stateId: number
+  public stateId: number | null
 
   @column()
-  public countryId: number
+  public countryId: number | null
 
   @column()
-  public profilePicture: string
+  public profilePicture: string | null
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
