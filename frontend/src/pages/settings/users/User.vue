@@ -344,6 +344,23 @@
               </q-item>
 
               <q-item
+                v-if="resourcePermissions.canDelete"
+                clickable
+                @click.prevent="
+                  useDeleteResource({
+                    resource: 'user',
+                    resourceName: 'User',
+                    payload: userId,
+                  })
+                "
+              >
+                <q-item-section>
+                  <q-btn flat icon="delete" />
+                </q-item-section>
+                <q-item-section>Delete User</q-item-section>
+              </q-item>
+
+              <q-item
                 v-if="resourcePermissions.canList"
                 :to="{
                   name: 'all_users',
@@ -378,6 +395,7 @@ import {
 import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
 import useResourcePermissions from '../../../composables/useResourcePermissions';
+import useDeleteResource from '../../../composables/useDeleteResource';
 import {
   CurrentlyViewedUser,
   PERMISSION,
@@ -440,7 +458,9 @@ export default defineComponent({
       resourcePermissions: useResourcePermissions({
         edit: PERMISSION.CAN_EDIT_USERS,
         list: PERMISSION.CAN_LIST_USERS,
+        delete: PERMISSION.CAN_DELETE_USERS,
       }),
+      useDeleteResource,
     };
   },
 });

@@ -24,6 +24,8 @@
             class="q-mb-md"
             type="email"
             :error="form$.email.$invalid"
+            aria-autocomplete="email"
+            autocomplete="email"
           >
             <template #before>
               <q-icon name="email" />
@@ -91,6 +93,8 @@
             :dense="dense"
             :error="form$?.[field.name]?.$invalid ?? false"
             class="q-mb-md"
+            :aria-autocomplete="form?.[field.name]?.autocomplete ?? 'off'"
+            :autocomplete="form?.[field.name]?.autocomplete ?? 'off'"
           >
             <template #before>
               <q-icon name="person" />
@@ -113,7 +117,8 @@
             :options="countries"
             label="Country"
             name="country_id"
-            aria-autocomplete="off"
+            aria-autocomplete="country-name"
+            autocomplete="country-name"
             clearable
             bottom-slots
             options-dense
@@ -136,7 +141,8 @@
             :options="countryStates"
             label="State"
             name="state_id"
-            autocomplete="off"
+            aria-autocomplete="address-level1"
+            autocomplete="address-level1"
             clearable
             bottom-slots
             options-dense
@@ -400,26 +406,32 @@ export default defineComponent({
       {
         name: 'first_name',
         label: 'First Name',
+        autocomplete: 'given-name',
       },
       {
         name: 'middle_name',
         label: 'Middle Name',
+        autocomplete: 'additional-name',
       },
       {
         name: 'last_name',
         label: 'Last Name',
+        autocomplete: 'last-name',
       },
       {
         name: 'phone_number',
         label: 'Phone Number',
+        autocomplete: 'mobile tel',
       },
       {
         name: 'address',
         label: 'Address',
+        autocomplete: 'street-address',
       },
       {
         name: 'city',
         label: 'City',
+        autocomplete: 'address-level2',
       },
     ]);
 

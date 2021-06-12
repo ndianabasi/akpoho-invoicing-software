@@ -36,6 +36,8 @@
               clearable
               bottom-slots
               :label="field.label"
+              :aria-autocomplete="field?.autocomplete ?? 'off'"
+              :autocomplete="field?.autocomplete ?? 'off'"
               :dense="dense"
               :error="form$?.[field.name]?.$invalid ?? false"
               class="q-mb-md"
@@ -279,6 +281,7 @@ export default defineComponent({
         default: null,
         componentType: 'select',
         options: unref(customerTitles),
+        autocomplete: 'honorific-prefix',
         isVisible:
           (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
       },
@@ -287,6 +290,7 @@ export default defineComponent({
         label: 'First Name',
         default: '',
         componentType: 'input',
+        autocomplete: 'given-name',
         inputType: 'text',
         isVisible:
           (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
@@ -297,6 +301,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'text',
+        autocomplete: 'additional-name',
         isVisible:
           (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
       },
@@ -306,6 +311,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'text',
+        autocomplete: 'family-name',
         isVisible:
           (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
       },
@@ -315,6 +321,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'email',
+        autocomplete: 'email',
         isVisible:
           (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
       },
@@ -324,6 +331,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'text',
+        autocomplete: 'mobile tel',
         isVisible:
           (form.is_corporate && form.corporate_has_rep) || !form.is_corporate,
       },
@@ -333,6 +341,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'text',
+        autocomplete: 'organisation',
         isVisible: form.is_corporate,
       },
       {
@@ -340,6 +349,7 @@ export default defineComponent({
         label: 'Company Phone Number',
         default: '',
         componentType: 'input',
+        autocomplete: 'work tel',
         inputType: 'text',
         isVisible: form.is_corporate,
       },
@@ -348,6 +358,7 @@ export default defineComponent({
         label: 'Company Email Address',
         default: '',
         componentType: 'input',
+        autocomplete: 'work email',
         inputType: 'text',
         isVisible: form.is_corporate,
       },
@@ -357,6 +368,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'textarea',
+        autocomplete: 'shipping street-address',
         isVisible: props.creationMode,
       },
       {
@@ -366,6 +378,7 @@ export default defineComponent({
         componentType: 'input',
         inputType: 'text',
         isVisible: props.creationMode,
+        autocomplete: 'shipping address-level2',
       },
       {
         name: 'shipping_postal_code',
@@ -374,6 +387,7 @@ export default defineComponent({
         componentType: 'input',
         inputType: 'text',
         isVisible: props.creationMode,
+        autocomplete: 'shipping postal-code',
       },
       {
         name: 'shipping_country',
@@ -382,6 +396,7 @@ export default defineComponent({
         componentType: 'select',
         options: unref(countries),
         isVisible: props.creationMode,
+        autocomplete: 'shipping country-name',
       },
       {
         name: 'shipping_state',
@@ -390,6 +405,7 @@ export default defineComponent({
         componentType: 'select',
         options: unref(countryStates),
         isVisible: props.creationMode,
+        autocomplete: 'shipping address-level1',
       },
       {
         name: 'billing_address',
@@ -397,6 +413,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'textarea',
+        autocomplete: 'billing street-address',
         isVisible:
           !form.is_billing_shipping_addresses_same && props.creationMode,
       },
@@ -406,6 +423,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'text',
+        autocomplete: 'billing address-level2',
         isVisible:
           !form.is_billing_shipping_addresses_same && props.creationMode,
       },
@@ -415,6 +433,7 @@ export default defineComponent({
         default: '',
         componentType: 'input',
         inputType: 'text',
+        autocomplete: 'billing postal-code',
         isVisible:
           !form.is_billing_shipping_addresses_same && props.creationMode,
       },
@@ -424,6 +443,7 @@ export default defineComponent({
         default: null,
         componentType: 'select',
         options: unref(countries),
+        autocomplete: 'billing country-name',
         isVisible:
           !form.is_billing_shipping_addresses_same && props.creationMode,
       },
@@ -433,6 +453,7 @@ export default defineComponent({
         default: null,
         componentType: 'select',
         options: unref(countryStates),
+        autocomplete: 'billing address-level1',
         isVisible:
           !form.is_billing_shipping_addresses_same && props.creationMode,
       },

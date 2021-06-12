@@ -347,7 +347,7 @@ export default defineComponent({
 
       $q.dialog({
         title: 'Warning',
-        message: 'File was rejected. Reasaons: ' + reasons.join('; '),
+        message: 'File was rejected. Reasons: ' + reasons.join('; '),
       });
     };
 
