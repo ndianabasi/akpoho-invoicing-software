@@ -45,6 +45,8 @@ export default class UserValidator {
     country_id: schema.number.optional([rules.unsigned()]),
 
     login_status: schema.boolean(),
+
+    profile_picture: schema.file({ extnames: ['jpg', 'gif', 'png'], size: '5mb' }),
   })
 
   public messages = {

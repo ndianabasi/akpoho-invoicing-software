@@ -250,6 +250,7 @@ import {
   unref,
   Ref,
   reactive,
+  ComputedRef,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, email, helpers } from '@vuelidate/validators';
@@ -326,6 +327,24 @@ export default defineComponent({
       profile_picture: null,
     });
 
+    const getFormData: ComputedRef<FormData> = computed(() => {
+      const formData = new FormData();
+
+      for (const key in form) {
+        if (Object.prototype.hasOwnProperty.call(form, key)) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const value = form[key];
+          if (key === 'profile_picture') {
+            formData.append('profile_picture', form.profile_picture as Blob);
+          } else {
+            formData.append(key, value as string);
+          }
+        }
+      }
+
+      return formData;
+    });
+
     const rules = {
       first_name: {
         required: helpers.withMessage('First name is required.', required),
@@ -352,7 +371,7 @@ export default defineComponent({
           void store
             .dispatch('users/EDIT_USER', {
               userId: props.userId,
-              form: form,
+              formData: getFormData.value,
             })
             .then(() => {
               submitting.value = false;
@@ -371,7 +390,7 @@ export default defineComponent({
         } else {
           store
             .dispatch('users/CREATE_USER', {
-              form: form,
+              formData: getFormData,
             })
             .then((userId: string) => {
               submitting.value = false;
@@ -581,6 +600,7 @@ export default defineComponent({
       }),
       CAN_EDIT_USERS,
       handleCropperFinish,
+      getFormData,
     };
   },
 });

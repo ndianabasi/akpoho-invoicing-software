@@ -7,6 +7,7 @@ import { CACHE_TAGS } from 'Contracts/cache'
 import { ROLES } from 'Database/data/roles'
 import querystring from 'querystring'
 import Logger from '@ioc:Adonis/Core/Logger'
+import Application from '@ioc:Adonis/Core/Application'
 
 export default class UsersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -173,7 +174,10 @@ export default class UsersController {
       state_id,
       country_id,
       login_status,
+      profile_picture,
     } = await request.validate(UserValidator)
+
+    await profile_picture.move(Application.tmpPath('uploads'))
 
     await bouncer.with('UserPolicy').authorize('edit', requestedCompany!, requestedUser!)
 

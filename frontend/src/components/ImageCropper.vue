@@ -15,6 +15,7 @@
     <template #after>
       <q-icon
         v-if="previewCropped"
+        round
         name="visibility"
         @click="previewDialog = !previewDialog"
       />

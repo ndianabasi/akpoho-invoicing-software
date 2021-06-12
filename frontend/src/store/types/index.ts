@@ -232,7 +232,8 @@ export interface TitleInfo extends Object {
   avatar?: string;
 }
 
-export interface UserFormShape extends Object {
+export interface UserFormShape {
+  [index: string]: string | undefined | null | number | boolean | File | Blob;
   first_name: string;
   last_name: string;
   middle_name: string | undefined | null;

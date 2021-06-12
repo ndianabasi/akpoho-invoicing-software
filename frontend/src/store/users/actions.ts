@@ -5,12 +5,7 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { UsersStateInterface /* Users */ } from './state';
 import { api as $http } from '../../boot/http';
-import {
-  HttpResponse,
-  HttpError,
-  StringIDNameInterface,
-  UserFormShape,
-} from '../types';
+import { HttpResponse, HttpError, StringIDNameInterface } from '../types';
 import { Notify } from 'quasar';
 
 const actions: ActionTree<UsersStateInterface, StateInterface> = {
@@ -52,7 +47,7 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
     });
   },
 
-  async CREATE_USER({ rootGetters }, { form }: { form: UserFormShape }) {
+  async CREATE_USER({ rootGetters }, formData: FormData) {
     return new Promise(async (resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const currentCompany = rootGetters[
@@ -60,7 +55,11 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
       ] as StringIDNameInterface;
 
       await $http
-        .post(`/${currentCompany.id}/users`, { ...form })
+        .post(`/${currentCompany.id}/users`, formData, {
+          headers: {
+            'Content-type': 'multipart/form-data',
+          },
+        })
         .then((res: HttpResponse) => {
           Notify.create({
             message: 'User was successfully created',
@@ -86,8 +85,10 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
 
   async EDIT_USER(
     { rootGetters },
-    { userId, form }: { userId: string; form: UserFormShape }
+    { userId, formData }: { userId: string; formData: FormData }
   ) {
+    console.log(formData);
+
     return new Promise(async (resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const currentCompany = rootGetters[
@@ -95,7 +96,11 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
       ] as StringIDNameInterface;
 
       await $http
-        .patch(`/${currentCompany.id}/users/${userId}`, { ...form })
+        .patch(`/${currentCompany.id}/users/${userId}`, formData, {
+          headers: {
+            'Content-type': 'multipart/form-data',
+          },
+        })
         .then((res: HttpResponse) => {
           Notify.create({
             message: 'User was successfully edited',
