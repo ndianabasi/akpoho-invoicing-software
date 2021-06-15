@@ -110,6 +110,8 @@ export const http: ServerConfig = {
     sameSite: false,
   },
   forceContentNegotiationTo: 'application/json',
+  // Activate Async Local Storage
+  useAsyncLocalStorage: true,
 }
 
 /*

@@ -12,6 +12,7 @@ import {
 import CompanyHook from './Hooks/CompanyHook'
 import User from 'App/Models/User'
 import Customer from 'App/Models/Customer'
+import UploadedFile from './UploadedFile'
 
 export default class Company extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -71,4 +72,7 @@ export default class Company extends BaseModel {
 
   @hasMany(() => Customer)
   public customers: HasMany<typeof Customer>
+
+  @hasMany(() => UploadedFile)
+  public uploadFiles: HasMany<typeof UploadedFile>
 }

@@ -8,6 +8,9 @@ import { ROLES } from 'Database/data/roles'
 import querystring from 'querystring'
 import Logger from '@ioc:Adonis/Core/Logger'
 import Application from '@ioc:Adonis/Core/Application'
+import { DateTime } from 'luxon'
+import FileUploadHelper from 'App/Helpers/FileUploadHelper'
+import { AttachedFile, FileData } from 'App/Helpers/types/file'
 
 export default class UsersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -53,8 +56,6 @@ export default class UsersController {
 
     const cacheQuerystring = querystring.stringify(request.qs())
     const cacheKey = `company_users_index:${requestedCompany?.id}__`.concat(cacheQuerystring)
-    console.log(cacheKey)
-
     const sets = [
       `${CACHE_TAGS.ALL_COMPANIES_CACHES_TAG}`,
       `${CACHE_TAGS.ALL_USERS_CACHES_TAG}`,
@@ -177,7 +178,7 @@ export default class UsersController {
       profile_picture,
     } = await request.validate(UserValidator)
 
-    await profile_picture.move(Application.tmpPath('uploads'))
+    const fileStatus = { fileExists: false, uploaded: false }
 
     await bouncer.with('UserPolicy').authorize('edit', requestedCompany!, requestedUser!)
 
@@ -186,8 +187,6 @@ export default class UsersController {
 
     // Ensure that a SuperAdmin does not lose login access
     await requestedUser?.load('role')
-    console.log(requestedUser?.role?.name)
-
     if (requestedUser?.role?.name !== ROLES.SUPERADMIN) {
       requestedUser?.merge({ roleId: role_id })
       await requestedUser?.save()
@@ -207,6 +206,55 @@ export default class UsersController {
     })
     await requestedUserProfile?.save()
 
+    // Process uploaded file (if any)
+    if (profile_picture) {
+      fileStatus.fileExists = true
+
+      const firstName = requestedUserProfile?.firstName!
+      const lastName = requestedUserProfile?.lastName!
+      const firstLetter = firstName.charAt(0)
+      const secondLetter = firstName.charAt(1)
+      const finalUploadDir = `uploads/profile_pictures/${firstLetter}/${secondLetter}`.toLowerCase()
+
+      const fileName = `${firstName}_${lastName}_${DateTime.now().toMillis()}`.toLowerCase()
+      await profile_picture.move(Application.tmpPath('uploads/user_profile_pictures/'), {
+        name: `${fileName}.${profile_picture.extname}`,
+        overwrite: true,
+      })
+
+      // Generate file formats using sharp and persist them
+      const fileObject: AttachedFile = {
+        filePath: profile_picture.filePath,
+        name: `${fileName}.${profile_picture.extname}`,
+        type: profile_picture.type!,
+        size: profile_picture.size!,
+      }
+
+      const mime = profile_picture.type + '/' + profile_picture.subtype
+
+      const fileData: FileData = {
+        data: {
+          fileInfo: {
+            ext: profile_picture.extname!,
+            hash: '',
+            mime,
+            size: fileObject.size,
+            alternativeText: '',
+            caption: '',
+            name: fileObject.name,
+            path: fileObject.filePath,
+          },
+        },
+        files: profile_picture,
+      }
+
+      const fileUploadHelper = new FileUploadHelper(fileData, finalUploadDir, 'local')
+      await fileUploadHelper.upload().then((uploadedFileModel) => {
+        fileStatus.uploaded = true
+        console.log(uploadedFileModel?.id)
+      })
+    }
+
     // Clear the user's entire cache
     const sets = [
       `${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${requestedUser?.id}`,
@@ -215,7 +263,7 @@ export default class UsersController {
     ]
     await CacheHelper.flushTags(sets)
 
-    return response.created()
+    return response.created({ message: 'User was successfully edited.', fileStatus })
   }
 
   public async store({ response, requestedCompany, request, bouncer }: HttpContextContract) {

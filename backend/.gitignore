@@ -6,3 +6,5 @@ coverage
 .env
 tmp
 database/data/seeded_users.txt
+app/Helpers/FileUploadHelper_.ts
+app/Controllers/Http/examples

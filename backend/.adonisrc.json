@@ -21,11 +21,7 @@
     {
       "file": "./start/events",
       "optional": true,
-      "environment": [
-        "web",
-        "console",
-        "test"
-      ]
+      "environment": ["web", "console", "test"]
     }
   ],
   "providers": [
@@ -37,8 +33,7 @@
     "@adonisjs/lucid",
     "@adonisjs/redis",
     "@adonisjs/shield",
-    "@adonisjs/bouncer",
-    "adonis5-cache"
+    "@adonisjs/bouncer"
   ],
   "metaFiles": [
     {
@@ -50,7 +45,5 @@
       "reloadServer": false
     }
   ],
-  "aceProviders": [
-    "@adonisjs/repl"
-  ]
+  "aceProviders": ["@adonisjs/repl"]
 }
