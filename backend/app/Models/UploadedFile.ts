@@ -1,6 +1,15 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  belongsTo,
+  column,
+  BelongsTo,
+  hasOne,
+  HasOne,
+  beforeSave,
+} from '@ioc:Adonis/Lucid/Orm'
 import FileProvider from 'App/Models/FileProvider'
+import UserProfile from './UserProfile'
 
 type FormatAttributes = {
   name: string
@@ -84,4 +93,14 @@ export default class UploadedFile extends BaseModel {
 
   @belongsTo(() => FileProvider)
   public provider: BelongsTo<typeof FileProvider>
+
+  @hasOne(() => UserProfile, { foreignKey: 'profile_picture' })
+  public profilePicture: HasOne<typeof UserProfile>
+
+  @beforeSave()
+  public static async stringifyFormats(file: UploadedFile) {
+    if (file.$dirty.formats && file.formats !== undefined) {
+      file.formats = JSON.stringify(file.formats)
+    }
+  }
 }

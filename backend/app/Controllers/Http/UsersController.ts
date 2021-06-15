@@ -249,9 +249,13 @@ export default class UsersController {
       }
 
       const fileUploadHelper = new FileUploadHelper(fileData, finalUploadDir, 'local')
-      await fileUploadHelper.upload().then((uploadedFileModel) => {
+      await fileUploadHelper.upload().then(async (uploadedFileModel) => {
         fileStatus.uploaded = true
         console.log(uploadedFileModel?.id)
+
+        // Associate profile picture with the uploaded file
+        requestedUserProfile?.merge({ profilePicture: uploadedFileModel?.id })
+        await requestedUserProfile?.save()
       })
     }
 

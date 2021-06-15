@@ -70,7 +70,7 @@ class FileUploadHelper {
     fileInfo: FileInfo,
     metas: FileMetaInfo
   ) => {
-    const { filename, type, size } = enhancedInfo
+    const { filename, size } = enhancedInfo
     const ext = path.extname(filename)
     const basename = path.basename(fileInfo.name || filename, ext)
 
@@ -175,9 +175,6 @@ class FileUploadHelper {
   }
 
   public async uploadFileAndPersist(file: FileInfo) {
-    //console.log(data.buffer)
-    let uploadedFileModel: UploadedFile | null | undefined = null
-
     const finalDir = `public/${this.uploadDir}`
     await createDirectory(finalDir).then(async () => {
       sharp(file.buffer!)
@@ -199,6 +196,8 @@ class FileUploadHelper {
         delete thumbnailFile.buffer
 
         _.set(file, 'formats.thumbnail', thumbnailFile)
+
+        console.log('file after thumbnail generation', file.formats)
       }
 
       const formats = await generateResponsiveFormats(file)
@@ -206,19 +205,21 @@ class FileUploadHelper {
         for (const format of formats) {
           if (!format) continue
 
-          const { key, file } = format
+          const { key, file: responsiveFile } = format
 
           // Store breakpoint file to filesystem
-          sharp(file.buffer!)
+          sharp(responsiveFile.buffer!)
             .jpeg()
-            .toFile(`${finalDir}/${file.name}`)
+            .toFile(`${finalDir}/${responsiveFile.name}`)
             .then((info) => console.log(info))
             .catch((error) => console.log(error))
 
-          delete file.buffer
+          delete responsiveFile.buffer
 
-          _.set(file, ['formats', key], file)
+          _.set(file, ['formats', key], responsiveFile)
         }
+
+        console.log('file after responsive formats generation', file.formats)
       }
 
       const { width, height } = await getDimensions(file.buffer!)
@@ -287,7 +288,7 @@ class FileUploadHelper {
         createdBy: this.requestedUser?.id,
         updatedBy: this.requestedUser?.id,
         fileProviderId: provider.id,
-        formats: JSON.stringify(fileInfo.formats || null),
+        formats: fileInfo.formats || null,
       })
 
       this.uploadedFileModel = uploadedFile

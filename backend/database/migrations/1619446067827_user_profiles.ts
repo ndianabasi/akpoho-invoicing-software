@@ -18,15 +18,23 @@ export default class UserProfiles extends BaseSchema {
       table.integer('state_id').unsigned().nullable()
       table.integer('country_id').unsigned().nullable()
 
-      table.string('profile_picture').nullable()
+      table.integer('profile_picture').unsigned().index().nullable()
 
       table.timestamps(true)
 
       table.foreign('user_id').references('users.id').onDelete('CASCADE').onUpdate('CASCADE')
+
       table.foreign('state_id').references('states.id').onDelete('SET NULL').onUpdate('CASCADE')
+
       table
         .foreign('country_id')
         .references('countries.id')
+        .onDelete('SET NULL')
+        .onUpdate('CASCADE')
+
+      table
+        .foreign('profile_picture')
+        .references('uploaded_files.id')
         .onDelete('SET NULL')
         .onUpdate('CASCADE')
     })

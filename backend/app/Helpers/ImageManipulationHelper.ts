@@ -7,9 +7,9 @@ import fs from 'fs'
 import { BreakpointFormat, FileDimensions, FileInfo } from './types/file'
 
 export let uploadSettings = {
-  sizeOptimization: false,
-  autoOrientation: false,
-  responsiveDimensions: false,
+  sizeOptimization: true,
+  autoOrientation: true,
+  responsiveDimensions: true,
 }
 
 const { responsiveDimensions } = uploadSettings

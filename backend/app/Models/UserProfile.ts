@@ -1,9 +1,17 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, beforeCreate, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
-import UuidHook from './Hooks/UUIDHook'
+import {
+  BaseModel,
+  column,
+  beforeCreate,
+  belongsTo,
+  BelongsTo,
+  afterFetch,
+} from '@ioc:Adonis/Lucid/Orm'
+import UuidHook from 'App/Models/Hooks/UUIDHook'
 import User from 'App/Models/User'
 import Country from 'App/Models/Country'
 import State from 'App/Models/State'
+import UploadedFile, { FileFormats } from 'App/Models/UploadedFile'
 
 export default class UserProfile extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -39,7 +47,7 @@ export default class UserProfile extends BaseModel {
   public countryId: number | null
 
   @column()
-  public profilePicture: string | null
+  public profilePicture: number | null
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -60,4 +68,7 @@ export default class UserProfile extends BaseModel {
 
   @belongsTo(() => State)
   public userState: BelongsTo<typeof State>
+
+  @belongsTo(() => UploadedFile, { foreignKey: 'profilePicture' })
+  public profilePictureFile: BelongsTo<typeof UploadedFile>
 }

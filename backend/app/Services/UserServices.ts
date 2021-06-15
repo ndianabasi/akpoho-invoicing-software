@@ -126,59 +126,58 @@ export default class UserServices {
     let userDetails: UserFullDetails | null = null
 
     const cacheKey = `${CACHE_TAGS.USER_DETAILS_CACHE_KEY_PREFIX}:${this.id}`
-    await CacheHelper.get(cacheKey)
-      .then(async (result: UserFullDetails | null) => {
-        if (result) {
-          userDetails = result
-        } else {
-          // Compute and set a new key-value pair
-          const user = await User.query()
-            .preload('role', (roleQuery) => roleQuery.select('name', 'id'))
-            .preload('profile', (profileQuery) => {
-              profileQuery.preload('userCountry', (countryQuery) =>
-                countryQuery.select('id', 'name')
-              )
-              profileQuery.preload('userState', (stateQuery) => stateQuery.select('id', 'name'))
-              profileQuery.select(
-                'first_name',
-                'last_name',
-                'middle_name',
-                'profile_picture',
-                'phone_number',
-                'address',
-                'city',
-                'created_at',
-                'updated_at',
-                'country_id',
-                'state_id'
-              )
-            })
-            .where('id', this.id!)
-            .first()
+    await CacheHelper.get(cacheKey).then(async (result: UserFullDetails | null) => {
+      if (result) {
+        userDetails = result
+        console.log(userDetails)
+      } else {
+        // Compute and set a new key-value pair
+        const user = await User.query()
+          .preload('role', (roleQuery) => roleQuery.select('name', 'id'))
+          .preload('profile', (profileQuery) => {
+            profileQuery.preload('userCountry', (countryQuery) => countryQuery.select('id', 'name'))
+            profileQuery.preload('userState', (stateQuery) => stateQuery.select('id', 'name'))
+            profileQuery.preload('profilePictureFile', (fileQuery) => fileQuery.select('formats'))
+            profileQuery.select(
+              'first_name',
+              'last_name',
+              'middle_name',
+              'profile_picture',
+              'phone_number',
+              'address',
+              'city',
+              'created_at',
+              'updated_at',
+              'country_id',
+              'state_id'
+            )
+          })
+          .where('id', this.id!)
+          .first()
 
-          const serialisedUserDetails = user?.serialize()
+        const serialisedUserDetails = user?.serialize()
 
-          await CacheHelper.put(cacheKey, serialisedUserDetails)
+        await CacheHelper.put(cacheKey, serialisedUserDetails)
 
-          // Add the `cacheKey` to sets
-          const companiesTags = await this.getCompaniesCacheTags()
-          const sets = [
-            CACHE_TAGS.ALL_COMPANIES_CACHES_TAG,
-            ...companiesTags,
-            CACHE_TAGS.ALL_USERS_CACHES_TAG,
-            CACHE_TAGS.ALL_USERS_DETAILS_CACHES_TAG,
-            `${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${this.id}`,
-            `${CACHE_TAGS.USER_DETAILS_CACHE_TAG_PREFIX}:${this.id}`,
-          ]
+        // Add the `cacheKey` to sets
+        const companiesTags = await this.getCompaniesCacheTags()
+        const sets = [
+          CACHE_TAGS.ALL_COMPANIES_CACHES_TAG,
+          ...companiesTags,
+          CACHE_TAGS.ALL_USERS_CACHES_TAG,
+          CACHE_TAGS.ALL_USERS_DETAILS_CACHES_TAG,
+          `${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${this.id}`,
+          `${CACHE_TAGS.USER_DETAILS_CACHE_TAG_PREFIX}:${this.id}`,
+        ]
 
-          await CacheHelper.tag(sets, cacheKey)
+        await CacheHelper.tag(sets, cacheKey)
 
-          userDetails = serialisedUserDetails as UserFullDetails
-        }
-      })
-      .catch((error) => {
+        userDetails = serialisedUserDetails as UserFullDetails
+      }
+    })
+    /* .catch((error) => {
         Logger.error('Error from App/Services/UserServices.getFullUserDetails: %j', error)
-      })
+      }) */
 
     return userDetails!
   }
