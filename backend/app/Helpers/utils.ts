@@ -1,7 +1,7 @@
 'use strict'
 
 import { Readable } from 'stream'
-import slugify from 'slugify'
+import slugify from '@sindresorhus/slugify'
 
 export const STANDARD_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss'
 export const TIMEZONE_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss ZZ'
@@ -36,7 +36,7 @@ export const streamToBuffer = (stream: Readable) =>
     stream.on('error', reject)
   })
 
-export const nameToSlug = (name: string, options = { replacement: '-' }) => slugify(name, options)
+export const nameToSlug = (name: string, options = { separator: '-' }) => slugify(name, options)
 
 export const nameToCollectionName = (name: string) =>
-  slugify(name, { replacement: '_', lower: true })
+  slugify(name, { separator: '_', lowercase: true })

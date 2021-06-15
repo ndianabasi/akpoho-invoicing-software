@@ -7,14 +7,6 @@
   "prettier.arrowParens": "avoid",
   "prettier.endOfLine": "auto",
   "vetur.validation.template": false,
-  "eslint.workingDirectories": [
-    "backend", "frontend"
-  ],
-  "cSpell.words": [
-    "Addressbar",
-    "Kbytes",
-    "Metadatas",
-    "metas",
-    "ncontains"
-  ]
+  "eslint.workingDirectories": ["backend", "frontend"],
+  "cSpell.words": ["Addressbar", "Kbytes", "Metadatas", "metas", "ncontains"]
 }

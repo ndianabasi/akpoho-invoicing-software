@@ -7,4 +7,6 @@ coverage
 tmp
 database/data/seeded_users.txt
 app/Helpers/FileUploadHelper_.ts
+app/Helpers/ImageManipulationHelper.ts
+app/Helpers/UploadHelper.ts
 app/Controllers/Http/examples
