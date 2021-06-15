@@ -334,7 +334,7 @@ export default defineComponent({
         if (Object.prototype.hasOwnProperty.call(form, key)) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const value = form[key];
-          if (key === 'profile_picture') {
+          if (key === 'profile_picture' && value !== null) {
             formData.append('profile_picture', form.profile_picture as Blob);
           } else {
             formData.append(key, value as string);
@@ -477,14 +477,20 @@ export default defineComponent({
     watch(
       currentUser,
       () => {
-        if (!props.creationMode) return;
+        const profilePictureFileBase =
+          currentUser?.value?.profile?.profilePictureFile;
+
         const title =
           currentUser && currentUser.value
             ? useTitleInfo({
                 title: `${currentUser.value.profile?.first_name ?? ''} ${
                   currentUser.value.profile?.last_name ?? ''
                 }`,
-                avatar: currentUser.value.profile?.profile_picture ?? '',
+                avatar:
+                  profilePictureFileBase?.formats?.thumbnail?.url ??
+                  profilePictureFileBase?.formats?.small?.url ??
+                  profilePictureFileBase?.url ??
+                  '',
               })
             : props.creationMode
             ? useTitleInfo({

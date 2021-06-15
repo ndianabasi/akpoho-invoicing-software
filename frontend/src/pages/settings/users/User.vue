@@ -398,6 +398,7 @@ import useResourcePermissions from '../../../composables/useResourcePermissions'
 import useDeleteResource from '../../../composables/useDeleteResource';
 import {
   CurrentlyViewedUser,
+  FileMultiFormats,
   PERMISSION,
   TitleInfo,
 } from '../../../store/types';
@@ -429,11 +430,18 @@ export default defineComponent({
     watch(
       currentUser,
       () => {
+        const profilePictureFileBase =
+          currentUser?.value?.profile?.profilePictureFile;
+
         const title = useTitleInfo({
           title: `${currentUser?.value?.profile?.first_name ?? ''} ${
             currentUser?.value?.profile?.last_name ?? ''
           }`,
-          avatar: currentUser?.value?.profile?.profile_picture ?? '',
+          avatar:
+            profilePictureFileBase?.formats?.thumbnail?.url ??
+            profilePictureFileBase?.formats?.small?.url ??
+            profilePictureFileBase?.url ??
+            '',
         });
 
         titleInfo.value = title.value;

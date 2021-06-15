@@ -46,7 +46,7 @@ export default class UserValidator {
 
     login_status: schema.boolean(),
 
-    profile_picture: schema.file({ extnames: ['jpg', 'gif', 'png'], size: '5mb' }),
+    profile_picture: schema.file.optional({ extnames: ['jpg', 'gif', 'png'], size: '5mb' }),
   })
 
   public messages = {
@@ -65,5 +65,9 @@ export default class UserValidator {
     'phone_number.mobile': 'Phone number is not valid',
     'city.maxLength': 'City should be maximum of {{options.choices}} characters.',
     'role_id.regex': 'Role is not valid',
+    'state_id.unsigned': 'State is invalid',
+    'state_id.number': 'State is invalid',
+    'country_id.unsigned': 'Country is invalid',
+    'country_id.number': 'Country is invalid',
   }
 }

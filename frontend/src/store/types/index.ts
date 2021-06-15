@@ -149,7 +149,7 @@ export type CurrentlyViewedUser = {
     phone_number: string;
     address: string;
     city: string;
-    profile_picture: string;
+    profilePictureFile: FileMultiFormats;
     userState?: NumberIDNameInterface;
     userCountry?: NumberIDNameInterface;
   };
@@ -242,8 +242,8 @@ export interface UserFormShape {
   city: string | undefined | null;
   email: string;
   role_id: string | undefined;
-  state_id: number | null;
-  country_id: number | null;
+  state_id: number | string | null;
+  country_id: number | string | null;
   login_status: boolean;
   profile_picture: File | null;
 }

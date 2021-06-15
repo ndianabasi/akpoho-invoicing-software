@@ -103,15 +103,41 @@
         </q-menu>
       </q-btn>
       <q-btn round flat>
-        <q-avatar size="26px">
-          <img :src="authUserProfilePicture?.thumbnail ?? ''" />
+        <q-avatar
+          v-bind="
+            authUserProfilePicture?.thumbnail ?? false
+              ? {}
+              : { color: 'accent', textColor: 'grey-3' }
+          "
+          size="26px"
+        >
+          <img
+            v-if="authUserProfilePicture?.thumbnail ?? false"
+            :src="authUserProfilePicture?.thumbnail"
+          />
+          <template v-else>
+            {{ getUserInitials }}
+          </template>
         </q-avatar>
         <q-tooltip v-if="$q.screen.gt.xs">Account</q-tooltip>
         <q-menu>
           <div class="row no-wrap q-py-md" style="min-width: 200px">
             <div class="col-12 column items-center q-px-md">
-              <q-avatar size="72px">
-                <img :src="authUserProfilePicture?.small ?? ''" />
+              <q-avatar
+                v-bind="
+                  authUserProfilePicture?.small ?? false
+                    ? {}
+                    : { color: 'accent', textColor: 'grey-3' }
+                "
+                size="72px"
+              >
+                <img
+                  v-if="authUserProfilePicture?.small ?? false"
+                  :src="authUserProfilePicture?.small"
+                />
+                <template v-else>
+                  {{ getUserInitials }}
+                </template>
               </q-avatar>
 
               <div class="text-subtitle1 text-center q-mt-md q-mb-xs">
@@ -267,6 +293,10 @@ export default defineComponent({
       toggleDarkMode,
       isDark,
       authUserProfilePicture,
+      getUserInitials: computed(() => {
+        const [firstName, lastName] = userFullName.split(' ');
+        return firstName[0] + lastName?.[0] ?? firstName[1];
+      }),
     };
   },
 });
