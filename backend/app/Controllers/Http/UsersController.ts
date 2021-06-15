@@ -225,7 +225,7 @@ export default class UsersController {
       // Generate file formats using sharp and persist them
       const fileObject: AttachedFile = {
         filePath: profile_picture.filePath,
-        name: `${fileName}.${profile_picture.extname}`,
+        name: fileName,
         type: profile_picture.type!,
         size: profile_picture.size!,
       }
@@ -235,7 +235,7 @@ export default class UsersController {
       const fileData: FileData = {
         data: {
           fileInfo: {
-            ext: profile_picture.extname!,
+            ext: '',
             hash: '',
             mime,
             size: fileObject.size,

@@ -15,7 +15,7 @@ export type FileMetaInfo = {
 
 export type AttachedFile = { filePath?: string; name?: string; type?: string; size: number }
 
-export type EnhancedFileInfo = { filename: string; type: string; size: number }
+export type EnhancedFileInfo = { absoluteFilePath: string; type: string; size: number }
 
 export type FileInfo = {
   name?: string
@@ -31,6 +31,7 @@ export type FileInfo = {
   width?: number
   height?: number
   formats?: FileFormats | null
+  url?: string | null
 }
 
 export type OptimizedOutput = {
@@ -39,6 +40,7 @@ export type OptimizedOutput = {
     width: number
     height: number
     size: number
+    format: string
   }
 }
 

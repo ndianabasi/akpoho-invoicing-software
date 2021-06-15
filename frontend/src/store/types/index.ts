@@ -109,7 +109,7 @@ export interface LoginUserSummary extends IDEntity {
 export interface UserProfileSummary extends IDEntity {
   first_name: string;
   last_name: string;
-  profile_picture: string;
+  profilePictureFile: FileMultiFormats;
 }
 
 export interface LoginHttpResponse extends AxiosResponse {
@@ -272,3 +272,25 @@ export interface FormSchema {
   isVisible: boolean;
   autocomplete?: string;
 }
+
+export interface FileMultiFormats {
+  formats: {
+    thumbnail?: FileFormatAttributes;
+    large?: FileFormatAttributes;
+    medium?: FileFormatAttributes;
+    small?: FileFormatAttributes;
+  };
+  url: string;
+}
+
+export type FileFormatAttributes = {
+  name: string;
+  hash: string;
+  ext: string;
+  mime: string;
+  width: number;
+  height: number;
+  size: number;
+  path: string | null;
+  url: string;
+};

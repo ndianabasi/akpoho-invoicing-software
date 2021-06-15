@@ -1,8 +1,8 @@
 import {
   LoginData,
   UserSummary,
-  UserProfileSummary,
   StringIDNameInterface,
+  FileMultiFormats,
 } from '../types';
 export interface AuthStateInterface {
   token: string;
@@ -13,9 +13,16 @@ export interface AuthStateInterface {
   loginData: LoginData;
   userSummary: UserSummary | null;
   userCompanies: StringIDNameInterface[] | null;
-  userProfile: UserProfileSummary | null;
+  userProfile: UserProfile | null;
   currentCompany: StringIDNameInterface | null;
   authRole: StringIDNameInterface | null;
+}
+
+export interface UserProfile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  profile_picture: FileMultiFormats;
 }
 
 function state(): AuthStateInterface {

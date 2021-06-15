@@ -66,7 +66,7 @@ export default boot(
             type: 'negative',
             position: 'top',
             progress: true,
-            timeout: 10000,
+            timeout: 5000,
             actions: [
               {
                 label: 'Dismiss',

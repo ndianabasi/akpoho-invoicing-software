@@ -28,23 +28,29 @@ const mutation: MutationTree<AuthStateInterface> = {
   },
 
   SET_USER_DATA(state: AuthStateInterface, payload: LoginUserData) {
-    state.userCompanies = payload.companies;
-    state.userProfile = {
-      first_name: payload.profile.first_name,
-      last_name: payload.profile.last_name,
-      id: payload.profile.id,
-      profile_picture: payload.profile.profile_picture,
-    };
+    try {
+      console.log(payload.profile.profilePictureFile);
 
-    state.userSummary = {
-      id: payload.id,
-      email: payload.email,
-      is_account_activated: Boolean(payload.is_account_activated),
-      is_email_verified: Boolean(payload.is_email_verified),
-      login_status: Boolean(payload.login_status),
-    };
+      state.userCompanies = payload.companies;
+      state.userProfile = {
+        first_name: payload.profile.first_name,
+        last_name: payload.profile.last_name,
+        id: payload.profile.id,
+        profile_picture: payload.profile.profilePictureFile,
+      };
 
-    state.authRole = payload.role;
+      state.userSummary = {
+        id: payload.id,
+        email: payload.email,
+        is_account_activated: Boolean(payload.is_account_activated),
+        is_email_verified: Boolean(payload.is_email_verified),
+        login_status: Boolean(payload.login_status),
+      };
+
+      state.authRole = payload.role;
+    } catch (error) {
+      console.log(error);
+    }
   },
 };
 

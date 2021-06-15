@@ -36,6 +36,7 @@ class FileUploadHelper {
   protected uploadDir: string
   protected provider: string
   protected uploadedFileModel: UploadedFile | undefined | null
+  protected UPLOAD_DIR_PREFIX = 'public'
 
   /**
    *
@@ -70,22 +71,23 @@ class FileUploadHelper {
     fileInfo: FileInfo,
     metas: FileMetaInfo
   ) => {
-    const { filename, size } = enhancedInfo
-    const ext = path.extname(filename)
-    const basename = path.basename(fileInfo.name || filename, ext)
+    const { absoluteFilePath, size } = enhancedInfo
+    const ext = fileInfo.ext || path.extname(absoluteFilePath)
+    const basename = path.basename(fileInfo.name || absoluteFilePath, ext)
 
-    const usedName = fileInfo.name || filename
+    const usedName = fileInfo.name || basename
 
     const entity: FileInfo = {
       name: usedName,
       alternativeText: fileInfo.alternativeText,
       caption: fileInfo.caption,
       hash: this.generateFileName(basename),
-      ext: fileInfo.ext,
+      ext,
       mime: fileInfo.mime,
       size: bytesToKbytes(size),
       width: fileInfo.width,
       height: fileInfo.height,
+      url: `${this.uploadDir}/${usedName}.${ext}`,
     }
 
     if (metas) {
@@ -117,7 +119,7 @@ class FileUploadHelper {
 
     const formattedFile = this.formatFileInfo(
       {
-        filename: file.filePath!,
+        absoluteFilePath: file.filePath!,
         type: file.type!,
         size: file.size,
       },
@@ -148,6 +150,7 @@ class FileUploadHelper {
             width: info.width,
             height: info.height,
             size: bytesToKbytes(output.length),
+            format: info.format,
           },
         }
       })
@@ -162,9 +165,9 @@ class FileUploadHelper {
     const fileInfoArray = Array.isArray(fileInfo) ? fileInfo : [fileInfo]
 
     const doUpload = async (file: AttachedFile, fileInfo: FileInfo) => {
-      const data = await this.enhanceFile(file, fileInfo, metas)
+      const fileData = await this.enhanceFile(file, fileInfo, metas)
 
-      return this.uploadFileAndPersist(data)
+      return this.uploadFileAndPersist(fileData)
     }
 
     await Promise.all(
@@ -175,11 +178,12 @@ class FileUploadHelper {
   }
 
   public async uploadFileAndPersist(file: FileInfo) {
-    const finalDir = `public/${this.uploadDir}`
+    const finalDir = `${this.UPLOAD_DIR_PREFIX}/${this.uploadDir}`
     await createDirectory(finalDir).then(async () => {
+      // Generate main file which serves as the origin
       sharp(file.buffer!)
-        .png()
-        .toFile(`${finalDir}/${file.name}`)
+        .jpeg()
+        .toFile(`${this.UPLOAD_DIR_PREFIX}/${file.url}`)
         .then((info) => console.log(info))
         .catch((error) => console.log(error))
 
@@ -189,7 +193,7 @@ class FileUploadHelper {
         // Store thumbnailFile to filesystem
         sharp(thumbnailFile.buffer!)
           .jpeg()
-          .toFile(`${finalDir}/${thumbnailFile.name}`)
+          .toFile(`${finalDir}/${thumbnailFile.name}.${thumbnailFile.ext}`)
           .then((info) => console.log(info))
           .catch((error) => console.log(error))
 
@@ -198,7 +202,7 @@ class FileUploadHelper {
         _.set(file, 'formats.thumbnail', thumbnailFile)
       }
 
-      const formats = await generateResponsiveFormats(file)
+      const formats = await generateResponsiveFormats(file, this.uploadDir)
       if (formats && Array.isArray(formats) && formats.length > 0) {
         for (const format of formats) {
           if (!format) continue
@@ -208,7 +212,7 @@ class FileUploadHelper {
           // Store breakpoint file to filesystem
           sharp(responsiveFile.buffer!)
             .jpeg()
-            .toFile(`${finalDir}/${responsiveFile.name}`)
+            .toFile(`${finalDir}/${responsiveFile.name}.${responsiveFile.ext}`)
             .then((info) => console.log(info))
             .catch((error) => console.log(error))
 
@@ -245,18 +249,22 @@ class FileUploadHelper {
       const newBuff = await resizeTo(file.buffer!, THUMBNAIL_RESIZE_OPTIONS)
 
       if (newBuff) {
-        const { width, height, size } = await getMetadatas(newBuff)
+        const { width, height, size, format } = await getMetadatas(newBuff)
+
+        const ext = (format as string) || file.ext
+        const thumbnailFileName = `thumbnail_${file.name}`
 
         return {
-          name: `thumbnail_${file.name}`,
+          name: thumbnailFileName,
           hash: `thumbnail_${file.hash}`,
-          ext: file.ext,
+          ext,
           mime: file.mime,
           width: width!,
           height: height!,
           size: bytesToKbytes(size!),
           buffer: newBuff,
           path: file.path ? file.path : null,
+          url: `${this.uploadDir}/${thumbnailFileName}.${ext}`,
         }
       }
     }
@@ -278,7 +286,7 @@ class FileUploadHelper {
         mime: fileInfo.mime,
         name: fileInfo.name,
         size: fileInfo.size,
-        url: `${this.uploadDir}/${fileInfo.name}`,
+        url: fileInfo.url!,
         width: fileInfo.width,
         height: fileInfo.height,
         createdBy: this.requestedUser?.id,

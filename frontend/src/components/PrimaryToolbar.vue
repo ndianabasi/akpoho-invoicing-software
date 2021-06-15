@@ -104,14 +104,14 @@
       </q-btn>
       <q-btn round flat>
         <q-avatar size="26px">
-          <img :src="userProfile.profile_picture" />
+          <img :src="authUserProfilePicture?.thumbnail ?? ''" />
         </q-avatar>
         <q-tooltip v-if="$q.screen.gt.xs">Account</q-tooltip>
         <q-menu>
           <div class="row no-wrap q-py-md" style="min-width: 200px">
             <div class="col-12 column items-center q-px-md">
               <q-avatar size="72px">
-                <img :src="userProfile.profile_picture" />
+                <img :src="authUserProfilePicture?.small ?? ''" />
               </q-avatar>
 
               <div class="text-subtitle1 text-center q-mt-md q-mb-xs">
@@ -240,6 +240,13 @@ export default defineComponent({
       'auth/GET_USER_SUMMARY'
     ] as UserProfileSummary;
 
+    const authUserProfilePicture = computed(
+      () =>
+        store.getters[
+          'auth/GET_AUTH_USER_PROFILE_PICTURE'
+        ] as UserProfileSummary
+    );
+
     const authRole = store.getters[
       'auth/GET_AUTH_ROLE'
     ] as StringIDNameInterface['name'];
@@ -259,6 +266,7 @@ export default defineComponent({
       authRole: ref(authRole),
       toggleDarkMode,
       isDark,
+      authUserProfilePicture,
     };
   },
 });

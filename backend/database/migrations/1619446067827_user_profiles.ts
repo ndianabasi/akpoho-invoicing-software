@@ -9,10 +9,10 @@ export default class UserProfiles extends BaseSchema {
       table.uuid('user_id').index().unique().nullable()
 
       table.string('first_name', 50).notNullable().index()
-      table.string('middle_name', 50).unique().nullable().index()
+      table.string('middle_name', 50).nullable().index()
       table.string('last_name', 50).notNullable().index()
 
-      table.string('phone_number', 30).unique().nullable()
+      table.string('phone_number', 30).nullable()
       table.string('address').nullable()
       table.string('city', 50).nullable()
       table.integer('state_id').unsigned().nullable()

@@ -477,6 +477,7 @@ export default defineComponent({
     watch(
       currentUser,
       () => {
+        if (!props.creationMode) return;
         const title =
           currentUser && currentUser.value
             ? useTitleInfo({

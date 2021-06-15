@@ -67,7 +67,7 @@ const DEFAULT_BREAKPOINTS = {
   small: 500,
 }
 
-export const generateResponsiveFormats = async (file: FileInfo) => {
+export const generateResponsiveFormats = async (file: FileInfo, uploadDir: string) => {
   if (!responsiveDimensions) return []
 
   if (!(await canBeProcessed(file.buffer!))) {
@@ -80,8 +80,10 @@ export const generateResponsiveFormats = async (file: FileInfo) => {
     Object.keys(DEFAULT_BREAKPOINTS).map((key) => {
       const breakpoint = DEFAULT_BREAKPOINTS[key] as number
 
-      if (breakpointSmallerThan(breakpoint, originalDimensions)) {
-        return generateBreakpoint(key, { file, breakpoint })
+      const isBreakpointSmallerThanOriginal = breakpointSmallerThan(breakpoint, originalDimensions)
+
+      if (isBreakpointSmallerThanOriginal) {
+        return generateBreakpoint(key, { file, breakpoint }, uploadDir)
       }
     })
   )
@@ -89,7 +91,8 @@ export const generateResponsiveFormats = async (file: FileInfo) => {
 
 export const generateBreakpoint = async (
   key: string,
-  { file, breakpoint }: { file: FileInfo; breakpoint: number }
+  { file, breakpoint }: { file: FileInfo; breakpoint: number },
+  uploadDir: string
 ): Promise<BreakpointFormat> => {
   const newBuff = await resizeTo(file.buffer!, {
     width: breakpoint,
@@ -98,20 +101,24 @@ export const generateBreakpoint = async (
   })
 
   if (newBuff) {
-    const { width, height, size } = await getMetadatas(newBuff)
+    const { width, height, size, format } = await getMetadatas(newBuff)
+
+    const ext = (format as string) || file.ext
+    const breakpointFileName = `${key}_${file.name}`
 
     return {
       key,
       file: {
-        name: `${key}_${file.name}`,
+        name: breakpointFileName,
         hash: `${key}_${file.hash}`,
-        ext: file.ext,
+        ext,
         mime: file.mime,
         width: width!,
         height: height!,
         size: bytesToKbytes(size!),
         buffer: newBuff,
         path: file.path ? file.path : null,
+        url: `${uploadDir}/${breakpointFileName}.${ext}`,
       },
     }
   } else {

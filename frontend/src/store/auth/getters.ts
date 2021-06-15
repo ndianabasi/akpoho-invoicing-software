@@ -31,6 +31,33 @@ const getters: GetterTree<AuthStateInterface, StateInterface> = {
       ? globalRoles.some((role: string) => role === authRole)
       : false;
   },
+  GET_AUTH_USER_PROFILE_PICTURE: (state, getters, rootState, rootGetters) => {
+    const rootUrl = rootGetters['getRootURL'] as string;
+    const profilePictureBase = state.userProfile?.profile_picture;
+    const profilePictureFormat = { thumbnail: '', small: '' };
+
+    if (profilePictureBase) {
+      profilePictureFormat.thumbnail =
+        profilePictureBase?.formats?.thumbnail?.url ??
+        profilePictureBase?.formats?.thumbnail?.url ??
+        '';
+
+      profilePictureFormat.small =
+        profilePictureBase?.formats?.small?.url ??
+        profilePictureFormat?.thumbnail ??
+        profilePictureBase?.url ??
+        '';
+    }
+
+    return {
+      thumbnail: profilePictureFormat.thumbnail
+        ? `${rootUrl}/${profilePictureFormat.thumbnail}`
+        : '',
+      small: profilePictureFormat.small
+        ? `${rootUrl}/${profilePictureFormat.small}`
+        : '',
+    };
+  },
 };
 
 export default getters;

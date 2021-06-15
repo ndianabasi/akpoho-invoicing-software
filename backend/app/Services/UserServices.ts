@@ -90,7 +90,9 @@ export default class UserServices {
           .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
           .preload('profile', (profileQuery) => {
             profileQuery.select(...['id', 'first_name', 'last_name', 'profile_picture']) // profile picture is added for the relationship below
-            profileQuery.preload('profilePictureFile', (fileQuery) => fileQuery.select('formats'))
+            profileQuery.preload('profilePictureFile', (fileQuery) =>
+              fileQuery.select('formats', 'url')
+            )
           })
           .preload('role', (roleQuery) => roleQuery.select(...['name']))
           .first()
@@ -136,7 +138,9 @@ export default class UserServices {
           .preload('profile', (profileQuery) => {
             profileQuery.preload('userCountry', (countryQuery) => countryQuery.select('id', 'name'))
             profileQuery.preload('userState', (stateQuery) => stateQuery.select('id', 'name'))
-            profileQuery.preload('profilePictureFile', (fileQuery) => fileQuery.select('formats'))
+            profileQuery.preload('profilePictureFile', (fileQuery) =>
+              fileQuery.select('formats', 'url')
+            )
             profileQuery.select(
               'first_name',
               'last_name',

@@ -7,6 +7,8 @@ import {
   hasOne,
   HasOne,
   beforeSave,
+  afterFind,
+  afterFetch,
 } from '@ioc:Adonis/Lucid/Orm'
 import FileProvider from 'App/Models/FileProvider'
 import UserProfile from './UserProfile'
@@ -102,5 +104,18 @@ export default class UploadedFile extends BaseModel {
     if (file.$dirty.formats && file.formats !== undefined) {
       file.formats = JSON.stringify(file.formats)
     }
+  }
+
+  @afterFind()
+  public static async parseFormats(file: UploadedFile) {
+    file.formats = JSON.parse(file.formats as string)
+  }
+
+  @afterFetch()
+  public static async parseAllFormats(files: UploadedFile[]) {
+    files.map((file) => {
+      file.formats = JSON.parse(file.formats as string)
+      return file
+    })
   }
 }

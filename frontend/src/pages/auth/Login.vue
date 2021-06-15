@@ -190,7 +190,6 @@ export default defineComponent({
     const form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
 
     async function handleLogin() {
-      console.log('handling login');
       if (!form$.value.$invalid) {
         submitting.value = true;
 
@@ -201,7 +200,6 @@ export default defineComponent({
               submitting.value = false;
               void nextTick(() => {
                 const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
-                console.log(isLoggedIn);
 
                 if (isLoggedIn) {
                   void router.push({ name: 'Dashboard' });
