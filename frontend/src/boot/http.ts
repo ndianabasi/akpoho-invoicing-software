@@ -55,13 +55,14 @@ export default boot(
       async (error: HttpError) => {
         console.log(error.response);
         if (error?.response?.status === 401) {
-          setAuthHeader('');
-          void (await store.dispatch('auth/LOGOUT_USER'));
+          store.commit('auth/LOGOUT_USER');
 
           Notify.create({
             message:
-              (error?.response?.data as string) ??
-              error?.response?.data?.message,
+              error?.response?.data?.message ??
+              typeof error?.response?.data === 'string'
+                ? error?.response?.data
+                : 'You are not logged in!',
             type: 'negative',
             position: 'top',
             progress: true,

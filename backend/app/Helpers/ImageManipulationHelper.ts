@@ -6,6 +6,7 @@ import crypto from 'crypto'
 import fs from 'fs'
 import { BreakpointFormat, FileDimensions, FileInfo } from './types/file'
 
+// Todo: add this setting to .env or database
 export let uploadSettings = {
   sizeOptimization: true,
   autoOrientation: true,

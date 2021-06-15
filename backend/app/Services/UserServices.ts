@@ -72,52 +72,52 @@ export default class UserServices {
 
     const cacheKey = `${CACHE_TAGS.USER_SUMMARY_CACHE_KEY_PREFIX}:${user.id}`
     let userSummary: UserSummary | null = null
-    await CacheHelper.get(cacheKey)
-      .then(async (result: UserSummary | null) => {
-        if (result) {
-          userSummary = result
-        } else {
-          // Compute and set a new key-value pair
-          const user = await User.query()
-            .select(
-              'users.id',
-              'users.email',
-              'users.login_status',
-              'users.is_account_activated',
-              'users.is_email_verified',
-              'users.role_id'
-            )
-            .where('id', this.id!)
-            .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
-            .preload('profile', (profileQuery) =>
-              profileQuery.select(...['id', 'first_name', 'last_name', 'profile_picture'])
-            )
-            .preload('role', (roleQuery) => roleQuery.select(...['name']))
-            .first()
+    await CacheHelper.get(cacheKey).then(async (result: UserSummary | null) => {
+      if (result) {
+        userSummary = result
+      } else {
+        // Compute and set a new key-value pair
+        const user = await User.query()
+          .select(
+            'users.id',
+            'users.email',
+            'users.login_status',
+            'users.is_account_activated',
+            'users.is_email_verified',
+            'users.role_id'
+          )
+          .where('id', this.id!)
+          .preload('companies', (companiesQuery) => companiesQuery.select(...['id', 'name']))
+          .preload('profile', (profileQuery) => {
+            profileQuery.select(...['id', 'first_name', 'last_name', 'profile_picture']) // profile picture is added for the relationship below
+            profileQuery.preload('profilePictureFile', (fileQuery) => fileQuery.select('formats'))
+          })
+          .preload('role', (roleQuery) => roleQuery.select(...['name']))
+          .first()
 
-          const serialisedUser = user?.serialize()
+        const serialisedUser = user?.serialize()
 
-          await CacheHelper.put(cacheKey, serialisedUser)
+        await CacheHelper.put(cacheKey, serialisedUser)
 
-          // Add the `cacheKey` to sets
-          const companiesTags = await this.getCompaniesCacheTags()
-          const sets = [
-            CACHE_TAGS.ALL_COMPANIES_CACHES_TAG,
-            ...companiesTags,
-            CACHE_TAGS.ALL_USERS_CACHES_TAG,
-            CACHE_TAGS.ALL_USERS_SUMMARY_CACHES_TAG,
-            `${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${user?.id}`,
-            `${CACHE_TAGS.USER_SUMMARY_CACHE_TAG_PREFIX}:${user?.id}`,
-          ]
+        // Add the `cacheKey` to sets
+        const companiesTags = await this.getCompaniesCacheTags()
+        const sets = [
+          CACHE_TAGS.ALL_COMPANIES_CACHES_TAG,
+          ...companiesTags,
+          CACHE_TAGS.ALL_USERS_CACHES_TAG,
+          CACHE_TAGS.ALL_USERS_SUMMARY_CACHES_TAG,
+          `${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${user?.id}`,
+          `${CACHE_TAGS.USER_SUMMARY_CACHE_TAG_PREFIX}:${user?.id}`,
+        ]
 
-          await CacheHelper.tag(sets, cacheKey)
+        await CacheHelper.tag(sets, cacheKey)
 
-          userSummary = serialisedUser as UserSummary
-        }
-      })
-      .catch((error) => {
+        userSummary = serialisedUser as UserSummary
+      }
+    })
+    /* .catch((error) => {
         Logger.error('Error from App/Services/UserServices.getUserSummary: %o', error)
-      })
+      }) */
 
     return userSummary!
   }
@@ -129,7 +129,6 @@ export default class UserServices {
     await CacheHelper.get(cacheKey).then(async (result: UserFullDetails | null) => {
       if (result) {
         userDetails = result
-        console.log(userDetails)
       } else {
         // Compute and set a new key-value pair
         const user = await User.query()
@@ -142,7 +141,7 @@ export default class UserServices {
               'first_name',
               'last_name',
               'middle_name',
-              'profile_picture',
+              'profile_picture', // important for the profilePictureFile relationship above
               'phone_number',
               'address',
               'city',

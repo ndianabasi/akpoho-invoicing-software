@@ -12,6 +12,7 @@ import {
 import routes /* CustomRouteRecord */ from './routes';
 //import qs from 'qs';
 import { store } from '../store/index';
+import { Notify } from 'quasar';
 
 /*
  * If not building with SSR mode, you can
@@ -62,11 +63,12 @@ export default function () {
       if (isLoggedIn) {
         next();
       } else {
-        await store.dispatch('auth/logoutUser', {
-          message: 'You are not logged in!',
+        Notify.create({
+          type: 'negative',
+          message: 'You are not logged in.',
+          position: 'top',
         });
         await Router.push({ name: 'Login' });
-        next();
       }
     } else next();
   });

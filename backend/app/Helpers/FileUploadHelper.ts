@@ -196,8 +196,6 @@ class FileUploadHelper {
         delete thumbnailFile.buffer
 
         _.set(file, 'formats.thumbnail', thumbnailFile)
-
-        console.log('file after thumbnail generation', file.formats)
       }
 
       const formats = await generateResponsiveFormats(file)
@@ -218,8 +216,6 @@ class FileUploadHelper {
 
           _.set(file, ['formats', key], responsiveFile)
         }
-
-        console.log('file after responsive formats generation', file.formats)
       }
 
       const { width, height } = await getDimensions(file.buffer!)

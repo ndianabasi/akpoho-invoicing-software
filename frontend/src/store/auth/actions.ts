@@ -43,8 +43,6 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
   },
 
   LOGOUT_USER({ commit }) {
-    commit('LOGOUT_USER');
-
     return new Promise(async (resolve, reject) => {
       await $http
         .post('/auth/logout')
@@ -62,6 +60,8 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
               },
             ],
           });
+
+          commit('LOGOUT_USER');
 
           resolve(res.data);
         })
