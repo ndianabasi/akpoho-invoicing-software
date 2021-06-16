@@ -20,6 +20,10 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
+Route.get('/views/test', async ({ view }) => {
+  return view.render('layouts.default')
+})
+
 Route.group(() => {
   Route.post('/auth/login', 'AuthController.login')
   // Register a new account from the public registration form

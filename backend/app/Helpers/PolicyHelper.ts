@@ -5,15 +5,15 @@ import PermissionHelper from '../Helpers/PermissionHelper'
 import Company from 'App/Models/Company'
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
 
-const accessCompany = async (resourcePermission: string, user: User, company: Company) => {
+const accessCompany = async (resourcePermission: string, authUser: User, company: Company) => {
   const isPermitted = await PermissionHelper.hasResourcePermission({
     resourcePermission,
-    user,
+    user: authUser,
     loggable: true,
   })
 
-  await user.load('companies')
-  const serialisedUser = user.toJSON()
+  await authUser.load('companies')
+  const serialisedUser = authUser.serialize()
 
   if (
     serialisedUser.companies.some((serialisedCompany) => serialisedCompany.id === company.id) &&

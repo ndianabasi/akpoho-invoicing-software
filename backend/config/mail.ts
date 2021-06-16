@@ -46,11 +46,11 @@ const mailConfig: MailConfig = {
       driver: 'smtp',
       host: Env.get('SMTP_HOST'),
       port: Env.get('SMTP_PORT'),
-			auth: {
-				user: Env.get('SMTP_USERNAME'),
-				pass: Env.get('SMTP_PASSWORD'),
-				type: 'login',
-			}
+      auth: {
+        user: Env.get('SMTP_USERNAME'),
+        pass: Env.get('SMTP_PASSWORD'),
+        type: 'login',
+      },
     },
 
     /*
@@ -84,6 +84,22 @@ const mailConfig: MailConfig = {
       baseUrl: 'https://api.sparkpost.com/api/v1',
       key: Env.get('SPARKPOST_API_KEY'),
     },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mailjet
+    |--------------------------------------------------------------------------
+    |
+		| Uses Mailjet service for sending emails.
+    |
+    */
+    /* mailjet: {
+      driver: 'mailjet',
+      auth: {
+        publicKey: Env.get('MAILJET_API_KEY'),
+        secretKey: Env.get('MAILJET_SECRET_KEY'),
+      },
+    }, */
   },
 }
 

@@ -53,4 +53,8 @@ export default Env.rules({
 
   // Sparkpost
   SPARKPOST_API_KEY: Env.schema.string(),
+
+  // Mailjet
+  MAILJET_API_KEY: Env.schema.string(),
+  MAILJET_SECRET_KEY: Env.schema.string(),
 })

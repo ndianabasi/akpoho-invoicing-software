@@ -8,5 +8,12 @@
   "prettier.endOfLine": "auto",
   "vetur.validation.template": false,
   "eslint.workingDirectories": ["backend", "frontend"],
-  "cSpell.words": ["Addressbar", "Kbytes", "Metadatas", "metas", "ncontains"]
+  "cSpell.words": [
+    "Addressbar",
+    "Kbytes",
+    "Metadatas",
+    "metas",
+    "ncontains"
+  ],
+  "edge.format.enable": true
 }
