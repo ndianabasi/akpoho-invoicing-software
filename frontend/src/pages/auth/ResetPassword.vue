@@ -156,8 +156,7 @@ import AuthForm from '../../components/AuthForm.vue';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useRouter } from 'vue-router';
-
-const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
+import { passwordRegex } from '../../helpers/utils';
 
 export default defineComponent({
   name: 'RequestPasswordReset',

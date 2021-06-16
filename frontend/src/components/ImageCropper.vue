@@ -39,7 +39,7 @@
     ref="launchDialogRef"
     v-model="launchCropperDialog"
   >
-    <q-card class="my-card">
+    <q-card class="cropper-wrapper">
       <img
         ref="sourceRef"
         :src="objectUrl"
@@ -96,7 +96,13 @@
             label="Finish"
             @click.prevent="finishCrop"
           />
-          <q-btn flat color="warning" icon="cancel" label="Cancel" />
+          <q-btn
+            v-close-popup
+            flat
+            color="warning"
+            icon="cancel"
+            label="Cancel"
+          />
           <q-btn
             color="grey"
             flat
@@ -392,17 +398,24 @@ export default defineComponent({
 });
 </script>
 
-<style>
-.cropper-preview {
-  display: block;
-  max-width: 100%;
-}
+<style lang="scss">
+.cropper-wrapper {
+  width: 100%;
+  .cropper-preview {
+    display: block;
+    max-width: 100%;
+  }
 
-.image-preview {
-  max-height: 80%;
-}
+  .image-preview {
+    max-height: 80%;
+  }
 
-.image-source {
-  max-height: 50%;
+  .image-source {
+    max-height: 50% !important;
+  }
+
+  .cropper-container {
+    max-height: 50% !important;
+  }
 }
 </style>

@@ -113,6 +113,7 @@ module.exports = configure(function (/* ctx */) {
         },
         loadingBar: {
           color: 'accent',
+          size: '0.25rem',
         },
       },
       cssAddon: true,

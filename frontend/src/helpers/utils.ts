@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import { DateTime } from 'luxon';
 //import { Format, TableRow } from 'src/types/table';
 
@@ -22,11 +23,5 @@ export function isEmpty<T>(obj: ObjectInterface<T>) {
   return Object.keys(obj).length === 0;
 }
 
-/* export const booleanFormatter: Format<boolean, TableRow, string> =
-  () => (value: boolean, row: TableRow) => {
-    console.log(value);
-
-    return value
-      ? '<div class="q-badge flex inline items-center no-wrap q-badge--single-line bg-blue" role="alert" aria-label="TRUE">TRUE</div>'
-      : '<div class="q-badge flex inline items-center no-wrap q-badge--single-line bg-orange" role="alert" aria-label="FALSE">FALSE</div>';
-  }; */
+export const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
+export const phoneNumberRegex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;

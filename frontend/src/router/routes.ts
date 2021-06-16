@@ -264,6 +264,15 @@ const routes: CustomRouteRecord[] = [
         },
       },
       {
+        path: 'register',
+        component: () => import('pages/auth/Register.vue'),
+        name: 'Register',
+        meta: {
+          label: 'Register',
+          requiresAuth: false,
+        },
+      },
+      {
         path: 'forgot-password',
         component: () => import('pages/auth/ForgotPassword.vue'),
         name: 'forgot_password',

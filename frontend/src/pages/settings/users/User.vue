@@ -398,7 +398,6 @@ import useResourcePermissions from '../../../composables/useResourcePermissions'
 import useDeleteResource from '../../../composables/useDeleteResource';
 import {
   CurrentlyViewedUser,
-  FileMultiFormats,
   PERMISSION,
   TitleInfo,
 } from '../../../store/types';

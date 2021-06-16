@@ -25,6 +25,12 @@ Route.group(() => {
   Route.post('/auth/request-password-reset', 'AuthController.requestPasswordReset')
   Route.post('/auth/verify-password-reset', 'AuthController.verifyPasswordReset')
   Route.post('/auth/reset-password', 'AuthController.ResetPassword')
+
+  Route.get('/countries/countries-for-select', 'CountriesController.countriesForSelect')
+  Route.get(
+    '/countries/:country_id/states-for-select',
+    'CountriesController.countryStatesForSelect'
+  )
 }).prefix('/v1')
 
 // General Authenticated routes
@@ -44,13 +50,6 @@ Route.group(() => {
   Route.post('/auth/confirm-password-change-code', 'AuthController.confirmPasswordCode')
   // Receive and update new password for auth user
   Route.post('/auth/submit-new-password', 'AuthController.submitNewPassword')
-
-  Route.get('/countries/countries-for-select', 'CountriesController.countriesForSelect')
-
-  Route.get(
-    '/countries/:country_id/states-for-select',
-    'CountriesController.countryStatesForSelect'
-  )
 
   Route.get('/roles/roles-for-select', 'RolesController.rolesForSelect')
   Route.get('/roles/global-roles', 'RolesController.globalRoles')

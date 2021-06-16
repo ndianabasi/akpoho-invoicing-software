@@ -84,9 +84,13 @@
     </template>
 
     <template #formFooterLink>
-      <router-link :to="{ name: 'forgot_password' }"
-        >Forgot Password?
-      </router-link>
+      <span class="text-accent">
+        <router-link :to="{ name: 'Register' }">Register </router-link>
+        /
+        <router-link :to="{ name: 'forgot_password' }"
+          >Forgot Password?
+        </router-link>
+      </span>
     </template>
 
     <template

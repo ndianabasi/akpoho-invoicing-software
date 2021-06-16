@@ -1,8 +1,14 @@
 <!-- eslint-disable vue/v-slot-style -->
 <template>
   <q-card class="container row flex-center">
-    <div class="col-md-6 col-sm-8 col-xs-12 col-lg-4 col-xl-3">
-      <q-card class="login-card text-white q-pa-lg q-mx-sm-md q-mx-xs-sm">
+    <div :class="columnClasses">
+      <q-card
+        class="
+          auth-form-card
+          text-white
+          q-pa-lg-md q-pa-sm-sm q-mx-sm-md q-mx-xs-sm q-my-lg
+        "
+      >
         <q-card-section>
           <p class="form-logo">Akpoho Invoicing Software</p>
           <span class="form-title q-mb-md q-pb-md">
@@ -48,6 +54,13 @@ import { useQuasar } from 'quasar';
 export default defineComponent({
   name: 'AuthForm',
   components: {},
+  props: {
+    columnClasses: {
+      type: [String, Array],
+      default: () => 'col-md-6 col-sm-8 col-xs-12 col-lg-4 col-xl-3',
+      required: false,
+    },
+  },
   setup() {
     const $q = useQuasar();
 
@@ -104,14 +117,15 @@ export default defineComponent({
   display: block;
 }
 
-.login-card {
+.auth-form-card {
   background-color: $grey-1;
 }
 
 .q-card.container {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   background-color: $purple-2;
+  overflow-y: auto;
 }
 </style>
 
@@ -123,7 +137,7 @@ export default defineComponent({
     font-size: 1rem
 </style>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .form-footer {
   color: $grey-10;
   a {
@@ -144,5 +158,10 @@ export default defineComponent({
   .col {
     margin-top: 0.5rem;
   }
+}
+
+.auth-form-card {
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 </style>
