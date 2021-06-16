@@ -45,6 +45,7 @@ export default class AuthController {
       email,
       password: newPassword,
       isAccountActivated: true,
+      loginStatus: true,
       accountActivatedAt: DateTime.now(),
       roleId: companyAdminRole.id,
     })

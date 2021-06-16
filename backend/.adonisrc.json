@@ -5,7 +5,8 @@
     "@adonisjs/core/build/commands",
     "@adonisjs/repl/build/commands",
     "@adonisjs/lucid/build/commands",
-    "@adonisjs/bouncer/build/commands"
+    "@adonisjs/bouncer/build/commands",
+    "@adonisjs/mail/build/commands"
   ],
   "exceptionHandlerNamespace": "App/Exceptions/Handler",
   "aliases": {
@@ -21,7 +22,11 @@
     {
       "file": "./start/events",
       "optional": true,
-      "environment": ["web", "console", "test"]
+      "environment": [
+        "web",
+        "console",
+        "test"
+      ]
     }
   ],
   "providers": [
@@ -33,7 +38,8 @@
     "@adonisjs/lucid",
     "@adonisjs/redis",
     "@adonisjs/shield",
-    "@adonisjs/bouncer"
+    "@adonisjs/bouncer",
+    "@adonisjs/mail"
   ],
   "metaFiles": [
     {
@@ -45,5 +51,7 @@
       "reloadServer": false
     }
   ],
-  "aceProviders": ["@adonisjs/repl"]
+  "aceProviders": [
+    "@adonisjs/repl"
+  ]
 }

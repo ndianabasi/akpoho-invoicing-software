@@ -40,4 +40,17 @@ export default Env.rules({
   UUID_NAMESPACE: Env.schema.string(),
   APP_URL: Env.schema.string({ format: 'url' }),
   FRONTEND_URL: Env.schema.string({ format: 'url' }),
+
+  // SMTP driver
+  SMTP_HOST: Env.schema.string({ format: 'host' }),
+  SMTP_PORT: Env.schema.number(),
+  SMTP_USERNAME: Env.schema.string(),
+  SMTP_PASSWORD: Env.schema.string(),
+
+  // Mailgun driver
+  MAILGUN_API_KEY: Env.schema.string(),
+  MAILGUN_DOMAIN: Env.schema.string(),
+
+  // Sparkpost
+  SPARKPOST_API_KEY: Env.schema.string(),
 })
