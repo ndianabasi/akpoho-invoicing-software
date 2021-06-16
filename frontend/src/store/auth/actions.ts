@@ -9,6 +9,25 @@ import { Notify } from 'quasar';
 import { LoginHttpResponse, HttpError, HttpResponse } from '../types';
 
 const actions: ActionTree<AuthStateInterface, StateInterface> = {
+  REGISTER_USER({ commit }, form) {
+    return new Promise(async (resolve, reject) => {
+      await $httpNoAuth
+        .post('/auth/register', form)
+        .then((res: LoginHttpResponse & HttpResponse) => {
+          const data = res.data;
+          const token = data.token;
+          const userData = data.data;
+          commit('SET_TOKEN', token);
+          commit('SET_USER_DATA', userData);
+
+          resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          reject(error);
+        });
+    });
+  },
+
   LOGIN_USER({ commit }, form) {
     return new Promise(async (resolve, reject) => {
       await $httpNoAuth

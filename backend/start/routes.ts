@@ -22,6 +22,8 @@ import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
   Route.post('/auth/login', 'AuthController.login')
+  // Register a new account from the public registration form
+  Route.post('/auth/register', 'AuthController.register')
   Route.post('/auth/request-password-reset', 'AuthController.requestPasswordReset')
   Route.post('/auth/verify-password-reset', 'AuthController.verifyPasswordReset')
   Route.post('/auth/reset-password', 'AuthController.ResetPassword')

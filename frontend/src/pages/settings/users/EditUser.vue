@@ -390,7 +390,7 @@ export default defineComponent({
         } else {
           store
             .dispatch('users/CREATE_USER', {
-              formData: getFormData,
+              formData: getFormData.value,
             })
             .then((userId: string) => {
               submitting.value = false;

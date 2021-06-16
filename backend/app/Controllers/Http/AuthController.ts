@@ -9,34 +9,80 @@ import { DateTime } from 'luxon'
 import Event from '@ioc:Adonis/Core/Event'
 import Hash from '@ioc:Adonis/Core/Hash'
 import PasswordChangeValidator from 'App/Validators/PasswordChangeValidator'
+import AppRegistrationValidator from 'App/Validators/AppRegistrationValidator'
 import UserServices from 'App/Services/UserServices'
+import Role from 'App/Models/Role'
+import Logger from '@ioc:Adonis/Core/Logger'
 
 export default class AuthController {
-  public async register({ request, response }: HttpContextContract) {
-    /**
-     * Validate user details
-     */
-    const validationSchema = schema.create({
-      email: schema.string({ trim: true }, [
-        rules.email(),
-        rules.unique({ table: 'users', column: 'email' }),
-      ]),
-      password: schema.string({ trim: true }, [rules.confirmed()]),
+  public async register({ request, response, auth }: HttpContextContract) {
+    // Validate user details
+    const form = await request.validate(AppRegistrationValidator)
+    const {
+      email,
+      firstName,
+      middleName,
+      lastName,
+      newPassword,
+      phoneNumber,
+      address,
+      city,
+      stateId,
+      countryId,
+    } = form
+
+    // Get the CompanyAdmin role
+    let companyAdminRole
+    try {
+      companyAdminRole = await Role.findByOrFail('name', 'CompanyAdmin')
+    } catch (error) {
+      Logger.error('Role not found at AuthController.register:\n%o', error)
+      return response.abort({ message: 'Account could not be created' })
+    }
+
+    // Create a new user
+    const user = await User.create({
+      email,
+      password: newPassword,
+      isAccountActivated: true,
+      accountActivatedAt: DateTime.now(),
+      roleId: companyAdminRole.id,
     })
 
-    const userDetails = await request.validate({
-      schema: validationSchema,
-    })
+    if (user) {
+      await user
+        .related('profile')
+        .create({ firstName, middleName, lastName, phoneNumber, address, city, stateId, countryId })
 
-    /**
-     * Create a new user
-     */
-    const user = new User()
-    user.email = userDetails.email
-    user.password = userDetails.password
-    await user.save()
+      const token = await auth.use('api').attempt(email, newPassword)
+      // Check if credentials are valid, else return error
+      if (!token)
+        throw new NoLoginException({ message: 'Email address or password is not correct.' })
 
-    return response.created(user)
+      /* Retrieve user with company information */
+      const userService = new UserServices({ email })
+      const cachedUser = await userService.getUserSummary()
+
+      /**
+       * Emit event to log login activity and
+       * persist login meta information to DB
+       * Also Clean up login code information
+       */
+      const ip = request.ip()
+      Event.emit('auth::new-login', {
+        ip: ip,
+        user: user,
+      })
+
+      return response.created({
+        message: 'Account was created successfully.',
+        token: token,
+        data: cachedUser,
+      })
+    } else {
+      Logger.error('User could not be created at AuthController.register')
+      return response.abort({ message: 'Account could not be created' })
+    }
   }
 
   public async login({ request, auth, response }: HttpContextContract) {

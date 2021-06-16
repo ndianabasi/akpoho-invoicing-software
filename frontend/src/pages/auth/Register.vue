@@ -463,43 +463,38 @@ export default defineComponent({
       }
     );
 
-    const onSubmit = handleSubmit(async (values) => {
-      console.log(values);
-
-      await nextTick(() => {
-        /* void store
-          .dispatch('auth/LOGIN_USER', form)
+    const onSubmit = handleSubmit((form) => {
+      void nextTick(() => {
+        void store
+          .dispatch('auth/REGISTER_USER', form)
           .then(() => {
-            void nextTick(() => {
+            Notify.create({
+              message:
+                'Registration was successful. You will be logged in 5 seconds.',
+              type: 'positive',
+              position: 'top',
+              timeout: 2500,
+              actions: [
+                {
+                  label: 'Dismiss',
+                  color: 'white',
+                },
+              ],
+            });
+
+            setTimeout(() => {
               const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
 
               if (isLoggedIn) {
                 void router.push({ name: 'Dashboard' });
               }
-            });
+            }, 5000);
           })
-          .catch(() => {
-            //
-          }); */
+          .catch((error) => {
+            console.error(error);
+
+          });
       });
-
-      /* if (meta.value.valid) {
-
-      } else {
-        Notify.create({
-          message: 'Errors exist on the form!',
-          type: 'negative',
-          position: 'bottom',
-          progress: true,
-          timeout: 2500,
-          actions: [
-            {
-              label: 'Dismiss',
-              color: 'white',
-            },
-          ],
-        });
-      } */
     });
 
     onBeforeMount(() => {

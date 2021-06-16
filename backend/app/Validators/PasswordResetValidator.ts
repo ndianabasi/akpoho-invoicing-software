@@ -1,14 +1,14 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { passwordRegex } from 'App/Helpers/utils'
 
 export default class PasswordResetValidator {
   constructor(protected ctx: HttpContextContract) {}
 
-  private passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/
   public refs = schema.refs({ newPassword: this.ctx.request.body().newPassword })
 
   public schema = schema.create({
-    newPassword: schema.string({ escape: true, trim: true }, [rules.regex(this.passwordRegex)]),
+    newPassword: schema.string({ escape: true, trim: true }, [rules.regex(passwordRegex)]),
 
     confirmNewPassword: schema.string({ escape: true, trim: true }, [
       rules.equalTo(this.refs.newPassword),
