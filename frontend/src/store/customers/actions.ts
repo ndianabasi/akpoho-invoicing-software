@@ -87,21 +87,15 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
   },
 
   async FETCH_CURRENTLY_VIEWED_CUSTOMER(
-    { commit, rootGetters },
+    { commit },
     { customerId }: { customerId: string }
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const currentCompany = rootGetters[
-      'auth/GET_CURRENT_COMPANY'
-    ] as StringIDNameInterface;
     return new Promise(async (resolve) => {
-      await $http
-        .get(`/${currentCompany.id}/customers/${customerId}`)
-        .then((res: HttpResponse) => {
-          commit('SET_CURRENTLY_VIEWED_CUSTOMER', res.data.data);
+      await $http.get(`/customers/${customerId}`).then((res: HttpResponse) => {
+        commit('SET_CURRENTLY_VIEWED_CUSTOMER', res.data.data);
 
-          resolve(res.data);
-        });
+        resolve(res.data);
+      });
     });
   },
 

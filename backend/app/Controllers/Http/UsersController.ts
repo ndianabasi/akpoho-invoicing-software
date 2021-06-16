@@ -147,7 +147,7 @@ export default class UsersController {
   }
 
   public async show({ response, requestedCompany, requestedUser, bouncer }: HttpContextContract) {
-    await bouncer.with('UserPolicy').authorize('view', requestedCompany!, requestedUser!)
+    await bouncer.with('UserPolicy').authorize('view', requestedCompany ?? null, requestedUser!)
 
     const userService = new UserServices({ id: requestedUser?.id })
 
@@ -318,7 +318,7 @@ export default class UsersController {
     requestedUser,
     bouncer,
   }: HttpContextContract) {
-    await bouncer.with('UserPolicy').authorize('delete', requestedCompany!, requestedUser!)
+    await bouncer.with('UserPolicy').authorize('delete', requestedCompany ?? null, requestedUser!)
 
     // Ensure that a SuperAdmin is not deleted
     if (requestedUser?.role?.name !== ROLES.SUPERADMIN) {

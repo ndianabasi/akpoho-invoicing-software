@@ -63,6 +63,13 @@ Route.group(() => {
     '/customer-titles/customer-titles-for-select',
     'CustomersController.customerTitlesForSelect'
   )
+
+  // Alternative route for fetching a specific user
+  Route.get('/users/:user_id', 'UsersController.show').middleware('findRequestedUser')
+  // Alternative route for fetching a specific customer
+  Route.get('/customers/:customer_id', 'CustomersController.show').middleware(
+    'findRequestedCustomer'
+  )
 })
   .prefix('/v1')
   .middleware('auth')

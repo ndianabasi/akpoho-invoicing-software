@@ -143,6 +143,11 @@ export default defineComponent({
         // Unwrap the proxy
         newCompanies = [...newCompanies];
 
+        if (!newCompanies.length) {
+          store.commit('auth/SET_CURRENT_COMPANY', []);
+          return;
+        }
+
         companies.value = newCompanies.map((company) => ({
           label: company.name,
           value: company.id,

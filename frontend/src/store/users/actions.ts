@@ -9,18 +9,10 @@ import { HttpResponse, HttpError, StringIDNameInterface } from '../types';
 import { Notify } from 'quasar';
 
 const actions: ActionTree<UsersStateInterface, StateInterface> = {
-  async FETCH_CURRENTLY_VIEW_USER(
-    { commit, rootGetters },
-    { userId }: { userId: string }
-  ) {
+  async FETCH_CURRENTLY_VIEW_USER({ commit }, { userId }: { userId: string }) {
     return new Promise(async (resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const currentCompany = rootGetters[
-        'auth/GET_CURRENT_COMPANY'
-      ] as StringIDNameInterface;
-
       await $http
-        .get(`/${currentCompany.id}/users/${userId}`)
+        .get(`/users/${userId}`)
         .then((res: HttpResponse) => {
           commit('SET_CURRENTLY_VIEWED_USER', res.data.data);
 

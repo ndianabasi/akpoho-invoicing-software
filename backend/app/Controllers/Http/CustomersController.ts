@@ -174,7 +174,10 @@ export default class CustomersController {
     requestedCustomer,
     bouncer,
   }: HttpContextContract) {
-    await bouncer.with('CustomerPolicy').authorize('view', requestedCompany!, requestedCustomer!)
+    // Check authorisation
+    await bouncer
+      .with('CustomerPolicy')
+      .authorize('view', requestedCompany ?? null, requestedCustomer!)
 
     await requestedCustomer?.load('title')
 

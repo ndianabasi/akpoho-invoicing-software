@@ -5,9 +5,9 @@ import Company from 'App/Models/Company'
 import { accessCompany, accessCompanyCustomer } from 'App/Helpers/PolicyHelper'
 
 export default class CustomerPolicy extends BasePolicy {
-  public async view(user: User, company: Company, customer: Customer) {
+  public async view(user: User, company: Company | null, customer: Customer) {
     const resourcePermission = 'can_view_customers'
-    return await accessCompanyCustomer(resourcePermission, user, company, customer)
+    return await accessCompanyCustomer(resourcePermission, user, company ?? null, customer)
   }
 
   public async create(user: User, company: Company) {
@@ -15,14 +15,14 @@ export default class CustomerPolicy extends BasePolicy {
     return await accessCompany(resourcePermission, user, company)
   }
 
-  public async edit(user: User, company: Company, customer: Customer) {
+  public async edit(user: User, company: Company | null, customer: Customer) {
     const resourcePermission = 'can_edit_customers'
-    return await accessCompanyCustomer(resourcePermission, user, company, customer)
+    return await accessCompanyCustomer(resourcePermission, user, company ?? null, customer)
   }
 
-  public async delete(user: User, company: Company, customer: Customer) {
+  public async delete(user: User, company: Company | null, customer: Customer) {
     const resourcePermission = 'can_delete_customers'
-    return await accessCompanyCustomer(resourcePermission, user, company, customer)
+    return await accessCompanyCustomer(resourcePermission, user, company ?? null, customer)
   }
 
   public async list(user: User, company: Company) {
