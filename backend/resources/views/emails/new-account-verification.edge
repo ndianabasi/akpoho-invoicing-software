@@ -1,0 +1,136 @@
+@layout('layouts/default')
+
+@section('email-summary')
+Please verify your email address
+@endsection
+
+@section('email-title')
+Your Email Verification Instructions
+@endsection
+
+@section('greetings')
+Hello {{firstName}},
+@endsection
+
+@section('body')
+<tr>
+  <td
+    valign="top"
+    align="left"
+    style="
+        font-family: Roboto, Helvetica, Arial sans-serif;
+        font-size: 14px;
+        line-height: 24px;
+        color: #414347;
+        padding: 0px 40px 20px 40px;
+      "
+  >
+    We are so delighted to have you onboard Akpoho Software. Thank you for choosing to being this exciting journey with
+    us. We hope that you will find this software useful for your invoicing, quotation, and receipting purposes.
+  </td>
+</tr>
+<tr>
+  <td
+    valign="top"
+    align="left"
+    style="
+        font-family: Roboto, Helvetica, Arial sans-serif;
+        font-size: 14px;
+        line-height: 24px;
+        color: #414347;
+        padding: 0px 40px 20px 40px;
+      "
+  >
+    Your full access to the software starts with you confirming your email address. Please click the button or link
+    below to verify your email address.
+  </td>
+</tr>
+<tr>
+  <td
+    align="center"
+    valign="top"
+    style="padding: 0px 0px 0px 40px"
+  >
+    <table
+      width="100%"
+      border="0"
+      cellspacing="0"
+      cellpadding="0"
+    >
+      <tbody>
+        <tr>
+          <td>
+            <table
+              align="left"
+              border="0"
+              cellspacing="0"
+              cellpadding="0"
+              style="padding: 0px 0px 0px 0px"
+            >
+              <tbody>
+                <tr>
+                  <td
+                    align="center"
+                    style="border-radius: 3px"
+                    bgcolor="#e65100"
+                  >
+                    <a
+                      href="{{link}}"
+                      style="
+                        font-size: 16px;
+                        font-family: Google Sans, Roboto, Helvetica, Arial, sans-serif;
+                        font-weight: 500;
+                        letter-spacing: -0.31px;
+                        color: #ffffff;
+                        text-decoration: none;
+                        text-decoration: none;
+                        border-radius: 3px;
+                        padding: 11px 19px 11px 19px;
+                        border: 1px solid #e65100;
+                        display: inline-block;
+                      "
+                      target="_blank"
+                    >
+                      Verify your email
+                    </a>
+                  </td>
+                  <td
+                    valign="center"
+                    align="center"
+                    style="
+
+                        font-family: Roboto, Helvetica, Arial sans-serif;
+                        font-size: 14px;
+                        line-height: 24px;
+                        color: #414347;
+                        padding-left: 10px
+                      "
+                  >or click the link below</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </td>
+</tr>
+<tr>
+  <td
+    valign="top"
+    align="left"
+    style="
+        font-family: Roboto, Helvetica, Arial sans-serif;
+        font-size: 14px;
+        line-height: 24px;
+        color: #e65100;
+        padding: 40px 40px 20px 40px;
+      "
+  >
+    <a
+      style="color: inherit"
+      href="{{link}}"
+    >{{link}}</a>
+  </td>
+</tr>
+@endsection

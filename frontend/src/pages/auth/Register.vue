@@ -27,9 +27,6 @@
             class="q-mb-sm-sm q-mb-md-md"
             :dense="isSmallScreen"
           >
-            <template v-if="field?.icon" #before>
-              <q-icon :name="field?.icon ?? ''" />
-            </template>
 
             <template #error>
               {{ formErrors[field.name] }}
@@ -87,7 +84,7 @@
             :ref="field.name"
             v-model="field.model"
             filled
-            aria-autocomplete="off"
+            aria-autocomplete="list"
             autocomplete="off"
             :options="field.options"
             :label="field.label"
@@ -188,7 +185,6 @@ import {
   watchEffect,
   onBeforeMount,
   unref,
-  readonly,
 } from 'vue';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
@@ -198,7 +194,7 @@ import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { passwordRegex, phoneNumberRegex } from '../../helpers/utils';
 import QuasarSelect from '../../components/QuasarSelect';
-import { SelectionOption } from '../../store/types';
+import { SelectionOption, SelectOption } from '../../store/types';
 import { isEqual } from 'lodash';
 
 interface RegisterFormInterface {
@@ -224,6 +220,7 @@ interface FormSchemaProperties {
   default: string | number | null;
   autocomplete: string;
   isVisible: boolean;
+  options?: SelectOption[]
 }
 
 type FormSchema = Record<string, FormSchemaProperties>;
@@ -524,6 +521,11 @@ export default defineComponent({
       } else next();
     });
 
+    const revealPasswords: Record<string, boolean>= reactive({
+        newPassword: false,
+        confirmPassword: false,
+      })
+
     return {
       dismissed: ref(false),
       isSubmitting,
@@ -531,10 +533,7 @@ export default defineComponent({
       onSubmit,
       showPassword: ref(false),
       formErrors,
-      revealPasswords: reactive({
-        newPassword: false,
-        confirmPassword: false,
-      }),
+      revealPasswords,
     };
   },
 });

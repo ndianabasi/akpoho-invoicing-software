@@ -2,6 +2,7 @@
 
 import { Readable } from 'stream'
 import slugify from 'slugify'
+import Env from '@ioc:Adonis/Core/Env'
 
 export const STANDARD_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss'
 export const TIMEZONE_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss ZZ'
@@ -41,3 +42,10 @@ export const nameToSlug = (name: string, options = { replacement: '-' }) => slug
 
 export const nameToCollectionName = (name: string) =>
   slugify(name, { replacement: '_', lower: true })
+
+export const commonEmailProperties = function () {
+  const APP_NAME = Env.get('APP_NAME')
+  const APP_SENDING_EMAIL = Env.get('APP_SENDING_EMAIL')
+
+  return { APP_NAME, APP_SENDING_EMAIL }
+}

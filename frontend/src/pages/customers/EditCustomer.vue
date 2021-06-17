@@ -42,10 +42,6 @@
               :error="form$?.[field.name]?.$invalid ?? false"
               class="q-mb-md"
             >
-              <template v-if="field?.icon" #before>
-                <q-icon :name="field?.icon ?? ''" />
-              </template>
-
               <template #error>
                 {{
                   form$ && form$[field.name]
@@ -124,7 +120,7 @@
           >
             <q-list>
               <q-item
-                v-if="resourcePermissions.canView"
+                v-if="resourcePermissions?.canView ?? false"
                 :to="{
                   name: 'view_customer',
                   params: { customerId: customerId }, //customerId from route props
@@ -137,7 +133,7 @@
               </q-item>
 
               <q-item
-                v-if="resourcePermissions.canList"
+                v-if="resourcePermissions?.canList ?? false"
                 :to="{
                   name: 'customers',
                 }"
@@ -175,7 +171,7 @@ import { email, helpers, required } from '@vuelidate/validators';
 import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import { store } from '../../store';
-import useResourcePermissions from '../../composables/useResourcePermissions';
+import useResourcePermissions, { ResourcePermissions } from '../../composables/useResourcePermissions';
 import {
   CurrentlyViewedCustomer,
   SelectionOption,
@@ -474,7 +470,7 @@ export default defineComponent({
       },
     }));
 
-    const form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
+    const form$ = useVuelidate(rules, form);
 
     function submitForm() {
       if (!form$.value.$invalid) {
@@ -638,6 +634,11 @@ export default defineComponent({
       stopFetchCustomerTitlesForSelect();
     });
 
+    const resourcePermissions: ResourcePermissions | null = useResourcePermissions({
+        view: PERMISSION.CAN_VIEW_CUSTOMERS,
+        list: PERMISSION.CAN_LIST_CUSTOMERS,
+      })
+
     return {
       customer: currentCustomer,
       text: ref(''),
@@ -651,10 +652,7 @@ export default defineComponent({
       customerFormSchema,
       titleInfo,
       customerTitles,
-      resourcePermissions: useResourcePermissions({
-        view: PERMISSION.CAN_VIEW_CUSTOMERS,
-        list: PERMISSION.CAN_LIST_CUSTOMERS,
-      }),
+      resourcePermissions
     };
   },
 });

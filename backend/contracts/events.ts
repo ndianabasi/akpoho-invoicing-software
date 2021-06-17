@@ -28,8 +28,9 @@ declare module '@ioc:Adonis/Core/Event' {
   |
   */
   interface EventsList {
-    'auth::send-code': { user: User; type: string }
-    'auth::send-success-emails': { user: User; type: string }
-    'auth::new-login': { ip: string; user: User }
+    'auth::send-code': { user: User | null; type: string }
+    'auth::send-success-emails': { user: User | null; type: string }
+    'auth::new-login': { ip: string; user: User | null }
+    'auth::new-registration-verification': { user: User }
   }
 }

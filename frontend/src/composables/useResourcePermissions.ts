@@ -5,7 +5,17 @@ import { computed, reactive } from 'vue';
 import { store } from '../store';
 import { PropObject } from 'src/types/table';
 
-export default function (resourceActionPermissions: PropObject) {
+export type ResourcePermissions = {
+  canList: boolean;
+  canCreate: boolean;
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+};
+
+export default function (
+  resourceActionPermissions: PropObject
+): ResourcePermissions | null {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const GET_USER_PERMISSION = store.getters['permissions/GET_USER_PERMISSION'];
 
@@ -29,7 +39,7 @@ export default function (resourceActionPermissions: PropObject) {
             )
           : false,
       })
-    : reactive({});
+    : null;
 
   return resourcePermissions;
 }

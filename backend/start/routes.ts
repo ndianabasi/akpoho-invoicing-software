@@ -21,7 +21,15 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.get('/views/test', async ({ view }) => {
-  return view.render('layouts.default')
+  return view.render('emails/new-account-verification')
+}).middleware(({ view }, next) => {
+  view.share({
+    firstName: 'Ndianabasi',
+    email: 'xyz@akpoho.com',
+    link: 'https://akpoho.com/verify-email/random-verification-key',
+  })
+
+  return next()
 })
 
 Route.group(() => {

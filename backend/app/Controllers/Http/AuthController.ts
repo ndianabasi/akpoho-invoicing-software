@@ -51,9 +51,21 @@ export default class AuthController {
     })
 
     if (user) {
-      await user
-        .related('profile')
-        .create({ firstName, middleName, lastName, phoneNumber, address, city, stateId, countryId })
+      await user.related('profile').create({
+        firstName,
+        middleName,
+        lastName,
+        phoneNumber,
+        address,
+        city,
+        stateId,
+        countryId,
+      })
+
+      // Send verification email
+      Event.emit('auth::new-registration-verification', {
+        user,
+      })
 
       const token = await auth.use('api').attempt(email, newPassword)
       // Check if credentials are valid, else return error
@@ -71,8 +83,8 @@ export default class AuthController {
        */
       const ip = request.ip()
       Event.emit('auth::new-login', {
-        ip: ip,
-        user: user,
+        ip,
+        user,
       })
 
       return response.created({
@@ -141,8 +153,8 @@ export default class AuthController {
        */
       const ip = request.ip()
       Event.emit('auth::new-login', {
-        ip: ip,
-        user: user,
+        ip,
+        user,
       })
 
       return response.created({
@@ -230,11 +242,9 @@ export default class AuthController {
       return response.badRequest('Invalid request for password reset validation')
     }
 
-    const decryptedKey: string = Encryption?.decrypt(key)!
+    const decryptedKey: string = Encryption?.decrypt(key) ?? ''
     if (!decryptedKey) return response.badRequest('Invalid request for password reset validation')
     else {
-      console.log(decryptedKey)
-
       const userId = decryptedKey.split('password-reset-for-')[1]
 
       let user: User
@@ -248,6 +258,11 @@ export default class AuthController {
     }
   }
 
+  /**
+   * Reset password via the auth page password reset flow
+   * @param ctx {HttpContextContract} The HTTP context
+   * @returns {Promise<void>}
+   */
   public async ResetPassword({ request, response, auth }: HttpContextContract) {
     let { email, newPassword } = await request.validate(PasswordResetValidator)
 
@@ -258,6 +273,28 @@ export default class AuthController {
       return response.notFound({ message: 'Invalid user for password reset' })
     }
 
+    // Verify 'newPassword' against user's old passwords on
+    // the password_histories table.
+    await user.load('passwordHistories')
+    const passwordHistories = user.passwordHistories
+
+    for (const history of passwordHistories) {
+      if (await Hash.verify(history.oldPassword, newPassword)) {
+        return response.badRequest({
+          message:
+            'The password you submitted was already used by you! Please try again with a unique password.',
+        })
+      }
+    }
+
+    /**
+     *  If all is green, update password on users table and store old password
+     *  on the password_histories table.
+     */
+    await user.related('passwordHistories').create({
+      oldPassword: user.password,
+    })
+
     user.merge({ password: newPassword })
     await user.save()
 
@@ -266,9 +303,7 @@ export default class AuthController {
     if (!token) throw new NoLoginException({ message: 'Email address or password is not correct.' })
 
     /* Retrieve user with company information */
-    const userService = new UserServices({ email: email })
-
-    const cachedUser = await userService.getUserSummary()
+    const cachedUser = new UserServices({ email: email }).getUserSummary()
 
     return response.created({
       message: 'Password change was successful.',
@@ -305,7 +340,7 @@ export default class AuthController {
     /**
      * Fire event and send verification email
      */
-    Event.emit('auth::send-code', { user: user!, type: 'password_change_code' })
+    Event.emit('auth::send-code', { user: user ?? null, type: 'password_change_code' })
 
     return response.ok({
       message:

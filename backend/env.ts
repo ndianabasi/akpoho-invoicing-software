@@ -21,6 +21,7 @@ export default Env.rules({
   PORT: Env.schema.number(),
   APP_KEY: Env.schema.string(),
   APP_NAME: Env.schema.string(),
+  APP_SENDING_EMAIL: Env.schema.string(),
   CACHE_VIEWS: Env.schema.boolean(),
   SESSION_DRIVER: Env.schema.string(),
   NODE_ENV: Env.schema.enum(['development', 'production', 'testing'] as const),

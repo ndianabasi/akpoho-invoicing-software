@@ -12,6 +12,8 @@ import {
   HasOne,
   hasMany,
   HasMany,
+  scope,
+  computed,
 } from '@ioc:Adonis/Lucid/Orm'
 import UserHook from 'App/Models/Hooks/UserHook'
 import Company from 'App/Models/Company'
@@ -25,6 +27,7 @@ import LoginRecord from 'App/Models/LoginRecord'
 export default class User extends BaseModel {
   public static selfAssignPrimaryKey = true
 
+  // Column definitions
   @column({ isPrimary: true })
   public id: string
 
@@ -126,6 +129,7 @@ export default class User extends BaseModel {
   })
   public createdAt: DateTime
 
+  // CRUD Hooks
   @beforeCreate()
   public static generateUUID(user: User) {
     UserHook.generateUUID(user)
@@ -141,6 +145,7 @@ export default class User extends BaseModel {
     await UserHook.hashPassword(user)
   }
 
+  // Relationships Hooks
   @manyToMany(() => Company)
   public companies: ManyToMany<typeof Company>
 
@@ -158,4 +163,19 @@ export default class User extends BaseModel {
 
   @hasMany(() => LoginRecord)
   public loginRecords: HasMany<typeof LoginRecord>
+
+  // Query scopes
+  public static companyAdmins = scope((query, companyId: Company['id']) => {
+    query.leftJoin('roles', (rolesQuery) => rolesQuery.on('users.role_id', '=', 'roles.id'))
+    query.leftJoin('company_user', (rolesQuery) =>
+      rolesQuery.on('users.id', '=', 'company_user.user_id')
+    )
+    query.where('roles.name', 'CompanyAdmin')
+    query.where('company_user.company_id', companyId)
+  })
+
+  public static SuperAdmins = scope((query) => {
+    query.leftJoin('roles', (rolesQuery) => rolesQuery.on('users.role_id', '=', 'roles.id'))
+    query.where('roles.name', 'SuperAdmin')
+  })
 }

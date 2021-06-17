@@ -1,10 +1,19 @@
 <tr>
-        <td align="center" valign="top" style="padding: 0px 30px 30px 30px">
-          <table width="100%" border="0" cellspacing="0" cellpadding="0">
-            <tbody>
-              <tr>
-                {{-- Footer logo --}}
-                {{--  <td align="center" valign="top" style="padding-top: 40px; padding-bottom: 23px">
+  <td
+    align="center"
+    valign="top"
+    style="padding: 0px 30px 30px 30px"
+  >
+    <table
+      width="100%"
+      border="0"
+      cellspacing="0"
+      cellpadding="0"
+    >
+      <tbody>
+        <tr>
+          {{-- Footer logo --}}
+          {{--  <td align="center" valign="top" style="padding-top: 40px; padding-bottom: 23px">
                   <img
                     src=""
                     width="140"
@@ -22,12 +31,31 @@
                     class="CToWUd"
                   />
                 </td>  --}}
-              </tr>
-              <tr>
-                <td
-                  align="center"
-                  valign="top"
-                  style="
+          <td
+            align="center"
+            valign="top"
+            style="padding-top: 20px; padding-bottom: 20px; display: block;
+                      font-family: Arial, sans-serif;
+                      font-size: 24px;
+                      line-height: 20px;
+                      color: #6a1b9a;"
+          >
+            <a
+              style="text-align: center; font-family: inherit; font-size: inherit; line-height: inherit; color: inherit; text-decoration: none"
+              href="https://akpoho.com"
+            >
+              <p>
+                Akpoho Software</p>
+            </a>
+
+          </td>
+        </tr>
+        <tr>
+
+          <td
+            align="center"
+            valign="top"
+            style="
                     font-family: Roboto, Helvetica, Arial sans-serif;
                     font-size: 14px;
                     line-height: 22px;
@@ -35,15 +63,19 @@
                     letter-spacing: 0.25px;
                     padding-bottom: 25px;
                   "
-                >
-                  12 Silverbird Road, Lekki, Lagos 101245
-                </td>
-              </tr>
-              <tr>
-                <td
-                  align="center"
-                  valign="top"
-                  style="
+          >
+            @section('footer-address')
+            12 Silverbird Road, Lekki, Lagos 101245
+            @endsection
+
+          </td>
+        </tr>
+        <tr>
+          @section('footer-email-note')
+          <td
+            align="center"
+            valign="top"
+            style="
                     font-family: Roboto, Helvetica, Arial sans-serif;
                     font-size: 14px;
                     line-height: 22px;
@@ -51,32 +83,49 @@
                     letter-spacing: 0.25px;
                     padding-bottom: 0px;
                   "
-                >
-                  This email was sent to ndianabasi.udonkang@gmail.com as important notification regarding your account. Unsubscription is not available for this type of email.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td valign="top" align="center">
-          <table border="0" cellspacing="0" cellpadding="0" align="center">
-            <tbody>
-              <tr>
-                <td width="16" style="width: 16px">&nbsp;</td>
-                <td valign="top" align="center">
-                  <a
-                    href=""
-                    style="color: #2979ff; text-decoration: none"
-                    target="_blank"
-                    ><img
-                      src="../media/github.png"
-                      title="Github"
-                      width="33"
-                      height="32"
-                      border="0"
-                      style="
+          >
+            This email was sent to <b>{{email}}</b> as an important notification regarding your account.
+            Unsubscription is not available for this type of email.
+          </td>
+          @endsection
+
+        </tr>
+      </tbody>
+    </table>
+  </td>
+</tr>
+<tr>
+  <td
+    valign="top"
+    align="center"
+  >
+    <table
+      border="0"
+      cellspacing="0"
+      cellpadding="0"
+      align="center"
+    >
+      <tbody>
+        <tr>
+          <td
+            width="16"
+            style="width: 16px"
+          >&nbsp;</td>
+          <td
+            valign="top"
+            align="center"
+          >
+            <a
+              href="https://github.com/ndianabasi/akpoho-invoicing-software"
+              style="color: #2979ff; text-decoration: none"
+              target="_blank"
+            ><img
+                src="../media/github.png"
+                title="Github"
+                width="33"
+                height="32"
+                border="0"
+                style="
                         display: block;
                         font-family: Arial, sans-serif;
                         font-size: 17px;
@@ -84,22 +133,28 @@
                         color: #000000;
                         max-width: 33px;
                       "
-                      class="CToWUd"
-                  /></a>
-                </td>
-                <td width="16" style="width: 16px">&nbsp;</td>
-                <td valign="top" align="center">
-                  <a
-                    href=""
-                    style="color: #2979ff; text-decoration: none"
-                    target="_blank"
-                    ><img
-                      src="../media/linkedin.png"
-                      title="LinkedIn"
-                      width="33"
-                      height="32"
-                      border="0"
-                      style="
+                class="CToWUd"
+              /></a>
+          </td>
+          <td
+            width="16"
+            style="width: 16px"
+          >&nbsp;</td>
+          <td
+            valign="top"
+            align="center"
+          >
+            <a
+              href="https://www.linkedin.com/company/akpoho-invoicing-software"
+              style="color: #2979ff; text-decoration: none"
+              target="_blank"
+            ><img
+                src="../media/linkedin.png"
+                title="LinkedIn"
+                width="33"
+                height="32"
+                border="0"
+                style="
                         display: block;
                         font-family: Arial, sans-serif;
                         font-size: 17px;
@@ -107,22 +162,28 @@
                         color: #000000;
                         max-width: 33px;
                       "
-                      class="CToWUd"
-                  /></a>
-                </td>
-                <td width="16" style="width: 16px">&nbsp;</td>
-                <td valign="top" align="center">
-                  <a
-                    href=""
-                    style="color: #2979ff; text-decoration: none"
-                    target="_blank"
-                    ><img
-                      src="../media/twitter.png"
-                      title="Twitter"
-                      width="33"
-                      height="32"
-                      border="0"
-                      style="
+                class="CToWUd"
+              /></a>
+          </td>
+          <td
+            width="16"
+            style="width: 16px"
+          >&nbsp;</td>
+          <td
+            valign="top"
+            align="center"
+          >
+            <a
+              href="#"
+              style="color: #2979ff; text-decoration: none"
+              target="_blank"
+            ><img
+                src="../media/twitter.png"
+                title="Twitter"
+                width="33"
+                height="32"
+                border="0"
+                style="
                         display: block;
                         font-family: Arial, sans-serif;
                         font-size: 17px;
@@ -130,22 +191,28 @@
                         color: #000000;
                         max-width: 33px;
                       "
-                      class="CToWUd"
-                  /></a>
-                </td>
-                <td width="16" style="width: 16px">&nbsp;</td>
-                <td valign="top" align="center">
-                  <a
-                    href=""
-                    style="color: #2979ff; text-decoration: none"
-                    target="_blank"
-                    ><img
-                      src="../media/facebook.png"
-                      title="Facebook"
-                      width="33"
-                      height="32"
-                      border="0"
-                      style="
+                class="CToWUd"
+              /></a>
+          </td>
+          <td
+            width="16"
+            style="width: 16px"
+          >&nbsp;</td>
+          <td
+            valign="top"
+            align="center"
+          >
+            <a
+              href="#"
+              style="color: #2979ff; text-decoration: none"
+              target="_blank"
+            ><img
+                src="../media/facebook.png"
+                title="Facebook"
+                width="33"
+                height="32"
+                border="0"
+                style="
                         display: block;
                         font-family: Arial, sans-serif;
                         font-size: 17px;
@@ -153,22 +220,28 @@
                         color: #000000;
                         max-width: 33px;
                       "
-                      class="CToWUd"
-                  /></a>
-                </td>
-                <td width="16" style="width: 16px">&nbsp;</td>
-                <td valign="top" align="center">
-                  <a
-                    href=""
-                    style="color: #2979ff; text-decoration: none"
-                    target="_blank"
-                    ><img
-                      src="../media/youtube.png"
-                      title="YouTube"
-                      width="33"
-                      height="32"
-                      border="0"
-                      style="
+                class="CToWUd"
+              /></a>
+          </td>
+          <td
+            width="16"
+            style="width: 16px"
+          >&nbsp;</td>
+          <td
+            valign="top"
+            align="center"
+          >
+            <a
+              href="#"
+              style="color: #2979ff; text-decoration: none"
+              target="_blank"
+            ><img
+                src="../media/youtube.png"
+                title="YouTube"
+                width="33"
+                height="32"
+                border="0"
+                style="
                         display: block;
                         font-family: Arial, sans-serif;
                         font-size: 17px;
@@ -176,11 +249,11 @@
                         color: #000000;
                         max-width: 33px;
                       "
-                      class="CToWUd"
-                  /></a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </td>
-      </tr>
+                class="CToWUd"
+              /></a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </td>
+</tr>

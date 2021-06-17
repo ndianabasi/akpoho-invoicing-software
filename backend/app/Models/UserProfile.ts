@@ -6,6 +6,7 @@ import {
   belongsTo,
   BelongsTo,
   afterFetch,
+  computed,
 } from '@ioc:Adonis/Lucid/Orm'
 import UuidHook from 'App/Models/Hooks/UUIDHook'
 import User from 'App/Models/User'
@@ -54,6 +55,12 @@ export default class UserProfile extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  // Computed properties
+  @computed()
+  public get fullName() {
+    return `${this.lastName ? this.firstName + ' ' + this.lastName : this.firstName}`
+  }
 
   @beforeCreate()
   public static generateUUID(model: UserProfile) {
