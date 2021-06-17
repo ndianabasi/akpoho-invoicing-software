@@ -68,7 +68,10 @@
     </template>
 
     <template #formFooterLink>
-      <router-link :to="{ name: 'Login' }">Login instead? </router-link>
+      <span class="text-accent">
+        <router-link :to="{ name: 'Register' }">Register</router-link> /
+        <router-link :to="{ name: 'Login' }">Login instead?</router-link>
+      </span>
     </template>
   </auth-form>
 </template>

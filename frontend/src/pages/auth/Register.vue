@@ -188,16 +188,18 @@ import {
   watchEffect,
   onBeforeMount,
   unref,
+  readonly,
 } from 'vue';
 import { useStore } from 'vuex';
-import { Notify } from 'quasar';
-import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
+import { useRouter, onBeforeRouteLeave } from 'vue-router';
 import AuthForm from '../../components/AuthForm.vue';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { passwordRegex, phoneNumberRegex } from '../../helpers/utils';
 import QuasarSelect from '../../components/QuasarSelect';
 import { SelectionOption } from '../../store/types';
+import { isEqual } from 'lodash';
 
 interface RegisterFormInterface {
   email: string | null | undefined;
@@ -232,6 +234,7 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const router = useRouter();
+    const $q = useQuasar();
 
     const stopFetchCountriesForSelect = watchEffect(() => {
       void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
@@ -295,25 +298,28 @@ export default defineComponent({
       })
     );
 
+    const initialValues: Readonly<RegisterFormInterface> = {
+      email: '',
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      newPassword: '',
+      confirmNewPassword: '',
+      phoneNumber: '',
+      address: '',
+      city: '',
+      stateId: null,
+      countryId: null,
+    };
+
     const {
       handleSubmit,
       errors: formErrors,
       isSubmitting,
+      values,
     } = useForm<RegisterFormInterface>({
       validationSchema: formSchema.value,
-      initialValues: {
-        email: '',
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        newPassword: '',
-        confirmNewPassword: '',
-        phoneNumber: '',
-        address: '',
-        city: '',
-        stateId: null,
-        countryId: null,
-      },
+      initialValues,
     });
 
     const { value: email } = useField('email');
@@ -468,7 +474,7 @@ export default defineComponent({
         void store
           .dispatch('auth/REGISTER_USER', form)
           .then(() => {
-            Notify.create({
+            $q.notify({
               message:
                 'Registration was successful. You will be logged in 5 seconds.',
               type: 'positive',
@@ -492,13 +498,30 @@ export default defineComponent({
           })
           .catch((error) => {
             console.error(error);
-
           });
       });
     });
 
     onBeforeMount(() => {
       stopFetchCountriesForSelect();
+    });
+
+    onBeforeRouteLeave((to, from, next) => {
+      const didFormValuesChange = !isEqual(initialValues, values);
+      if (didFormValuesChange) {
+        $q.dialog({
+          message: 'Form has changed. Do you really want to leave this page?',
+          title: 'Data loss warning',
+          persistent: true,
+          cancel: true,
+        })
+          .onOk(() => {
+            next();
+          })
+          .onCancel(() => {
+            return false;
+          });
+      } else next();
     });
 
     return {
