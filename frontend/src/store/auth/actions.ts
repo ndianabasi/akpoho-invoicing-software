@@ -343,6 +343,32 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         });
     });
   },
+  REQUEST_EMAIL_VERIFICATION() {
+    return new Promise(async (resolve, reject) => {
+      await $http
+        .post('/auth/request-email-verification')
+        .then((res: LoginHttpResponse & HttpResponse) => {
+          Notify.create({
+            message: res.data.message,
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 10000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
 };
 
 export default actions;

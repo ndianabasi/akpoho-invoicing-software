@@ -13,6 +13,8 @@ import AppRegistrationValidator from 'App/Validators/AppRegistrationValidator'
 import UserServices from 'App/Services/UserServices'
 import Role from 'App/Models/Role'
 import Logger from '@ioc:Adonis/Core/Logger'
+import { CACHE_TAGS } from 'Contracts/cache'
+import CacheHelper from 'App/Helpers/CacheHelper'
 
 export default class AuthController {
   public async register({ request, response, auth }: HttpContextContract) {
@@ -121,6 +123,16 @@ export default class AuthController {
         user.merge({ isEmailVerified: true, emailVerifiedAt: DateTime.now() })
         await user.save()
 
+        // Clear the user's entire cache
+        const userCompaniesTags = await new UserServices({ id: user.id }).getCompaniesCacheTags()
+        const sets = [
+          `${CACHE_TAGS.USER_CACHE_TAG_PREFIX}:${user.id}`,
+          `${CACHE_TAGS.COMPANY_USERS_CACHE_TAG_PREFIX}:${user.id}`,
+          `${CACHE_TAGS.COMPANY_USERS_INDEX_CACHE_TAG_PREFIX}:${user.id}`,
+          ...userCompaniesTags,
+        ]
+        await CacheHelper.flushTags(sets)
+
         return response.ok({ message: 'Thank you! Your email address is verified' })
       } catch (error) {
         return response.notFound({
@@ -131,8 +143,27 @@ export default class AuthController {
     }
   }
 
+  public async requestEmailVerification({ response, auth }: HttpContextContract) {
+    const user = auth?.user ?? null
+
+    if (user) {
+      // Send verification email
+      Event.emit('auth::new-registration-verification', {
+        user,
+      })
+
+      return response.created({
+        message:
+          'Your verification email was sent. Please check your spam/junk folders too. Verification link is valid for 2 days.',
+      })
+    } else {
+      Logger.error('User not found at AuthController.requestEmailVerification')
+      return response.abort({ message: 'Account not found' })
+    }
+  }
+
   public async login({ request, auth, response }: HttpContextContract) {
-    const { password, loginCode /* recaptchaResponseToken */ } = request.body()
+    const { password /* recaptchaResponseToken */ } = request.body()
     const email: string = request.body().email
     //const loginRecaptchaHelper = new LoginRecaptchaHelper(recaptchaResponseToken);
 

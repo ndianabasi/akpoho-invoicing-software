@@ -69,6 +69,8 @@ import {
   computed,
   watchEffect,
   onBeforeUnmount,
+  reactive,
+  Ref,
 } from 'vue';
 import SecondaryToolbar from '../components/SecondaryToolbar.vue';
 import StickySidebar from '../components/StickySidebar.vue';
@@ -78,6 +80,7 @@ import PrimaryToolbar from '../components/PrimaryToolbar.vue';
 import AkpohoBanners from '../components/AkpohoBanners.vue';
 import { useMeta, useQuasar } from 'quasar';
 import { Menu } from '../store/menus/state';
+import { Banner } from '../store/banners/getters';
 
 const metaData = {
   // sets document title
@@ -160,7 +163,6 @@ export default defineComponent({
     const store = useStore();
 
     const search = ref('');
-    const storage = ref(0.26);
 
     const leftDrawerOpen = ref(false);
 
@@ -173,26 +175,6 @@ export default defineComponent({
     );
 
     watchEffect(() => void store.dispatch('roles/FETCH_GLOBAL_ROLES'));
-
-    onMounted(() => {
-      window.addEventListener('offline', () => {
-        store.commit('SET_OFFLINE', true);
-      });
-
-      window.addEventListener('online', () => {
-        store.commit('SET_OFFLINE', false);
-      });
-    });
-
-    onBeforeUnmount(() => {
-      window.removeEventListener('offline', () => {
-        store.commit('SET_OFFLINE', true);
-      });
-
-      window.removeEventListener('online', () => {
-        store.commit('SET_OFFLINE', false);
-      });
-    });
 
     const TOGGLE_LEFT_DRAWER = (payload: boolean) => {
       if (payload) {
@@ -236,6 +218,26 @@ export default defineComponent({
       });
     };
 
+    onMounted(() => {
+      window.addEventListener('offline', () => {
+        store.commit('SET_OFFLINE', true);
+      });
+
+      window.addEventListener('online', () => {
+        store.commit('SET_OFFLINE', false);
+      });
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('offline', () => {
+        store.commit('SET_OFFLINE', true);
+      });
+
+      window.removeEventListener('online', () => {
+        store.commit('SET_OFFLINE', false);
+      });
+    });
+
     return {
       links1,
       links2,
@@ -246,10 +248,7 @@ export default defineComponent({
       ),
       TOGGLE_LEFT_DRAWER,
       search,
-      storage,
       breadcrumbsRoutes,
-      mobileData: ref(true),
-      bluetooth: ref(false),
       leftDrawerOpen,
       showCreateSheet,
     };
@@ -277,11 +276,6 @@ export default defineComponent({
       font-size: .875rem
       font-weight: 500
       line-height: 1.25rem
-    &--storage
-      border-radius: 0
-      margin-right: 0
-      padding-top: 24px
-      padding-bottom: 24px
   &__side-btn
     &__label
       font-size: 12px

@@ -65,6 +65,9 @@ Route.group(() => {
   Route.post('/auth/confirm-password-change-code', 'AuthController.confirmPasswordCode')
   // Receive and update new password for auth user
   Route.post('/auth/submit-new-password', 'AuthController.submitNewPassword')
+  // Allow user to request for email verification if
+  // previous one was not received
+  Route.post('/auth/request-email-verification', 'AuthController.requestEmailVerification')
 
   Route.get('/roles/roles-for-select', 'RolesController.rolesForSelect')
   Route.get('/roles/global-roles', 'RolesController.globalRoles')

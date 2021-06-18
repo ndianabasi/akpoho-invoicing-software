@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { GetterTree } from 'vuex';
 import { StateInterface } from '../index';
+//import { UserSummary } from '../types';
 import { BannerStateInterface } from './state';
 
 export interface Banner {
@@ -10,10 +11,16 @@ export interface Banner {
   dismissible: boolean;
   visible: boolean;
   visibleOnRoutes: 'all' | string[];
-  action: {
-    type: 'navigation' | (() => void);
-    label: string;
-  } | null;
+  action?:
+    | {
+        type: 'navigation' | 'function' | 'store_action';
+        label: string;
+        routeName?: string;
+        functionName?: (...args: string[]) => void;
+        storeAction?: { type: string; payload?: unknown | null };
+      }
+    | null
+    | undefined;
 }
 
 export type BannerGettersInterface = GetterTree<
@@ -28,8 +35,11 @@ const getters: BannerGettersInterface = {
     rootState,
     rootGetters
   ): Array<Banner> => {
-    const IS_EMAIL_VERIFIED = rootGetters['auth/IS_EMAIL_VERIFIED'] as boolean;
     const IS_APP_OFFLINE = rootGetters['GET_OFFLINE_MODE'] as boolean;
+    const IS_EMAIL_VERIFIED = rootGetters['auth/IS_EMAIL_VERIFIED'] as boolean;
+    /* const authUserEmail = rootGetters[
+      'auth/GET_AUTH_USER_EMAIL'
+    ] as UserSummary['email']; */
 
     return [
       {
@@ -43,15 +53,18 @@ const getters: BannerGettersInterface = {
         visible: IS_APP_OFFLINE,
       },
       {
-        id: 'new_account_verfication_warning',
+        id: 'new_account_verification_warning',
         message:
           'You have not verified your email address. Please check your email address or request a new one',
         type: 'warning',
         dismissible: false,
         action: {
           label: 'Request Again',
-          type: () => {
-            return null;
+          type: 'store_action',
+          storeAction: {
+            type: 'auth/REQUEST_EMAIL_VERIFICATION',
+            // Payload not necessary as the auth user can be retrieved
+            // by the server
           },
         },
         visibleOnRoutes: 'all',
@@ -65,7 +78,9 @@ const getters: BannerGettersInterface = {
     getters
   ): Array<Banner> => {
     const banners = getters.GET_BANNERS as Array<Banner>;
-    return banners.filter((banner) => banner.visible);
+    if (banners.length > 0) {
+      return banners.filter((banner) => banner?.visible ?? false);
+    } else return [];
   },
 };
 

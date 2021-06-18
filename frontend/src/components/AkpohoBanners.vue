@@ -29,6 +29,7 @@
           color="white"
           flat
           :label="currentBanner.action?.label ?? ''"
+          @click.prevent="handleAction"
         />
         <q-btn v-if="currentBanner.dismissible" flat round icon="close" />
 
@@ -98,6 +99,13 @@ export default defineComponent({
       () => banners.value[currentBannerIndex.value]
     );
 
+    const handleAction = function () {
+      const bannerAction = currentBanner.value.action;
+      if (bannerAction?.type === 'store_action') {
+        void store.dispatch(bannerAction?.storeAction?.type ?? '');
+      }
+    };
+
     return {
       currentBanner,
       currentBannerIndex,
@@ -110,6 +118,7 @@ export default defineComponent({
         if (currentBannerIndex.value === 0) return;
         currentBannerIndex.value--;
       },
+      handleAction,
     };
   },
 });

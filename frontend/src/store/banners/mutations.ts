@@ -3,10 +3,12 @@ import { BannerStateInterface } from './state';
 //import { MutationPayload } from '../../types/store';
 
 const mutation: MutationTree<BannerStateInterface> = {
-  /* TOGGLE_LEFT_DRAWER(state: BannerStateInterface) {
-    state.leftDrawerOpen = !state.leftDrawerOpen;
-    console.log(state.leftDrawerOpen);
-  }, */
+  ADD_BANNER(state: BannerStateInterface, payload) {
+    console.log(payload);
+
+    if (Array.isArray(payload)) state.banners.concat(payload);
+    else state.banners.push(payload);
+  },
 };
 
 export default mutation;
