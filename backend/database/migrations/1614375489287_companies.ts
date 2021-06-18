@@ -12,10 +12,10 @@ export default class Companies extends BaseSchema {
       table.boolean('is_approved').defaultTo(0)
       table.string('address').nullable()
       table.string('city', 50).nullable()
-      table.integer('state').unsigned().nullable()
-      table.integer('country').unsigned().nullable()
+      table.integer('state_id').unsigned().nullable()
+      table.integer('country_id').unsigned().nullable()
       table.string('slug', 255).notNullable().index()
-      table.integer('size').nullable().index().unsigned()
+      table.integer('company_size_id').nullable().index().unsigned()
       table.string('profile_picture').nullable()
       table.string('website', 50).nullable()
       table.timestamp('approved_at').nullable()
@@ -23,9 +23,17 @@ export default class Companies extends BaseSchema {
       table.timestamps(true)
 
       table.foreign('approved_by').references('users.id').onDelete('SET NULL').onUpdate('CASCADE')
-      table.foreign('state').references('states.id').onDelete('SET NULL').onUpdate('CASCADE')
-      table.foreign('country').references('countries.id').onDelete('SET NULL').onUpdate('CASCADE')
-      table.foreign('size').references('company_sizes.id').onDelete('RESTRICT').onUpdate('CASCADE')
+      table.foreign('state_id').references('states.id').onDelete('SET NULL').onUpdate('CASCADE')
+      table
+        .foreign('country_id')
+        .references('countries.id')
+        .onDelete('SET NULL')
+        .onUpdate('CASCADE')
+      table
+        .foreign('company_size_id')
+        .references('company_sizes.id')
+        .onDelete('RESTRICT')
+        .onUpdate('CASCADE')
 
       table.index(
         ['id', 'name', 'email', 'phone_number', 'address', 'city', 'country', 'slug'],

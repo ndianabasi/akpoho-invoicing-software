@@ -99,7 +99,7 @@ import {
   SelectionOption,
   PERMISSION,
   CustomerAddressInterface,
-  FormSchema,
+  FormSchemaProperties,
 } from '../../store/types';
 import { Notify } from 'quasar';
 import { FetchTableDataInterface } from '../../types/table';
@@ -185,71 +185,73 @@ export default defineComponent({
       type: null,
     });
 
-    const customerFormSchema: ComputedRef<FormSchema[]> = computed(() => [
-      {
-        name: 'type',
-        label: 'Address Type',
-        default: null,
-        componentType: 'select',
-        options: props.creationMode
-          ? [
-              { label: 'Billing', value: 'billing_address' },
-              { label: 'Shipping', value: 'shipping_address' },
-              { label: 'Both', value: 'both' },
-            ]
-          : [
-              { label: 'Billing', value: 'billing_address' },
-              { label: 'Shipping', value: 'shipping_address' },
-            ],
-        isVisible: true,
-        autocomplete: 'off',
-      },
-      {
-        name: 'address',
-        label: 'Address Line',
-        default: '',
-        componentType: 'input',
-        inputType: 'textarea',
-        isVisible: true,
-        autocomplete: 'street-address',
-      },
-      {
-        name: 'lga',
-        label: 'LGA/County',
-        default: '',
-        componentType: 'input',
-        inputType: 'text',
-        isVisible: true,
-        autocomplete: 'address-level2',
-      },
-      {
-        name: 'postal_code',
-        label: 'Postal Code',
-        default: '',
-        componentType: 'input',
-        inputType: 'text',
-        isVisible: true,
-        autocomplete: 'postal-code',
-      },
-      {
-        name: 'country',
-        label: 'Country',
-        default: null,
-        componentType: 'select',
-        options: unref(countries),
-        isVisible: true,
-        autocomplete: 'country',
-      },
-      {
-        name: 'state',
-        label: 'State/Region',
-        default: null,
-        componentType: 'select',
-        options: unref(countryStates),
-        isVisible: true,
-        autocomplete: 'address-level1',
-      },
-    ]);
+    const customerFormSchema: ComputedRef<FormSchemaProperties[]> = computed(
+      () => [
+        {
+          name: 'type',
+          label: 'Address Type',
+          default: null,
+          componentType: 'select',
+          options: props.creationMode
+            ? [
+                { label: 'Billing', value: 'billing_address' },
+                { label: 'Shipping', value: 'shipping_address' },
+                { label: 'Both', value: 'both' },
+              ]
+            : [
+                { label: 'Billing', value: 'billing_address' },
+                { label: 'Shipping', value: 'shipping_address' },
+              ],
+          isVisible: true,
+          autocomplete: 'off',
+        },
+        {
+          name: 'address',
+          label: 'Address Line',
+          default: '',
+          componentType: 'input',
+          inputType: 'textarea',
+          isVisible: true,
+          autocomplete: 'street-address',
+        },
+        {
+          name: 'lga',
+          label: 'LGA/County',
+          default: '',
+          componentType: 'input',
+          inputType: 'text',
+          isVisible: true,
+          autocomplete: 'address-level2',
+        },
+        {
+          name: 'postal_code',
+          label: 'Postal Code',
+          default: '',
+          componentType: 'input',
+          inputType: 'text',
+          isVisible: true,
+          autocomplete: 'postal-code',
+        },
+        {
+          name: 'country',
+          label: 'Country',
+          default: null,
+          componentType: 'select',
+          options: unref(countries),
+          isVisible: true,
+          autocomplete: 'country',
+        },
+        {
+          name: 'state',
+          label: 'State/Region',
+          default: null,
+          componentType: 'select',
+          options: unref(countryStates),
+          isVisible: true,
+          autocomplete: 'address-level1',
+        },
+      ]
+    );
 
     const rules = computed(() => ({
       address: {

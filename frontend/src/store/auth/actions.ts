@@ -90,10 +90,10 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
     });
   },
 
-  FETCH_AUTH_PROFILE({ commit }, form) {
+  FETCH_AUTH_PROFILE({ commit }) {
     return new Promise(async (resolve, reject) => {
       await $http
-        .get('/auth/profile', form)
+        .get('/auth/profile')
         .then((res: LoginHttpResponse) => {
           commit('SET_USER_DATA', res.data.data);
           resolve(res.data);

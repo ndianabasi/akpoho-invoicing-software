@@ -86,6 +86,14 @@ Route.group(() => {
   Route.get('/customers/:customer_id', 'CustomersController.show').middleware(
     'findRequestedCustomer'
   )
+
+  Route.get(
+    '/company-sizes/company-sizes-for-select',
+    'CompanySizesController.companySizesForSelect'
+  )
+
+  // Create a new company
+  Route.post('/companies', 'CompaniesController.store')
 })
   .prefix('/v1')
   .middleware('auth')

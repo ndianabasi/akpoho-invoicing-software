@@ -229,7 +229,7 @@ const routes: CustomRouteRecord[] = [
                   permission: 'can_create_companies',
                 },
               },
-              /* {
+              {
                 path: ':companyId/view',
                 props: true,
                 component: () => import('pages/settings/companies/Company.vue'),
@@ -239,7 +239,7 @@ const routes: CustomRouteRecord[] = [
                   permission: 'can_view_companies',
                 },
               },
-              {
+              /*  {
                 path: ':companyId/edit',
                 props: true,
                 component: () => import('pages/settings/companies/EditCompany.vue'),

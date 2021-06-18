@@ -8,11 +8,16 @@ import {
   ManyToMany,
   hasMany,
   HasMany,
+  belongsTo,
+  BelongsTo,
 } from '@ioc:Adonis/Lucid/Orm'
 import CompanyHook from './Hooks/CompanyHook'
 import User from 'App/Models/User'
 import Customer from 'App/Models/Customer'
-import UploadedFile from './UploadedFile'
+import UploadedFile from 'App/Models/UploadedFile'
+import CompanySize from 'App/Models/CompanySize'
+import State from 'App/Models/State'
+import Country from 'App/Models/Country'
 
 export default class Company extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -33,13 +38,15 @@ export default class Company extends BaseModel {
   @column()
   public city: string
   @column()
-  public state: number | null
+  public type: 'personal' | 'corporate'
   @column()
-  public country: number | null
+  public stateId: number | null
+  @column()
+  public countryId: number | null
   @column()
   public slug: string
   @column()
-  public size: number
+  public companySizeId: number
   @column()
   public profilePicture: string
   @column()
@@ -75,4 +82,13 @@ export default class Company extends BaseModel {
 
   @hasMany(() => UploadedFile)
   public uploadFiles: HasMany<typeof UploadedFile>
+
+  @belongsTo(() => CompanySize)
+  public companySize: BelongsTo<typeof CompanySize>
+
+  @belongsTo(() => State)
+  public state: BelongsTo<typeof State>
+
+  @belongsTo(() => Country)
+  public country: BelongsTo<typeof Country>
 }

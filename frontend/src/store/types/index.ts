@@ -182,6 +182,19 @@ export type CurrentlyViewedUser = {
   role: StringIDNameInterface;
 };
 
+export type CurrentlyViewedCompany = {
+  name: string;
+  phone_number: string;
+  email: string;
+  address?: string;
+  city?: string;
+  companySize?: NumberIDNameInterface;
+  companyState?: NumberIDNameInterface;
+  companyCountry?: NumberIDNameInterface;
+  website?: string;
+  type: 'personal' | 'corporate';
+};
+
 interface CurrentCustomerBaseInterface {
   first_name: string;
   last_name: string;
@@ -272,6 +285,19 @@ export interface UserFormShape {
   profile_picture: File | null;
 }
 
+export interface CompanyFormShape {
+  name: string;
+  phoneNumber: string | undefined | null;
+  address: string | undefined | null;
+  city: string | undefined | null;
+  email: string;
+  size: number | undefined | null;
+  stateId: number | null;
+  countryId: number | null;
+  website: string | undefined | null;
+  isPersonalBrand: boolean | undefined;
+}
+
 export enum PERMISSION {
   CAN_LIST_USERS = 'can_list_users',
   CAN_CREATE_USERS = 'can_create_users',
@@ -288,18 +314,6 @@ export enum PERMISSION {
   CAN_VIEW_COMPANIES = 'can_view_companies',
   CAN_EDIT_COMPANIES = 'can_edit_companies',
   CAN_DELETE_COMPANIES = 'can_delete_companies',
-}
-
-type InputComponentType = 'select' | 'input' | 'date';
-
-export interface FormSchema {
-  name: string;
-  label: string;
-  default: string | number | boolean | null;
-  componentType: InputComponentType;
-  options?: { label: string; value: string | number | boolean }[];
-  isVisible: boolean;
-  autocomplete?: string;
 }
 
 export interface FileMultiFormats {
@@ -323,3 +337,19 @@ export type FileFormatAttributes = {
   path: string | null;
   url: string;
 };
+
+type InputComponentType = 'select' | 'input' | 'date' | 'toggle';
+
+export interface FormSchemaProperties {
+  model?: unknown;
+  inputType?: string;
+  options?: SelectOption[];
+  default?: string | number | boolean | null;
+  autocomplete?: string;
+  isVisible?: boolean;
+  name: string;
+  label: string;
+  componentType: InputComponentType;
+}
+
+export type FormSchema = Record<string, FormSchemaProperties>;

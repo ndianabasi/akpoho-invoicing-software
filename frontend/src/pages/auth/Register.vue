@@ -27,7 +27,6 @@
             class="q-mb-sm-sm q-mb-md-md"
             :dense="isSmallScreen"
           >
-
             <template #error>
               {{ formErrors[field.name] }}
             </template>
@@ -194,7 +193,7 @@ import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { passwordRegex, phoneNumberRegex } from '../../helpers/utils';
 import QuasarSelect from '../../components/QuasarSelect';
-import { SelectionOption, SelectOption } from '../../store/types';
+import { FormSchemaProperties, SelectionOption } from '../../store/types';
 import { isEqual } from 'lodash';
 
 interface RegisterFormInterface {
@@ -209,18 +208,6 @@ interface RegisterFormInterface {
   city: string | null | undefined;
   stateId: number | null | undefined;
   countryId: number | null | undefined;
-}
-
-interface FormSchemaProperties {
-  model: unknown;
-  name: string;
-  componentType: string;
-  inputType: string;
-  label: string;
-  default: string | number | null;
-  autocomplete: string;
-  isVisible: boolean;
-  options?: SelectOption[]
 }
 
 type FormSchema = Record<string, FormSchemaProperties>;
@@ -521,10 +508,10 @@ export default defineComponent({
       } else next();
     });
 
-    const revealPasswords: Record<string, boolean>= reactive({
-        newPassword: false,
-        confirmPassword: false,
-      })
+    const revealPasswords: Record<string, boolean> = reactive({
+      newPassword: false,
+      confirmPassword: false,
+    });
 
     return {
       dismissed: ref(false),

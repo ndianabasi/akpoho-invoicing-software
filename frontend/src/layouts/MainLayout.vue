@@ -69,8 +69,6 @@ import {
   computed,
   watchEffect,
   onBeforeUnmount,
-  reactive,
-  Ref,
 } from 'vue';
 import SecondaryToolbar from '../components/SecondaryToolbar.vue';
 import StickySidebar from '../components/StickySidebar.vue';
@@ -80,7 +78,6 @@ import PrimaryToolbar from '../components/PrimaryToolbar.vue';
 import AkpohoBanners from '../components/AkpohoBanners.vue';
 import { useMeta, useQuasar } from 'quasar';
 import { Menu } from '../store/menus/state';
-import { Banner } from '../store/banners/getters';
 
 const metaData = {
   // sets document title

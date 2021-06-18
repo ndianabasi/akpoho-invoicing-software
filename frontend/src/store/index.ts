@@ -49,6 +49,10 @@ import banners from './banners';
 import { BannerStateInterface } from './banners/state';
 import { BannerGettersInterface } from './banners/getters';
 
+import companies from './companies';
+import { CompanyStateInterface } from './companies/state';
+import { CompanyGetterInterface } from './companies/getters';
+
 //import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -100,6 +104,7 @@ export interface StateInterface {
   roles?: RolesStateInterface;
   permissions?: PermissionStateInterface;
   banners?: BannerStateInterface;
+  companies?: CompanyStateInterface;
 }
 
 export interface StoreGettersInterface {
@@ -112,6 +117,7 @@ export interface StoreGettersInterface {
   roles?: RolesGetterInterface;
   permissions?: PermissionGettersInterface;
   banners?: BannerGettersInterface;
+  companies?: CompanyGetterInterface;
 }
 
 export type StoreGetters = RootGetterInterface & StoreGettersInterface;
@@ -212,6 +218,7 @@ export default function (/* { ssrContext } */) {
       roles,
       permissions,
       banners,
+      companies,
     },
 
     plugins:

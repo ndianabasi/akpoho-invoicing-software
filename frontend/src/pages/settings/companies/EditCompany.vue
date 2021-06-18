@@ -6,173 +6,83 @@
       show-avatar
       show-title-panel-side
     >
-      <template #body-panel>
-        <form class="q-pa-md" @submit.prevent="submitForm">
-          <image-cropper
-            :input-max-file-size="5 * 1048576"
-            @finish-cropper="handleCropperFinish"
-          />
-          <!-- 5 MB max file size -->
+      <template #body-panel="{ isSmallScreen }">
+        <form class="q-pa-md" @submit="onSubmit">
+          <template v-for="field in form">
+            <q-toggle
+              v-if="field.componentType === 'toggle' && field.isVisible"
+              :key="`field_${field.name}_${field.componentType}`"
+              v-model="field.model"
+              checked-icon="check"
+              color="green"
+              unchecked-icon="clear"
+              :label="field.label"
+              class="q-ml-lg q-mb-md"
+              :dense="isSmallScreen"
+            />
 
-          <q-input
-            v-model="form$.email.$model"
-            filled
-            clearable
-            bottom-slots
-            label="Email Address"
-            :dense="dense"
-            class="q-mb-md"
-            type="email"
-            :error="form$.email.$invalid"
-            aria-autocomplete="email"
-            autocomplete="email"
-          >
-            <template #before>
-              <q-icon name="email" />
-            </template>
+            <q-input
+              v-if="field.componentType === 'input' && field.isVisible"
+              :key="`field_${field.name}_${field.componentType}`"
+              v-model="field.model"
+              :type="
+                field.inputType !== 'password'
+                  ? field.inputType
+                  : revealPasswords[field.name]
+                  ? 'text'
+                  : 'password'
+              "
+              :for="field.name"
+              filled
+              clearable
+              bottom-slots
+              :label="field.label"
+              :aria-autocomplete="field?.autocomplete ?? 'off'"
+              :autocomplete="field?.autocomplete ?? 'off'"
+              :error="!!formErrors?.[field.name]?.length ?? false"
+              class="q-mb-sm-sm q-mb-md-md"
+              :dense="isSmallScreen"
+            >
+              <template #error>
+                {{ formErrors[field.name] }}
+              </template>
 
-            <template #error>
-              {{
-                form$.email.$silentErrors
-                  .map((error) => error.$message)
-                  .join(', ')
-              }}
-            </template>
-          </q-input>
+              <template #hint></template>
+            </q-input>
 
-          <quasar-select
-            v-if="CAN_EDIT_USERS"
-            v-model="form.role_id"
-            filled
-            :options="roles"
-            label="Role"
-            aria-autocomplete="off"
-            autocomplete="off"
-            clearable
-            bottom-slots
-            options-dense
-            use-input
-            emit-value
-            map-options
-            class="q-mb-md"
-            transition-show="scale"
-            transition-hide="scale"
-            :error="form$.role_id.$invalid"
-          >
-            <template #before>
-              <q-icon name="person" />
-            </template>
-
-            <template #hint>
-              <div
-                v-if="CAN_EDIT_USERS && myAccountMode"
-                class="q-mb-sm text-warning"
-              >
-                <q-icon name="warning" color="warning" /> Be care and don't
-                downgrade your role, unless that is what you really want to do!
-              </div>
-            </template>
-
-            <template #error>
-              {{
-                form$.role_id.$silentErrors
-                  .map((error) => error.$message)
-                  .join(', ')
-              }}
-            </template>
-          </quasar-select>
-
-          <q-input
-            v-for="field in profileTextFields"
-            :key="'profileTextField_' + field.name"
-            v-model="form[field.name]"
-            filled
-            clearable
-            bottom-slots
-            :label="field.label"
-            :dense="dense"
-            :error="form$?.[field.name]?.$invalid ?? false"
-            class="q-mb-md"
-            :aria-autocomplete="form?.[field.name]?.autocomplete ?? 'off'"
-            :autocomplete="form?.[field.name]?.autocomplete ?? 'off'"
-          >
-            <template #before>
-              <q-icon name="person" />
-            </template>
-
-            <template #error>
-              {{
-                form$ && form$[field.name]
-                  ? form$[field.name].$silentErrors
-                      .map((error) => error.$message)
-                      .join(', ')
-                  : ''
-              }}
-            </template>
-          </q-input>
-
-          <quasar-select
-            v-model="form.country_id"
-            filled
-            :options="countries"
-            label="Country"
-            name="country_id"
-            aria-autocomplete="country-name"
-            autocomplete="country-name"
-            clearable
-            bottom-slots
-            options-dense
-            use-input
-            :input-debounce="0"
-            class="q-mb-md"
-            transition-show="scale"
-            transition-hide="scale"
-            emit-value
-            map-options
-            ><template #before>
-              <q-icon name="business" />
-            </template>
-          </quasar-select>
-
-          <quasar-select
-            v-model="form.state_id"
-            filled
-            :disable="!form.country_id"
-            :options="countryStates"
-            label="State"
-            name="state_id"
-            aria-autocomplete="address-level1"
-            autocomplete="address-level1"
-            clearable
-            bottom-slots
-            options-dense
-            use-input
-            :input-debounce="0"
-            class="q-mb-md"
-            transition-show="scale"
-            transition-hide="scale"
-            emit-value
-            map-options
-            ><template #before>
-              <q-icon name="business" />
-            </template>
-          </quasar-select>
-
-          <q-toggle
-            v-if="CAN_EDIT_USERS"
-            v-model="form.login_status"
-            checked-icon="check"
-            unchecked-icon="clear"
-            :label="form.login_status ? 'Can login' : 'Cannot login'"
-          />
-          <div
-            v-if="CAN_EDIT_USERS && myAccountMode"
-            class="q-mb-sm text-warning"
-            style="font-size: 0.75rem"
-          >
-            <q-icon name="warning" color="warning" /> Be care and don't disable
-            your login access, unless that is what you really want to do!
-          </div>
+            <quasar-select
+              v-if="field.componentType === 'select' && field.isVisible"
+              :key="`field_${field.name}_${field.componentType}`"
+              :ref="field.name"
+              v-model="field.model"
+              filled
+              aria-autocomplete="list"
+              autocomplete="off"
+              :options="field.options"
+              :label="field.label"
+              :name="field.name"
+              :for="field.name"
+              clearable
+              bottom-slots
+              :options-dense="isSmallScreen"
+              use-input
+              :input-debounce="200"
+              class="q-mb-md"
+              transition-show="scale"
+              transition-hide="scale"
+              emit-value
+              map-options
+              :dense="isSmallScreen"
+              :error="!!formErrors?.[field.name]?.length ?? false"
+            >
+              <template v-if="field?.icon" #before>
+                <q-icon :name="field?.icon ?? ''" />
+              </template>
+              <template #error>
+                {{ formErrors[field.name] }}
+              </template>
+            </quasar-select>
+          </template>
         </form>
       </template>
 
@@ -184,7 +94,7 @@
             label="Submit"
             class="q-mt-md"
             icon-right="send"
-            @click.prevent="submitForm"
+            @click="onSubmit"
           >
             <!-- eslint-disable-next-line vue/v-slot-style -->
             <template #loading>
@@ -250,35 +160,35 @@ import {
   unref,
   Ref,
   reactive,
-  ComputedRef,
+  nextTick,
 } from 'vue';
-import useVuelidate from '@vuelidate/core';
-import { required, email, helpers } from '@vuelidate/validators';
+
 import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
-import { store } from '../../../store';
 import useResourcePermissions from '../../../composables/useResourcePermissions';
 import {
-  CurrentlyViewedUser,
+  CurrentlyViewedCompany,
   SelectionOption,
-  UserFormShape,
   PERMISSION,
   TitleInfo,
+  CompanyFormShape,
+  FormSchema,
 } from '../../../store/types';
-import { Notify } from 'quasar';
-import { useRouter } from 'vue-router';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../../components/QuasarSelect';
-/* import { useForm, useField } from 'vee-validate';
-import * as yup from 'yup'; */
-import ImageCropper from '../../../components/ImageCropper.vue';
+import { useForm, useField } from 'vee-validate';
+import * as yup from 'yup';
+import { useStore } from 'vuex';
+import { useQuasar } from 'quasar';
+import { phoneNumberRegex, urlRegex } from '../../../helpers/utils';
+import { isEqual } from 'lodash';
 
 export default defineComponent({
-  name: 'EditUser',
+  name: 'EditCompany',
 
   components: {
     ViewCard,
     QuasarSelect,
-    ImageCropper,
   },
 
   props: {
@@ -298,161 +208,18 @@ export default defineComponent({
   },
 
   setup(props) {
-    const submitting = ref(false);
+    const companyCreated = ref(false);
+    const store = useStore();
     const router = useRouter();
+    const $q = useQuasar();
 
-    let currentUser: Ref<CurrentlyViewedUser | null>;
-
-    currentUser = !props.creationMode
-      ? computed(
-          () =>
-            store.getters[
-              'users/GET_CURRENTLY_VIEWED_USER'
-            ] as CurrentlyViewedUser
-        )
-      : ref(null);
-
-    let form: UserFormShape = reactive({
-      first_name: '',
-      last_name: '',
-      middle_name: '',
-      phone_number: '',
-      address: '',
-      city: '',
-      email: '',
-      role_id: '',
-      state_id: null,
-      country_id: null,
-      login_status: false,
-      profile_picture: null,
+    const stopFetchCountriesForSelect = watchEffect(() => {
+      void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
     });
 
-    const getFormData: ComputedRef<FormData> = computed(() => {
-      const formData = new FormData();
-
-      for (const key in form) {
-        if (Object.prototype.hasOwnProperty.call(form, key)) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const value = form[key];
-          if (key === 'profile_picture' && value !== null) {
-            formData.append('profile_picture', form.profile_picture as Blob);
-          } else {
-            formData.append(key, value as string);
-          }
-        }
-      }
-
-      return formData;
+    const stopFetchCompanySizesForSelect = watchEffect(() => {
+      void store.dispatch('companies/FETCH_COMPANY_SIZES_FOR_SELECT');
     });
-
-    const rules = {
-      first_name: {
-        required: helpers.withMessage('First name is required.', required),
-      },
-      last_name: {
-        required: helpers.withMessage('Last name is required.', required),
-      },
-      role_id: { required: helpers.withMessage('Role is required.', required) },
-      email: {
-        email: helpers.withMessage('Email is not valid.', email),
-        required: helpers.withMessage('Email is required.', required),
-      },
-    };
-
-    let form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
-
-    //const profilePictureSchema = computed(() => yup.mixed().test('fileSize', ))
-
-    function submitForm() {
-      if (!form$.value.$invalid) {
-        submitting.value = true;
-
-        if (!props.creationMode) {
-          void store
-            .dispatch('users/EDIT_USER', {
-              userId: props.userId,
-              formData: getFormData.value,
-            })
-            .then(() => {
-              submitting.value = false;
-              if (!props.myAccountMode) {
-                void router.push({
-                  name: 'view_user',
-                  params: { userId: props.userId },
-                });
-              }
-
-              return;
-            })
-            .catch(() => {
-              submitting.value = false;
-            });
-        } else {
-          store
-            .dispatch('users/CREATE_USER', {
-              formData: getFormData.value,
-            })
-            .then((userId: string) => {
-              submitting.value = false;
-              void router.push({
-                name: 'view_user',
-                params: { userId },
-              });
-              return;
-            })
-            .catch(() => {
-              submitting.value = false;
-            });
-        }
-      } else {
-        Notify.create({
-          message: 'Errors exist on the form!',
-          type: 'negative',
-          position: 'bottom',
-          progress: true,
-          timeout: 2500,
-          actions: [
-            {
-              label: 'Dismiss',
-              color: 'white',
-            },
-          ],
-        });
-      }
-    }
-
-    const profileTextFields = ref([
-      {
-        name: 'first_name',
-        label: 'First Name',
-        autocomplete: 'given-name',
-      },
-      {
-        name: 'middle_name',
-        label: 'Middle Name',
-        autocomplete: 'additional-name',
-      },
-      {
-        name: 'last_name',
-        label: 'Last Name',
-        autocomplete: 'last-name',
-      },
-      {
-        name: 'phone_number',
-        label: 'Phone Number',
-        autocomplete: 'mobile tel',
-      },
-      {
-        name: 'address',
-        label: 'Address',
-        autocomplete: 'street-address',
-      },
-      {
-        name: 'city',
-        label: 'City',
-        autocomplete: 'address-level2',
-      },
-    ]);
 
     const countries = computed(
       () =>
@@ -461,36 +228,240 @@ export default defineComponent({
         ] as SelectionOption[]
     );
 
-    const countryStates = computed(
-      () =>
+    const countryStates = computed({
+      get: () =>
         store.getters[
           'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
+        ] as SelectionOption[],
+      set: (value) => value,
+    });
+
+    const companySizes = computed(
+      () =>
+        store.getters[
+          'companies/GET_COMPANY_SIZES_FOR_SELECT'
         ] as SelectionOption[]
     );
+    let currentCompany: Ref<CurrentlyViewedCompany | null>;
 
-    const roles = computed(
-      () => store.getters['roles/GET_ROLES_FOR_SELECT'] as SelectionOption[]
+    currentCompany = !props.creationMode
+      ? computed(
+          () =>
+            store.getters[
+              'users/GET_CURRENTLY_VIEWED_USER'
+            ] as CurrentlyViewedCompany
+        )
+      : ref(null);
+
+    // Valiation section starts
+
+    const formSchema = computed(() =>
+      yup.object({
+        isPersonalBrand: yup.boolean(),
+        name: yup.string().required('Name is required').nullable(),
+        email: yup
+          .string()
+          .email('Email is not valid')
+          .required('Email is required'),
+        phoneNumber: yup
+          .string()
+          .matches(phoneNumberRegex, 'Please provide a valid phone number')
+          .nullable(),
+        address: yup.string().optional().nullable(),
+        city: yup.string().required('City is required').nullable(),
+        size: yup.number().required('Company Size is required').nullable(),
+        stateId: yup.number().required('State is required').nullable(),
+        countryId: yup.number().required('Country is required').nullable(),
+        website: yup.string().optional().nullable(),
+      })
     );
+
+    const initialValues: Readonly<CompanyFormShape> = {
+      isPersonalBrand: false,
+      name: '',
+      email: '',
+      phoneNumber: '',
+      address: '',
+      city: '',
+      size: null,
+      stateId: null,
+      countryId: null,
+      website: '',
+    };
+
+    const {
+      handleSubmit,
+      errors: formErrors,
+      isSubmitting,
+      values,
+    } = useForm<CompanyFormShape>({
+      validationSchema: formSchema.value,
+      initialValues,
+    });
+
+    const { value: isPersonalBrand } = useField('isPersonalBrand');
+    const { value: name } = useField('name');
+    const { value: email } = useField('email');
+    const { value: phoneNumber } = useField('phoneNumber');
+    const { value: address } = useField('address');
+    const { value: city } = useField('city');
+    const { value: size } = useField('size');
+    const { value: stateId } = useField('stateId');
+    const { value: countryId } = useField('countryId');
+    const { value: website } = useField('website');
+
+    // Form schema for form generation
+    const form: FormSchema = reactive({
+      isPersonalBrand: {
+        model: isPersonalBrand,
+        name: 'isPersonalBrand',
+        componentType: 'toggle',
+        label: 'Create as Personal Brand',
+        default: false,
+        isVisible: true,
+      },
+      name: {
+        model: name,
+        name: 'name',
+        componentType: 'input',
+        inputType: 'text',
+        label: 'Name',
+        default: '',
+        autocomplete: 'organization',
+        isVisible: true,
+      },
+      email: {
+        model: email,
+        name: 'email',
+        componentType: 'input',
+        inputType: 'work email',
+        label: 'Email',
+        default: '',
+        autocomplete: 'email',
+        isVisible: true,
+      },
+      phoneNumber: {
+        model: phoneNumber,
+        name: 'phoneNumber',
+        componentType: 'input',
+        inputType: 'text',
+        label: 'Phone Number',
+        default: '',
+        autocomplete: 'work tel',
+        isVisible: true,
+      },
+      address: {
+        model: address,
+        name: 'address',
+        componentType: 'input',
+        inputType: 'textarea',
+        label: 'Address',
+        default: '',
+        autocomplete: 'work street-address',
+        isVisible: true,
+      },
+      city: {
+        model: city,
+        name: 'city',
+        componentType: 'input',
+        inputType: 'text',
+        label: 'City',
+        default: '',
+        autocomplete: 'work address-level2',
+        isVisible: true,
+      },
+      size: {
+        model: size,
+        name: 'size',
+        componentType: 'select',
+        label: 'Company Size',
+        default: null,
+        isVisible: true,
+        options: computed(() => companySizes.value),
+      },
+      countryId: {
+        model: countryId,
+        name: 'countryId',
+        componentType: 'select',
+        label: 'Country',
+        default: null,
+        autocomplete: 'work country-name',
+        isVisible: true,
+        options: unref(countries),
+      },
+      stateId: {
+        model: stateId,
+        name: 'stateId',
+        componentType: 'select',
+        label: 'State',
+        default: null,
+        autocomplete: 'work address-level1',
+        isVisible: true,
+        options: computed(() => countryStates.value),
+      },
+      website: {
+        model: website,
+        name: 'website',
+        componentType: 'input',
+        inputType: 'text',
+        label: 'Website',
+        default: null,
+        autocomplete: 'url',
+        isVisible: true,
+      },
+    });
+
+    // Valiation section ends
+
+    watch(
+      () => form.countryId.model,
+      (newCountry) => {
+        stateId.value = null;
+        if (newCountry) {
+          void store.dispatch(
+            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
+            { countryId: newCountry }
+          );
+
+          countryStates.value = store.getters[
+            'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
+          ] as SelectionOption[];
+        }
+      }
+    );
+
+    const onSubmit = handleSubmit((form) => {
+      void nextTick(() => {
+        if (props.creationMode) {
+          void store
+            .dispatch('companies/CREATE_COMPANY', form)
+            .then((id: string) => {
+              companyCreated.value = true;
+              void store.dispatch('auth/FETCH_AUTH_PROFILE');
+              void nextTick(() => {
+                void router.push({
+                  name: 'view_company',
+                  params: { companyId: id },
+                });
+              });
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        }
+      });
+    });
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
     watch(
-      currentUser,
+      currentCompany,
       () => {
-        const profilePictureFileBase =
-          currentUser?.value?.profile?.profilePictureFile;
-
         const title =
-          currentUser && currentUser.value
+          currentCompany && currentCompany.value
             ? useTitleInfo({
-                title: `${currentUser.value.profile?.first_name ?? ''} ${
-                  currentUser.value.profile?.last_name ?? ''
-                }`,
-                avatar:
-                  profilePictureFileBase?.formats?.thumbnail?.url ??
-                  profilePictureFileBase?.formats?.small?.url ??
-                  profilePictureFileBase?.url ??
-                  '',
+                title: currentCompany.value.name ?? '',
+                avatar: undefined,
               })
             : props.creationMode
             ? useTitleInfo({
@@ -507,107 +478,115 @@ export default defineComponent({
     const stopFetchCurrentlyViewedUser = watchEffect(() => {
       if (!props.creationMode) {
         void store
-          .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
+          .dispatch('companies/FETCH_CURRENTLY_VIEW_COMPANY', {
             userId: props.userId,
           })
           .then(async () => {
-            currentUser.value = unref(
+            currentCompany.value = unref(
               computed(
                 () =>
                   store.getters[
-                    'users/GET_CURRENTLY_VIEWED_USER'
-                  ] as CurrentlyViewedUser
+                    'companies/GET_CURRENTLY_VIEWED_COMPANY'
+                  ] as CurrentlyViewedCompany
               )
             );
 
-            form.first_name = currentUser?.value?.profile.first_name;
-            form.last_name = currentUser?.value?.profile.last_name;
-            form.middle_name = currentUser?.value?.profile.middle_name;
-            form.phone_number = currentUser?.value?.profile.phone_number;
-            form.address = currentUser?.value?.profile.address;
-            form.city = currentUser?.value?.profile.city;
-            form.email = currentUser?.value?.email;
-            form.role_id = currentUser?.value.role.id;
-            form.country_id =
-              currentUser?.value?.profile.userCountry?.id ?? null;
+            isPersonalBrand.value = currentCompany?.value?.type === 'personal';
+            name.value = currentCompany?.value?.name ?? '';
+            email.value = currentCompany?.value?.email ?? '';
+            phoneNumber.value = currentCompany?.value?.phone_number ?? '';
+            address.value = currentCompany?.value?.address ?? '';
+            city.value = currentCompany?.value?.city ?? '';
+            size.value = currentCompany?.value?.companySize?.id ?? null;
+            website.value = currentCompany?.value?.website ?? '';
+            countryId.value = currentCompany?.value?.companyCountry?.id ?? null;
             // Fetch the states for the current country
-            if (form.country_id) {
+            if (countryId.value) {
               await store
                 .dispatch('countries_states/FETCH_COUNTRY_STATES_FOR_SELECT', {
-                  countryId: form.country_id,
+                  countryId: countryId.value,
                 })
                 .then(() => {
                   // Then update the current state
-                  form.state_id =
-                    currentUser?.value?.profile.userState?.id ?? null;
+                  stateId.value =
+                    currentCompany?.value?.companyState?.id ?? null;
                 });
             } else {
               // Then update the current state
-              form.state_id = currentUser?.value?.profile.userState?.id ?? null;
+              countryId.value = currentCompany?.value?.companyState?.id ?? null;
             }
-            form.login_status = Boolean(currentUser?.value.login_status);
           });
       }
     });
 
-    const stopFetchCountriesForSelect = watchEffect(() => {
-      void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
-    });
-
-    const stopFetchRolesForSelect = watchEffect(() => {
-      void store.dispatch('roles/FETCH_ROLES_FOR_SELECT');
-    });
-
     watch(
-      () => form.country_id,
+      () => countryId.value,
       (country) => {
         if (country) {
-          form.state_id = null;
+          stateId.value = null;
           void store.dispatch(
             'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
             { countryId: country }
           );
+
+          countryStates.value = store.getters[
+            'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
+          ] as SelectionOption[];
         }
       }
     );
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const CAN_EDIT_USERS = computed(() =>
-      store.getters['permissions/GET_USER_PERMISSION']('can_edit_users')
+    const CAN_EDIT_COMPANIES = computed(() =>
+      store.getters['permissions/GET_USER_PERMISSION']('can_edit_companies')
     );
-
-    const handleCropperFinish = function ({ file }: { file: File }) {
-      form.profile_picture = file;
-    };
 
     onBeforeMount(() => {
       stopFetchCurrentlyViewedUser();
       stopFetchCountriesForSelect();
-      stopFetchRolesForSelect();
+      stopFetchCompanySizesForSelect();
+    });
+
+    onBeforeRouteLeave((to, from, next) => {
+      if (companyCreated.value) {
+        return next();
+      }
+
+      const didFormValuesChange = !isEqual(initialValues, values);
+      if (didFormValuesChange) {
+        $q.dialog({
+          message: 'Form has changed. Do you really want to leave this page?',
+          title: 'Data loss warning',
+          persistent: true,
+          cancel: true,
+        })
+          .onOk(() => {
+            return next();
+          })
+          .onCancel(() => {
+            return false;
+          });
+      } else return next();
     });
 
     return {
-      user: currentUser,
+      user: currentCompany,
       text: ref(''),
       ph: ref(''),
       dense: ref(false),
       dismissed: ref(false),
-      submitting,
       form,
-      submitForm,
-      form$,
-      profileTextFields,
       titleInfo,
       countries,
       countryStates,
-      roles,
       resourcePermissions: useResourcePermissions({
         view: PERMISSION.CAN_VIEW_USERS,
         list: PERMISSION.CAN_LIST_USERS,
       }),
-      CAN_EDIT_USERS,
-      handleCropperFinish,
-      getFormData,
+      CAN_EDIT_COMPANIES,
+      isSubmitting,
+      onSubmit,
+      formErrors,
     };
   },
 });
