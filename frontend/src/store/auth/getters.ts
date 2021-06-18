@@ -24,6 +24,7 @@ const getters: GetterTree<AuthStateInterface, StateInterface> = {
   GET_USER_SUMMARY: (state) => state.userSummary,
   GET_USER_ID: (state) => state.userSummary?.id,
   GET_AUTH_ROLE: (state) => state.authRole?.name,
+  IS_EMAIL_VERIFIED: (state) => state.userSummary?.is_email_verified,
   IS_GLOBAL_USER: (state, getters, rootState, rootGetters) => {
     const globalRoles: string[] = rootGetters['roles/GET_GLOBAL_ROLES'];
     const authRole: string = getters.GET_AUTH_ROLE;

@@ -63,7 +63,7 @@ import { useStore } from 'vuex';
 import AuthForm from '../../components/AuthForm.vue';
 
 export default defineComponent({
-  name: 'RequestPasswordReset',
+  name: 'VerifyNewAccountEmail',
 
   components: { AuthForm },
 

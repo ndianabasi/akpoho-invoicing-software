@@ -159,15 +159,6 @@ export default class AuthController {
         })
       }
 
-      // Get email verification status
-      const emailVerificationStatus = Boolean(user.isEmailVerified)
-      if (!emailVerificationStatus) {
-        throw new NoLoginException({
-          message:
-            'Your email address is not verified. Please check your email inbox for a verification sent to you or request for a new verification email from your Church admin. If you are a Church admin, please contact us for assistance.',
-        })
-      }
-
       const token = await auth.use('api').attempt(email, password)
       // Check if credentials are valid, else return error
       if (!token)

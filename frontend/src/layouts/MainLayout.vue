@@ -17,6 +17,8 @@
     <sticky-sidebar />
 
     <q-page-container class="AIS__page-container q-my-xl q-mx-sm-xs q-mx-lg-md">
+      <akpoho-banners />
+
       <router-view />
     </q-page-container>
 
@@ -66,6 +68,7 @@ import StickySidebar from '../components/StickySidebar.vue';
 import GoToTop from '../components/GoToTop.vue';
 import SideDrawer from '../components/SideDrawer.vue';
 import PrimaryToolbar from '../components/PrimaryToolbar.vue';
+import AkpohoBanners from '../components/AkpohoBanners.vue';
 import { useMeta, useQuasar } from 'quasar';
 import { Menu } from '../store/menus/state';
 
@@ -140,6 +143,7 @@ export default defineComponent({
     GoToTop,
     SideDrawer,
     PrimaryToolbar,
+    AkpohoBanners,
   },
 
   setup() {
