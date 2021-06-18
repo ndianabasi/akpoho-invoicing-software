@@ -19,11 +19,13 @@ const getters: GetterTree<AuthStateInterface, StateInterface> = {
     return !!state.token;
   },
   GET_USER_COMPANIES: (state) => state.userCompanies,
+  DOES_USER_HAVE_COMPANIES: (state) => state.userCompanies?.length ?? 0 > 0,
   GET_CURRENT_COMPANY: (state) => state.currentCompany,
   GET_USER_PROFILE: (state) => state.userProfile,
   GET_USER_SUMMARY: (state) => state.userSummary,
   GET_USER_ID: (state) => state.userSummary?.id,
   GET_AUTH_ROLE: (state) => state.authRole?.name,
+  IS_COMPANY_ADMIN: (state) => state.authRole?.name === 'CompanyAdmin',
   GET_AUTH_USER_EMAIL: (state) => state.userSummary?.email,
   IS_EMAIL_VERIFIED: (state) => state.userSummary?.is_email_verified,
   IS_GLOBAL_USER: (state, getters, rootState, rootGetters) => {

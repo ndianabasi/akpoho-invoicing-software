@@ -62,7 +62,7 @@
 import { defineComponent, computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { Banner } from '../store/banners/getters';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'AkpohoBanners',
@@ -75,6 +75,7 @@ export default defineComponent({
   setup(/* props */) {
     const store = useStore();
     const route = useRoute();
+    const router = useRouter();
 
     const currentRouteName = route.name;
 
@@ -103,6 +104,12 @@ export default defineComponent({
       const bannerAction = currentBanner.value.action;
       if (bannerAction?.type === 'store_action') {
         void store.dispatch(bannerAction?.storeAction?.type ?? '');
+      }
+      if (bannerAction?.type === 'navigation') {
+        void router.push({
+          name: bannerAction?.route?.name ?? '',
+          params: bannerAction?.route?.params ?? undefined,
+        });
       }
     };
 

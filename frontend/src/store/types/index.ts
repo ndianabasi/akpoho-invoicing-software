@@ -40,6 +40,29 @@ export interface StringIDNameInterface extends IDNameInterface {
   id: string;
 }
 
+export enum ROLES {
+  SUPERADMIN = 'SuperAdmin',
+  SUPER_EDITOR = 'SuperEditor',
+  SUPER_VIEWER = 'SuperViewer',
+  DEVELOPER = 'Developer',
+  COMPANY_ADMIN = 'CompanyAdmin',
+  COMPANY_EDITOR = 'CompanyEditor',
+  COMPANY_STAFF = 'CompanyStaff',
+}
+
+export type ROLES_VALUES =
+  | ROLES.SUPERADMIN
+  | ROLES.SUPER_EDITOR
+  | ROLES.SUPER_VIEWER
+  | ROLES.DEVELOPER
+  | ROLES.COMPANY_ADMIN
+  | ROLES.COMPANY_EDITOR
+  | ROLES.COMPANY_STAFF;
+
+export interface RoleInterface extends StringIDNameInterface {
+  name: ROLES_VALUES;
+}
+
 export interface NumberIDNameInterface extends IDNameInterface {
   id: number | null;
 }
@@ -86,7 +109,7 @@ interface IDEntity {
 export interface LoginUserDataInterface {
   companies: StringIDNameInterface[];
   profile: UserProfileSummary;
-  role: StringIDNameInterface;
+  role: RoleInterface;
 }
 
 export type LoginUserData = LoginUserSummary & LoginUserDataInterface;
@@ -260,6 +283,11 @@ export enum PERMISSION {
   CAN_VIEW_CUSTOMERS = 'can_view_customers',
   CAN_EDIT_CUSTOMERS = 'can_edit_customers',
   CAN_DELETE_CUSTOMERS = 'can_delete_customers',
+  CAN_LIST_COMPANIES = 'can_list_companies',
+  CAN_CREATE_COMPANIES = 'can_create_companies',
+  CAN_VIEW_COMPANIES = 'can_view_companies',
+  CAN_EDIT_COMPANIES = 'can_edit_companies',
+  CAN_DELETE_COMPANIES = 'can_delete_companies',
 }
 
 type InputComponentType = 'select' | 'input' | 'date';

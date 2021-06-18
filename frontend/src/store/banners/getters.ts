@@ -15,7 +15,7 @@ export interface Banner {
     | {
         type: 'navigation' | 'function' | 'store_action';
         label: string;
-        routeName?: string;
+        route?: { name: string; params?: Record<string, string | number> };
         functionName?: (...args: string[]) => void;
         storeAction?: { type: string; payload?: unknown | null };
       }
@@ -37,6 +37,10 @@ const getters: BannerGettersInterface = {
   ): Array<Banner> => {
     const IS_APP_OFFLINE = rootGetters['GET_OFFLINE_MODE'] as boolean;
     const IS_EMAIL_VERIFIED = rootGetters['auth/IS_EMAIL_VERIFIED'] as boolean;
+    const IS_COMPANY_ADMIN = rootGetters['auth/IS_COMPANY_ADMIN'] as boolean;
+    const DOES_USER_HAVE_COMPANIES = rootGetters[
+      'auth/DOES_USER_HAVE_COMPANIES'
+    ] as boolean;
     /* const authUserEmail = rootGetters[
       'auth/GET_AUTH_USER_EMAIL'
     ] as UserSummary['email']; */
@@ -69,6 +73,20 @@ const getters: BannerGettersInterface = {
         },
         visibleOnRoutes: 'all',
         visible: !IS_EMAIL_VERIFIED,
+      },
+      {
+        id: 'no_company_warning',
+        message:
+          'You have not created any company yet. Please create one and unleash the full power of the Akpoho Software',
+        type: 'warning',
+        dismissible: false,
+        action: {
+          label: 'Create a Company',
+          type: 'navigation',
+          route: { name: 'add_company' },
+        },
+        visibleOnRoutes: 'all',
+        visible: !DOES_USER_HAVE_COMPANIES && IS_COMPANY_ADMIN,
       },
     ];
   },

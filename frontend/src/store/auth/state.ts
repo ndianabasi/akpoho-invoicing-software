@@ -3,6 +3,7 @@ import {
   UserSummary,
   StringIDNameInterface,
   FileMultiFormats,
+  RoleInterface,
 } from '../types';
 export interface AuthStateInterface {
   token: string;
@@ -15,7 +16,7 @@ export interface AuthStateInterface {
   userCompanies: StringIDNameInterface[] | null;
   userProfile: UserProfile | null;
   currentCompany: StringIDNameInterface | null;
-  authRole: StringIDNameInterface | null;
+  authRole: RoleInterface | null;
 }
 
 export interface UserProfile {
