@@ -14,6 +14,7 @@
       }"
     >
       <q-avatar
+        v-if="numberOfBanners > 1"
         size="1.75rem"
         color="info"
         text-color="white"
@@ -31,7 +32,7 @@
         />
         <q-btn v-if="currentBanner.dismissible" flat round icon="close" />
 
-        <q-btn-group flat round>
+        <q-btn-group v-if="numberOfBanners > 1" flat round>
           <q-btn
             flat
             round
@@ -45,7 +46,9 @@
             @click.prevent="showNextBanner"
           />
         </q-btn-group>
-        <div>{{ currentBannerIndex + 1 }}/{{ numberOfBanners }}</div>
+        <div v-if="numberOfBanners > 1">
+          {{ currentBannerIndex + 1 }}/{{ numberOfBanners }}
+        </div>
       </template>
     </q-banner>
   </div>

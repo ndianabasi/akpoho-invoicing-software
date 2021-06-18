@@ -62,7 +62,14 @@
 //import EssentialLink from '../components/EssentialLink.vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { defineComponent, ref, onMounted, computed, watchEffect } from 'vue';
+import {
+  defineComponent,
+  ref,
+  onMounted,
+  computed,
+  watchEffect,
+  onBeforeUnmount,
+} from 'vue';
 import SecondaryToolbar from '../components/SecondaryToolbar.vue';
 import StickySidebar from '../components/StickySidebar.vue';
 import GoToTop from '../components/GoToTop.vue';
@@ -173,6 +180,16 @@ export default defineComponent({
       });
 
       window.addEventListener('online', () => {
+        store.commit('SET_OFFLINE', false);
+      });
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('offline', () => {
+        store.commit('SET_OFFLINE', true);
+      });
+
+      window.removeEventListener('online', () => {
         store.commit('SET_OFFLINE', false);
       });
     });
