@@ -87,6 +87,7 @@ interface RootGetterInterface {
   ) => HttpOptions;
   getMessage: (state: StoreElements) => AlertInterface;
   getTokenRefreshTime: (state: StoreElements) => number;
+  GET_OFFLINE_MODE: (state: StoreElements) => boolean;
 }
 
 export interface StateInterface {
@@ -126,7 +127,7 @@ export interface StoreInterface {
 
 // define your own `useStore` composition function
 export function useStore() {
-  const key: InjectionKey<Store<StoreElements>> = Symbol('agboho_store_symbol');
+  const key: InjectionKey<Store<StoreElements>> = Symbol('akpoho_store_symbol');
   return baseUseStore(key);
 }
 
@@ -156,10 +157,12 @@ export default function (/* { ssrContext } */) {
       },
       tokenRefreshTime: 120,
       darkMode: false,
+      isOffline: false,
     }),
 
     mutations: {
       SET_DARK_MODE: (state, payload: boolean) => (state.darkMode = payload),
+      SET_OFFLINE: (state, payload: boolean) => (state.isOffline = payload),
     },
 
     getters: {
@@ -196,6 +199,7 @@ export default function (/* { ssrContext } */) {
       getMessage: (state) => state.message,
       getTokenRefreshTime: (state) => state.tokenRefreshTime,
       GET_DARK_MODE: (state) => state.darkMode,
+      GET_OFFLINE_MODE: (state) => state.isOffline,
     },
 
     modules: {

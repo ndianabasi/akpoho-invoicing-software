@@ -29,6 +29,7 @@ const getters: BannerGettersInterface = {
     rootGetters
   ): Array<Banner> => {
     const IS_EMAIL_VERIFIED = rootGetters['auth/IS_EMAIL_VERIFIED'] as boolean;
+    const IS_APP_OFFLINE = rootGetters['GET_OFFLINE_MODE'] as boolean;
 
     return [
       {
@@ -39,7 +40,7 @@ const getters: BannerGettersInterface = {
         dismissible: false,
         action: null,
         visibleOnRoutes: 'all',
-        visible: true,
+        visible: IS_APP_OFFLINE,
       },
       {
         id: 'new_account_verfication_warning',

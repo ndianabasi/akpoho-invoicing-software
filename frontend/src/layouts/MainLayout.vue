@@ -168,16 +168,13 @@ export default defineComponent({
     watchEffect(() => void store.dispatch('roles/FETCH_GLOBAL_ROLES'));
 
     onMounted(() => {
-      /* console.log('route matched', route.matched);
-      const matchedRoutes = route.matched;
-      breadcrumbsRoutes = computed(() => {
-        return matchedRoutes.map((route) => ({
-          meta: route.meta,
-          path: route.path,
-          name: route.name,
-        }));
+      window.addEventListener('offline', () => {
+        store.commit('SET_OFFLINE', true);
       });
-      console.log('breadcrumbsRoutes', breadcrumbsRoutes.value); */
+
+      window.addEventListener('online', () => {
+        store.commit('SET_OFFLINE', false);
+      });
     });
 
     const TOGGLE_LEFT_DRAWER = (payload: boolean) => {

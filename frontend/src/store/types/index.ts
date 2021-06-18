@@ -10,6 +10,7 @@ export interface RootState {
   message: AlertInterface;
   tokenRefreshTime: number;
   darkMode: boolean;
+  isOffline: boolean;
 }
 
 export interface AlertInterface {
