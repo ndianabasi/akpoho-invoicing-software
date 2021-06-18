@@ -291,6 +291,15 @@ const routes: CustomRouteRecord[] = [
           requiresAuth: false,
         },
       },
+      {
+        path: 'verify-email/:verificationKey',
+        component: () => import('pages/auth/VerifyNewAccountEmail.vue'),
+        name: 'verify_new_account_email',
+        props: true,
+        meta: {
+          label: 'Verify New Account Email',
+        },
+      },
     ],
   },
 

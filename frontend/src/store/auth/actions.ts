@@ -300,6 +300,49 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         });
     });
   },
+
+  NEW_ACCOUNT_EMAIL_VERIFICATION(_, key: string) {
+    return new Promise(async (resolve, reject) => {
+      console.log(key);
+
+      await $httpNoAuth
+        .post('/auth/new-account-email-verification', { key })
+        .then((res: LoginHttpResponse & HttpResponse) => {
+          Notify.create({
+            message: res.data.message,
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.message);
+        })
+        .catch((error: HttpError) => {
+          Notify.create({
+            message: error?.response?.data?.message ?? '',
+            type: 'negative',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return reject(error?.response?.data?.message ?? '');
+        });
+    });
+  },
 };
 
 export default actions;

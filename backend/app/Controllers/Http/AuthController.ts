@@ -98,6 +98,39 @@ export default class AuthController {
     }
   }
 
+  public async newAccountEmailVerification({ request, response }: HttpContextContract) {
+    let { key } = request.body()
+    if (!key) {
+      return response.badRequest('Invalid request for password reset validation')
+    }
+
+    const decryptedKey: string = Encryption?.decrypt(key) ?? ''
+    if (!decryptedKey)
+      return response.badRequest({ message: 'Invalid request for password reset validation' })
+    else {
+      const userId = decryptedKey.split('email-verification-for-')[1]
+
+      let user: User
+      try {
+        user = await User.findOrFail(userId)
+
+        if (Boolean(user.isEmailVerified)) {
+          return response.ok({ message: 'Your email address is already verified' })
+        }
+
+        user.merge({ isEmailVerified: true, emailVerifiedAt: DateTime.now() })
+        await user.save()
+
+        return response.ok({ message: 'Thank you! Your email address is verified' })
+      } catch (error) {
+        return response.notFound({
+          message:
+            'Email verification failed. This could be as a result of an expired or tampered link. Please proceed to Dashboard to request a new one',
+        })
+      }
+    }
+  }
+
   public async login({ request, auth, response }: HttpContextContract) {
     const { password, loginCode /* recaptchaResponseToken */ } = request.body()
     const email: string = request.body().email

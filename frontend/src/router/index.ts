@@ -57,7 +57,7 @@ export default function () {
     ),
   });
 
-  Router.beforeEach(async (to, _from, next) => {
+  Router.beforeEach((to, _from, next) => {
     const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       if (isLoggedIn) {
@@ -68,7 +68,7 @@ export default function () {
           message: 'You are not logged in.',
           position: 'top',
         });
-        await Router.push({ name: 'Login' });
+        next({ name: 'Login' });
       }
     } else next();
   });
@@ -79,11 +79,9 @@ export default function () {
     if (to.meta && !!to.meta.permission) {
       if (GET_USER_PERMISSION(to.meta.permission)) {
         next();
-        return;
-      } else from;
+      } else return false;
     } else {
       next();
-      return;
     }
   });
 

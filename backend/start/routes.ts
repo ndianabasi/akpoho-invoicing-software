@@ -39,6 +39,7 @@ Route.group(() => {
   Route.post('/auth/request-password-reset', 'AuthController.requestPasswordReset')
   Route.post('/auth/verify-password-reset', 'AuthController.verifyPasswordReset')
   Route.post('/auth/reset-password', 'AuthController.ResetPassword')
+  Route.post('/auth/new-account-email-verification', 'AuthController.newAccountEmailVerification')
 
   Route.get('/countries/countries-for-select', 'CountriesController.countriesForSelect')
   Route.get(
