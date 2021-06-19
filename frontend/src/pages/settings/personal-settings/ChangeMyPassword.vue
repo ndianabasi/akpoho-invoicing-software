@@ -29,7 +29,9 @@
               done-color="positive"
               done-icon="done"
               :caption="
-                'Password was last changed at: ' + lastPasswordChangeDate
+                lastPasswordChangeDate
+                  ? 'Password was last changed at: ' + lastPasswordChangeDate
+                  : 'Password yet to be changed'
               "
             >
               <q-input

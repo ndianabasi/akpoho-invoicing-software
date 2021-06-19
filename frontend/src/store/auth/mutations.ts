@@ -49,7 +49,9 @@ const mutation: MutationTree<AuthStateInterface> = {
 
       state.authRole = payload.role;
 
-      state.lastPasswordHistory = payload.passwordHistories[0].created_at;
+      state.lastPasswordHistory = payload.passwordHistories.length
+        ? payload.passwordHistories[0].created_at
+        : '';
     } catch (error) {
       console.log(error);
     }

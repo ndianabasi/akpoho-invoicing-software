@@ -63,8 +63,11 @@ const getters: GetterTree<AuthStateInterface, StateInterface> = {
         : '',
     };
   },
-  GET_LAST_PASSWORD_HISTORY: (state) =>
-    DateTime.fromISO(state.lastPasswordHistory).toLocaleString(),
+  GET_LAST_PASSWORD_HISTORY: (state) => {
+    return state.lastPasswordHistory
+      ? DateTime.fromISO(state.lastPasswordHistory).toLocaleString()
+      : '';
+  },
 };
 
 export default getters;
