@@ -167,14 +167,25 @@
           </template>
         </q-input>
 
-        <div class="q-mt-md">
-          {{
-            paginationModel.rowsNumber > 1
-              ? `${paginationModel.rowsNumber} records were found`
-              : paginationModel.rowsNumber === 1
-              ? `${paginationModel.rowsNumber} record was found`
-              : 'No record was found'
-          }}
+        <div class="col-12 row">
+          <div v-if="usePagination" class="q-mt-md col">
+            {{
+              paginationModel.rowsNumber > 1
+                ? `${paginationModel.rowsNumber} records were found`
+                : paginationModel.rowsNumber === 1
+                ? `${paginationModel.rowsNumber} record was found`
+                : 'No record was found'
+            }}
+          </div>
+          <div v-else class="q-mt-md col">
+            {{
+              clientSidePagination.total > 1
+                ? `${clientSidePagination.total} records were found`
+                : clientSidePagination.total === 1
+                ? `${clientSidePagination.total} record was found`
+                : 'No record was found'
+            }}
+          </div>
         </div>
       </template>
 
@@ -448,8 +459,12 @@ export default defineComponent({
       descending: props.defaultSort.descending || false,
       page: 1,
       rowsPerPage: 10,
-      rowsNumber: 10,
+      rowsNumber: props.usePagination ? 10 : undefined,
     });
+    const clientSidePagination = ref({
+      total: 0,
+    });
+
     const filterSubmitting = ref(false);
 
     const visibleColumnsObjects = function () {
@@ -574,6 +589,8 @@ export default defineComponent({
                 paginationParams?.page || pagination.value.page;
               pagination.value.rowsPerPage =
                 paginationParams?.perPage || pagination.value.rowsPerPage;
+
+              clientSidePagination.value.total = data.length;
             }
             pagination.value.sortBy =
               paginationParams?.sortBy || pagination.value.sortBy;
@@ -750,6 +767,7 @@ export default defineComponent({
         props.resourceActionPermissions
       ),
       fetchTableData,
+      clientSidePagination,
     };
   },
 });
