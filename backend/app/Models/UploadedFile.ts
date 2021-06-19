@@ -12,6 +12,7 @@ import {
 } from '@ioc:Adonis/Lucid/Orm'
 import FileProvider from 'App/Models/FileProvider'
 import UserProfile from './UserProfile'
+import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
 type FormatAttributes = {
   name: string
@@ -87,10 +88,21 @@ export default class UploadedFile extends BaseModel {
   @column()
   public updatedBy: string
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({
+    autoCreate: true,
+    serialize(value: DateTime) {
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
+    },
+  })
   public createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({
+    autoCreate: true,
+    autoUpdate: true,
+    serialize(value: DateTime) {
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
+    },
+  })
   public updatedAt: DateTime
 
   @belongsTo(() => FileProvider)

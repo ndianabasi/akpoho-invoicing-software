@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, beforeCreate, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
 import UUIDHook from './Hooks/UUIDHook'
+import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
 export default class LoginRecord extends BaseModel {
   @column({ isPrimary: true })
@@ -16,7 +17,12 @@ export default class LoginRecord extends BaseModel {
   @column()
   public location: string
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({
+    autoCreate: true,
+    serialize(value: DateTime) {
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
+    },
+  })
   public timestamp: DateTime
 
   @belongsTo(() => User)

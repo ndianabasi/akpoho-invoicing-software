@@ -11,9 +11,7 @@ import {
 import Company from 'App/Models/Company'
 import CustomerAddress from 'App/Models/CustomerAddress'
 import UUIDHook from './Hooks/UUIDHook'
-import Country from 'App/Models/Country'
-import State from 'App/Models/State'
-import { STANDARD_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 import CustomerTitle from './CustomerTitle'
 
 export default class Customer extends BaseModel {
@@ -73,7 +71,7 @@ export default class Customer extends BaseModel {
   @column.dateTime({
     autoCreate: true,
     serialize(value: DateTime) {
-      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
     },
   })
   public createdAt: DateTime
@@ -82,7 +80,7 @@ export default class Customer extends BaseModel {
     autoCreate: true,
     autoUpdate: true,
     serialize(value: DateTime) {
-      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
     },
   })
   public updatedAt: DateTime

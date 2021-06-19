@@ -13,6 +13,7 @@ import User from 'App/Models/User'
 import Country from 'App/Models/Country'
 import State from 'App/Models/State'
 import UploadedFile, { FileFormats } from 'App/Models/UploadedFile'
+import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
 export default class UserProfile extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -50,10 +51,21 @@ export default class UserProfile extends BaseModel {
   @column()
   public profilePicture: number | null
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({
+    autoCreate: true,
+    serialize(value: DateTime) {
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
+    },
+  })
   public createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({
+    autoCreate: true,
+    autoUpdate: true,
+    serialize(value: DateTime) {
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
+    },
+  })
   public updatedAt: DateTime
 
   // Computed properties

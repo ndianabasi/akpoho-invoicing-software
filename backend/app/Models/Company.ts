@@ -18,6 +18,7 @@ import UploadedFile from 'App/Models/UploadedFile'
 import CompanySize from 'App/Models/CompanySize'
 import State from 'App/Models/State'
 import Country from 'App/Models/Country'
+import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
 export default class Company extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -27,31 +28,48 @@ export default class Company extends BaseModel {
 
   @column()
   public name: string
+
   @column()
   public email: string
+
   @column()
   public phoneNumber: string
+
   @column()
   public isApproved: boolean
+
   @column()
   public address: string
+
   @column()
   public city: string
+
   @column()
   public type: 'personal' | 'corporate'
+
   @column()
   public stateId: number | null
+
   @column()
   public countryId: number | null
+
   @column()
   public slug: string
+
   @column()
   public companySizeId: number
+
   @column()
   public profilePicture: string
+
   @column()
   public website: string
-  @column()
+
+  @column.dateTime({
+    serialize(value: DateTime) {
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
+    },
+  })
   public approvedAt: DateTime
   @column()
   public approvedBy: string
@@ -66,10 +84,21 @@ export default class Company extends BaseModel {
     CompanyHook.generateSlug(company)
   }
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({
+    autoCreate: true,
+    serialize(value: DateTime) {
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
+    },
+  })
   public createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({
+    autoCreate: true,
+    autoUpdate: true,
+    serialize(value: DateTime) {
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
+    },
+  })
   public updatedAt: DateTime
 
   @manyToMany(() => User, {

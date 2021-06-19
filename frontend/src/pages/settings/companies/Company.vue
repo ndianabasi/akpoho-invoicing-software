@@ -154,23 +154,23 @@ export default defineComponent({
       return [
         { name: 'ID', value: company?.id },
         { name: 'Name', value: company?.name },
+        { name: 'Type', value: company?.type?.toUpperCase() ?? '' },
+        { name: 'Email', value: company?.email },
         { name: 'Phone Number', value: company?.phone_number ?? '' },
         { name: 'Address', value: company?.address },
+        { name: 'Website', value: company?.website ?? '' },
+        { name: 'Company Size', value: company?.companySize?.size ?? '' },
+        { name: 'City', value: company?.city ?? '' },
+        { name: 'Country', value: company?.country?.name ?? '' },
+        { name: 'State', value: company?.state?.name ?? '' },
+        { name: 'Slug', value: company?.slug },
         {
           name: 'Is Company Approved',
           value: company?.is_approved ? true : false,
         },
         { name: 'Approved At', value: company?.approved_at },
-        { name: 'City', value: company?.city ?? '' },
         { name: 'Created At', value: company?.created_at },
-        { name: 'Email', value: company?.email },
         { name: 'Updated At', value: company?.updated_at },
-        { name: 'Slug', value: company?.slug },
-        { name: 'Type', value: company?.type?.toUpperCase() ?? '' },
-        { name: 'Website', value: company?.website ?? '' },
-        { name: 'Company Size', value: company?.companySize?.size ?? '' },
-        { name: 'Country', value: company?.country?.name ?? '' },
-        { name: 'State', value: company?.state?.name ?? '' },
       ];
     });
 

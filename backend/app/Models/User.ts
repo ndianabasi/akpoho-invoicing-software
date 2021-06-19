@@ -13,13 +13,12 @@ import {
   hasMany,
   HasMany,
   scope,
-  computed,
 } from '@ioc:Adonis/Lucid/Orm'
 import UserHook from 'App/Models/Hooks/UserHook'
 import Company from 'App/Models/Company'
 import Role from 'App/Models/Role'
 import UserProfile from 'App/Models/UserProfile'
-import { STANDARD_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 import PasswordChange from 'App/Models/PasswordChange'
 import PasswordHistory from 'App/Models/PasswordHistory'
 import LoginRecord from 'App/Models/LoginRecord'
@@ -116,7 +115,7 @@ export default class User extends BaseModel {
     autoCreate: true,
     autoUpdate: true,
     serialize(value: DateTime) {
-      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
     },
   })
   public updatedAt: DateTime
@@ -124,7 +123,7 @@ export default class User extends BaseModel {
   @column.dateTime({
     autoCreate: true,
     serialize(value: DateTime) {
-      return value ? value.toFormat(STANDARD_DATE_TIME_FORMAT) : ''
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
     },
   })
   public createdAt: DateTime
