@@ -1,6 +1,6 @@
 import { TableRow } from '../../../types/table';
 
-interface Headers extends TableRow {
+interface CustomerAddressesHeaders extends TableRow {
   name: Columns;
   field: Columns;
 }
@@ -15,7 +15,7 @@ enum Columns {
   street_address = 'street_address',
 }
 
-const columns: Array<Headers> = [
+const columns: Array<CustomerAddressesHeaders> = [
   {
     name: Columns.id,
     required: false,

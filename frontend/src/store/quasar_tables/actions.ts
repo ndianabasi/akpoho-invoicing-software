@@ -5,7 +5,7 @@ import { ActionContext, ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { QuasarTableStateInterface, DataRows } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpResponse, HttpError, StringIDNameInterface } from '../types';
+import { HttpResponse, HttpError } from '../types';
 import { PaginationParams } from '../../types/table';
 
 export interface QuasarTableActionsContract
@@ -22,19 +22,14 @@ export interface QuasarTableActionsContract
 
 const actions: QuasarTableActionsContract = {
   async FETCH_TABLE_DATA(
-    { commit, rootGetters },
+    { commit },
     { paginationParams, entityEndPoint, queryObject }
   ) {
     return new Promise(async (resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const currentCompany = rootGetters[
-        'auth/GET_CURRENT_COMPANY'
-      ] as StringIDNameInterface;
-
       commit('SET_TABLE_DATA', []);
 
       await $http
-        .get(`/${currentCompany.id}/${entityEndPoint}`, {
+        .get(`/${entityEndPoint}`, {
           params:
             paginationParams && queryObject
               ? { ...paginationParams, ...queryObject }

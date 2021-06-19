@@ -53,6 +53,11 @@ export default defineComponent({
         description: 'View, edit, and delete users.',
       },
       {
+        name: 'Companies',
+        link: 'all_companies',
+        description: 'View, edit, and delete your companies.',
+      },
+      {
         name: 'My Personal Settings',
         link: 'all_personal_settings',
         description: 'View and edit your personal settings',

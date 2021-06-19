@@ -117,7 +117,7 @@ const actions: ActionTree<CompanyStateInterface, StateInterface> = {
             ],
           });
 
-          return resolve(res.data);
+          return resolve(res.data.data);
         })
         .catch((error: HttpError) => {
           return reject(error);

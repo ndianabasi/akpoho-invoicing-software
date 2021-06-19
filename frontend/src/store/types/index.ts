@@ -203,6 +203,7 @@ export type CurrentlyViewedCompany = {
   created_at: string;
   updated_at: string;
   slug: string;
+  is_approved: string;
 };
 
 interface CurrentCustomerBaseInterface {

@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md">
     <view-card
-      v-if="creationMode || user"
+      v-if="creationMode || company"
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
@@ -90,7 +90,7 @@
         <div class="row justify-center q-mb-xl">
           <q-btn
             type="submit"
-            :loading="submitting"
+            :loading="isSubmitting"
             label="Submit"
             class="q-mt-md"
             icon-right="send"
@@ -116,26 +116,26 @@
               <q-item
                 v-if="resourcePermissions.canView"
                 :to="{
-                  name: 'view_user',
-                  params: { userId: userId }, //userId from route props
+                  name: 'view_company',
+                  params: { companyId: companyId }, //companyId from route props
                 }"
               >
                 <q-item-section>
                   <q-btn flat icon="visibility" />
                 </q-item-section>
-                <q-item-section>View User</q-item-section>
+                <q-item-section>View Company</q-item-section>
               </q-item>
 
               <q-item
                 v-if="resourcePermissions.canList"
                 :to="{
-                  name: 'all_users',
+                  name: 'all_companies',
                 }"
               >
                 <q-item-section>
                   <q-btn flat icon="view_list" />
                 </q-item-section>
-                <q-item-section>All Users</q-item-section>
+                <q-item-section>All Companies</q-item-section>
               </q-item>
             </q-list>
           </q-menu>
@@ -180,7 +180,7 @@ import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
-import { phoneNumberRegex, urlRegex } from '../../../helpers/utils';
+import { phoneNumberRegex } from '../../../helpers/utils';
 import { isEqual } from 'lodash';
 
 export default defineComponent({
@@ -192,7 +192,7 @@ export default defineComponent({
   },
 
   props: {
-    userId: {
+    companyId: {
       type: String,
       required: false,
       default: '',
@@ -248,7 +248,7 @@ export default defineComponent({
       ? computed(
           () =>
             store.getters[
-              'users/GET_CURRENTLY_VIEWED_USER'
+              'companies/GET_CURRENTLY_VIEWED_COMPANY'
             ] as CurrentlyViewedCompany
         )
       : ref(null);
@@ -432,23 +432,25 @@ export default defineComponent({
 
     const onSubmit = handleSubmit((form) => {
       void nextTick(() => {
-        if (props.creationMode) {
-          void store
-            .dispatch('companies/CREATE_COMPANY', form)
-            .then((id: string) => {
-              companyCreated.value = true;
-              void store.dispatch('auth/FETCH_AUTH_PROFILE');
-              void nextTick(() => {
-                void router.push({
-                  name: 'view_company',
-                  params: { companyId: id },
-                });
+        const isCreationMode = props.creationMode;
+        void store
+          .dispatch(
+            `companies/${isCreationMode ? 'CREATE_COMPANY' : 'EDIT_COMPANY'}`,
+            isCreationMode ? form : { form, companyId: props.companyId }
+          )
+          .then((id: string) => {
+            companyCreated.value = true;
+            void store.dispatch('auth/FETCH_AUTH_PROFILE');
+            void nextTick(() => {
+              void router.push({
+                name: 'view_company',
+                params: { companyId: id },
               });
-            })
-            .catch((error) => {
-              console.error(error);
             });
-        }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       });
     });
 
@@ -465,7 +467,7 @@ export default defineComponent({
               })
             : props.creationMode
             ? useTitleInfo({
-                title: 'New User',
+                title: 'New Company',
                 avatar: '',
               })
             : ref(null);
@@ -475,11 +477,11 @@ export default defineComponent({
       { deep: true }
     );
 
-    const stopFetchCurrentlyViewedUser = watchEffect(() => {
+    const stopFetchCurrentlyViewedCompany = watchEffect(() => {
       if (!props.creationMode) {
         void store
-          .dispatch('companies/FETCH_CURRENTLY_VIEW_COMPANY', {
-            userId: props.userId,
+          .dispatch('companies/FETCH_CURRENTLY_VIEWED_COMPANY', {
+            companyId: props.companyId,
           })
           .then(async () => {
             currentCompany.value = unref(
@@ -541,7 +543,7 @@ export default defineComponent({
     );
 
     onBeforeMount(() => {
-      stopFetchCurrentlyViewedUser();
+      stopFetchCurrentlyViewedCompany();
       stopFetchCountriesForSelect();
       stopFetchCompanySizesForSelect();
     });
@@ -569,7 +571,7 @@ export default defineComponent({
     });
 
     return {
-      user: currentCompany,
+      company: currentCompany,
       text: ref(''),
       ph: ref(''),
       dense: ref(false),
@@ -579,8 +581,8 @@ export default defineComponent({
       countries,
       countryStates,
       resourcePermissions: useResourcePermissions({
-        view: PERMISSION.CAN_VIEW_USERS,
-        list: PERMISSION.CAN_LIST_USERS,
+        view: PERMISSION.CAN_VIEW_COMPANIES,
+        list: PERMISSION.CAN_LIST_COMPANIES,
       }),
       CAN_EDIT_COMPANIES,
       isSubmitting,

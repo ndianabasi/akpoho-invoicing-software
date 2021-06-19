@@ -94,6 +94,7 @@ Route.group(() => {
 
   // Create a new company
   Route.post('/companies', 'CompaniesController.store')
+  Route.get('/companies', 'CompaniesController.index')
 })
   .prefix('/v1')
   .middleware('auth')
@@ -104,6 +105,8 @@ Route.group(() => {
   // Customers routes
   // Get a specific company
   Route.get('/companies/:company_id', 'CompaniesController.show')
+  // Edit a specific company
+  Route.patch('/companies/:company_id', 'CompaniesController.update')
 
   // Get all customers within a company. Returns paginated result
   Route.get('/:company_id/customers', 'CustomersController.index')

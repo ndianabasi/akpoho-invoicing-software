@@ -211,14 +211,15 @@ const routes: CustomRouteRecord[] = [
               permission: 'can_list_companies',
             },
             children: [
-              /* {
+              {
                 path: '',
-                component: () => import('pages/settings/companies/AllCompanies.vue'),
+                component: () =>
+                  import('pages/settings/companies/AllCompanies.vue'),
                 name: 'all_companies',
                 meta: {
                   label: 'All Companies',
                 },
-              }, */
+              },
               {
                 path: 'new',
                 component: () =>
@@ -239,16 +240,17 @@ const routes: CustomRouteRecord[] = [
                   permission: 'can_view_companies',
                 },
               },
-              /*  {
+              {
                 path: ':companyId/edit',
                 props: true,
-                component: () => import('pages/settings/companies/EditCompany.vue'),
+                component: () =>
+                  import('pages/settings/companies/EditCompany.vue'),
                 name: 'edit_company',
                 meta: {
                   label: 'Edit Company',
                   permission: 'can_edit_companies',
                 },
-              }, */
+              },
             ],
           },
           {

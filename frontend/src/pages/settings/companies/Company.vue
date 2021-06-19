@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md">
     <view-card
-      v-if="user"
+      v-if="!!companyProperties.length"
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
@@ -156,6 +156,10 @@ export default defineComponent({
         { name: 'Name', value: company?.name },
         { name: 'Phone Number', value: company?.phone_number ?? '' },
         { name: 'Address', value: company?.address },
+        {
+          name: 'Is Company Approved',
+          value: company?.is_approved ? true : false,
+        },
         { name: 'Approved At', value: company?.approved_at },
         { name: 'City', value: company?.city ?? '' },
         { name: 'Created At', value: company?.created_at },

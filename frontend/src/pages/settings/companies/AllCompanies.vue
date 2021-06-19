@@ -4,18 +4,18 @@
     :table-name="tableName"
     :table-data-getter-type="tableDataGetterType"
     :default-sort="defaultSort"
-    no-results-label="Sorry! No users were found. Please check your filters too."
-    row-view-route-name="view_user"
-    row-edit-route-name="edit_user"
-    route-param="userId"
-    row-delete-action-type="users/DELETE_USER"
-    entity-name="User"
-    table-data-fetch-end-point="users"
+    no-results-label="Sorry! No companies were found. Please check your filters too."
+    row-view-route-name="view_company"
+    row-edit-route-name="edit_company"
+    route-param="companyId"
+    row-delete-action-type="companies/DELETE_COMPANY"
+    entity-name="Company"
+    table-data-fetch-end-point="companies"
     show-new-route-button
     :new-route-object="{
-      routeName: 'add_user',
+      routeName: 'add_company',
       icon: 'person_add_alt',
-      title: 'New User',
+      title: 'New Company',
     }"
     :resource-action-permissions="resourceActionPermissions"
   ></quasar-table>
@@ -27,17 +27,17 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import userColumns from '../../../components/data/table-definitions/users';
+import companyColumns from '../../../components/data/table-definitions/companies';
 import QuasarTable from '../../../components/QuasarTable.vue';
 import { PERMISSION } from '../../../store/types';
 
 export default defineComponent({
-  name: 'AllUsers',
+  name: 'AllCompanies',
   components: {
     QuasarTable,
   },
   setup() {
-    const tableName = ref('All Users');
+    const tableName = ref('All Companies');
     const store = useStore();
 
     const defaultSort = {
@@ -53,7 +53,7 @@ export default defineComponent({
     );
 
     const data = reactive({
-      columns: userColumns,
+      columns: companyColumns,
       stickyTable: false,
     });
 
@@ -66,10 +66,10 @@ export default defineComponent({
       tableDataGetterType,
       defaultSort,
       resourceActionPermissions: ref({
-        new: PERMISSION.CAN_CREATE_USERS,
-        view: PERMISSION.CAN_VIEW_USERS,
-        edit: PERMISSION.CAN_EDIT_USERS,
-        delete: PERMISSION.CAN_DELETE_USERS,
+        new: PERMISSION.CAN_CREATE_COMPANIES,
+        view: PERMISSION.CAN_VIEW_COMPANIES,
+        edit: PERMISSION.CAN_EDIT_COMPANIES,
+        delete: PERMISSION.CAN_DELETE_COMPANIES,
       }),
     };
   },
