@@ -3,6 +3,8 @@ import CacheHelper from 'App/Helpers/CacheHelper'
 import UserServices from 'App/Services/UserServices'
 import CompanyValidator from 'App/Validators/CompanyValidator'
 import { CACHE_TAGS } from 'Contracts/cache'
+import Logger from '@ioc:Adonis/Core/Logger'
+import Company from 'App/Models/Company'
 
 export default class CompaniesController {
   public async index({}: HttpContextContract) {}
@@ -53,7 +55,40 @@ export default class CompaniesController {
     } else return response.abort({ message: 'User not found' })
   }
 
-  public async show({}: HttpContextContract) {}
+  public async show({ response, requestedCompany, bouncer }: HttpContextContract) {
+    if (requestedCompany) {
+      // Check authorisation
+      await bouncer.with('CompanyPolicy').authorize('view', requestedCompany)
+
+      const company = await Company.query()
+        .select(
+          'id',
+          'name',
+          'phone_number',
+          'address',
+          'approved_at',
+          'city',
+          'created_at',
+          'email',
+          'updated_at',
+          'slug',
+          'type',
+          'website',
+          'company_size_id',
+          'country_id',
+          'state_id'
+        )
+        .where('id', requestedCompany.id)
+        .preload('companySize', (query) => query.select('id', 'size'))
+        .preload('country', (query) => query.select('id', 'name'))
+        .preload('state', (query) => query.select('id', 'name'))
+        .first()
+
+      return response.ok({ data: company })
+    } else {
+      Logger.warn('Requested company not found at CompaniesController.show')
+    }
+  }
 
   public async update({}: HttpContextContract) {}
 

@@ -499,7 +499,7 @@ export default defineComponent({
             city.value = currentCompany?.value?.city ?? '';
             size.value = currentCompany?.value?.companySize?.id ?? null;
             website.value = currentCompany?.value?.website ?? '';
-            countryId.value = currentCompany?.value?.companyCountry?.id ?? null;
+            countryId.value = currentCompany?.value?.country?.id ?? null;
             // Fetch the states for the current country
             if (countryId.value) {
               await store
@@ -508,12 +508,11 @@ export default defineComponent({
                 })
                 .then(() => {
                   // Then update the current state
-                  stateId.value =
-                    currentCompany?.value?.companyState?.id ?? null;
+                  stateId.value = currentCompany?.value?.state?.id ?? null;
                 });
             } else {
               // Then update the current state
-              countryId.value = currentCompany?.value?.companyState?.id ?? null;
+              countryId.value = currentCompany?.value?.state?.id ?? null;
             }
           });
       }

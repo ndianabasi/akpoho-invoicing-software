@@ -102,6 +102,9 @@ Route.group(() => {
 // Authenticated company-specific routes
 Route.group(() => {
   // Customers routes
+  // Get a specific company
+  Route.get('/companies/:company_id', 'CompaniesController.show')
+
   // Get all customers within a company. Returns paginated result
   Route.get('/:company_id/customers', 'CustomersController.index')
   // Create a new customer within a company.

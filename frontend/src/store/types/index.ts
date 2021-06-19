@@ -67,6 +67,11 @@ export interface NumberIDNameInterface extends IDNameInterface {
   id: number | null;
 }
 
+export interface CompanySizeInterface extends IDNameInterface {
+  id: number;
+  size: string;
+}
+
 type Token = {
   token: string;
   type: string;
@@ -183,16 +188,21 @@ export type CurrentlyViewedUser = {
 };
 
 export type CurrentlyViewedCompany = {
+  id: string;
   name: string;
   phone_number: string;
   email: string;
   address?: string;
   city?: string;
-  companySize?: NumberIDNameInterface;
-  companyState?: NumberIDNameInterface;
-  companyCountry?: NumberIDNameInterface;
+  companySize?: CompanySizeInterface;
+  state?: NumberIDNameInterface;
+  country?: NumberIDNameInterface;
   website?: string;
   type: 'personal' | 'corporate';
+  approved_at: string;
+  created_at: string;
+  updated_at: string;
+  slug: string;
 };
 
 interface CurrentCustomerBaseInterface {
