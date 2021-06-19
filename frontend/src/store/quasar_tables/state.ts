@@ -1,16 +1,16 @@
-export type GenericRowObject = {
-  [key: string]: unknown;
-};
+import { GenericTableData } from 'src/types/table';
 
-export type DataRows = Array<GenericRowObject>;
+export type DataRows = Array<GenericTableData>;
 
 export interface QuasarTableStateInterface {
   rows: DataRows;
+  selectedRows: string[];
 }
 
 function state(): QuasarTableStateInterface {
   return {
     rows: [],
+    selectedRows: [],
   };
 }
 

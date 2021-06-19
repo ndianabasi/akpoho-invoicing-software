@@ -5,7 +5,7 @@
     position="top"
     style="z-index: 10"
   >
-    <q-toolbar class="q-pl-lg">
+    <q-toolbar v-if="!tableSelectionActive" class="q-pl-lg">
       <q-btn
         flat
         round
@@ -15,18 +15,28 @@
         @click="$router.go(-1)"
       />
 
-      <q-toolbar-title>{{ currentRouteLabel }}</q-toolbar-title>
+      <q-toolbar-title class="q-ml-lg-xl q-ml-md-md q-ml-sm-sm">{{
+        currentRouteLabel
+      }}</q-toolbar-title>
 
-      <breadcrumbs :routes="breadcrumbsRoutes" />
+      <breadcrumbs v-if="!$q.screen.lt.sm" :routes="breadcrumbsRoutes" />
+    </q-toolbar>
+    <q-toolbar v-else class="q-pl-lg">
+      <q-btn flat round dense icon="menu" />
+      <q-toolbar-title> Toolbar </q-toolbar-title>
+      <q-btn flat round dense icon="more_vert" />
     </q-toolbar>
   </q-page-sticky>
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { defineComponent, computed, ref, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { useMeta } from 'quasar';
+import { GenericTableData } from '../types/table';
+import { useStore } from 'vuex';
 
 export default defineComponent({
   name: 'SecondaryToolbar',
@@ -41,6 +51,7 @@ export default defineComponent({
   },
   setup(/* props */) {
     const route = useRoute();
+    const store = useStore();
 
     const title = ref(''); // we define the "title" prop
 
@@ -76,9 +87,19 @@ export default defineComponent({
       setPageTitle(currentRouteLabel.value);
     });
 
+    const tableSelections = computed(
+      () =>
+        store.getters['quasar_tables/GET_SELECTED_ROWS'] as GenericTableData[]
+    );
+
+    const tableSelectionActive = computed(
+      () => tableSelections.value.length > 0
+    );
+
     return {
       breadcrumbsRoutes,
       currentRouteLabel,
+      tableSelectionActive,
     };
   },
 });

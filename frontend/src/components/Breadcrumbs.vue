@@ -1,6 +1,6 @@
 <template>
   <q-breadcrumbs
-    class="desktop-only text-grey"
+    class="text-grey"
     active-color="primary"
     style="font-size: 12px; max-width: 50%"
   >

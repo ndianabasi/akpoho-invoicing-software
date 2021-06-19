@@ -3,7 +3,7 @@
 <template>
   <div :class="{ 'q-pa-md': !embedMode }">
     <q-table
-      v-model:selected="selected"
+      v-model:selected="selectedRows"
       v-model:pagination="paginationModel"
       :grid="gridMode"
       :hide-pagination="!usePagination"
@@ -26,62 +26,6 @@
       @request="processTableRequest"
     >
       <template #top="props">
-        <div
-          class="
-            col-md-2 col-xl-2 col-sm-12 col-xs-12
-            q-mb-sm-xl q-mb-xs-xl
-            q-table__title
-          "
-        >
-          <span v-if="!embedMode">{{ nameOfTable }}</span>
-          <slot name="topAddNew" v-bind="{ fetch: fetchTableData }">
-            <q-btn
-              v-if="
-                showNewRouteButton &&
-                newRouteObject &&
-                newRouteObject.routeName &&
-                resourcePermissions.canCreate
-              "
-              :to="{
-                name: newRouteObject.routeName,
-              }"
-              flat
-              round
-              :icon="newRouteObject.icon"
-              :title="newRouteObject.title"
-            />
-          </slot>
-        </div>
-
-        <q-space />
-
-        <q-select
-          v-if="useVisibleColumns"
-          v-model="visibleColumns"
-          multiple
-          dense
-          options-dense
-          :display-value="$q.lang.table.columns"
-          emit-value
-          map-options
-          :options="visibleColumnsObjects"
-          option-value="name"
-          options-cover
-          style="min-width: 200px"
-        />
-
-        <q-btn
-          v-if="!embedMode"
-          flat
-          round
-          dense
-          :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-          class="q-ml-md"
-          @click="props.toggleFullscreen"
-        />
-
-        <q-separator />
-
         <div v-if="useMultiFilter" class="col-12 q-mt-md">
           <q-expansion-item
             v-model="filterPanelExpanded"
@@ -167,24 +111,76 @@
           </template>
         </q-input>
 
-        <div class="col-12 row">
-          <div v-if="usePagination" class="q-mt-md col">
-            {{
-              paginationModel.rowsNumber > 1
-                ? `${paginationModel.rowsNumber} records were found`
-                : paginationModel.rowsNumber === 1
-                ? `${paginationModel.rowsNumber} record was found`
-                : 'No record was found'
-            }}
+        <div class="col-12 row items-start">
+          <div class="q-mt-md col col-md-3 col-sm-12 col-xs-12">
+            <div v-if="usePagination" class="inline-block">
+              {{
+                paginationModel.rowsNumber > 1
+                  ? `${paginationModel.rowsNumber} records were found`
+                  : paginationModel.rowsNumber === 1
+                  ? `${paginationModel.rowsNumber} record was found`
+                  : 'No record was found'
+              }}
+            </div>
+            <div v-else class="inline-block">
+              {{
+                clientSidePagination.total > 1
+                  ? `${clientSidePagination.total} records were found`
+                  : clientSidePagination.total === 1
+                  ? `${clientSidePagination.total} record was found`
+                  : 'No record was found'
+              }}
+            </div>
+
+            <slot name="topAddNew" v-bind="{ fetch: fetchTableData }">
+              <q-btn
+                v-if="
+                  showNewRouteButton &&
+                  newRouteObject &&
+                  newRouteObject.routeName &&
+                  resourcePermissions.canCreate
+                "
+                class="q-ml-lg"
+                :to="{
+                  name: newRouteObject.routeName,
+                }"
+                flat
+                round
+                :icon="newRouteObject.icon"
+                :title="newRouteObject.title"
+              />
+            </slot>
           </div>
-          <div v-else class="q-mt-md col">
-            {{
-              clientSidePagination.total > 1
-                ? `${clientSidePagination.total} records were found`
-                : clientSidePagination.total === 1
-                ? `${clientSidePagination.total} record was found`
-                : 'No record was found'
-            }}
+
+          <q-space />
+
+          <div class="col col-sm-12 col-xs-12 col-md-4 col-lg-4">
+            <div class="row justify-end">
+              <q-select
+                v-if="useVisibleColumns"
+                v-model="visibleColumns"
+                multiple
+                dense
+                options-dense
+                :display-value="$q.lang.table.columns"
+                emit-value
+                map-options
+                :options="visibleColumnsObjects"
+                option-value="name"
+                options-cover
+                style="min-width: 200px"
+              />
+
+              <q-btn
+                v-if="!embedMode"
+                flat
+                round
+                dense
+                :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+                class="q-ml-md"
+                @click="props.toggleFullscreen"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -452,8 +448,8 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
     const route = useRoute();
-    const selected = ref([]);
-    const tableRows: Ref<GenericTableData> = ref([]);
+    const selectedRows = ref([] as GenericTableData[]);
+    const tableRows: Ref<GenericTableData[]> = ref([]);
     const pagination = ref({
       sortBy: props.defaultSort.sortBy || '',
       descending: props.defaultSort.descending || false,
@@ -569,7 +565,7 @@ export default defineComponent({
         .then((response: ResponseData) => {
           void nextTick(() => {
             // The value from the getter is actually a Proxy which does not work with the Quasar table. So stringify and parse the Proxy first.
-            const data: unknown[] = JSON.parse(
+            const data: GenericTableData[] = JSON.parse(
               JSON.stringify(
                 store.getters['quasar_tables/GET_TABLE_ROWS'] as unknown[]
               )
@@ -703,6 +699,7 @@ export default defineComponent({
 
     onMounted(async () => {
       await fetchTableData({ queryObject: filterForm });
+      store.commit('quasar_tables/SET_SELECTED_ROWS', null);
     });
 
     const currentCompany = computed(
@@ -737,9 +734,19 @@ export default defineComponent({
       { deep: true }
     );
 
+    // Watch for changes in the selectedRows array
+    watch(
+      selectedRows,
+      (newSelections) => {
+        // Update quasar_tables store
+        store.commit('quasar_tables/SET_SELECTED_ROWS', newSelections);
+      },
+      { deep: true }
+    );
+
     return {
       nameOfTable: ref(props.tableName),
-      selected,
+      selectedRows,
       visibleColumns,
       visibleColumnsObjects: visibleColumnsObjects(),
       columns: ref(props.tableColumns),

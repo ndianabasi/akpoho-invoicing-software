@@ -29,8 +29,8 @@ export interface TableRow {
   filterOptions?: SelectOption[];
 }
 
-export interface GenericTableData extends Array<unknown> {
-  [index: number]: unknown;
+export interface GenericTableData {
+  [index: string]: unknown;
 }
 
 export interface TableRequestInterface {

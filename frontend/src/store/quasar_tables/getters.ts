@@ -9,6 +9,7 @@ export type QuasarTableGetterInterface = GetterTree<
 
 const getters: QuasarTableGetterInterface = {
   GET_TABLE_ROWS: (state: QuasarTableStateInterface) => state.rows,
+  GET_SELECTED_ROWS: (state: QuasarTableStateInterface) => state.selectedRows,
 };
 
 export default getters;
