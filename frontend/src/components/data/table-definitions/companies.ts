@@ -26,47 +26,14 @@ enum CompanyColumns {
   state = 'state',
 }
 
-const stopFetchCountriesForSelect = watchEffect(() => {
-  void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
-});
-
 const stopFetchCompanySizesForSelect = watchEffect(() => {
   void store.dispatch('companies/FETCH_COMPANY_SIZES_FOR_SELECT');
-});
-
-const countries = computed(
-  () =>
-    store.getters['countries_states/GET_COUNTRIES_FOR_SELECT'] as SelectOption[]
-);
-
-const countryStates = computed({
-  get: () =>
-    store.getters[
-      'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-    ] as SelectOption[],
-  set: (value) => value,
 });
 
 const companySizes = computed(
   () =>
     store.getters['companies/GET_COMPANY_SIZES_FOR_SELECT'] as SelectOption[]
 );
-
-/* watch(
-  () => form.countryId.model,
-  (newCountry) => {
-    stateId.value = null;
-    if (newCountry) {
-      void store.dispatch('countries_states/FETCH_COUNTRY_STATES_FOR_SELECT', {
-        countryId: newCountry,
-      });
-
-      countryStates.value = store.getters[
-        'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-      ] as SelectOption[];
-    }
-  }
-); */
 
 const columns: CompanyHeaders[] = [
   {
@@ -155,24 +122,22 @@ const columns: CompanyHeaders[] = [
   {
     name: CompanyColumns.state,
     required: false,
-    label: 'Company Size',
+    label: 'State',
     align: 'center',
     field: CompanyColumns.state,
     sortable: true,
     filterable: true,
-    filterInputType: 'select',
-    filterOptions: computed(() => countryStates.value).value,
+    filterInputType: 'text',
   },
   {
     name: CompanyColumns.country,
     required: false,
-    label: 'Last Login Time',
+    label: 'Country',
     align: 'center',
     field: CompanyColumns.country,
     sortable: true,
     filterable: true,
-    filterInputType: 'select',
-    filterOptions: computed(() => countries.value).value,
+    filterInputType: 'text',
   },
   {
     name: CompanyColumns.created_at,
@@ -197,7 +162,6 @@ const columns: CompanyHeaders[] = [
 ];
 
 onBeforeUnmount(() => {
-  stopFetchCountriesForSelect();
   stopFetchCompanySizesForSelect();
 });
 

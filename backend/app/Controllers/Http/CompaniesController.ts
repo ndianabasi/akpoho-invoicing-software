@@ -59,7 +59,10 @@ export default class CompaniesController {
           'companies.updated_at',
           'companies.slug',
           'companies.type',
-          'companies.website'
+          'companies.website',
+          'countries.name as country',
+          'states.name as state',
+          'company_sizes.size as company_size'
         )
         .leftJoin('company_user', (query) =>
           query.on('company_user.company_id', '=', 'companies.id')
@@ -68,6 +71,8 @@ export default class CompaniesController {
         .leftJoin('company_sizes', (query) =>
           query.on('company_sizes.id', '=', 'companies.company_size_id')
         )
+        .leftJoin('countries', (query) => query.on('countries.id', '=', 'companies.country_id'))
+        .leftJoin('states', (query) => query.on('states.id', '=', 'companies.state_id'))
 
       if (sortBy) {
         subquery = subquery.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
@@ -83,6 +88,12 @@ export default class CompaniesController {
                 if (value === 'false') value = false
 
                 if (param === 'company_size') {
+                  query.where('company_sizes.id', value)
+                } else if (param === 'country') {
+                  query.where('countries.name', value)
+                } else if (param === 'state') {
+                  query.where('states.name', value)
+                } else if (param === 'company_size') {
                   query.where('company_sizes.id', value)
                 } else {
                   query.where(`companies.${param}`, value)
