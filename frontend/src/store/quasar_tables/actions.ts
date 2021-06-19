@@ -29,7 +29,7 @@ const actions: QuasarTableActionsContract = {
       commit('SET_TABLE_DATA', []);
 
       await $http
-        .get(`/${entityEndPoint}`, {
+        .get(`${entityEndPoint}`, {
           params:
             paginationParams && queryObject
               ? { ...paginationParams, ...queryObject }

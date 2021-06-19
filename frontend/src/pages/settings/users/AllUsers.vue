@@ -10,7 +10,7 @@
     route-param="userId"
     row-delete-action-type="users/DELETE_USER"
     entity-name="User"
-    table-data-fetch-end-point="users"
+    :table-data-fetch-end-point="allUsersEndpoint"
     show-new-route-button
     :new-route-object="{
       routeName: 'add_user',
@@ -25,11 +25,12 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import userColumns from '../../../components/data/table-definitions/users';
 import QuasarTable from '../../../components/QuasarTable.vue';
-import { PERMISSION } from '../../../store/types';
+import { PERMISSION, StringIDNameInterface } from '../../../store/types';
 
 export default defineComponent({
   name: 'AllUsers',
@@ -52,6 +53,14 @@ export default defineComponent({
       () => store.getters['customers/GET_ALL_CUSTOMERS']
     );
 
+    const allUsersEndpoint = computed(() => {
+      const currentCompany = store.getters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      return `/${currentCompany.id}/users`;
+    });
+
     const data = reactive({
       columns: userColumns,
       stickyTable: false,
@@ -65,6 +74,7 @@ export default defineComponent({
       tableDataFetchActionType,
       tableDataGetterType,
       defaultSort,
+      allUsersEndpoint,
       resourceActionPermissions: ref({
         new: PERMISSION.CAN_CREATE_USERS,
         view: PERMISSION.CAN_VIEW_USERS,

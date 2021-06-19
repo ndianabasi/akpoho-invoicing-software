@@ -11,7 +11,7 @@
     :table-data-getter-type="tableDataGetterType"
     no-results-label="Sorry! No addresses were found for this customer"
     entity-name="CustomerAddress"
-    :table-data-fetch-end-point="`customers/${customerId}/customer-addresses`"
+    :table-data-fetch-end-point="`/${currentCompanyId}/customers/${customerId}/customer-addresses`"
     show-new-route-button
     :resource-action-permissions="resourceActionPermissions"
   >
@@ -138,7 +138,7 @@ import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import customerAddressesColumns from '../../components/data/table-definitions/customer_addresses';
 import QuasarTable from '../../components/QuasarTable.vue';
-import { PERMISSION } from '../../store/types';
+import { PERMISSION, StringIDNameInterface } from '../../store/types';
 import { FetchTableDataInterface } from '../../types/table';
 import CustomerAddressEdit from './CustomerAddressEdit.vue';
 import { useQuasar } from 'quasar';
@@ -228,6 +228,14 @@ export default defineComponent({
       });
     };
 
+    const currentCompanyId = computed(() => {
+      const currentCompany = store.getters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      return currentCompany.id;
+    });
+
     return {
       tableName,
       columns: data.columns,
@@ -235,6 +243,7 @@ export default defineComponent({
       stickyTable: data.stickyTable,
       tableDataFetchActionType,
       tableDataGetterType,
+      currentCompanyId,
       resourceActionPermissions: ref({
         new: PERMISSION.CAN_CREATE_CUSTOMERS,
         view: PERMISSION.CAN_VIEW_CUSTOMERS,

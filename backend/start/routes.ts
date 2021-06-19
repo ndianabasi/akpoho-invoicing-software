@@ -86,6 +86,9 @@ Route.group(() => {
   Route.get('/customers/:customer_id', 'CustomersController.show').middleware(
     'findRequestedCustomer'
   )
+  // Alternative route to get all customers within a company.
+  // Returns paginated result
+  Route.get('/customers', 'CustomersController.index')
 
   Route.get(
     '/company-sizes/company-sizes-for-select',

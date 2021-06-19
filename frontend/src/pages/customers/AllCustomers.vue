@@ -16,19 +16,20 @@
     row-edit-route-name="edit_customer"
     row-delete-action-type="customers/DELETE_CUSTOMER"
     entity-name="Customer"
-    table-data-fetch-end-point="customers"
+    :table-data-fetch-end-point="allCustomersEndpoint"
     show-selections
     route-param="customerId"
   ></quasar-table>
 </template>
 
-<!-- eslint-disable @typescript-eslint/no-unsafe-return -->
-<!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
-<!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import { PERMISSION } from '../../store/types';
+import { PERMISSION, StringIDNameInterface } from '../../store/types';
 import customerColumns from '../../components/data/table-definitions/customers';
 import QuasarTable from '../../components/QuasarTable.vue';
 
@@ -58,6 +59,14 @@ export default defineComponent({
       stickyTable: false,
     });
 
+    const allCustomersEndpoint = computed(() => {
+      const currentCompany = store.getters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      return `/${currentCompany.id}/customers`;
+    });
+
     return {
       tableName,
       columns: data.columns,
@@ -66,6 +75,7 @@ export default defineComponent({
       tableDataFetchActionType,
       tableDataGetterType,
       defaultSort,
+      allCustomersEndpoint,
       resourceActionPermissions: ref({
         new: PERMISSION.CAN_CREATE_CUSTOMERS,
         view: PERMISSION.CAN_VIEW_CUSTOMERS,
