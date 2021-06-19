@@ -96,7 +96,8 @@ export default boot(
           });
         } else if (error?.response?.status === 403) {
           Notify.create({
-            message: 'You are not permitted to perform the requested action',
+            message:
+              'You are not permitted to perform the requested action. Make sure that you are viewing the right company.',
             type: 'negative',
             position: 'top',
             progress: true,

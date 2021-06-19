@@ -29,7 +29,7 @@
               done-color="positive"
               done-icon="done"
               :caption="
-                'Password was last changed at: ' + dateOfLastPasswordChange
+                'Password was last changed at: ' + lastPasswordChangeDate
               "
             >
               <q-input
@@ -446,8 +446,6 @@ export default defineComponent({
       }
     }
 
-    const dateOfLastPasswordChange = '';
-
     /* onBeforeMount(() => {
     }); */
 
@@ -473,10 +471,12 @@ export default defineComponent({
       }),
       submitCurrentPassword,
       revealPasswords,
-      dateOfLastPasswordChange,
       submitPasswordChangeCode,
       passwordChangeCompleted,
       submitNewPassword,
+      lastPasswordChangeDate: computed(
+        () => store.getters['auth/GET_LAST_PASSWORD_HISTORY']
+      ),
     };
   },
 });

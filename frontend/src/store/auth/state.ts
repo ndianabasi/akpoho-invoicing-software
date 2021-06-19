@@ -17,6 +17,7 @@ export interface AuthStateInterface {
   userProfile: UserProfile | null;
   currentCompany: StringIDNameInterface | null;
   authRole: RoleInterface | null;
+  lastPasswordHistory: string;
 }
 
 export interface UserProfile {
@@ -40,6 +41,7 @@ function state(): AuthStateInterface {
     userSummary: null,
     currentCompany: null,
     authRole: null,
+    lastPasswordHistory: '',
   };
 }
 

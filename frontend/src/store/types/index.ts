@@ -115,6 +115,7 @@ export interface LoginUserDataInterface {
   companies: StringIDNameInterface[];
   profile: UserProfileSummary;
   role: RoleInterface;
+  passwordHistories: Array<{ created_at: string; user_id: string }>;
 }
 
 export type LoginUserData = LoginUserSummary & LoginUserDataInterface;

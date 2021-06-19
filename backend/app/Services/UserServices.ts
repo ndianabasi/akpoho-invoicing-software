@@ -102,6 +102,12 @@ export default class UserServices {
               )
             })
             .preload('role', (roleQuery) => roleQuery.select(...['name']))
+            .preload('passwordHistories', (historiesQuery) =>
+              historiesQuery
+                .orderBy('created_at', 'desc')
+                .select(...['created_at'])
+                .first()
+            )
             .first()
 
           const serialisedUser = user?.serialize()

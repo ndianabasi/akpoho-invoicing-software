@@ -4,6 +4,7 @@
 import { GetterTree } from 'vuex';
 import { StateInterface } from '../index';
 import { AuthStateInterface } from './state';
+import { DateTime } from 'luxon';
 
 export interface AuthGettersInterface {
   getToken: (state: AuthStateInterface) => string;
@@ -62,6 +63,8 @@ const getters: GetterTree<AuthStateInterface, StateInterface> = {
         : '',
     };
   },
+  GET_LAST_PASSWORD_HISTORY: (state) =>
+    DateTime.fromISO(state.lastPasswordHistory).toLocaleString(),
 };
 
 export default getters;
