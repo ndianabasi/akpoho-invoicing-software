@@ -110,6 +110,8 @@ Route.group(() => {
   Route.get('/companies/:company_id', 'CompaniesController.show')
   // Edit a specific company
   Route.patch('/companies/:company_id', 'CompaniesController.update')
+  // Delete a specific company
+  Route.delete('/companies/:company_id', 'CompaniesController.destroy')
 
   // Get all customers within a company. Returns paginated result
   Route.get('/:company_id/customers', 'CustomersController.index')

@@ -225,7 +225,7 @@ export default class CompaniesController {
     })
     await requestedCompany?.save()
 
-    // Clear the user's entire cache
+    // Clear the company's entire cache
     const userCompaniesTags = await new UserServices({ id: auth?.user?.id }).getCompaniesCacheTags()
     const sets = [...userCompaniesTags]
     await CacheHelper.flushTags(sets)
@@ -233,5 +233,29 @@ export default class CompaniesController {
     return response.created({ data: requestedCompany?.id })
   }
 
-  public async destroy({}: HttpContextContract) {}
+  public async destroy({
+    response,
+    requestedCompany,
+    requestedUser,
+    bouncer,
+    auth,
+  }: HttpContextContract) {
+    if (requestedCompany) {
+      await bouncer.with('CompanyPolicy').authorize('delete', requestedCompany ?? undefined)
+
+      requestedCompany?.delete()
+
+      // Clear the company's entire cache
+      const userCompaniesTags = await new UserServices({
+        id: auth?.user?.id,
+      }).getCompaniesCacheTags()
+      const sets = [...userCompaniesTags]
+      await CacheHelper.flushTags(sets)
+
+      return response.created({ data: requestedUser?.id })
+    } else {
+      Logger.warn('Requested User not found in CompaniesController.destroy')
+      return response.abort({ message: 'Requested company not found' })
+    }
+  }
 }

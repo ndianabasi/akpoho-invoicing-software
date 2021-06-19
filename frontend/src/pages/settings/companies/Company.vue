@@ -48,13 +48,7 @@
               <q-item
                 v-if="resourcePermissions.canDelete"
                 clickable
-                @click.prevent="
-                  useDeleteResource({
-                    resource: 'company',
-                    resourceName: 'Company',
-                    payload: companyId,
-                  })
-                "
+                @click.prevent="handleDeletion"
               >
                 <q-item-section>
                   <q-btn flat icon="delete" />
@@ -104,6 +98,8 @@ import {
   TitleInfo,
 } from '../../../store/types';
 import { store } from '../../../store';
+import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'ViewCompany',
@@ -121,6 +117,9 @@ export default defineComponent({
   },
 
   setup(props) {
+    const router = useRouter();
+    const $q = useQuasar();
+
     const currentCompany = computed(
       () =>
         store.getters[
@@ -174,6 +173,33 @@ export default defineComponent({
       ];
     });
 
+    const handleDeletion = async function () {
+      await useDeleteResource({
+        resource: 'company',
+        resourceName: 'Company',
+        payload: props.companyId,
+      })
+        .then(() => {
+          const postDeletionAction = {
+            routeName: 'all_companies',
+            routeParams: undefined,
+          };
+
+          void router.push({
+            name: postDeletionAction?.routeName,
+            params: postDeletionAction?.routeParams,
+          });
+        })
+        .catch((error) => {
+          $q.notify({
+            type: 'negative',
+            message: JSON.stringify(error),
+            timeout: 5000,
+            position: 'top',
+          });
+        });
+    };
+
     onBeforeMount(() => {
       stopFetchCurrentlyViewedCompany();
     });
@@ -186,7 +212,7 @@ export default defineComponent({
         list: PERMISSION.CAN_LIST_COMPANIES,
         delete: PERMISSION.CAN_DELETE_COMPANIES,
       }),
-      useDeleteResource,
+      handleDeletion,
       companyProperties,
     };
   },

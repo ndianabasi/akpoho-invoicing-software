@@ -346,13 +346,7 @@
               <q-item
                 v-if="resourcePermissions.canDelete"
                 clickable
-                @click.prevent="
-                  useDeleteResource({
-                    resource: 'user',
-                    resourceName: 'User',
-                    payload: userId,
-                  })
-                "
+                @click.prevent="handleDeletion"
               >
                 <q-item-section>
                   <q-btn flat icon="delete" />
@@ -402,6 +396,8 @@ import {
   TitleInfo,
 } from '../../../store/types';
 import { store } from '../../../store';
+import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'ViewUser',
@@ -419,6 +415,9 @@ export default defineComponent({
   },
 
   setup(props) {
+    const router = useRouter();
+    const $q = useQuasar();
+
     const currentUser = computed(
       () =>
         store.getters['users/GET_CURRENTLY_VIEWED_USER'] as CurrentlyViewedUser
@@ -454,6 +453,33 @@ export default defineComponent({
       });
     });
 
+    const handleDeletion = async function () {
+      await useDeleteResource({
+        resource: 'user',
+        resourceName: 'User',
+        payload: props.userId,
+      })
+        .then(() => {
+          const postDeletionAction = {
+            routeName: 'all_users',
+            routeParams: undefined,
+          };
+
+          void router.push({
+            name: postDeletionAction?.routeName,
+            params: postDeletionAction?.routeParams,
+          });
+        })
+        .catch((error) => {
+          $q.notify({
+            type: 'negative',
+            message: JSON.stringify(error),
+            timeout: 5000,
+            position: 'top',
+          });
+        });
+    };
+
     onBeforeMount(() => {
       stopFetchCurrentlyViewedUser();
     });
@@ -467,7 +493,7 @@ export default defineComponent({
         list: PERMISSION.CAN_LIST_USERS,
         delete: PERMISSION.CAN_DELETE_USERS,
       }),
-      useDeleteResource,
+      handleDeletion,
     };
   },
 });
