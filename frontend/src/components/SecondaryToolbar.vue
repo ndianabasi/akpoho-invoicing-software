@@ -21,22 +21,39 @@
 
       <breadcrumbs v-if="!$q.screen.lt.sm" :routes="breadcrumbsRoutes" />
     </q-toolbar>
-    <q-toolbar v-else class="q-pl-lg">
-      <q-btn flat round dense icon="menu" />
-      <q-toolbar-title> Toolbar </q-toolbar-title>
-      <q-btn flat round dense icon="more_vert" />
+    <q-toolbar
+      v-else
+      class="
+        q-pl-lg q-py-sm
+        items-center
+        justify-center
+        q-mx-auto q-gutter-md-md q-gutter-sm-sm
+      "
+    >
+      <q-btn
+        v-for="(action, index) in selectionActions"
+        :key="action.label"
+        flat
+        round
+        dense
+        :icon="action.icon"
+        @click.prevent="handleSelectionAction(index)"
+      >
+        <q-tooltip class="bg-accent">{{ action.label }}</q-tooltip>
+      </q-btn>
     </q-toolbar>
   </q-page-sticky>
 </template>
 
 <script lang="ts">
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { defineComponent, computed, ref, watchEffect } from 'vue';
+import { defineComponent, computed, ref, watchEffect, inject } from 'vue';
 import { useRoute } from 'vue-router';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { useMeta } from 'quasar';
-import { GenericTableData } from '../types/table';
+import { GenericTableData, SelectionAction } from '../types/table';
 import { useStore } from 'vuex';
+import useDeleteResource from '../composables/useDeleteResource';
 
 export default defineComponent({
   name: 'SecondaryToolbar',
@@ -96,10 +113,34 @@ export default defineComponent({
       () => tableSelections.value.length > 0
     );
 
+    const selectionActions = computed(
+      () =>
+        store.getters['quasar_tables/GET_SELECTION_ACTIONS'] as Readonly<
+          SelectionAction[]
+        >
+    );
+
+    const handleSelectionAction = async function (index: number) {
+      const clickedAction = selectionActions.value[0];
+      const { resourceName, resourceNamePlural, resourceType } = clickedAction;
+      if (clickedAction.actionType === 'delete') {
+        await useDeleteResource({
+          resource: resourceType,
+          resourceName:
+            tableSelections.value.length > 1
+              ? resourceNamePlural
+              : resourceName,
+          payload: JSON.parse(JSON.stringify(tableSelections.value)), // convert proxy to object
+        });
+      }
+    };
+
     return {
       breadcrumbsRoutes,
       currentRouteLabel,
       tableSelectionActive,
+      selectionActions,
+      handleSelectionAction,
     };
   },
 });

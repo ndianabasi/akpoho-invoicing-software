@@ -97,7 +97,10 @@ Route.group(() => {
 
   // Create a new company
   Route.post('/companies', 'CompaniesController.store')
+  // Get a companies for a user
   Route.get('/companies', 'CompaniesController.index')
+  // Delete requested companies
+  Route.delete('/companies', 'CompaniesController.destroy')
 })
   .prefix('/v1')
   .middleware('auth')

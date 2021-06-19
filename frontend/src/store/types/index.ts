@@ -365,3 +365,30 @@ export interface FormSchemaProperties {
 }
 
 export type FormSchema = Record<string, FormSchemaProperties>;
+
+export type ResourceType =
+  | 'user'
+  | 'company'
+  | 'customer_address'
+  | 'quotation'
+  | 'invoice'
+  | 'receipt'
+  | 'customer';
+
+export type ResourceName =
+  | 'User'
+  | 'Company'
+  | 'Customer Address'
+  | 'Quotation'
+  | 'Invoice'
+  | 'Receipt'
+  | 'Customer';
+
+export type ResourceNamePlural =
+  | 'Users'
+  | 'Companies'
+  | 'Customer Addresses'
+  | 'Quotations'
+  | 'Invoices'
+  | 'Receipts'
+  | 'Customers';

@@ -4,14 +4,19 @@
 //import { computed, reactive } from 'vue';
 import { store } from '../store';
 import { Dialog } from 'quasar';
+import {
+  ResourceName,
+  ResourceNamePlural,
+  ResourceType,
+} from 'src/store/types';
 
 export default function ({
   resource,
   resourceName,
   payload,
 }: {
-  resource: 'user' | 'company';
-  resourceName: string;
+  resource: ResourceType;
+  resourceName: ResourceName | ResourceNamePlural;
   payload: unknown;
 }) {
   return new Promise((resolve, reject) => {
@@ -42,6 +47,8 @@ export default function ({
           actionName = 'users/DELETE_USER';
         } else if (resource === 'company') {
           actionName = 'companies/DELETE_COMPANY';
+        } else if (resource === 'customer') {
+          actionName = 'customers/DELETE_CUSTOMER';
         } else {
           actionName = '';
           throw new Error('A valid resource is not specified');

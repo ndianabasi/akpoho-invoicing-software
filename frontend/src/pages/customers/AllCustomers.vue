@@ -19,6 +19,7 @@
     :table-data-fetch-end-point="allCustomersEndpoint"
     show-selections
     route-param="customerId"
+    :selection-actions="selectionActions"
   ></quasar-table>
 </template>
 
@@ -27,11 +28,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { defineComponent, reactive, ref, computed } from 'vue';
+import { defineComponent, reactive, ref, computed, Ref } from 'vue';
 import { useStore } from 'vuex';
-import { PERMISSION, StringIDNameInterface } from '../../store/types';
+import {
+  PERMISSION,
+  ResourceName,
+  ResourceNamePlural,
+  ResourceType,
+  StringIDNameInterface,
+} from '../../store/types';
 import customerColumns from '../../components/data/table-definitions/customers';
 import QuasarTable from '../../components/QuasarTable.vue';
+import { SelectionAction } from '../../types/table';
 
 export default defineComponent({
   name: 'AllCustomers',
@@ -67,6 +75,17 @@ export default defineComponent({
       return `/${currentCompany.id}/customers`;
     });
 
+    const selectionActions: Ref<SelectionAction[]> = ref([
+      {
+        label: 'Delete',
+        icon: 'delete',
+        actionType: 'delete',
+        resourceType: 'customer' as ResourceType,
+        resourceName: 'Customer' as ResourceName,
+        resourceNamePlural: 'Customers' as ResourceNamePlural,
+      },
+    ]);
+
     return {
       tableName,
       columns: data.columns,
@@ -82,6 +101,7 @@ export default defineComponent({
         edit: PERMISSION.CAN_EDIT_CUSTOMERS,
         delete: PERMISSION.CAN_DELETE_CUSTOMERS,
       }),
+      selectionActions,
     };
   },
 });

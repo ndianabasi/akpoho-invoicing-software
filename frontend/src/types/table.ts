@@ -1,4 +1,9 @@
-import { SelectOption } from 'src/store/types';
+import {
+  ResourceName,
+  ResourceNamePlural,
+  ResourceType,
+  SelectOption,
+} from 'src/store/types';
 
 type FieldFn = (row: TableRow) => string;
 //declare type Format = (value: string) => string;
@@ -62,4 +67,13 @@ export interface FetchTableDataInterface {
     paginationParams?: PaginationParams;
     queryObject?: { [index: string]: string | boolean };
   }): Promise<void>;
+}
+
+export interface SelectionAction {
+  label: string;
+  icon: string;
+  actionType: string;
+  resourceType: ResourceType;
+  resourceName: ResourceName;
+  resourceNamePlural: ResourceNamePlural;
 }

@@ -56,15 +56,19 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
     });
   },
 
-  async DELETE_CUSTOMER({ rootGetters }, ID: string) {
+  async DELETE_CUSTOMER(ctx, payload: string | string[]) {
+    console.log(payload);
+
     return new Promise(async (resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const currentCompany = rootGetters[
-        'auth/GET_CURRENT_COMPANY'
-      ] as StringIDNameInterface;
+      const isArray = Array.isArray(payload);
+      if (typeof payload !== 'string' && !isArray)
+        return reject('Invalid payload provided');
 
       await $http
-        .delete(`/${currentCompany.id}/customers/${ID}`)
+        .delete(
+          typeof payload === 'string' ? `/customers/${payload}` : '/customers',
+          isArray ? { data: payload } : undefined
+        )
         .then((res: HttpResponse) => {
           return resolve(res.data);
         })

@@ -312,6 +312,8 @@ import {
   Ref,
   onMounted,
   watch,
+  provide,
+  readonly,
 } from 'vue';
 import { useStore } from 'vuex';
 import {
@@ -438,6 +440,11 @@ export default defineComponent({
     rosPerPageOptions: {
       type: Array,
       default: () => [5, 10, 15, 20, 30, 50, 100],
+    },
+    selectionActions: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
   },
 
@@ -700,6 +707,10 @@ export default defineComponent({
     onMounted(async () => {
       await fetchTableData({ queryObject: filterForm });
       store.commit('quasar_tables/SET_SELECTED_ROWS', null);
+      store.commit(
+        'quasar_tables/SET_SELECTION_ACTIONS',
+        readonly(ref(props.selectionActions))
+      );
     });
 
     const currentCompany = computed(

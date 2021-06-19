@@ -1,5 +1,7 @@
+import { SelectionAction } from 'src/types/table';
 import { MutationTree } from 'vuex';
 import { QuasarTableStateInterface, DataRows } from './state';
+import { Ref } from 'vue';
 
 const mutation: MutationTree<QuasarTableStateInterface> = {
   SET_TABLE_DATA(state: QuasarTableStateInterface, payload: DataRows) {
@@ -17,6 +19,13 @@ const mutation: MutationTree<QuasarTableStateInterface> = {
     if (payload === null) state.selectedRows = [];
     else if (payload.length === 0) state.selectedRows = [];
     else state.selectedRows = payload.map((row) => row.id as string);
+  },
+
+  SET_SELECTION_ACTIONS(
+    state: QuasarTableStateInterface,
+    payload: Readonly<Ref<SelectionAction[]>>
+  ) {
+    state.selectionActions = payload.value;
   },
 };
 
