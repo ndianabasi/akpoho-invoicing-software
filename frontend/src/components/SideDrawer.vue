@@ -47,6 +47,7 @@
             clickable
             class="AIS__drawer-item"
             :to="{ name: link.link }"
+            active-class="AIS__drawer-item__active"
           >
             <q-item-section avatar>
               <q-icon :name="link.icon" />
@@ -118,6 +119,7 @@
 import { defineComponent, computed, ref, watch, Ref, watchEffect } from 'vue';
 import { useStore } from 'vuex';
 import { SelectOption, StringIDNameInterface } from '../store/types';
+import { useRoute } from 'vue-router';
 
 export default defineComponent({
   name: 'SideDrawer',
@@ -130,6 +132,7 @@ export default defineComponent({
   },
   setup(/* props */) {
     const store = useStore();
+    const route = useRoute();
 
     const selectedCompany: Ref<SelectOption | null> = ref(null);
     let currentCompany: Ref<StringIDNameInterface | null> = ref(null);
@@ -209,6 +212,7 @@ export default defineComponent({
       selectedCompany,
       userCompanies: companies,
       handleSelectedCompanyUpdate,
+      isActive: (link: string) => link === route.name,
     };
   },
 });

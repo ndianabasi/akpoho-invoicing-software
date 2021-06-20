@@ -103,6 +103,14 @@
       color: $accent;
     }
   }
+
+  .AIS__drawer-item__active.q-item,
+  .AIS__sticky-sidebar-item__active.q-item {
+    .q-icon,
+    .q-item__label {
+      color: var(--q-accent);
+    }
+  }
 }
 // Light mode ends
 
@@ -114,6 +122,10 @@
 .sticky-sidebar {
   .q-btn {
     color: $grey-9;
+  }
+
+  .q-item {
+    padding: 0;
   }
 }
 
@@ -155,4 +167,8 @@
 
 input[type='file'] {
   display: none;
+}
+
+.AIS__sticky-sidebar-item:hover > .q-focus-helper {
+  background: none !important;
 }
