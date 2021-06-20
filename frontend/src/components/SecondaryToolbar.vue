@@ -54,7 +54,7 @@ import { useMeta } from 'quasar';
 import { GenericTableData, SelectionAction } from '../types/table';
 import { useStore } from 'vuex';
 import useDeleteResource from '../composables/useDeleteResource';
-import Emittery from 'emittery';
+import { emitter } from '../boot/EventBus';
 
 export default defineComponent({
   name: 'SecondaryToolbar',
@@ -133,7 +133,7 @@ export default defineComponent({
               : resourceName,
           payload: JSON.parse(JSON.stringify(tableSelections.value)), // convert proxy to object
         }).then(() => {
-          /* void emitter.emit('quasar-table::refresh'); */
+          void emitter.emit('quasar-table::refresh');
         });
       }
     };

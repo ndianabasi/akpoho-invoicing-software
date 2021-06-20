@@ -35,6 +35,7 @@ module.exports = configure(function (/* ctx */) {
       'httpNoAuth',
       'global-components',
       'addressbar-color',
+      'EventBus',
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

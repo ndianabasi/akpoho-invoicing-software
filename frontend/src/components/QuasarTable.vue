@@ -327,6 +327,7 @@ import { ResponseData } from '../store/types';
 import { useRouter, useRoute } from 'vue-router';
 import useResourcePermissions from '../composables/useResourcePermissions';
 import { isEmpty } from '../helpers/utils';
+import { emitter } from '../boot/EventBus';
 
 export default defineComponent({
   name: 'QuasarTable',
@@ -701,21 +702,22 @@ export default defineComponent({
       await fetchTableData({ queryObject: filterForm });
     };
 
-
-
     onBeforeUnmount(() => {
-      /* void emitter.off('quasar-table::refresh', () => void 0); */
+      void emitter.off('quasar-table::refresh', () => {
+        store.commit('quasar_tables/SET_SELECTED_ROWS', null);
+        selectedRows.value = [];
+      });
     });
 
     onMounted(async () => {
       await tableRefresh();
 
       // Listen for table refresh event
-    /* Emitter.on('quasar-table::refresh', async () => {
-      console.log('listen for quasar-table::refresh');
-
-      await tableRefresh();
-    }); */
+      emitter.on('quasar-table::refresh', async () => {
+        store.commit('quasar_tables/SET_SELECTED_ROWS', null);
+        selectedRows.value = [];
+        await tableRefresh();
+      });
 
       store.commit('quasar_tables/SET_SELECTED_ROWS', null);
       store.commit(
