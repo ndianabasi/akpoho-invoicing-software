@@ -66,6 +66,7 @@
             clickable
             class="AIS__drawer-item"
             :to="{ name: link.link }"
+            active-class="AIS__drawer-item__active"
           >
             <q-item-section avatar>
               <q-icon :name="link.icon" />
@@ -84,6 +85,7 @@
             clickable
             class="AIS__drawer-item"
             :to="{ name: link.link }"
+            active-class="AIS__drawer-item__active"
           >
             <q-item-section avatar>
               <q-icon :name="link.icon" />

@@ -46,4 +46,9 @@ export const permissions = [
   'can_delete_companies',
   'can_list_companies',
   'can_view_company_dashboard',
+  'can_create_inventories',
+  'can_view_inventories',
+  'can_edit_inventories',
+  'can_delete_inventories',
+  'can_list_inventories',
 ]

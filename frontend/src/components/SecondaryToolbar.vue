@@ -122,7 +122,7 @@ export default defineComponent({
     );
 
     const handleSelectionAction = async function (index: number) {
-      const clickedAction = selectionActions.value[0];
+      const clickedAction = selectionActions.value[index];
       const { resourceName, resourceNamePlural, resourceType } = clickedAction;
       if (clickedAction.actionType === 'delete') {
         await useDeleteResource({

@@ -19,6 +19,7 @@ function state(): MenusStateInterface {
       { icon: 'request_page', title: 'Quotations', link: 'quotations' },
       { icon: 'list_alt', title: 'Invoices', link: 'invoices' },
       { icon: 'receipt', title: 'Receipts', link: 'receipts' },
+      { icon: 'inventory', title: 'Inventories', link: 'inventories' },
     ],
     links2: [
       /* { icon: 'archive', title: 'Archive' },

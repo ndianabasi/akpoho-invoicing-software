@@ -61,16 +61,16 @@ export default function () {
     const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       if (isLoggedIn) {
-        next();
+        return next();
       } else {
         Notify.create({
           type: 'negative',
           message: 'You are not logged in.',
           position: 'top',
         });
-        next({ name: 'Login' });
+        return next({ name: 'Login' });
       }
-    } else next();
+    } else return next();
   });
 
   Router.beforeEach((to, from, next) => {
@@ -78,10 +78,10 @@ export default function () {
       store.getters['permissions/GET_USER_PERMISSION'];
     if (to.meta && !!to.meta.permission) {
       if (GET_USER_PERMISSION(to.meta.permission)) {
-        next();
-      } else return false;
+        return next();
+      } else return next(from);
     } else {
-      next();
+      return next();
     }
   });
 

@@ -82,6 +82,55 @@ const routes: CustomRouteRecord[] = [
         ],
       },
       {
+        path: 'inventory',
+        component: () => import('pages/inventories/InventoryIndex.vue'),
+        meta: {
+          label: 'Inventories',
+          icon: 'people',
+          permission: 'can_list_inventories',
+        },
+        children: [
+          {
+            path: '',
+            component: () => import('pages/inventories/Inventories.vue'),
+            name: 'inventories',
+            meta: {
+              label: 'All Inventories',
+              icon: 'people',
+            },
+          },
+          {
+            path: ':inventoryId/view',
+            component: () => import('pages/inventories/Inventory.vue'),
+            props: true,
+            name: 'view_inventory',
+            meta: {
+              label: 'View Inventory',
+              permission: 'can_view_inventories',
+            },
+          },
+          {
+            path: ':inventoryId/edit',
+            component: () => import('pages/inventories/EditInventory.vue'),
+            props: true,
+            name: 'edit_inventory',
+            meta: {
+              label: 'Edit Inventory',
+              permission: 'can_edit_inventories',
+            },
+          },
+          {
+            path: 'new',
+            component: () => import('pages/inventories/CreateInventory.vue'),
+            name: 'create_inventory',
+            meta: {
+              label: 'New Inventory',
+              permission: 'can_create_inventories',
+            },
+          },
+        ],
+      },
+      {
         path: 'quotations',
         name: 'quotations',
         component: () => import('pages/quotations/QuotationIndex.vue'),
