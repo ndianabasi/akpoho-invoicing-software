@@ -67,10 +67,16 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
       await $http
         .delete(
           typeof payload === 'string' ? `/customers/${payload}` : '/customers',
-          isArray ? { data: payload } : undefined
+          isArray
+            ? {
+                data: {
+                  customers: payload,
+                },
+              }
+            : undefined
         )
         .then((res: HttpResponse) => {
-          return resolve(res.data);
+          return resolve(res.data.message);
         })
         .catch((error: HttpError) => {
           return reject(error);

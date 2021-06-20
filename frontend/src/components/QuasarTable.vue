@@ -312,7 +312,6 @@ import {
   Ref,
   onMounted,
   watch,
-  provide,
   readonly,
 } from 'vue';
 import { useStore } from 'vuex';
@@ -457,6 +456,7 @@ export default defineComponent({
     const route = useRoute();
     const selectedRows = ref([] as GenericTableData[]);
     const tableRows: Ref<GenericTableData[]> = ref([]);
+
     const pagination = ref({
       sortBy: props.defaultSort.sortBy || '',
       descending: props.defaultSort.descending || false,
@@ -487,7 +487,6 @@ export default defineComponent({
     );
 
     const existingQueryString = route.query as { [index: string]: string };
-    console.log(existingQueryString);
 
     const filterFormArray: string[] = filterableColumns.value.map(
       (col) => col.name as string
@@ -550,7 +549,6 @@ export default defineComponent({
     ): Promise<void> {
       const paginationParams = options?.paginationParams;
       const queryObject = options?.queryObject;
-      console.log(queryObject);
 
       loading.value = true;
 
@@ -622,7 +620,6 @@ export default defineComponent({
           }
         }
       }
-      console.log({ activeFilter });
 
       // clear query string
       void router.push({ query: activeFilter });
@@ -700,12 +697,26 @@ export default defineComponent({
       }
     };
 
+    const tableRefresh = async function () {
+      await fetchTableData({ queryObject: filterForm });
+    };
+
+
+
     onBeforeUnmount(() => {
-      //stopFetchActionWatchEffect();
+      /* void emitter.off('quasar-table::refresh', () => void 0); */
     });
 
     onMounted(async () => {
-      await fetchTableData({ queryObject: filterForm });
+      await tableRefresh();
+
+      // Listen for table refresh event
+    /* Emitter.on('quasar-table::refresh', async () => {
+      console.log('listen for quasar-table::refresh');
+
+      await tableRefresh();
+    }); */
+
       store.commit('quasar_tables/SET_SELECTED_ROWS', null);
       store.commit(
         'quasar_tables/SET_SELECTION_ACTIONS',
@@ -730,8 +741,6 @@ export default defineComponent({
             const value = newQueryString[item];
             let normalisedValue;
             if (value !== undefined && value !== null && value !== '') {
-              console.log(value, typeof value);
-
               if (value === 'true') normalisedValue = true;
               if (value === 'false') normalisedValue = false;
               else normalisedValue = value;

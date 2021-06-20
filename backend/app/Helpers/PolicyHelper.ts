@@ -119,6 +119,58 @@ const accessCompanyCustomer = async (
   return Bouncer.deny('You are not permitted to perform this action!')
 }
 
+export const accessCustomers = async (
+  resourcePermission: string,
+  authUser: User,
+  customers: Customer | string[]
+) => {
+  const resourcePermitted = await PermissionHelper.hasResourcePermission({
+    resourcePermission,
+    user: authUser,
+    loggable: true,
+  })
+
+  await authUser.load('companies')
+  const authUserCompanies = authUser.companies
+
+  if (customers && Array.isArray(customers)) {
+    /**
+     * Array to hold each permitted customer
+     */
+    const permitted: boolean[] = []
+
+    for (let i = 0; i < customers.length; i++) {
+      const customerId = customers[i]
+      const customer = await Customer.findOrFail(customerId)
+
+      // Load customer company
+      await customer.load('company')
+      const customerCompany = customer.company
+
+      if (
+        authUserCompanies.some((authUserCompany) => authUserCompany.id === customerCompany.id) &&
+        resourcePermitted
+      ) {
+        permitted.push(true)
+      } else permitted.push(false)
+    }
+    if (permitted.every((value) => value === true)) return true
+    else return Bouncer.deny('You are not permitted to perform this action!')
+  } else {
+    const customer = customers
+    // Load customer company
+    await customer.load('company')
+    const customerCompany = customer.company
+
+    if (
+      authUserCompanies.some((authUserCompany) => authUserCompany.id === customerCompany.id) &&
+      resourcePermitted
+    ) {
+      return true
+    } else return Bouncer.deny('You are not permitted to perform this action!')
+  }
+}
+
 const serialisedAuthUserCompanyIds = async function (authUser: User) {
   await authUser.load('companies')
   const authUserCompanies = authUser.companies

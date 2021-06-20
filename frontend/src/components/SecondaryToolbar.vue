@@ -47,13 +47,14 @@
 
 <script lang="ts">
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { defineComponent, computed, ref, watchEffect, inject } from 'vue';
+import { defineComponent, computed, ref, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import Breadcrumbs from './Breadcrumbs.vue';
 import { useMeta } from 'quasar';
 import { GenericTableData, SelectionAction } from '../types/table';
 import { useStore } from 'vuex';
 import useDeleteResource from '../composables/useDeleteResource';
+import Emittery from 'emittery';
 
 export default defineComponent({
   name: 'SecondaryToolbar',
@@ -131,6 +132,8 @@ export default defineComponent({
               ? resourceNamePlural
               : resourceName,
           payload: JSON.parse(JSON.stringify(tableSelections.value)), // convert proxy to object
+        }).then(() => {
+          /* void emitter.emit('quasar-table::refresh'); */
         });
       }
     };

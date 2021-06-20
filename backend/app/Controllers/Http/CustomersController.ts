@@ -1,5 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
+import Customer from 'App/Models/Customer'
 import CustomerTitle from 'App/Models/CustomerTitle'
 import CustomerAddressValidator from 'App/Validators/CustomerAddressValidator'
 import CustomerValidator from 'App/Validators/CustomerValidator'
@@ -343,19 +344,53 @@ export default class CustomersController {
   }
 
   public async destroy({
+    request,
     response,
     requestedCompany,
     requestedCustomer,
     bouncer,
   }: HttpContextContract) {
-    await bouncer.with('CustomerPolicy').authorize('delete', requestedCompany!, requestedCustomer!)
+    /**
+     * This method can be used to delete individual customers or multi-customers
+     * For multiple customers, we need to check if the user is authorised to delete
+     * all requested customers. If any check fails, the request will be aborted.
+     */
 
-    await requestedCustomer?.delete()
+    // Check if the body contains an array of requested customers
+    const { customers } = request.body()
+    if (customers && Array.isArray(customers)) {
+      // This is a request to delete multiple customers
+      await bouncer.with('CustomerPolicy').authorize('massDelete', customers)
 
-    return response.ok({
-      message: 'Customer was deleted successfully.',
-      data: requestedCustomer?.id,
-    })
+      for (let i = 0; i < customers.length; i++) {
+        const customerId = customers[i]
+        let customer: Customer
+        try {
+          customer = await Customer.findOrFail(customerId)
+          await customer.delete()
+        } catch (error) {
+          return response.abort({ message: 'Customer not found' })
+        }
+      }
+
+      return response.ok({
+        message: `${
+          customers.length > 1 ? 'Customers were' : 'Customer was'
+        } deleted successfully.`,
+        data: customers,
+      })
+    } else {
+      await bouncer
+        .with('CustomerPolicy')
+        .authorize('delete', requestedCompany!, requestedCustomer!)
+
+      await requestedCustomer?.delete()
+
+      return response.ok({
+        message: 'Customer was deleted successfully.',
+        data: requestedCustomer?.id,
+      })
+    }
   }
 
   public async destroyAddress({

@@ -29,8 +29,6 @@ const mutation: MutationTree<AuthStateInterface> = {
 
   SET_USER_DATA(state: AuthStateInterface, payload: LoginUserData) {
     try {
-      console.log(payload.profile.profilePictureFile);
-
       state.userCompanies = payload.companies;
       state.userProfile = {
         first_name: payload.profile.first_name,

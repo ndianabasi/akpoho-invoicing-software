@@ -101,6 +101,9 @@ Route.group(() => {
   Route.get('/companies', 'CompaniesController.index')
   // Delete requested companies
   Route.delete('/companies', 'CompaniesController.destroy')
+
+  // Delete requested customers
+  Route.delete('/customers', 'CustomersController.destroy')
 })
   .prefix('/v1')
   .middleware('auth')

@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 //import { computed, reactive } from 'vue';
 import { store } from '../store';
-import { Dialog } from 'quasar';
+import { Dialog, Notify } from 'quasar';
 import {
   ResourceName,
   ResourceNamePlural,
@@ -56,7 +56,7 @@ export default function ({
 
         await store
           .dispatch(actionName, payload)
-          .then(() => {
+          .then((message: string) => {
             // Show success message before dialog is hidden programmatically
             deleteProgressDialog.update({
               title: 'Success',
@@ -65,6 +65,12 @@ export default function ({
             });
             // Avoid screen flicker for quick operations
             setTimeout(() => {
+              Notify.create({
+                type: 'positive',
+                message,
+                position: 'top',
+                timeout: 5000,
+              });
               deleteProgressDialog.hide();
               return resolve(`${resourceName} was successfully deleted`);
             }, 1500);
