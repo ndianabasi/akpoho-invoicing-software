@@ -1,5 +1,5 @@
 import Factory from '@ioc:Adonis/Lucid/Factory'
-import Company from 'App/Models/Company'
+import Company, { CompanyType } from 'App/Models/Company'
 import slugify from 'slugify'
 import CustomerFactory from './CustomerFactory'
 import UserFactory from './UserFactory'
@@ -16,6 +16,8 @@ const CompanyFactory = Factory.define(Company, ({ faker }) => {
     state: null,
     country: null,
     slug: slugify(companyName, { lower: true, strict: true }),
+    type: faker.random.arrayElement(['personal', 'corporate']) as CompanyType,
+    website: faker.internet.url(),
   }
 
   //console.log(generatedCompany)

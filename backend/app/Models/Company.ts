@@ -20,6 +20,8 @@ import State from 'App/Models/State'
 import Country from 'App/Models/Country'
 import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
+export type CompanyType = 'personal' | 'corporate'
+
 export default class Company extends BaseModel {
   public static selfAssignPrimaryKey = true
 
@@ -45,7 +47,7 @@ export default class Company extends BaseModel {
   public city: string
 
   @column()
-  public type: 'personal' | 'corporate'
+  public type: CompanyType
 
   @column()
   public stateId: number | null
