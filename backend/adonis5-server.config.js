@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'Adonis5_Demo_Api_Server',
-      script: './build/server.js',
+      script: './server.js',
       watch: true,
       ignore_watch: ['public', 'private_uploads'],
       watch_options: {
