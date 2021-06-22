@@ -9,15 +9,19 @@ module.exports = {
         persistent: true,
         ignoreInitial: true,
       },
+      env: {
+        // Set this as the default environment for this demo config file
+        NODE_ENV: 'demo',
+      },
       env_production: {
         NODE_ENV: 'production',
-      },
-      env_demo: {
-        NODE_ENV: 'demo',
       },
       instances: 1,
       autorestart: true,
       exec_mode: 'cluster',
+      kill_timeout: 3000,
+      wait_ready: true,
+      listen_timeout: 3000,
     },
   ],
 }
