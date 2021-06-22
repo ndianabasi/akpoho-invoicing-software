@@ -10,10 +10,6 @@ module.exports = {
         ignoreInitial: true,
       },
       env: {
-        // Set this as the default environment for this demo config file
-        NODE_ENV: 'demo',
-      },
-      env_production: {
         NODE_ENV: 'production',
       },
       instances: 1,
