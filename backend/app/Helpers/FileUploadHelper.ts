@@ -170,9 +170,10 @@ class FileUploadHelper {
       return this.uploadFileAndPersist(fileData)
     }
 
-    await Promise.all(
-      fileArray.map((file: AttachedFile, idx: number) => doUpload(file, fileInfoArray[idx] || {}))
-    )
+    for (let i = 0; i < fileArray.length; i++) {
+      const file: AttachedFile = fileArray[i]
+      await doUpload(file, fileInfoArray[i] || {})
+    }
 
     return this.uploadedFileModel
   }
