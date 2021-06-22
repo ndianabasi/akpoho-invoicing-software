@@ -36,7 +36,7 @@ export default class Companies extends BaseSchema {
         .onUpdate('CASCADE')
 
       table.index(
-        ['id', 'name', 'email', 'phone_number', 'address', 'city', 'country', 'slug'],
+        ['id', 'name', 'email', 'phone_number', 'state_id', 'country_id', 'slug'],
         'companies_full_index'
       )
     })
