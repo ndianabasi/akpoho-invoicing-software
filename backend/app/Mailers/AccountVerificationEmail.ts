@@ -5,6 +5,8 @@ import { commonEmailProperties } from 'App/Helpers/utils'
 export default class AccountVerificationEmail extends BaseMailer {
   constructor(private newUser: User, private emailVerificationLink: string) {
     super()
+    this.newUser = newUser
+    this.emailVerificationLink = emailVerificationLink
   }
 
   public async prepare(message: MessageContract) {

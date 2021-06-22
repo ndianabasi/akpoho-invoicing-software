@@ -1,6 +1,5 @@
 import { BasePolicy } from '@ioc:Adonis/Addons/Bouncer'
 import User from 'App/Models/User'
-import Customer from 'App/Models/Customer'
 import Company from 'App/Models/Company'
 import { accessCompany, accessCompanyUser } from 'App/Helpers/PolicyHelper'
 

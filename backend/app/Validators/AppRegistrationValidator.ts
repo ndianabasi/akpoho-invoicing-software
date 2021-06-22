@@ -1,6 +1,6 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { passwordRegex, UUID_REGEX } from 'App/Helpers/utils'
+import { passwordRegex } from 'App/Helpers/utils'
 
 export default class AppRegistrationValidator {
   constructor(protected ctx: HttpContextContract) {}

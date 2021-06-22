@@ -5,14 +5,13 @@ import {
   beforeCreate,
   belongsTo,
   BelongsTo,
-  afterFetch,
   computed,
 } from '@ioc:Adonis/Lucid/Orm'
 import UuidHook from 'App/Models/Hooks/UUIDHook'
 import User from 'App/Models/User'
 import Country from 'App/Models/Country'
 import State from 'App/Models/State'
-import UploadedFile, { FileFormats } from 'App/Models/UploadedFile'
+import UploadedFile from 'App/Models/UploadedFile'
 import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
 export default class UserProfile extends BaseModel {

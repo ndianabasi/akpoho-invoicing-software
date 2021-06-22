@@ -19,7 +19,7 @@ const createDirectory = function (relativeDirPath: string) {
     console.log(fullDirPath)
     fs.promises
       .readdir(fullDirPath)
-      .then((_data) => {
+      .then(() => {
         Logger.info(
           `Helpers/createDirectory.js -> createDirectory(): dir '${relativeDirPath}' already exists.`
         )

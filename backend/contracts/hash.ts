@@ -7,6 +7,7 @@
  */
 
 declare module '@ioc:Adonis/Core/Hash' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   import { HashDrivers } from '@ioc:Adonis/Core/Hash'
 
   interface HashersList {
