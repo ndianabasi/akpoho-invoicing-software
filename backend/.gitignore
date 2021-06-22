@@ -10,4 +10,4 @@ app/Helpers/FileUploadHelper_.ts
 app/Helpers/ImageManipulationHelper.ts
 app/Helpers/UploadHelper.ts
 app/Controllers/Http/examples
-public/uploads/*
+public/uploads/profile_pictures
