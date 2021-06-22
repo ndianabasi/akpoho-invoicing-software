@@ -8,7 +8,6 @@ const UserProfileFactory = Factory.define(UserProfile, ({ faker }) => {
     phone_number: faker.phone.phoneNumber(),
     address: faker.address.streetAddress(true),
     city: faker.address.city(),
-    profile_picture: faker.image.avatar(),
   }
 
   //console.log(generatedProfile)
