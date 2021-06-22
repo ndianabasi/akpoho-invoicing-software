@@ -3,7 +3,7 @@ import Country from 'App/Models/Country'
 import State from 'App/Models/State'
 import countriesStatesData from '../data/countries_states'
 
-export default class State_2Seeder extends BaseSeeder {
+export default class StateSeeder2 extends BaseSeeder {
   public async run() {
     for (const countryData of countriesStatesData) {
       try {

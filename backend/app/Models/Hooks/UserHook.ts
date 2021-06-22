@@ -61,8 +61,8 @@ const UserHook: UserHookContract = {
   },
 
   generateActivationCode: (userInstance) => {
-    userInstance.activation_code = crypto.randomBytes(20).toString('hex')
-    userInstance.activation_code_expires_at = DateTime.now().plus({ days: 2 })
+    userInstance.activationCode = crypto.randomBytes(20).toString('hex')
+    userInstance.activationCodeExpiresAt = DateTime.now().plus({ days: 2 })
   },
 }
 

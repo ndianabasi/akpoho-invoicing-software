@@ -11,7 +11,7 @@ export default class UserServices {
   protected id: string | undefined
   protected user: User | null
 
-  public constructor(userOptions?: UserOptions) {
+  constructor(userOptions?: UserOptions) {
     if (userOptions) {
       const { email, id } = userOptions
       if (email && id)
@@ -54,11 +54,11 @@ export default class UserServices {
     }
   }
 
-  async getCompaniesCacheTags(): Promise<string[]> {
+  public async getCompaniesCacheTags(): Promise<string[]> {
     const companies = await this.getUserCompanies()
 
-    let companiesCacheTags: string[] = [],
-      companiesUsersCacheTags: string[] = []
+    let companiesCacheTags: string[] = []
+    let companiesUsersCacheTags: string[] = []
 
     if (companies?.length) {
       companiesCacheTags = companies?.map(
@@ -206,12 +206,12 @@ export default class UserServices {
    */
   public async getSuperAdmins(serialise = false, filters: string[]): Promise<User[] | null> {
     const superAdmins = await User.query().withScopes((scopes) => scopes.SuperAdmins())
-    if (!!superAdmins.length) {
+    if (superAdmins.length) {
       return serialise
         ? superAdmins.map(
             (superAdmin) =>
               superAdmin.serialize(
-                !!filters.length ? { fields: { pick: [...filters] } } : void 0
+                filters.length ? { fields: { pick: [...filters] } } : void 0
               ) as User
           )
         : (superAdmins as User[])
@@ -220,12 +220,12 @@ export default class UserServices {
 
   public async getCompanyAdmins(serialise = false, filters: string[]): Promise<User[] | null> {
     const superAdmins = await User.query().withScopes((scopes) => scopes.SuperAdmins())
-    if (!!superAdmins.length) {
+    if (superAdmins.length) {
       return serialise
         ? superAdmins.map(
             (superAdmin) =>
               superAdmin.serialize(
-                !!filters.length ? { fields: { pick: [...filters] } } : void 0
+                filters.length ? { fields: { pick: [...filters] } } : void 0
               ) as User
           )
         : (superAdmins as User[])

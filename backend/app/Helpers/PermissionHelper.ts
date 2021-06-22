@@ -3,7 +3,7 @@ import Logger from '@ioc:Adonis/Core/Logger'
 import User from 'App/Models/User'
 
 class PermissionHelper {
-  hasResourcePermission({
+  public hasResourcePermission({
     resourcePermission,
     user,
     loggable,

@@ -8,9 +8,10 @@
 declare module '@ioc:Adonis/Addons/Mail' {
   import { MailDrivers } from '@ioc:Adonis/Addons/Mail'
 
+  // eslint-disable-next-line no-unused-vars
   interface MailersList {
-    smtp: MailDrivers['smtp'],
-    mailgun: MailDrivers['mailgun'],
-    sparkpost: MailDrivers['sparkpost'],
+    smtp: MailDrivers['smtp']
+    mailgun: MailDrivers['mailgun']
+    sparkpost: MailDrivers['sparkpost']
   }
 }

@@ -1,12 +1,5 @@
 import { DateTime } from 'luxon'
-import {
-  BaseModel,
-  beforeCreate,
-  beforeSave,
-  belongsTo,
-  BelongsTo,
-  column,
-} from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeSave, belongsTo, BelongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import UUIDHook from './Hooks/UUIDHook'
 import User from 'App/Models/User'
 import Hash from '@ioc:Adonis/Core/Hash'

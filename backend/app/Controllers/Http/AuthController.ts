@@ -116,7 +116,7 @@ export default class AuthController {
       try {
         user = await User.findOrFail(userId)
 
-        if (Boolean(user.isEmailVerified)) {
+        if (user.isEmailVerified) {
           return response.ok({ message: 'Your email address is already verified' })
         }
 

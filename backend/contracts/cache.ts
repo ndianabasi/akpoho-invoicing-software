@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export enum CACHE_TAGS {
   ALL_USERS_CACHES_TAG = 'all_users_caches_tag',
   ALL_COMPANIES_CACHES_TAG = 'all_companies_caches_tag',

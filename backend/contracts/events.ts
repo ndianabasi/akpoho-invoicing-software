@@ -27,6 +27,7 @@ declare module '@ioc:Adonis/Core/Event' {
   | an instance of the the UserModel only.
   |
   */
+  // eslint-disable-next-line no-unused-vars
   interface EventsList {
     'auth::send-code': { user: User | null; type: string }
     'auth::send-success-emails': { user: User | null; type: string }

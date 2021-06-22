@@ -6,6 +6,7 @@
  */
 
 declare module '@ioc:Adonis/Addons/Redis' {
+  // eslint-disable-next-line no-unused-vars
   interface RedisConnectionsList {
     local: RedisConnectionConfig
   }

@@ -10,12 +10,12 @@ export default class StateSeeder extends BaseSeeder {
       const country = await Country.findBy('numeric_code', code)
 
       if (country) {
-        const temp_state = new State()
-        temp_state.name = state.name
-        temp_state.capital = state.capital
-        temp_state.countryNumericCode = code
+        const tempState = new State()
+        tempState.name = state.name
+        tempState.capital = state.capital
+        tempState.countryNumericCode = code
 
-        await country.related('states').save(temp_state)
+        await country.related('states').save(tempState)
       }
     }
   }

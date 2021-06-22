@@ -43,7 +43,7 @@ class FileUploadHelper {
    * @param fileData {FileData} The data of the attached file(s)
    * @param uploadDir {string} The upload directory
    */
-  public constructor(fileData: FileData, uploadDir: string, provider: string) {
+  constructor(fileData: FileData, uploadDir: string, provider: string) {
     const { requestedUser, requestedCompany } = this.getContext
     this.requestedUser = requestedUser
     this.requestedCompany = requestedCompany
@@ -53,7 +53,7 @@ class FileUploadHelper {
     this.provider = provider
   }
 
-  get getContext() {
+  private get getContext() {
     const ctx = HttpContext.get()
     const { requestedUser, requestedCompany }: HttpContextContract = ctx!
     return { requestedUser, requestedCompany }
@@ -272,7 +272,7 @@ class FileUploadHelper {
     return null
   }
 
-  async add(fileInfo: FileInfo) {
+  public async add(fileInfo: FileInfo) {
     // Get provider
     const provider: FileProvider = await FileProvider.findByOrFail('name', this.provider)
 
