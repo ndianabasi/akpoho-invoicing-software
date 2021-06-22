@@ -139,32 +139,35 @@ export function useStore() {
 
 let store: Store<StoreElements>;
 
-export default function (/* { ssrContext } */) {
+export default function () {
   store = createStore<StoreElements>({
     strict: process.env.NODE_ENV !== 'production',
-    state: () => ({
-      baseURL: `${
-        process.env.NODE_ENV === 'production'
-          ? 'api.xxx.com/v1'
-          : '127.0.0.1:4444/v1'
-      }`,
-      rootURL: `${
-        process.env.NODE_ENV === 'production' ? 'api.xxx.com' : '127.0.0.1:4444'
-      }`,
-      gtmID: `${process.env.NODE_ENV === 'production' ? '' : ''}`,
-      httpTimeout: process.env.NODE_ENV === 'production' ? 60000 : 30000,
-      currentYear: null,
-      message: {
-        type: '',
-        content: '',
-        status: null,
-        statusText: '',
-        activity: '',
-      },
-      tokenRefreshTime: 120,
-      darkMode: false,
-      isOffline: false,
-    }),
+    state: function () {
+      return {
+        apiHost: process.env.API_HOST ?? '127.0.0.1',
+        apiPort: process.env.API_PORT ?? '4444',
+        apiVersion: 'v1',
+        apiProtocol:
+          window.location.hostname === 'localhost'
+            ? 'http://'
+            : ['staging', 'production'].includes(process.env.NODE_ENV)
+            ? 'https://'
+            : 'http://',
+        gtmID: `${process.env.NODE_ENV === 'production' ? '' : ''}`,
+        httpTimeout: process.env.NODE_ENV === 'production' ? 60000 : 30000,
+        currentYear: null,
+        message: {
+          type: '',
+          content: '',
+          status: null,
+          statusText: '',
+          activity: '',
+        },
+        tokenRefreshTime: 120,
+        darkMode: false,
+        isOffline: false,
+      };
+    },
 
     mutations: {
       SET_DARK_MODE: (state, payload: boolean) => (state.darkMode = payload),
@@ -172,19 +175,14 @@ export default function (/* { ssrContext } */) {
     },
 
     getters: {
-      getHttpProtocol() {
-        return window.location.hostname === 'localhost' ||
-          process.env.NODE_ENV !== 'production'
-          ? 'http://'
-          : 'https://';
-      },
+      getHttpProtocol: (state) => state.apiProtocol,
       getCurrentYear: (state) => state.currentYear,
       getGtmID: (state) => state.gtmID,
-      getRootURL: (state, getters) => {
-        return `${getters.getHttpProtocol as string}${state.rootURL}`;
+      getRootURL: (state) => {
+        return `${state.apiProtocol}${state.apiHost}:${state.apiPort}`;
       },
-      getBaseURL: (state, getters) => {
-        return `${getters.getHttpProtocol as string}${state.baseURL}`;
+      getBaseURL: (state) => {
+        return `${state.apiProtocol}${state.apiHost}:${state.apiPort}/${state.apiVersion}`;
       },
       getHttpTimeout: (state) => state.httpTimeout,
       getHttpOptions: (state, getters) => {

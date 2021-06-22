@@ -2,8 +2,6 @@ import { AxiosResponse, AxiosError } from 'axios';
 import { DataRows } from '../quasar_tables/state';
 
 export interface RootState {
-  baseURL: string;
-  rootURL: string;
   gtmID: string;
   httpTimeout: number;
   currentYear: number | null;
@@ -11,6 +9,10 @@ export interface RootState {
   tokenRefreshTime: number;
   darkMode: boolean;
   isOffline: boolean;
+  apiPort: string;
+  apiVersion: string;
+  apiProtocol: string;
+  apiHost: string;
 }
 
 export interface AlertInterface {
