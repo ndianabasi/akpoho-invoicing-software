@@ -4,6 +4,8 @@ coverage
 .vscode
 .DS_STORE
 .env
+.env.demo
+.env.testing
 tmp
 database/data/seeded_users.txt
 app/Helpers/FileUploadHelper_.ts
