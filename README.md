@@ -81,21 +81,13 @@ Akpoho Invoicing Software is developed with the following technologies:
         ``` 
 
         1.  On the prompt, select `database\seeders\Role` to create `roles` for authorisation. 
-        2.  After the `roles` table is seeded. Run the seeder command again and select `database\seeders\Permission` to create `permissions` for authorisation. 
-        3.  Run the seeder command again and select `database\seeders\PermissionRole` to associate `roles` with `permissions`. 
-        4.  Run the seeder command again and select `database\seeders\Company` to create companies, users, customers, and customer addresses. Please, take note of the user credentials logged to the console.
-        5.  Run the seeder command again and select `database\seeders\UserExtraCompany` to associate each existing user with two more companies. This ensures that the user belongs to one than one company.
+        2.  After the `roles` table is seeded. Run the seeder command again and select `database\seeders\Permission` and `database\seeders\PermissionRole` to create `permissions` for authorisation and associate `roles` with `permissions`.
+        3.  Run the seeder command again and select `database\seeders\Company` to create companies, users, customers, and customer addresses. Please, take note of the user credentials logged to the console.
+        4. Run the seeder command again and select `database\seeders\CompanySize` to create company sizes.
+        5. Run the seeder command again and select `database\seeders\CustomerTitle` and `database\seeders\FileProvider` to create customer titles and file providers.
+        6.  Run the seeder command again and select `database\seeders\UserExtraCompany` to associate each existing user with two more companies. This ensures that the user belongs to one than one company.
     
-16. After running the `database\seeders\Company` seeder, all users generated will be logged to file. Check the file: `database/data/seeded_users.txt` and take note of the user credentials logged to the file. Only users with full access can log in. That is:
-    ```js
-    {
-        ...,
-        login_status: true, 
-        is_account_activated: true, 
-        is_email_verified: true
-    }
-    
-    ```
+16. After running the `database\seeders\Company` seeder, all users generated will be logged to file. Check the file: `database/data/seeded_users.txt` and take note of the user credentials logged to the file.
    1.  Copy the email and password of a user with full access from the console and log in.
    2.  Congratulations. You have successfully set up the Akpoho Invoicing Software.
 17. After you log in, check the role of the logged-in user. Click the avatar on the top-right corner of the user interface. The role is displayed after the user's name. E.g. `CompanyAdmin`, `CompanyEditor`, or `CompanyStaff`. 

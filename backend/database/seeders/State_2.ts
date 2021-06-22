@@ -29,12 +29,12 @@ export default class StateSeeder2 extends BaseSeeder {
         const states = countryData.states
         for (const state of states) {
           const stateName = state.name
-          console.log('stateName: ', stateName)
+          //console.log('stateName: ', stateName)
           //Check if state already exist in DB
           let stateExists = await State.query().where('name', stateName)
 
           if (stateExists && stateExists.length) {
-            console.log('stateExists: ', stateExists)
+            //console.log('stateExists: ', stateExists)
             //Check if state is in the same country
             const foundStateBelongsToSameCountry = stateExists.some(
               (state) => state.countryId === countryID
