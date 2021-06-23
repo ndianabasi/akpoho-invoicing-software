@@ -10,11 +10,13 @@ import Event from '@ioc:Adonis/Core/Event'
 import Hash from '@ioc:Adonis/Core/Hash'
 import PasswordChangeValidator from 'App/Validators/PasswordChangeValidator'
 import AppRegistrationValidator from 'App/Validators/AppRegistrationValidator'
-import UserServices from 'App/Services/UserServices'
+import UserServices, { randomUserByRole } from 'App/Services/UserServices'
 import Role from 'App/Models/Role'
 import Logger from '@ioc:Adonis/Core/Logger'
 import { CACHE_TAGS } from 'Contracts/cache'
 import CacheHelper from 'App/Helpers/CacheHelper'
+import { IS_DEMO_MODE } from 'App/Helpers/utils'
+import { ROLES } from 'Database/data/roles'
 
 export default class AuthController {
   public async register({ request, response, auth }: HttpContextContract) {
@@ -163,13 +165,19 @@ export default class AuthController {
   }
 
   public async login({ request, auth, response }: HttpContextContract) {
-    const { password /* recaptchaResponseToken */ } = request.body()
-    const email: string = request.body().email
+    const { password, email } = request.body()
     //const loginRecaptchaHelper = new LoginRecaptchaHelper(recaptchaResponseToken);
+
+    if (!IS_DEMO_MODE && !password) {
+      throw new NoLoginException({
+        message: 'Invalid credentials',
+      })
+    }
 
     const userService = new UserServices({ email: email })
 
     let user = await userService.getUserModel()
+
     if (!user) throw new NoLoginException({ message: 'Log in not allowed' })
     else {
       // Check if user can log in.
@@ -190,7 +198,13 @@ export default class AuthController {
         })
       }
 
-      const token = await auth.use('api').attempt(email, password)
+      let token
+      if (IS_DEMO_MODE) {
+        token = await auth.use('api').login(user)
+      } else {
+        token = await auth.use('api').attempt(email, password)
+      }
+
       // Check if credentials are valid, else return error
       if (!token)
         throw new NoLoginException({ message: 'Email address or password is not correct.' })
@@ -497,8 +511,28 @@ export default class AuthController {
 
     Event.emit('auth::send-success-emails', { user, type: 'password_change_success' })
 
-    return response.status(201).json({
+    return response.created({
       message: 'Your password was updated successfully. You can now login with it subsequently.',
+    })
+  }
+
+  public async demoLoginCredentials({ response }: HttpContextContract) {
+    if (!IS_DEMO_MODE) return response.ok({ data: {} })
+
+    const randomCompanyAdmin = await randomUserByRole(ROLES.COMPANY_ADMIN)
+
+    const randomCompanyEditor = await randomUserByRole(ROLES.COMPANY_EDITOR)
+
+    const randomCompanyStaff = await randomUserByRole(ROLES.COMPANY_STAFF)
+
+    const data = {
+      admin: randomCompanyAdmin?.[0]?.email ?? '',
+      editor: randomCompanyEditor?.[0]?.email ?? '',
+      staff: randomCompanyStaff?.[0]?.email ?? '',
+    }
+
+    return response.ok({
+      data,
     })
   }
 }

@@ -5,6 +5,7 @@ import { UserFullDetails, UserOptions, UserSummary } from './types/user_types'
 import Logger from '@ioc:Adonis/Core/Logger'
 import CacheHelper from 'App/Helpers/CacheHelper'
 import { CACHE_TAGS } from 'Contracts/cache'
+import { ROLES } from 'Database/data/roles'
 
 export default class UserServices {
   protected email: string | undefined
@@ -231,4 +232,15 @@ export default class UserServices {
         : (superAdmins as User[])
     } else return null
   }
+}
+
+export const randomUserByRole = async function (role: ROLES) {
+  return await User.query()
+    .leftJoin('roles', (query) => query.on('roles.id', '=', 'users.role_id'))
+    .where('roles.name', role)
+    .where('users.login_status', true)
+    .where('users.is_account_activated', true)
+    .where('users.is_email_verified', true)
+    .orderByRaw('RAND()')
+    .limit(1)
 }

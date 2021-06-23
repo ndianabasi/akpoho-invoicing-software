@@ -46,6 +46,7 @@ Route.group(() => {
     '/countries/:country_id/states-for-select',
     'CountriesController.countryStatesForSelect'
   )
+  Route.get('/auth/demo-login-credentials', 'AuthController.demoLoginCredentials')
 }).prefix('/v1')
 
 // General Authenticated routes

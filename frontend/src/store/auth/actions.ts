@@ -343,6 +343,7 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         });
     });
   },
+
   REQUEST_EMAIL_VERIFICATION() {
     return new Promise(async (resolve, reject) => {
       await $http
@@ -362,6 +363,19 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
             ],
           });
 
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  FETCH_DEMO_LOGIN_CREDENTIALS() {
+    return new Promise(async (resolve, reject) => {
+      await $httpNoAuth
+        .get('/auth/demo-login-credentials')
+        .then((res: LoginHttpResponse & HttpResponse) => {
           return resolve(res.data.data);
         })
         .catch((error: HttpError) => {

@@ -5,20 +5,43 @@
 
     <template #formSection="{ isSmallScreen }">
       <q-expansion-item
+        v-if="isDemoMode && demoCredentials"
         :dense="isSmallScreen"
-        dense-toggle
+        :dense-toggle="isSmallScreen"
         expand-separator
         icon="security"
         label="Demo Credentials"
-        class="q-mb-md"
+        class="q-mb-md demo-credentials"
+        header-class="demo-credentials-header"
+        expand-icon-class="demo-credentials-icon"
         :dark="$q.dark"
       >
         <q-card>
           <q-card-section>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem,
-            eius reprehenderit eos corrupti commodi magni quaerat ex numquam,
-            dolorum officiis modi facere maiores architecto suscipit iste
-            eveniet doloribus ullam aliquid.
+            <q-list bordered padding class="no-border">
+              <q-item
+                v-for="(value, key) of demoCredentials"
+                :key="'demo_' + key"
+              >
+                <q-item-section>
+                  <q-item-label class="text-uppercase" lines="1">{{
+                    key
+                  }}</q-item-label>
+                  <q-item-label caption>{{ value }}</q-item-label>
+                </q-item-section>
+
+                <q-item-section side>
+                  <q-btn
+                    flat
+                    ripple
+                    round
+                    label="use"
+                    color="green"
+                    @click.prevent="useCredential(value)"
+                  />
+                </q-item-section>
+              </q-item>
+            </q-list>
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -47,6 +70,7 @@
           </template>
         </q-input>
         <q-input
+          v-if="!isDemoMode"
           v-model="form.password"
           :dense="isSmallScreen"
           filled
@@ -149,7 +173,16 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { defineComponent, reactive, ref, nextTick, Ref } from 'vue';
+import {
+  defineComponent,
+  reactive,
+  ref,
+  nextTick,
+  Ref,
+  watchEffect,
+  onBeforeUnmount,
+  computed,
+} from 'vue';
 import useVuelidate from '@vuelidate/core';
 import {
   required,
@@ -157,12 +190,18 @@ import {
   minLength,
   helpers,
   maxLength,
+  requiredIf,
 } from '@vuelidate/validators';
 import { useStore } from 'vuex';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
 import AuthForm from '../../components/AuthForm.vue';
-//const strongPassword = helpers.regex('strongPassword', //)
+
+type DemoCredentials = {
+  admin: string;
+  editor: string;
+  staff: string;
+};
 
 export default defineComponent({
   name: 'Login',
@@ -171,11 +210,18 @@ export default defineComponent({
     const submitting = ref(false);
     const store = useStore();
     const router = useRouter();
+    const demoCredentials: Ref<DemoCredentials | null> = ref(null);
 
-    const form = reactive({
-      email: '',
-      password: '',
-    });
+    const isDemoMode = computed(() => process.env.DEMO_MODE === 'true');
+
+    const form = isDemoMode.value
+      ? reactive({
+          email: '',
+        })
+      : reactive({
+          email: '',
+          password: '',
+        });
 
     type MinMaxParams = {
       $params: {
@@ -190,7 +236,10 @@ export default defineComponent({
         required: helpers.withMessage('Email address is required.', required),
       },
       password: {
-        required: helpers.withMessage('Password is required.', required),
+        required: helpers.withMessage(
+          'Password is required.',
+          requiredIf(() => !isDemoMode.value)
+        ),
         minLength: helpers.withMessage(
           ({ $params }: MinMaxParams) =>
             `Password should maximum of ${$params.min} character`,
@@ -248,6 +297,20 @@ export default defineComponent({
       console.log(response);
     };
 
+    const stopFetchDemoLoginCredentials = watchEffect(() => {
+      if (isDemoMode.value) {
+        void store
+          .dispatch('auth/FETCH_DEMO_LOGIN_CREDENTIALS')
+          .then((credentials: DemoCredentials) => {
+            demoCredentials.value = credentials;
+          });
+      }
+    });
+
+    onBeforeUnmount(() => {
+      stopFetchDemoLoginCredentials();
+    });
+
     return {
       dismissed: ref(false),
       submitting,
@@ -256,6 +319,9 @@ export default defineComponent({
       form$,
       showPassword: ref(false),
       handleCredentialResponse,
+      demoCredentials,
+      isDemoMode,
+      useCredential: (email: typeof form['email']) => (form.email = email),
     };
   },
 });

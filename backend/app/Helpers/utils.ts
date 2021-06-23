@@ -50,3 +50,5 @@ export const commonEmailProperties = function () {
 
   return { APP_NAME, APP_SENDING_EMAIL }
 }
+
+export const IS_DEMO_MODE = Env.get('DEMO_MODE')
