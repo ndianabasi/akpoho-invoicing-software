@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "full_build": "yarn build && yarn copy_env",
     "build": "node ace build --production && cd build && yarn install --production",
+    "copy_env": "cp .env ./build/",
     "start": "node server.js",
     "serve": "node ace serve --watch",
     "lint": "eslint . --ext=.ts --format table",
