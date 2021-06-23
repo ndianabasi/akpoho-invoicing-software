@@ -72,6 +72,18 @@
       color: $grey-3;
     }
   }
+
+  .AIS__auth_pages__container {
+    background-color: $dark;
+    .auth-form-card {
+      background-color: $grey-10;
+    }
+    .form-footer {
+      a {
+        color: $grey-3;
+      }
+    }
+  }
 }
 // Dark mode ends
 
@@ -109,6 +121,38 @@
     .q-icon,
     .q-item__label {
       color: var(--q-accent);
+    }
+  }
+
+  .AIS__auth_pages__container {
+    background-color: $purple-2;
+    .form-logo {
+      color: $purple-10;
+    }
+    .form-title {
+      color: $grey-10;
+    }
+    .auth-form-card {
+      background-color: $grey-1;
+    }
+    .form-footer {
+      color: $grey-10;
+    }
+    .form {
+      .q-field__control {
+        background-color: $purple-1;
+        color: $purple-10;
+      }
+      .q-field__label {
+        color: $purple-10;
+      }
+    }
+    .form-footer {
+      color: $accent;
+      a,
+      span {
+        color: $accent;
+      }
     }
   }
 }

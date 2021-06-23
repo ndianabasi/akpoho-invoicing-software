@@ -1,9 +1,28 @@
 <!-- eslint-disable vue/v-slot-style -->
 <template>
-  <auth-form>
+  <auth-form class="AIS__login-page">
     <template #formTitle> Log into your account </template>
 
     <template #formSection="{ isSmallScreen }">
+      <q-expansion-item
+        :dense="isSmallScreen"
+        dense-toggle
+        expand-separator
+        icon="security"
+        label="Demo Credentials"
+        class="q-mb-md"
+        :dark="$q.dark"
+      >
+        <q-card>
+          <q-card-section>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem,
+            eius reprehenderit eos corrupti commodi magni quaerat ex numquam,
+            dolorum officiis modi facere maiores architecto suscipit iste
+            eveniet doloribus ullam aliquid.
+          </q-card-section>
+        </q-card>
+      </q-expansion-item>
+
       <form class="form validate-form" @submit.prevent="handleLogin">
         <q-input
           v-model="form.email"
@@ -16,9 +35,6 @@
           autocomplete="email"
           :error="form$.email.$invalid"
           label="Email"
-          color="purple-10"
-          label-color="purple-10"
-          bg-color="purple-1"
           autofocus
         >
           <template v-slot:hint> </template>
@@ -42,9 +58,6 @@
           :error="form$.password.$invalid"
           label="Password"
           :type="showPassword ? 'text' : 'password'"
-          color="purple-10"
-          label-color="purple-10"
-          bg-color="purple-1"
           class="q-mt-md"
         >
           <template v-slot:hint> </template>
@@ -84,8 +97,8 @@
     </template>
 
     <template #formFooterLink>
-      <span class="text-accent">
-        <router-link :to="{ name: 'Register' }">Register </router-link>
+      <span>
+        <router-link :to="{ name: 'Register' }">Register</router-link>
         /
         <router-link :to="{ name: 'forgot_password' }"
           >Forgot Password?

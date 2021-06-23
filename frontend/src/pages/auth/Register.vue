@@ -130,8 +130,8 @@
     </template>
 
     <template #formFooterLink>
-      <span class="text-accent">
-        <router-link :to="{ name: 'Login' }">Login </router-link>
+      <span>
+        <router-link :to="{ name: 'Login' }">Login</router-link>
         /
         <router-link :to="{ name: 'forgot_password' }"
           >Forgot Password?

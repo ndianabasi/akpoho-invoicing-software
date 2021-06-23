@@ -44,9 +44,6 @@
           autocomplete="new-password"
           :error="form$.newPasswordErrors && !!form$.newPasswordErrors.length"
           label="New Password"
-          color="purple-10"
-          label-color="purple-10"
-          bg-color="purple-1"
           autofocus
           @input="form$.newPasswordHandleInput"
         >
@@ -88,9 +85,6 @@
             !!form$.confirmNewPasswordErrors.length
           "
           label="Confirm New Password"
-          color="purple-10"
-          label-color="purple-10"
-          bg-color="purple-1"
           autofocus
           @input="form$.confirmNewPasswordHandleInput"
         >
@@ -142,8 +136,8 @@
       v-if="!showResetValidationError && !validationInProgresss"
       #formFooterLink
     >
-      <span class="text-accent">
-        <router-link :to="{ name: 'Register' }">Register </router-link>
+      <span>
+        <router-link :to="{ name: 'Register' }">Register</router-link>
         /
         <router-link :to="{ name: 'Login' }">Login instead? </router-link>
       </span>

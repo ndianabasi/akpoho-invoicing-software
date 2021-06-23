@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/v-slot-style -->
 <template>
-  <q-card class="container row flex-center">
+  <q-card class="container row flex-center AIS__auth_pages__container">
     <div :class="columnClasses">
       <q-card
         class="
@@ -12,8 +12,18 @@
         <q-card-section>
           <p class="form-logo">Akpoho Invoicing Software</p>
           <span class="form-title q-mb-md q-pb-md">
-            <slot name="formTitle"></slot>
+            <slot name="formTitle"></slot
+            ><q-btn flat round @click.prevent="toggleDarkMode">
+              <q-icon
+                :name="isDarkModeActive ? 'brightness_low' : 'brightness_2'"
+              />
+              <q-tooltip
+                >Switch to
+                {{ isDarkModeActive ? 'Light Mode' : 'Dark Mode' }}</q-tooltip
+              >
+            </q-btn>
           </span>
+
           <slot
             name="formSection"
             v-bind="{ isSmallScreen: isSmallScreen }"
@@ -49,6 +59,7 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from 'vue';
 import { useQuasar } from 'quasar';
+import { $dark } from '../composables/useDarkMode';
 //const strongPassword = helpers.regex('strongPassword', //)
 
 export default defineComponent({
@@ -63,6 +74,7 @@ export default defineComponent({
   },
   setup() {
     const $q = useQuasar();
+    const { toggleDarkMode, isDarkModeActive } = $dark;
 
     const isSmallScreen = computed(() => {
       return $q.screen.lt.sm;
@@ -93,6 +105,8 @@ export default defineComponent({
       googleClientIdExist,
       GOOGLE_OAUTH_CLIENT_ID,
       GOOGLE_SIGN_IN,
+      toggleDarkMode,
+      isDarkModeActive,
     };
   },
 });
@@ -101,7 +115,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 .form-logo {
   font-size: 2rem;
-  color: $purple-10;
   display: flex;
   text-align: center;
   display: block;
@@ -111,20 +124,14 @@ export default defineComponent({
 
 .form-title {
   font-size: 1.2rem;
-  color: $grey-10;
   line-height: 1.2;
   text-align: center;
   display: block;
 }
 
-.auth-form-card {
-  background-color: $grey-1;
-}
-
 .q-card.container {
   width: 100vw;
   min-height: 100vh;
-  background-color: $purple-2;
   overflow-y: auto;
 }
 </style>
@@ -139,7 +146,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .form-footer {
-  color: $grey-10;
   a {
     text-decoration: none;
     &:hover {

@@ -45,8 +45,8 @@
     </template>
 
     <template v-if="!validationInProgresss" #formFooterLink>
-      <span class="text-accent">
-        <router-link :to="{ name: 'Register' }">Register </router-link>
+      <span>
+        <router-link :to="{ name: 'Register' }">Register</router-link>
         /
         <router-link :to="{ name: 'Login' }">Login instead? </router-link>
         /

@@ -4,7 +4,7 @@ import CustomerAddressFactory from './CustomerAddressFactory'
 
 const CustomerFactory = Factory.define(Customer, ({ faker }) => {
   const isCorporate = faker.datatype.boolean()
-  const companyHasRep = faker.datatype.boolean()
+  const corporateHasRep = faker.datatype.boolean()
   const generatedCustomer = {
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
@@ -20,11 +20,11 @@ const CustomerFactory = Factory.define(Customer, ({ faker }) => {
   }
 
   const customer =
-    isCorporate && companyHasRep
-      ? { ...generatedCustomer, ...corporateCustomer }
-      : isCorporate && !companyHasRep
-      ? { ...corporateCustomer }
-      : generatedCustomer
+    isCorporate && corporateHasRep
+      ? { ...generatedCustomer, ...corporateCustomer, isCorporate, corporateHasRep }
+      : isCorporate && !corporateHasRep
+      ? { ...corporateCustomer, isCorporate, corporateHasRep }
+      : { ...generatedCustomer, isCorporate, corporateHasRep }
 
   //console.log(customer)
 

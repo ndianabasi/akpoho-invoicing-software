@@ -25,6 +25,7 @@ export default Env.rules({
   CACHE_VIEWS: Env.schema.boolean(),
   SESSION_DRIVER: Env.schema.string(),
   NODE_ENV: Env.schema.enum(['development', 'production', 'testing'] as const),
+  DEMO_MODE: Env.schema.boolean({ message: 'DEMO_TRUE variable should be a boolean' }),
 
   MYSQL_HOST: Env.schema.string({ format: 'host' }),
   MYSQL_PORT: Env.schema.number(),

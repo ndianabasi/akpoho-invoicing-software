@@ -169,13 +169,17 @@
                 <q-item v-ripple clickable @click.prevent="toggleDarkMode">
                   <q-item-section avatar>
                     <q-icon
-                      :name="isDark ? 'brightness_low' : 'brightness_2'"
+                      :name="
+                        isDarkModeActive ? 'brightness_low' : 'brightness_2'
+                      "
                     />
                   </q-item-section>
 
                   <q-item-section
                     >Switch to
-                    {{ isDark ? 'Bright Mode' : 'Dark Moe' }}</q-item-section
+                    {{
+                      isDarkModeActive ? 'Bright Mode' : 'Dark Moe'
+                    }}</q-item-section
                   >
                 </q-item>
 
@@ -198,7 +202,7 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-call -->
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <script lang="ts">
-import { defineComponent, ref, computed, watchEffect } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import CreateMenu from './CreateMenu.vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -206,7 +210,7 @@ import {
   UserProfileSummary,
   StringIDNameInterface,
 } from '../store/types/index';
-import { useQuasar } from 'quasar';
+import { $dark } from '../composables/useDarkMode';
 
 export default defineComponent({
   name: 'PrimaryToolbar',
@@ -229,21 +233,8 @@ export default defineComponent({
     const link = ref('');
     const search = ref('');
     const router = useRouter();
-    const $q = useQuasar();
 
-    const isDark = ref(false);
-
-    const toggleDarkMode = function () {
-      $q.dark.toggle();
-      store.commit('SET_DARK_MODE', $q.dark.isActive);
-    };
-
-    watchEffect(() => {
-      const isDarkStore = computed(
-        () => store.getters.GET_DARK_MODE as boolean
-      );
-      isDark.value = isDarkStore.value;
-    });
+    const { toggleDarkMode, isDarkModeActive } = $dark;
 
     const TOGGLE_LEFT_DRAWER = () => {
       leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -291,7 +282,7 @@ export default defineComponent({
       link,
       authRole: ref(authRole),
       toggleDarkMode,
-      isDark,
+      isDarkModeActive,
       authUserProfilePicture,
       getUserInitials: computed(() => {
         const [firstName, lastName] = userFullName.split(' ');

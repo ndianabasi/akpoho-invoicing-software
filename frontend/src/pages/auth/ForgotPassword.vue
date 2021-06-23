@@ -20,9 +20,6 @@
           autocomplete="email"
           :error="form$.email.$invalid"
           label="Email"
-          color="purple-10"
-          label-color="purple-10"
-          bg-color="purple-1"
           autofocus
         >
           <template v-slot:hint> </template>
@@ -68,7 +65,7 @@
     </template>
 
     <template #formFooterLink>
-      <span class="text-accent">
+      <span>
         <router-link :to="{ name: 'Register' }">Register</router-link> /
         <router-link :to="{ name: 'Login' }">Login instead?</router-link>
       </span>
