@@ -23,6 +23,9 @@ export default class CustomersController {
       is_corporate,
       created_at,
       updated_at,
+      company_name,
+      company_email,
+      company_phone,
     } = request.qs()
 
     const searchQuery = {
@@ -34,21 +37,25 @@ export default class CustomersController {
       is_corporate: is_corporate ? is_corporate : null,
       created_at: created_at ? created_at : null,
       updated_at: updated_at ? updated_at : null,
+      company_name: company_name ? company_name : null,
+      company_email: company_email ? company_email : null,
+      company_phone: company_phone ? company_phone : null,
     }
 
-    let subquery = Database.from('customers')
+    let subquery = Customer.query()
       .select(
         'customers.id',
         'customers.first_name',
         'customers.last_name',
         'customers.email',
         'customers.phone_number',
-        'customers.is_corporate',
         'customers.created_at',
         'customers.updated_at',
+        'customers.is_corporate',
         'customers.corporate_has_rep',
         'customers.company_name',
         'customers.company_email',
+        'customers.company_phone',
         'customer_titles.name as title'
       )
       .where({ company_id: requestedCompany?.id })
