@@ -36,7 +36,6 @@
                     ripple
                     round
                     label="use"
-                    color="green"
                     @click.prevent="useCredential(value)"
                   />
                 </q-item-section>
