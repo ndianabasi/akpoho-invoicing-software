@@ -1,6 +1,15 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  column,
+  HasMany,
+  hasMany,
+  hasManyThrough,
+  HasManyThrough,
+} from '@ioc:Adonis/Lucid/Orm'
 import Product from './Product'
+import Attribute from './Attribute'
+import AttributeGroup from './AttributeGroup'
 
 export default class AttributeSet extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -22,4 +31,7 @@ export default class AttributeSet extends BaseModel {
 
   @hasMany(() => Product)
   public products: HasMany<typeof Product>
+
+  @hasManyThrough([() => Attribute, () => AttributeGroup])
+  public attributes: HasManyThrough<typeof Attribute>
 }

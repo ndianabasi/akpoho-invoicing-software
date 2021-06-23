@@ -35,6 +35,8 @@ export default class Product extends BaseModel {
   @belongsTo(() => AttributeSet)
   public attributeSet: BelongsTo<typeof AttributeSet>
 
-  @manyToMany(() => ProductCategory)
+  @manyToMany(() => ProductCategory, {
+    pivotTimestamps: true,
+  })
   public categories: ManyToMany<typeof ProductCategory>
 }

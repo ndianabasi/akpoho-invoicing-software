@@ -1,7 +1,15 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  BelongsTo,
+  belongsTo,
+  column,
+  ManyToMany,
+  manyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import FieldInputType from 'App/Models/FieldInputType'
 import FieldInputValidationType from 'App/Models/FieldInputValidationType'
+import AttributeGroup from './AttributeGroup'
 
 export default class Attribute extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -55,5 +63,11 @@ export default class Attribute extends BaseModel {
   public fieldInputType: BelongsTo<typeof FieldInputType>
 
   @belongsTo(() => FieldInputValidationType)
-  public fieldInputValidationType: BelongsTo<typeof FieldInputType>
+  public fieldInputValidationType: BelongsTo<typeof FieldInputValidationType>
+
+  @manyToMany(() => AttributeGroup, {
+    pivotTimestamps: true,
+    pivotColumns: ['type'],
+  })
+  public groups: ManyToMany<typeof AttributeGroup>
 }

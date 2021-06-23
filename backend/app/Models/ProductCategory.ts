@@ -17,6 +17,8 @@ export default class ProductCategory extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @manyToMany(() => Product)
+  @manyToMany(() => Product, {
+    pivotTimestamps: true,
+  })
   public categories: ManyToMany<typeof Product>
 }

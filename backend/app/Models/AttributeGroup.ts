@@ -1,6 +1,14 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  BelongsTo,
+  belongsTo,
+  column,
+  manyToMany,
+  ManyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import AttributeSet from './AttributeSet'
+import Attribute from './Attribute'
 
 export default class AttributeGroup extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -28,4 +36,10 @@ export default class AttributeGroup extends BaseModel {
 
   @belongsTo(() => AttributeSet)
   public attributeSet: BelongsTo<typeof AttributeSet>
+
+  @manyToMany(() => Attribute, {
+    pivotTimestamps: true,
+    pivotColumns: ['type'],
+  })
+  public attributes: ManyToMany<typeof Attribute>
 }
