@@ -1,9 +1,10 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeCreate, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 import Attribute from './Attribute'
+import UUIDHook from './Hooks/UUIDHook'
 
-export default class FieldInputType extends BaseModel {
+export default class FieldInputValidationType extends BaseModel {
   public static selfAssignPrimaryKey = true
 
   @column({ isPrimary: true })
@@ -14,6 +15,9 @@ export default class FieldInputType extends BaseModel {
 
   @column()
   public code: string
+
+  @column()
+  public regex: string
 
   @column.dateTime({
     autoCreate: true,
@@ -34,4 +38,9 @@ export default class FieldInputType extends BaseModel {
 
   @hasMany(() => Attribute)
   public attributes: HasMany<typeof Attribute>
+
+  @beforeCreate()
+  public static generateUUID(model: FieldInputValidationType) {
+    UUIDHook.generateUUID(model, 'id')
+  }
 }

@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeCreate,
   BelongsTo,
   belongsTo,
   column,
@@ -10,6 +11,7 @@ import {
 import FieldInputType from 'App/Models/FieldInputType'
 import FieldInputValidationType from 'App/Models/FieldInputValidationType'
 import AttributeGroup from './AttributeGroup'
+import UUIDHook from './Hooks/UUIDHook'
 
 export default class Attribute extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -53,6 +55,12 @@ export default class Attribute extends BaseModel {
   @column()
   public useForProductListing: boolean
 
+  @column()
+  public useForLayeredNavigation: boolean
+
+  @column()
+  public comparable: boolean
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
@@ -70,4 +78,9 @@ export default class Attribute extends BaseModel {
     pivotColumns: ['type'],
   })
   public groups: ManyToMany<typeof AttributeGroup>
+
+  @beforeCreate()
+  public static generateUUID(model: FieldInputType) {
+    UUIDHook.generateUUID(model, 'id')
+  }
 }
