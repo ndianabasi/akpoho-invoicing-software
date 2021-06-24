@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeCreate,
   column,
   HasMany,
   hasMany,
@@ -10,6 +11,7 @@ import {
 import Product from './Product'
 import Attribute from './Attribute'
 import AttributeGroup from './AttributeGroup'
+import UUIDHook from './Hooks/UUIDHook'
 
 export default class AttributeSet extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -32,6 +34,14 @@ export default class AttributeSet extends BaseModel {
   @hasMany(() => Product)
   public products: HasMany<typeof Product>
 
+  @hasMany(() => AttributeGroup)
+  public attributeGroups: HasMany<typeof AttributeGroup>
+
   @hasManyThrough([() => Attribute, () => AttributeGroup])
   public attributes: HasManyThrough<typeof Attribute>
+
+  @beforeCreate()
+  public static generateUUID(model: AttributeSet) {
+    UUIDHook.generateUUID(model, 'id')
+  }
 }

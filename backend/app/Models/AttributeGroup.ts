@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeCreate,
   BelongsTo,
   belongsTo,
   column,
@@ -9,6 +10,7 @@ import {
 } from '@ioc:Adonis/Lucid/Orm'
 import AttributeSet from './AttributeSet'
 import Attribute from './Attribute'
+import UUIDHook from './Hooks/UUIDHook'
 
 export default class AttributeGroup extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -42,4 +44,9 @@ export default class AttributeGroup extends BaseModel {
     pivotColumns: ['type'],
   })
   public attributes: ManyToMany<typeof Attribute>
+
+  @beforeCreate()
+  public static generateUUID(model: AttributeGroup) {
+    UUIDHook.generateUUID(model, 'id')
+  }
 }

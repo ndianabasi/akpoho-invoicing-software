@@ -80,7 +80,7 @@ export default class Attribute extends BaseModel {
   public groups: ManyToMany<typeof AttributeGroup>
 
   @beforeCreate()
-  public static generateUUID(model: FieldInputType) {
+  public static generateUUID(model: Attribute) {
     UUIDHook.generateUUID(model, 'id')
   }
 }

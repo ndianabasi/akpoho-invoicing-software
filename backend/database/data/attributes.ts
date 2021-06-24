@@ -172,8 +172,8 @@ export default [
     'Searchable': 'No',
     'Use in Layered Navigation': 'No',
     'Comparable': 'No',
-    'inputType': 'Text Field',
-    'inputValidation': 'Decimal',
+    'inputType': 'Toggle',
+    'inputValidation': 'None',
   },
   {
     'Name': 'Product Name',
@@ -227,8 +227,8 @@ export default [
     'Searchable': 'No',
     'Use in Layered Navigation': 'No',
     'Comparable': 'No',
-    'inputType': 'Text Field',
-    'inputValidation': 'Decimal',
+    'inputType': 'Toggle',
+    'inputValidation': 'None',
   },
   {
     'Name': 'SEO Name',
@@ -282,7 +282,7 @@ export default [
     'Searchable': 'No',
     'Use in Layered Navigation': 'No',
     'Comparable': 'No',
-    'inputType': 'Text Field',
+    'inputType': 'Toggle',
     'inputValidation': 'None',
   },
   {
@@ -356,7 +356,6 @@ export default [
     'Required': 'No',
     'System': 'Yes',
     'Visible': 'No',
-
     'Searchable': 'Yes',
     'Use in Layered Navigation': 'No',
     'Comparable': 'No',
@@ -379,7 +378,6 @@ export default [
     'Required': 'No',
     'System': 'Yes',
     'Visible': 'No',
-
     'Searchable': 'No',
     'Use in Layered Navigation': 'No',
     'Comparable': 'No',
@@ -405,7 +403,7 @@ export default [
     'Searchable': 'No',
     'Use in Layered Navigation': 'No',
     'Comparable': 'No',
-    'inputType': 'Toggle',
+    'inputType': 'Select',
     'inputValidation': 'None',
   },
   {
@@ -427,7 +425,7 @@ export default [
     'Searchable': 'No',
     'Use in Layered Navigation': 'No',
     'Comparable': 'No',
-    'inputType': 'Text Field',
-    'inputValidation': 'Decimal',
+    'inputType': 'Toggle',
+    'inputValidation': 'None',
   },
 ]

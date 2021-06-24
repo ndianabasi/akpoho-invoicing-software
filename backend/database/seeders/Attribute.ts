@@ -10,31 +10,36 @@ export default class AttributeSeeder extends BaseSeeder {
     for (let index = 0; index < attributes.length; index++) {
       const attribute = attributes[index]
 
-      await Attribute.firstOrCreate({
-        name: attribute['Name'],
+      await Attribute.updateOrCreate(
+        { name: attribute['Name'] },
+        {
+          attributeCode: slugify(attribute['Name'], {
+            replacement: '_',
+            lower: true,
+            strict: true,
+          }),
 
-        attributeCode: slugify(attribute['Name'], { replacement: '_', lower: true, strict: true }),
+          fieldInputTypeId:
+            (await this.fieldInputTypes())?.filter(
+              (type) => type.name === attribute['inputType']
+            )?.[0]?.id ?? null,
 
-        fieldInputTypeId:
-          (await this.fieldInputTypes())?.filter(
-            (type) => type.name === attribute['inputType']
-          )?.[0]?.id ?? null,
+          fieldInputValidationTypeId:
+            (await this.fieldInputValidationTypes())?.filter(
+              (type) => type.name === attribute['inputValidation']
+            )?.[0]?.id ?? null,
 
-        fieldInputValidationTypeId:
-          (await this.fieldInputValidationTypes())?.filter(
-            (type) => type.name === attribute['inputValidation']
-          )?.[0]?.id ?? null,
+          isSystemAttribute: attribute['System'] === 'Yes',
 
-        isSystemAttribute: attribute['System'] === 'Yes',
+          visibility: attribute['Visible'] === 'Yes',
 
-        visibility: attribute['Visible'] === 'Yes',
+          useForProductSearch: attribute['Searchable'] === 'Yes',
 
-        useForProductSearch: attribute['Searchable'] === 'Yes',
+          useForLayeredNavigation: attribute['Use in Layered Navigation'] === 'Yes',
 
-        useForLayeredNavigation: attribute['Use in Layered Navigation'] === 'Yes',
-
-        comparable: attribute['Comparable'] === 'Yes',
-      })
+          comparable: attribute['Comparable'] === 'Yes',
+        }
+      )
     }
   }
 
