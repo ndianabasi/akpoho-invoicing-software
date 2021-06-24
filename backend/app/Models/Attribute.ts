@@ -12,6 +12,8 @@ import FieldInputType from 'App/Models/FieldInputType'
 import FieldInputValidationType from 'App/Models/FieldInputValidationType'
 import AttributeGroup from './AttributeGroup'
 import UUIDHook from './Hooks/UUIDHook'
+import AttributeOption from './AttributeOption'
+import AttributeSelection from './AttributeSelection'
 
 export default class Attribute extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -78,6 +80,18 @@ export default class Attribute extends BaseModel {
     pivotColumns: ['type'],
   })
   public groups: ManyToMany<typeof AttributeGroup>
+
+  @manyToMany(() => AttributeOption, {
+    pivotTimestamps: true,
+    pivotColumns: ['sort_order'],
+  })
+  public options: ManyToMany<typeof AttributeOption>
+
+  @manyToMany(() => AttributeSelection, {
+    pivotTimestamps: true,
+    pivotTable: 'attribute_selections',
+  })
+  public selectedOptions: ManyToMany<typeof AttributeSelection>
 
   @beforeCreate()
   public static generateUUID(model: Attribute) {

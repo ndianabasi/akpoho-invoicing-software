@@ -4,13 +4,14 @@ import Attribute from 'App/Models/Attribute'
 import slugify from 'slugify'
 import FieldInputType from 'App/Models/FieldInputType'
 import FieldInputValidationType from 'App/Models/FieldInputValidationType'
+import AttributeOption from 'App/Models/AttributeOption'
 
 export default class AttributeSeeder extends BaseSeeder {
   public async run() {
     for (let index = 0; index < attributes.length; index++) {
       const attribute = attributes[index]
 
-      await Attribute.updateOrCreate(
+      const attributeModel = await Attribute.updateOrCreate(
         { name: attribute['Name'] },
         {
           attributeCode: slugify(attribute['Name'], {
@@ -40,6 +41,19 @@ export default class AttributeSeeder extends BaseSeeder {
           comparable: attribute['Comparable'] === 'Yes',
         }
       )
+
+      // Associate attribute with attribute options
+      if (attribute['options']) {
+        await attributeModel.related('options').detach()
+        for (let i = 0; i < attribute['options'].length; i++) {
+          const option = attribute['options'][i]
+          const optionModel = await AttributeOption.firstOrCreate({ name: option })
+
+          await attributeModel
+            .related('options')
+            .attach({ [optionModel.id]: { sort_order: i + 1 } })
+        }
+      }
     }
   }
 

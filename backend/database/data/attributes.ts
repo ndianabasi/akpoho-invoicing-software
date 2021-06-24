@@ -174,6 +174,7 @@ export default [
     'Comparable': 'No',
     'inputType': 'Toggle',
     'inputValidation': 'None',
+    'options': ['Yes', 'No'],
   },
   {
     'Name': 'Product Name',
@@ -229,6 +230,7 @@ export default [
     'Comparable': 'No',
     'inputType': 'Toggle',
     'inputValidation': 'None',
+    'options': ['Yes', 'No'],
   },
   {
     'Name': 'SEO Name',
@@ -284,6 +286,7 @@ export default [
     'Comparable': 'No',
     'inputType': 'Toggle',
     'inputValidation': 'None',
+    'options': ['Yes', 'No'],
   },
   {
     'Name': 'Special Price From Date',
@@ -328,6 +331,7 @@ export default [
     'Comparable': 'No',
     'inputType': 'Toggle',
     'inputValidation': 'None',
+    'options': ['Yes', 'No'],
   },
   {
     'Name': 'Enabled one-time purchase',
@@ -339,6 +343,7 @@ export default [
     'Comparable': 'No',
     'inputType': 'Toggle',
     'inputValidation': 'None',
+    'options': ['Yes', 'No'],
   },
   {
     'Name': 'Swatch',
@@ -405,6 +410,7 @@ export default [
     'Comparable': 'No',
     'inputType': 'Select',
     'inputValidation': 'None',
+    'options': ['Catalogue Only', 'Search Only', 'Catalogue and Search', 'Embedded'],
   },
   {
     'Name': 'Weight',
@@ -427,5 +433,6 @@ export default [
     'Comparable': 'No',
     'inputType': 'Toggle',
     'inputValidation': 'None',
+    'options': ['Yes', 'No'],
   },
 ]

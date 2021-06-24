@@ -27,7 +27,7 @@ export default class ProductTypeSeeder extends BaseSeeder {
 
         await attributeGroup
           .related('attributes')
-          .attach({ [attribute.id]: { sort_order: ++j, type: group.type } })
+          .attach({ [attribute.id]: { sort_order: j + 1, type: group.type } })
       }
     }
   }
