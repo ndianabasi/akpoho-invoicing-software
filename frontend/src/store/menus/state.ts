@@ -3,6 +3,7 @@ export interface Menu {
   title: string;
   caption?: string;
   link?: string;
+  subMenu?: Menu[];
 }
 export interface MenusStateInterface {
   links1: Array<Menu>;
@@ -15,11 +16,31 @@ export interface MenusStateInterface {
 function state(): MenusStateInterface {
   return {
     links1: [
-      { icon: 'people', title: 'Customers', link: 'customers' },
+      {
+        icon: 'people',
+        title: 'Customers',
+        link: 'customers',
+        subMenu: [
+          { icon: 'people', title: 'All Customers', link: 'customers' },
+          { icon: 'people', title: 'Customer Groups', link: 'customers' },
+        ],
+      },
       { icon: 'request_page', title: 'Quotations', link: 'quotations' },
       { icon: 'list_alt', title: 'Invoices', link: 'invoices' },
       { icon: 'receipt', title: 'Receipts', link: 'receipts' },
-      { icon: 'inventory', title: 'Inventories', link: 'inventories' },
+      {
+        icon: 'inventory',
+        title: 'Inventories',
+        link: 'inventories',
+        subMenu: [
+          { icon: 'local_grocery_store', title: 'Products', link: 'customers' },
+          {
+            icon: 'storefront',
+            title: 'Product Categories',
+            link: 'customers',
+          },
+        ],
+      },
     ],
     links2: [
       /* { icon: 'archive', title: 'Archive' },

@@ -34,7 +34,7 @@
     "vee-validate": "^4.4.4",
     "vue-cropperjs": "^5.0.0",
     "vue-i18n": "^9.0.0-beta.0",
-    "vue-router": "^4.0.8",
+    "vue-router": "^4.0.10",
     "vuex": "^4.0.1",
     "vuex-persistedstate": "^4.0.0-beta.3",
     "yup": "^0.32.9"
