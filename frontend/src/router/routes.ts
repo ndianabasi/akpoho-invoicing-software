@@ -82,8 +82,9 @@ const routes: CustomRouteRecord[] = [
         ],
       },
       {
-        path: 'inventory',
+        path: 'inventories',
         component: () => import('pages/inventories/InventoryIndex.vue'),
+        redirect: '/inventories/products',
         meta: {
           label: 'Inventories',
           icon: 'people',
@@ -92,41 +93,66 @@ const routes: CustomRouteRecord[] = [
         children: [
           {
             path: '',
-            component: () => import('pages/inventories/Inventories.vue'),
-            name: 'inventories',
+            redirect: '/inventories/products',
+            name: 'all_inventory',
             meta: {
-              label: 'All Inventories',
-              icon: 'people',
+              label: 'All Inventory',
+              icon: 'inventory',
             },
           },
           {
-            path: ':inventoryId/view',
-            component: () => import('pages/inventories/Inventory.vue'),
-            props: true,
-            name: 'view_inventory',
+            path: 'products',
+            component: () =>
+              import('pages/inventories/products/ProductIndex.vue'),
+            name: 'products',
             meta: {
-              label: 'View Inventory',
-              permission: 'can_view_inventories',
+              label: 'Products',
+              icon: 'local_grocery_store',
             },
-          },
-          {
-            path: ':inventoryId/edit',
-            component: () => import('pages/inventories/EditInventory.vue'),
-            props: true,
-            name: 'edit_inventory',
-            meta: {
-              label: 'Edit Inventory',
-              permission: 'can_edit_inventories',
-            },
-          },
-          {
-            path: 'new',
-            component: () => import('pages/inventories/CreateInventory.vue'),
-            name: 'create_inventory',
-            meta: {
-              label: 'New Inventory',
-              permission: 'can_create_inventories',
-            },
+            children: [
+              {
+                path: '',
+                component: () =>
+                  import('pages/inventories/products/Products.vue'),
+                name: 'all_products',
+                meta: {
+                  label: 'All Products',
+                  icon: 'local_grocery_store',
+                },
+              },
+              {
+                path: ':productId/view',
+                component: () =>
+                  import('pages/inventories/products/Product.vue'),
+                props: true,
+                name: 'view_product',
+                meta: {
+                  label: 'View Product',
+                  permission: 'can_view_inventories',
+                },
+              },
+              {
+                path: ':productId/edit',
+                component: () =>
+                  import('pages/inventories/products/EditProduct.vue'),
+                props: true,
+                name: 'edit_product',
+                meta: {
+                  label: 'Edit Product',
+                  permission: 'can_edit_inventories',
+                },
+              },
+              {
+                path: 'new',
+                component: () =>
+                  import('pages/inventories/products/CreateProduct.vue'),
+                name: 'create_product',
+                meta: {
+                  label: 'New Product',
+                  permission: 'can_create_inventories',
+                },
+              },
+            ],
           },
         ],
       },

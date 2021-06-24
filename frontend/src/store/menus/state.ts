@@ -31,13 +31,16 @@ function state(): MenusStateInterface {
       {
         icon: 'inventory',
         title: 'Inventories',
-        link: 'inventories',
         subMenu: [
-          { icon: 'local_grocery_store', title: 'Products', link: 'customers' },
+          {
+            icon: 'local_grocery_store',
+            title: 'Products',
+            link: 'all_products',
+          },
           {
             icon: 'storefront',
             title: 'Product Categories',
-            link: 'customers',
+            link: 'all_products',
           },
         ],
       },

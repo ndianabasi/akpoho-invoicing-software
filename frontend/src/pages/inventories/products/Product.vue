@@ -88,16 +88,16 @@ import {
   computed,
   Ref,
 } from 'vue';
-import ViewCard from '../../components/ViewCard.vue';
-import useTitleInfo from '../../composables/useTitleInfo';
-import useResourcePermissions from '../../composables/useResourcePermissions';
-import useDeleteResource from '../../composables/useDeleteResource';
+import ViewCard from '../../../components/ViewCard.vue';
+import useTitleInfo from '../../../composables/useTitleInfo';
+import useResourcePermissions from '../../../composables/useResourcePermissions';
+import useDeleteResource from '../../../composables/useDeleteResource';
 import {
   CurrentlyViewedCompany,
   PERMISSION,
   TitleInfo,
-} from '../../store/types';
-import { store } from '../../store';
+} from '../../../store/types';
+import { store } from '../../../store';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 

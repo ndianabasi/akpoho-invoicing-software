@@ -27,9 +27,9 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import companyColumns from '../../components/data/table-definitions/companies';
-import QuasarTable from '../../components/QuasarTable.vue';
-import { PERMISSION } from '../../store/types';
+import companyColumns from '../../../components/data/table-definitions/companies';
+import QuasarTable from '../../../components/QuasarTable.vue';
+import { PERMISSION } from '../../../store/types';
 
 export default defineComponent({
   name: 'AllCompanies',

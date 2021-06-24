@@ -163,9 +163,9 @@ import {
   nextTick,
 } from 'vue';
 
-import ViewCard from '../../components/ViewCard.vue';
-import useTitleInfo from '../../composables/useTitleInfo';
-import useResourcePermissions from '../../composables/useResourcePermissions';
+import ViewCard from '../../../components/ViewCard.vue';
+import useTitleInfo from '../../../composables/useTitleInfo';
+import useResourcePermissions from '../../../composables/useResourcePermissions';
 import {
   CurrentlyViewedCompany,
   SelectionOption,
@@ -173,14 +173,14 @@ import {
   TitleInfo,
   CompanyFormShape,
   FormSchema,
-} from '../../store/types';
+} from '../../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
-import QuasarSelect from '../../components/QuasarSelect';
+import QuasarSelect from '../../../components/QuasarSelect';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
-import { phoneNumberRegex } from '../../helpers/utils';
+import { phoneNumberRegex } from '../../../helpers/utils';
 import { isEqual } from 'lodash';
 
 export default defineComponent({

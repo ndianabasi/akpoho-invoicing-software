@@ -14,7 +14,7 @@
 
     <secondary-toolbar />
 
-    <sticky-sidebar />
+    <!-- <sticky-sidebar /> -->
 
     <q-page-container class="AIS__page-container q-my-xl q-mx-sm-xs q-mx-lg-md">
       <akpoho-banners />
@@ -71,7 +71,7 @@ import {
   onBeforeUnmount,
 } from 'vue';
 import SecondaryToolbar from '../components/SecondaryToolbar.vue';
-import StickySidebar from '../components/StickySidebar.vue';
+//import StickySidebar from '../components/StickySidebar.vue';
 import GoToTop from '../components/GoToTop.vue';
 import SideDrawer from '../components/SideDrawer.vue';
 import PrimaryToolbar from '../components/PrimaryToolbar.vue';
@@ -146,7 +146,7 @@ export default defineComponent({
 
   components: {
     SecondaryToolbar,
-    StickySidebar,
+    /* StickySidebar, */
     GoToTop,
     SideDrawer,
     PrimaryToolbar,
@@ -279,7 +279,4 @@ export default defineComponent({
       line-height: 24px
       letter-spacing: .01785714em
       font-weight: 500
-  @media (min-width: 1024px)
-    &__page-container
-      padding-left: 94px
 </style>
