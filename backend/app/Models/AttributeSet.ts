@@ -2,16 +2,19 @@ import { DateTime } from 'luxon'
 import {
   BaseModel,
   beforeCreate,
+  BelongsTo,
+  belongsTo,
   column,
   HasMany,
   hasMany,
   hasManyThrough,
   HasManyThrough,
 } from '@ioc:Adonis/Lucid/Orm'
-import Product from './Product'
-import Attribute from './Attribute'
-import AttributeGroup from './AttributeGroup'
-import UUIDHook from './Hooks/UUIDHook'
+import Product from 'App/Models/Product'
+import Attribute from 'App/Models/Attribute'
+import AttributeGroup from 'App/Models/AttributeGroup'
+import UUIDHook from 'App/Models/Hooks/UUIDHook'
+import Company from 'App/Models/Company'
 
 export default class AttributeSet extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -42,6 +45,9 @@ export default class AttributeSet extends BaseModel {
 
   @hasManyThrough([() => Attribute, () => AttributeGroup])
   public attributes: HasManyThrough<typeof Attribute>
+
+  @belongsTo(() => Company)
+  public company: BelongsTo<typeof Company>
 
   @beforeCreate()
   public static generateUUID(model: AttributeSet) {

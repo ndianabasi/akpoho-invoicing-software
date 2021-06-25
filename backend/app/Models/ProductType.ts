@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, beforeCreate, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
-import Product from './Product'
-import UUIDHook from './Hooks/UUIDHook'
+import Product from 'App/Models/Product'
+import UUIDHook from 'App/Models/Hooks/UUIDHook'
 
 export default class ProductType extends BaseModel {
   public static selfAssignPrimaryKey = true

@@ -1,9 +1,9 @@
 import User from 'App/Models/User'
 import NoEntityDefinedException from 'App/Exceptions/NoEntityDefinedException'
-import { CustomContextContract } from '../Controllers/types/index'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class FindRequestedUser {
-  public async handle(ctx: CustomContextContract, next: () => Promise<void>) {
+  public async handle(ctx: HttpContextContract, next: () => Promise<void>) {
     // code for middleware goes here. ABOVE THE NEXT CALL
     const { user_id } = ctx.params
 

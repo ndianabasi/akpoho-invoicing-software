@@ -11,7 +11,7 @@ import {
   afterFetch,
 } from '@ioc:Adonis/Lucid/Orm'
 import FileProvider from 'App/Models/FileProvider'
-import UserProfile from './UserProfile'
+import UserProfile from 'App/Models/UserProfile'
 import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
 type FormatAttributes = {

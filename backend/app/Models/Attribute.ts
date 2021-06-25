@@ -10,10 +10,11 @@ import {
 } from '@ioc:Adonis/Lucid/Orm'
 import FieldInputType from 'App/Models/FieldInputType'
 import FieldInputValidationType from 'App/Models/FieldInputValidationType'
-import AttributeGroup from './AttributeGroup'
+import AttributeGroup from 'App/Models/AttributeGroup'
 import UUIDHook from './Hooks/UUIDHook'
-import AttributeOption from './AttributeOption'
-import AttributeSelection from './AttributeSelection'
+import AttributeOption from 'App/Models/AttributeOption'
+import AttributeSelection from 'App/Models/AttributeSelection'
+import Company from 'App/Models/Company'
 
 export default class Attribute extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -92,6 +93,9 @@ export default class Attribute extends BaseModel {
     pivotTable: 'attribute_selections',
   })
   public selectedOptions: ManyToMany<typeof AttributeSelection>
+
+  @belongsTo(() => Company)
+  public company: BelongsTo<typeof Company>
 
   @beforeCreate()
   public static generateUUID(model: Attribute) {

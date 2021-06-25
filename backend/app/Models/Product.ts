@@ -7,9 +7,10 @@ import {
   manyToMany,
   ManyToMany,
 } from '@ioc:Adonis/Lucid/Orm'
-import ProductType from './ProductType'
-import AttributeSet from './AttributeSet'
-import ProductCategory from './ProductCategory'
+import ProductType from 'App/Models/ProductType'
+import AttributeSet from 'App/Models/AttributeSet'
+import ProductCategory from 'App/Models/ProductCategory'
+import Company from 'App/Models/Company'
 
 export default class Product extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -39,4 +40,7 @@ export default class Product extends BaseModel {
     pivotTimestamps: true,
   })
   public categories: ManyToMany<typeof ProductCategory>
+
+  @belongsTo(() => Company)
+  public company: BelongsTo<typeof Company>
 }
