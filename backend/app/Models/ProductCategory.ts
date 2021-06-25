@@ -1,12 +1,5 @@
 import { DateTime } from 'luxon'
-import {
-  BaseModel,
-  BelongsTo,
-  belongsTo,
-  column,
-  ManyToMany,
-  manyToMany,
-} from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 import Product from 'App/Models/Product'
 import Company from 'App/Models/Company'
 
@@ -30,6 +23,6 @@ export default class ProductCategory extends BaseModel {
   })
   public categories: ManyToMany<typeof Product>
 
-  @belongsTo(() => Company)
-  public company: BelongsTo<typeof Company>
+  @manyToMany(() => Company, { pivotTimestamps: true })
+  public companies: ManyToMany<typeof Company>
 }

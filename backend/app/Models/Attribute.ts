@@ -13,7 +13,7 @@ import FieldInputValidationType from 'App/Models/FieldInputValidationType'
 import AttributeGroup from 'App/Models/AttributeGroup'
 import UUIDHook from './Hooks/UUIDHook'
 import AttributeOption from 'App/Models/AttributeOption'
-import AttributeSelection from 'App/Models/AttributeSelection'
+//import AttributeSelection from 'App/Models/AttributeSelection'
 import Company from 'App/Models/Company'
 
 export default class Attribute extends BaseModel {
@@ -78,7 +78,7 @@ export default class Attribute extends BaseModel {
 
   @manyToMany(() => AttributeGroup, {
     pivotTimestamps: true,
-    pivotColumns: ['type'],
+    pivotColumns: ['type', 'sort_order'],
   })
   public groups: ManyToMany<typeof AttributeGroup>
 
@@ -88,14 +88,14 @@ export default class Attribute extends BaseModel {
   })
   public options: ManyToMany<typeof AttributeOption>
 
-  @manyToMany(() => AttributeSelection, {
+  /* @manyToMany(() => AttributeSelection, {
     pivotTimestamps: true,
     pivotTable: 'attribute_selections',
   })
-  public selectedOptions: ManyToMany<typeof AttributeSelection>
+  public selectedOptions: ManyToMany<typeof AttributeSelection> */
 
-  @belongsTo(() => Company)
-  public company: BelongsTo<typeof Company>
+  @manyToMany(() => Company, { pivotTimestamps: true })
+  public companies: ManyToMany<typeof Company>
 
   @beforeCreate()
   public static generateUUID(model: Attribute) {

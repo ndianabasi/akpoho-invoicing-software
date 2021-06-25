@@ -41,6 +41,6 @@ export default class Product extends BaseModel {
   })
   public categories: ManyToMany<typeof ProductCategory>
 
-  @belongsTo(() => Company)
-  public company: BelongsTo<typeof Company>
+  @manyToMany(() => Company, { pivotTimestamps: true })
+  public companies: ManyToMany<typeof Company>
 }

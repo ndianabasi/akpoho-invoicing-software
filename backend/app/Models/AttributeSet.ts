@@ -2,13 +2,13 @@ import { DateTime } from 'luxon'
 import {
   BaseModel,
   beforeCreate,
-  BelongsTo,
-  belongsTo,
   column,
   HasMany,
   hasMany,
   hasManyThrough,
   HasManyThrough,
+  ManyToMany,
+  manyToMany,
 } from '@ioc:Adonis/Lucid/Orm'
 import Product from 'App/Models/Product'
 import Attribute from 'App/Models/Attribute'
@@ -46,8 +46,8 @@ export default class AttributeSet extends BaseModel {
   @hasManyThrough([() => Attribute, () => AttributeGroup])
   public attributes: HasManyThrough<typeof Attribute>
 
-  @belongsTo(() => Company)
-  public company: BelongsTo<typeof Company>
+  @manyToMany(() => Company, { pivotTimestamps: true })
+  public companies: ManyToMany<typeof Company>
 
   @beforeCreate()
   public static generateUUID(model: AttributeSet) {

@@ -352,7 +352,13 @@ export type FileFormatAttributes = {
   url: string;
 };
 
-type InputComponentType = 'select' | 'input' | 'date' | 'toggle';
+export type InputComponentType =
+  | 'select'
+  | 'input'
+  | 'date'
+  | 'toggle'
+  | 'editor'
+  | 'none';
 
 export interface FormSchemaProperties {
   model?: unknown;
@@ -407,4 +413,48 @@ export interface ProductFormShape {
 
 export interface AttributeSetData {
   id: string;
+  is_system: number;
+  name: string;
+  sort_order: number;
+  attributeGroups: Array<AttributeGroup>;
+}
+
+export interface AttributeGroup {
+  id: string;
+  attribute_set_id: string;
+  is_system: number;
+  name: string;
+  sort_order: number;
+  attributes: Array<Attribute>;
+}
+
+export interface Attribute {
+  attribute_code: string;
+  fieldInputType: FieldInputType;
+  fieldInputValidationType: FieldInputValidationType;
+  field_input_type_id: string;
+  field_input_validation_type_id: string;
+  id: string;
+  is_system_attribute: number;
+  name: string;
+  options: Array<AttributeOption>;
+  visibility: number;
+}
+
+export interface FieldInputType {
+  id: string;
+  name: string;
+  code: string;
+}
+
+export interface FieldInputValidationType {
+  id: string;
+  name: string;
+  code: string;
+  regex: string;
+}
+
+export interface AttributeOption {
+  id: string;
+  name: string;
 }

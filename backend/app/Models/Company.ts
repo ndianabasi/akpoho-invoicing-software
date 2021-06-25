@@ -127,15 +127,23 @@ export default class Company extends BaseModel {
   @belongsTo(() => Country)
   public country: BelongsTo<typeof Country>
 
-  @hasMany(() => Attribute)
-  public attributes: HasMany<typeof Attribute>
+  @manyToMany(() => Attribute, {
+    pivotTimestamps: true,
+  })
+  public attributes: ManyToMany<typeof Attribute>
 
-  @hasMany(() => AttributeSet)
-  public attributeSets: HasMany<typeof AttributeSet>
+  @manyToMany(() => AttributeSet, {
+    pivotTimestamps: true,
+  })
+  public attributeSets: ManyToMany<typeof AttributeSet>
 
-  @hasMany(() => Product)
-  public products: HasMany<typeof Product>
+  @manyToMany(() => Product, {
+    pivotTimestamps: true,
+  })
+  public products: ManyToMany<typeof Product>
 
-  @hasMany(() => ProductCategory)
-  public productCategories: HasMany<typeof ProductCategory>
+  @manyToMany(() => ProductCategory, {
+    pivotTimestamps: true,
+  })
+  public productCategories: ManyToMany<typeof ProductCategory>
 }

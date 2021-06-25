@@ -32,4 +32,39 @@ export default class AttributeSetsController {
       data: transformedSets,
     })
   }
+
+  public async attributeSetData({
+    response,
+    requestedCompany,
+    requestedAttributeSet,
+    params,
+    bouncer,
+  }: HttpContextContract) {
+    if (requestedAttributeSet) {
+      await bouncer
+        .with('AttributeSetPolicy')
+        .authorize('view', requestedCompany ?? null, requestedAttributeSet)
+
+      const { type } = params
+
+      const attributeSetData = await AttributeSet.query()
+        .where('id', requestedAttributeSet.id)
+        .preload('attributeGroups', (attributeGroupsQuery) => {
+          attributeGroupsQuery
+            .orderBy('sort_order', 'asc')
+            .preload('attributes', (attributesQuery) => {
+              attributesQuery.pivotColumns(['sort_order'])
+              attributesQuery.wherePivot('type', type)
+              attributesQuery.preload('fieldInputType')
+              attributesQuery.preload('fieldInputValidationType')
+              attributesQuery.preload('options', (optionsQuery) => {
+                optionsQuery.pivotColumns(['sort_order'])
+              })
+            })
+        })
+        .first()
+
+      return response.ok({ data: attributeSetData })
+    } else return response.abort({ message: 'Attribute Set not found' })
+  }
 }

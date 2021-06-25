@@ -41,7 +41,7 @@ export default class AttributeGroup extends BaseModel {
 
   @manyToMany(() => Attribute, {
     pivotTimestamps: true,
-    pivotColumns: ['type'],
+    pivotColumns: ['type', 'sort_order'],
   })
   public attributes: ManyToMany<typeof Attribute>
 

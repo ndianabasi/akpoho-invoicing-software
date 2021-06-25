@@ -16,7 +16,7 @@
             autocomplete="off"
             :options="attributeSets"
             label="Attribute Set"
-            :name="attribute_set_id"
+            name="attribute_set_id"
             clearable
             bottom-slots
             :options-dense="isSmallScreen"
@@ -30,6 +30,74 @@
             map-options
           >
           </QuasarSelect>
+
+          <template v-for="field in defaultFields">
+            <q-input
+              v-if="field.componentType === 'input' && field.isVisible"
+              :key="`field_${field.name}_${field.componentType}`"
+              v-model="form[field.name]"
+              :type="field.inputType"
+              filled
+              clearable
+              bottom-slots
+              :label="field.label"
+              :aria-autocomplete="field?.autocomplete ?? 'off'"
+              :autocomplete="field?.autocomplete ?? 'off'"
+              :dense="dense"
+              :error="form$?.[field.name]?.$invalid ?? false"
+              class="q-mb-md q-mb-sm-sm"
+            >
+              <template #error>
+                {{
+                  form$ && form$[field.name]
+                    ? form$[field.name].$silentErrors
+                        .map((error) => error.$message)
+                        .join(', ')
+                    : ''
+                }}
+              </template>
+            </q-input>
+
+            <quasar-select
+              v-if="field.componentType === 'select' && field.isVisible"
+              :key="`field_${field.name}_${field.componentType}`"
+              :ref="field.name"
+              v-model="form[field.name]"
+              filled
+              aria-autocomplete="off"
+              autocomplete="off"
+              :options="field.options"
+              :label="field.label"
+              :name="field.name"
+              clearable
+              bottom-slots
+              options-dense
+              use-input
+              :input-debounce="200"
+              class="q-mb-md q-mb-sm-sm"
+              transition-show="scale"
+              transition-hide="scale"
+              emit-value
+              map-options
+              ><template v-if="field?.icon" #before>
+                <q-icon :name="field?.icon ?? ''" />
+              </template>
+            </quasar-select>
+
+            <q-toggle
+              v-if="field.componentType === 'toggle' && field.isVisible"
+              :key="`field_${field.name}_${field.componentType}`"
+              v-model="form[field.name]"
+              true-value="Yes"
+              false-value="No"
+              checked-icon="check"
+              color="green"
+              unchecked-icon="clear"
+              :label="field.label"
+              :name="field.name"
+              class="q-mb-md-md q-mb-sm-sm"
+            />
+          </template>
         </form>
       </template>
 
@@ -119,20 +187,23 @@ import {
   PERMISSION,
   TitleInfo,
   ProductFormShape,
-  FormSchema,
+  InputComponentType,
   AttributeSetData,
+  FormSchemaProperties,
+  SelectOption,
+  AttributeOption,
 } from '../../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../../components/QuasarSelect';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useStore } from 'vuex';
-import { useQuasar } from 'quasar';
+import { useQuasar, QSpinnerFacebook } from 'quasar';
 import { phoneNumberRegex } from '../../../helpers/utils';
 import { isEqual } from 'lodash';
 
 export default defineComponent({
-  name: 'EditInventory',
+  name: 'EditProduct',
 
   components: {
     ViewCard,
@@ -160,6 +231,7 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
     const $q = useQuasar();
+    const loading = ref(false);
 
     const stopFetchCountriesForSelect = watchEffect(() => {
       void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
@@ -204,11 +276,18 @@ export default defineComponent({
       attributeSetId: '',
     });
 
+    const defaultFields = computed(
+      () =>
+        store.getters[
+          'attributes/GET_DEFAULT_ATTRIBUTES_SCHEMA'
+        ] as Array<FormSchemaProperties>
+    );
+
     // Valiation section starts
 
-    /* const formSchema = computed(() =>
+    const formSchema = computed(() =>
       yup.object({
-        isPersonalBrand: yup.boolean(),
+        /* isPersonalBrand: yup.boolean(),
         name: yup.string().required('Name is required').nullable(),
         email: yup
           .string()
@@ -223,11 +302,11 @@ export default defineComponent({
         size: yup.number().required('Product Size is required').nullable(),
         stateId: yup.number().required('State is required').nullable(),
         countryId: yup.number().required('Country is required').nullable(),
-        website: yup.string().optional().nullable(),
+        website: yup.string().optional().nullable(), */
       })
     );
 
-    const initialValues: Readonly<ProductFormShape> = {
+    /* const initialValues: Readonly<ProductFormShape> = {
       isPersonalBrand: false,
       name: '',
       email: '',
@@ -240,15 +319,15 @@ export default defineComponent({
       website: '',
     }; */
 
-    /* const {
+    const {
       handleSubmit,
       errors: formErrors,
       isSubmitting,
       values,
-    } = useForm<ProductFormShape>({
+    } = useForm<ProductFormShape>(/* {
       validationSchema: formSchema.value,
-      initialValues,
-    }); */
+      //initialValues,
+    } */);
 
     const { value: isPersonalBrand } = useField('isPersonalBrand');
     const { value: name } = useField('name');
@@ -263,8 +342,8 @@ export default defineComponent({
 
     // Valiation section ends
 
-    /* const onSubmit = handleSubmit((form) => {
-      void nextTick(() => {
+    const onSubmit = handleSubmit((form) => {
+      /* void nextTick(() => {
         const isCreationMode = props.creationMode;
         void store
           .dispatch(
@@ -284,8 +363,8 @@ export default defineComponent({
           .catch((error) => {
             console.error(error);
           });
-      });
-    }); */
+      }); */
+    });
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
@@ -331,13 +410,31 @@ export default defineComponent({
 
     watch(
       () => form.attributeSetId,
-      (id) => {
+      async (id) => {
         if (id) {
           stateId.value = null;
-          void store.dispatch('attributes/FETCH_ATTRIBUTE_SET_DATA', {
-            id,
-            type: 'product',
+
+          $q.loading.show({
+            spinner: QSpinnerFacebook,
+            spinnerSize: 50,
+            message: 'Loading form data',
           });
+
+          await store
+            .dispatch('attributes/FETCH_ATTRIBUTE_SET_DATA', {
+              id,
+              type: 'product',
+            })
+            .then(() => {
+              $q.loading.hide();
+
+              attributeSetData.value = store.getters[
+                'attributes/GET_ATTRIBUTE_SET_DATA'
+              ] as AttributeSetData;
+            })
+            .catch(() => {
+              $q.loading.hide();
+            });
 
           attributeSetData.value = store.getters[
             'attributes/GET_ATTRIBUTE_SET_DATA'
@@ -395,9 +492,10 @@ export default defineComponent({
       }),
       CAN_EDIT_COMPANIES,
       attributeSets,
-      /* isSubmitting,
       onSubmit,
-      formErrors, */
+      isSubmitting,
+      formErrors,
+      defaultFields,
     };
   },
 });

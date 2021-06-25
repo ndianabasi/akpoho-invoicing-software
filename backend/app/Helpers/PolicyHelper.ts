@@ -4,6 +4,7 @@ import Customer from 'App/Models/Customer'
 import PermissionHelper from '../Helpers/PermissionHelper'
 import Company from 'App/Models/Company'
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
+import AttributeSet from 'App/Models/AttributeSet'
 
 const accessCompany = async (resourcePermission: string, authUser: User, company: Company) => {
   const isPermitted = await PermissionHelper.hasResourcePermission({
@@ -60,7 +61,7 @@ const accessCompanyUser = async (
     )
     //console.log(belongToSameCompany)
 
-    return belongToSameCompany
+    return belongToSameCompany && isPermitted
   } else {
     if (
       authUserCompanyIds.some((authCompanyId) => authCompanyId === requestedCompany.id) &&
@@ -105,7 +106,7 @@ const accessCompanyCustomer = async (
     )
     //console.log(belongToSameCompany)
 
-    return belongToSameCompany
+    return belongToSameCompany && isPermitted
   } else {
     if (
       authUserCompanyIds.some((authCompanyId) => authCompanyId === requestedCompany?.id) &&
@@ -180,6 +181,71 @@ const serialisedAuthUserCompanyIds = async function (authUser: User) {
     return company.id
   })
   return serialisedUser
+}
+
+const serialisedAttributeSetCompanyIds = async function (attributeSet: AttributeSet) {
+  await attributeSet.load('companies')
+  const attributeSetCompanies = attributeSet.companies
+  if (!attributeSetCompanies.length) return []
+  const serialisedIds = attributeSetCompanies.map((company) => {
+    company.serialize()
+    return company.id
+  })
+  return serialisedIds
+}
+
+/**
+ * Helper function to determine access to a requested company
+ * and attribute set, as permitted by the resource permission
+ * @param resourcePermission The resource permission required for the operation
+ * @param authUser The authenticated user
+ * @param requestedCompany The company whose access is being requested
+ * @param requestedAttributeSet The customer whose access is being requested
+ * @returns {Boolean} True/false
+ */
+export const accessCompanyAttributeSet = async (
+  resourcePermission: string,
+  authUser: User,
+  requestedCompany: Company | null,
+  requestedAttributeSet: AttributeSet
+) => {
+  const isPermitted = await PermissionHelper.hasResourcePermission({
+    resourcePermission,
+    user: authUser,
+    loggable: true,
+  })
+
+  if (requestedAttributeSet.isSystem) {
+    return isPermitted
+  }
+
+  const authUserCompanyIds = await serialisedAuthUserCompanyIds(authUser)
+
+  const attributeSetCompanyIds = await serialisedAttributeSetCompanyIds(requestedAttributeSet)
+
+  if (!requestedCompany) {
+    // If no requested company, check if the requested attribute and
+    // auth user belong to the same company
+    const belongToSameCompany = authUserCompanyIds.some(
+      (authUserCompanyId) =>
+        attributeSetCompanyIds[attributeSetCompanyIds.indexOf(authUserCompanyId)]
+    )
+
+    return belongToSameCompany && isPermitted
+  } else {
+    if (
+      authUserCompanyIds.some((authCompanyId) => authCompanyId === requestedCompany?.id) &&
+      authUserCompanyIds.some(
+        (authUserCompanyId) =>
+          attributeSetCompanyIds[attributeSetCompanyIds.indexOf(authUserCompanyId)]
+      ) &&
+      isPermitted
+    ) {
+      return true
+    }
+  }
+
+  return Bouncer.deny('You are not permitted to perform this action!')
 }
 
 export { accessCompany, accessCompanyUser, accessCompanyCustomer }

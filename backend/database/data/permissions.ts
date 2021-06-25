@@ -51,4 +51,9 @@ export const permissions = [
   'can_edit_inventories',
   'can_delete_inventories',
   'can_list_inventories',
+  'can_create_attribute_sets',
+  'can_view_attribute_sets',
+  'can_edit_attribute_sets',
+  'can_delete_attribute_sets',
+  'can_list_attribute_sets',
 ]
