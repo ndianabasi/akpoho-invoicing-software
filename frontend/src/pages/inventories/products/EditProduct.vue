@@ -120,6 +120,7 @@ import {
   TitleInfo,
   ProductFormShape,
   FormSchema,
+  AttributeSetData,
 } from '../../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../../components/QuasarSelect';
@@ -182,11 +183,9 @@ export default defineComponent({
         ] as SelectionOption[]
     );
 
-    const countryStates = computed({
+    const attributeSetData = computed({
       get: () =>
-        store.getters[
-          'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-        ] as SelectionOption[],
+        store.getters['attributes/GET_ATTRIBUTE_SET_DATA'] as AttributeSetData,
       set: (value) => value,
     });
 
@@ -331,18 +330,18 @@ export default defineComponent({
     });
 
     watch(
-      () => countryId.value,
-      (country) => {
-        if (country) {
+      () => form.attributeSetId,
+      (id) => {
+        if (id) {
           stateId.value = null;
-          void store.dispatch(
-            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: country }
-          );
+          void store.dispatch('attributes/FETCH_ATTRIBUTE_SET_DATA', {
+            id,
+            type: 'product',
+          });
 
-          countryStates.value = store.getters[
-            'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-          ] as SelectionOption[];
+          attributeSetData.value = store.getters[
+            'attributes/GET_ATTRIBUTE_SET_DATA'
+          ] as AttributeSetData;
         }
       }
     );
@@ -389,7 +388,7 @@ export default defineComponent({
       form,
       titleInfo,
       countries,
-      countryStates,
+      attributeSetData,
       resourcePermissions: useResourcePermissions({
         view: PERMISSION.CAN_VIEW_COMPANIES,
         list: PERMISSION.CAN_LIST_COMPANIES,

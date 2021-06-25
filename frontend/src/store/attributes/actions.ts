@@ -19,6 +19,21 @@ const actions: ActionTree<AttributeStateInterface, StateInterface> = {
         });
     });
   },
+
+  async FETCH_ATTRIBUTE_SET_DATA(
+    { commit },
+    { id, type }: { id: string; type: 'product' | 'category' }
+  ) {
+    return new Promise(async (resolve) => {
+      await $http
+        .get(`/attribute-sets/${type}/${id}`)
+        .then((res: HttpResponse) => {
+          commit('SET_ATTRIBUTE_SET_DATA', res.data.data);
+
+          resolve(res.data);
+        });
+    });
+  },
 };
 
 export default actions;

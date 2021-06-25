@@ -196,6 +196,12 @@ Route.group(() => {
   )
 
   Route.post('/:company_id/users', 'UsersController.store')
+
+  // Get all attribute set data
+  Route.get(
+    '/:company_id/attribute-sets/:type/:attribute_set_id',
+    'AttributeSetsController.attributeSetData'
+  ).middleware('findRequestedAttributeSet')
 })
   .prefix('/v1')
   .middleware('auth')

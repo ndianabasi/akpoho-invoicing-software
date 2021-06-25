@@ -404,3 +404,7 @@ export type CurrentlyViewedProduct = {
 export interface ProductFormShape {
   attributeSetId: string;
 }
+
+export interface AttributeSetData {
+  id: string;
+}

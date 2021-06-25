@@ -10,6 +10,9 @@ export type AttributeGetterInterface = GetterTree<
 const getters: AttributeGetterInterface = {
   GET_ATTRIBUTE_SETS_FOR_SELECT: (state: AttributeStateInterface) =>
     state.attributeSetsForSelect,
+
+  GET_ATTRIBUTE_SET_DATA: (state: AttributeStateInterface) =>
+    state.attributeSetData,
 };
 
 export default getters;
