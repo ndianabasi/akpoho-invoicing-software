@@ -23,6 +23,9 @@ export default class AttributeSet extends BaseModel {
   public name: string
 
   @column()
+  public sortOrder: number
+
+  @column()
   public isSystem: boolean
 
   @column.dateTime({ autoCreate: true })

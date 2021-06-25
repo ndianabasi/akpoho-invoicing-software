@@ -59,6 +59,7 @@ import {
   computed,
   watchEffect,
   onBeforeUnmount,
+  nextTick,
 } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -97,12 +98,6 @@ export default defineComponent({
       // console.log('Clicked on main button')
     };
 
-    const onNewProductDropdownItemClick = (name: SelectOption['label']) => {
-      console.log(name);
-      if (name === 'Simple Product')
-        void router.push({ name: 'create_simple_product' });
-    };
-
     const stopFetchProductTypesEffect = watchEffect(
       () => void store.dispatch('products/FETCH_PRODUCT_TYPES_FOR_SELECT')
     );
@@ -111,6 +106,21 @@ export default defineComponent({
       () =>
         store.getters['products/GET_PRODUCT_TYPES_FOR_SELECT'] as SelectOption[]
     );
+
+    const onNewProductDropdownItemClick = (name: SelectOption['label']) => {
+      const selectedProductType = productTypesForSelect.value.filter(
+        (type) => type.label === name
+      )[0];
+      store.commit(
+        'products/SET_CURRENTLY_EDITED_PRODUCT_TYPE',
+        selectedProductType
+      );
+      void nextTick(() => {
+        if (name === 'Simple Product') {
+          void router.push({ name: 'create_simple_product' });
+        }
+      });
+    };
 
     onBeforeUnmount(() => {
       stopFetchProductTypesEffect();

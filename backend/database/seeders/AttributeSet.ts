@@ -7,10 +7,14 @@ export default class AttributeSetSeeder extends BaseSeeder {
     for (let index = 0; index < attributeSets.length; index++) {
       const set = attributeSets[index]
 
-      await AttributeSet.firstOrCreate({
-        name: set.name,
-        isSystem: set.system,
-      })
+      await AttributeSet.updateOrCreate(
+        { name: set.name },
+        {
+          name: set.name,
+          isSystem: set.system,
+          sortOrder: index + 1,
+        }
+      )
     }
   }
 }

@@ -1,88 +1,35 @@
 <template>
   <div class="q-pa-md">
     <view-card
-      v-if="creationMode || company"
+      v-if="creationMode || product"
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
     >
       <template #body-panel="{ isSmallScreen }">
         <form class="q-pa-md" @submit="onSubmit">
-          <template v-for="field in form">
-            <q-toggle
-              v-if="field.componentType === 'toggle' && field.isVisible"
-              :key="`field_${field.name}_${field.componentType}`"
-              v-model="field.model"
-              checked-icon="check"
-              color="green"
-              unchecked-icon="clear"
-              :label="field.label"
-              class="q-ml-lg q-mb-md"
-              :dense="isSmallScreen"
-            />
-
-            <q-input
-              v-if="field.componentType === 'input' && field.isVisible"
-              :key="`field_${field.name}_${field.componentType}`"
-              v-model="field.model"
-              :type="
-                field.inputType !== 'password'
-                  ? field.inputType
-                  : revealPasswords[field.name]
-                  ? 'text'
-                  : 'password'
-              "
-              :for="field.name"
-              filled
-              clearable
-              bottom-slots
-              :label="field.label"
-              :aria-autocomplete="field?.autocomplete ?? 'off'"
-              :autocomplete="field?.autocomplete ?? 'off'"
-              :error="!!formErrors?.[field.name]?.length ?? false"
-              class="q-mb-sm-sm q-mb-md-md"
-              :dense="isSmallScreen"
-            >
-              <template #error>
-                {{ formErrors[field.name] }}
-              </template>
-
-              <template #hint></template>
-            </q-input>
-
-            <quasar-select
-              v-if="field.componentType === 'select' && field.isVisible"
-              :key="`field_${field.name}_${field.componentType}`"
-              :ref="field.name"
-              v-model="field.model"
-              filled
-              aria-autocomplete="list"
-              autocomplete="off"
-              :options="field.options"
-              :label="field.label"
-              :name="field.name"
-              :for="field.name"
-              clearable
-              bottom-slots
-              :options-dense="isSmallScreen"
-              use-input
-              :input-debounce="200"
-              class="q-mb-md"
-              transition-show="scale"
-              transition-hide="scale"
-              emit-value
-              map-options
-              :dense="isSmallScreen"
-              :error="!!formErrors?.[field.name]?.length ?? false"
-            >
-              <template v-if="field?.icon" #before>
-                <q-icon :name="field?.icon ?? ''" />
-              </template>
-              <template #error>
-                {{ formErrors[field.name] }}
-              </template>
-            </quasar-select>
-          </template>
+          <QuasarSelect
+            ref="attributeSet"
+            v-model="form.attributeSetId"
+            filled
+            aria-autocomplete="off"
+            autocomplete="off"
+            :options="attributeSets"
+            label="Attribute Set"
+            :name="attribute_set_id"
+            clearable
+            bottom-slots
+            :options-dense="isSmallScreen"
+            :dense="isSmallScreen"
+            use-input
+            :input-debounce="200"
+            class="q-mb-md"
+            transition-show="scale"
+            transition-hide="scale"
+            emit-value
+            map-options
+          >
+          </QuasarSelect>
         </form>
       </template>
 
@@ -104,7 +51,7 @@
         </div>
       </template>
 
-      <template v-if="!creationMode && !myAccountMode" #title-panel-side>
+      <template v-if="!creationMode" #title-panel-side>
         <q-btn flat icon="more_vert">
           <q-menu
             anchor="bottom right"
@@ -116,14 +63,14 @@
               <q-item
                 v-if="resourcePermissions.canView"
                 :to="{
-                  name: 'view_company',
-                  params: { companyId: companyId }, //companyId from route props
+                  name: 'view_product',
+                  params: { productId: productId }, //productId from route props
                 }"
               >
                 <q-item-section>
                   <q-btn flat icon="visibility" />
                 </q-item-section>
-                <q-item-section>View Company</q-item-section>
+                <q-item-section>View Product</q-item-section>
               </q-item>
 
               <q-item
@@ -167,11 +114,11 @@ import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
 import useResourcePermissions from '../../../composables/useResourcePermissions';
 import {
-  CurrentlyViewedCompany,
+  CurrentlyViewedProduct,
   SelectionOption,
   PERMISSION,
   TitleInfo,
-  CompanyFormShape,
+  ProductFormShape,
   FormSchema,
 } from '../../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
@@ -192,7 +139,7 @@ export default defineComponent({
   },
 
   props: {
-    companyId: {
+    productId: {
       type: String,
       required: false,
       default: '',
@@ -205,14 +152,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    productType: {
-      type: String,
-      default: 'simple_product',
-    },
   },
 
   setup(props) {
-    const companyCreated = ref(false);
+    const productCreated = ref(false);
     const store = useStore();
     const router = useRouter();
     const $q = useQuasar();
@@ -221,9 +164,16 @@ export default defineComponent({
       void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
     });
 
-    const stopFetchCompanySizesForSelect = watchEffect(() => {
-      void store.dispatch('companies/FETCH_COMPANY_SIZES_FOR_SELECT');
+    const stopAttributeSetsForSelect = watchEffect(() => {
+      void store.dispatch('attributes/FETCH_ATTRIBUTE_SETS_FOR_SELECT');
     });
+
+    const attributeSets = computed(
+      () =>
+        store.getters[
+          'attributes/GET_ATTRIBUTE_SETS_FOR_SELECT'
+        ] as SelectionOption[]
+    );
 
     const countries = computed(
       () =>
@@ -240,26 +190,24 @@ export default defineComponent({
       set: (value) => value,
     });
 
-    const companySizes = computed(
-      () =>
-        store.getters[
-          'companies/GET_COMPANY_SIZES_FOR_SELECT'
-        ] as SelectionOption[]
-    );
-    let currentCompany: Ref<CurrentlyViewedCompany | null>;
+    let currentProduct: Ref<CurrentlyViewedProduct | null>;
 
-    currentCompany = !props.creationMode
+    currentProduct = !props.creationMode
       ? computed(
           () =>
             store.getters[
-              'companies/GET_CURRENTLY_VIEWED_COMPANY'
-            ] as CurrentlyViewedCompany
+              'companies/GET_CURRENTLY_VIEWED_PRODUCT'
+            ] as CurrentlyViewedProduct
         )
       : ref(null);
 
+    const form: ProductFormShape = reactive({
+      attributeSetId: '',
+    });
+
     // Valiation section starts
 
-    const formSchema = computed(() =>
+    /* const formSchema = computed(() =>
       yup.object({
         isPersonalBrand: yup.boolean(),
         name: yup.string().required('Name is required').nullable(),
@@ -273,14 +221,14 @@ export default defineComponent({
           .nullable(),
         address: yup.string().optional().nullable(),
         city: yup.string().required('City is required').nullable(),
-        size: yup.number().required('Company Size is required').nullable(),
+        size: yup.number().required('Product Size is required').nullable(),
         stateId: yup.number().required('State is required').nullable(),
         countryId: yup.number().required('Country is required').nullable(),
         website: yup.string().optional().nullable(),
       })
     );
 
-    const initialValues: Readonly<CompanyFormShape> = {
+    const initialValues: Readonly<ProductFormShape> = {
       isPersonalBrand: false,
       name: '',
       email: '',
@@ -291,17 +239,17 @@ export default defineComponent({
       stateId: null,
       countryId: null,
       website: '',
-    };
+    }; */
 
-    const {
+    /* const {
       handleSubmit,
       errors: formErrors,
       isSubmitting,
       values,
-    } = useForm<CompanyFormShape>({
+    } = useForm<ProductFormShape>({
       validationSchema: formSchema.value,
       initialValues,
-    });
+    }); */
 
     const { value: isPersonalBrand } = useField('isPersonalBrand');
     const { value: name } = useField('name');
@@ -314,141 +262,23 @@ export default defineComponent({
     const { value: countryId } = useField('countryId');
     const { value: website } = useField('website');
 
-    // Form schema for form generation
-    const form: FormSchema = reactive({
-      isPersonalBrand: {
-        model: isPersonalBrand,
-        name: 'isPersonalBrand',
-        componentType: 'toggle',
-        label: 'Create as Personal Brand',
-        default: false,
-        isVisible: true,
-      },
-      name: {
-        model: name,
-        name: 'name',
-        componentType: 'input',
-        inputType: 'text',
-        label: 'Name',
-        default: '',
-        autocomplete: 'organization',
-        isVisible: true,
-      },
-      email: {
-        model: email,
-        name: 'email',
-        componentType: 'input',
-        inputType: 'work email',
-        label: 'Email',
-        default: '',
-        autocomplete: 'email',
-        isVisible: true,
-      },
-      phoneNumber: {
-        model: phoneNumber,
-        name: 'phoneNumber',
-        componentType: 'input',
-        inputType: 'text',
-        label: 'Phone Number',
-        default: '',
-        autocomplete: 'work tel',
-        isVisible: true,
-      },
-      address: {
-        model: address,
-        name: 'address',
-        componentType: 'input',
-        inputType: 'textarea',
-        label: 'Address',
-        default: '',
-        autocomplete: 'work street-address',
-        isVisible: true,
-      },
-      city: {
-        model: city,
-        name: 'city',
-        componentType: 'input',
-        inputType: 'text',
-        label: 'City',
-        default: '',
-        autocomplete: 'work address-level2',
-        isVisible: true,
-      },
-      size: {
-        model: size,
-        name: 'size',
-        componentType: 'select',
-        label: 'Company Size',
-        default: null,
-        isVisible: true,
-        options: computed(() => companySizes.value),
-      },
-      countryId: {
-        model: countryId,
-        name: 'countryId',
-        componentType: 'select',
-        label: 'Country',
-        default: null,
-        autocomplete: 'work country-name',
-        isVisible: true,
-        options: unref(countries),
-      },
-      stateId: {
-        model: stateId,
-        name: 'stateId',
-        componentType: 'select',
-        label: 'State',
-        default: null,
-        autocomplete: 'work address-level1',
-        isVisible: true,
-        options: computed(() => countryStates.value),
-      },
-      website: {
-        model: website,
-        name: 'website',
-        componentType: 'input',
-        inputType: 'text',
-        label: 'Website',
-        default: null,
-        autocomplete: 'url',
-        isVisible: true,
-      },
-    });
-
     // Valiation section ends
 
-    watch(
-      () => form.countryId.model,
-      (newCountry) => {
-        stateId.value = null;
-        if (newCountry) {
-          void store.dispatch(
-            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: newCountry }
-          );
-
-          countryStates.value = store.getters[
-            'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-          ] as SelectionOption[];
-        }
-      }
-    );
-
-    const onSubmit = handleSubmit((form) => {
+    /* const onSubmit = handleSubmit((form) => {
       void nextTick(() => {
         const isCreationMode = props.creationMode;
         void store
           .dispatch(
-            `companies/${isCreationMode ? 'CREATE_COMPANY' : 'EDIT_COMPANY'}`,
-            isCreationMode ? form : { form, companyId: props.companyId }
+            `companies/${isCreationMode ? 'CREATE_PRODUCT' : 'EDIT_PRODUCT'}`,
+            isCreationMode ? form : { form, productId: props.productId }
           )
           .then((id: string) => {
-            companyCreated.value = true;
+            productCreated.value = true;
             void store.dispatch('auth/FETCH_AUTH_PROFILE');
             void nextTick(() => {
               void router.push({
-                name: 'view_company',
-                params: { companyId: id },
+                name: 'view_product',
+                params: { productId: id },
               });
             });
           })
@@ -456,22 +286,22 @@ export default defineComponent({
             console.error(error);
           });
       });
-    });
+    }); */
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
     watch(
-      currentCompany,
+      currentProduct,
       () => {
         const title =
-          currentCompany && currentCompany.value
+          currentProduct && currentProduct.value
             ? useTitleInfo({
-                title: currentCompany.value.name ?? '',
+                title: currentProduct.value.name ?? '',
                 avatar: undefined,
               })
             : props.creationMode
             ? useTitleInfo({
-                title: 'New Company',
+                title: 'New Product',
                 avatar: '',
               })
             : ref(null);
@@ -481,45 +311,21 @@ export default defineComponent({
       { deep: true }
     );
 
-    const stopFetchCurrentlyViewedCompany = watchEffect(() => {
+    const stopFetchCurrentlyViewedProduct = watchEffect(() => {
       if (!props.creationMode) {
         void store
-          .dispatch('companies/FETCH_CURRENTLY_VIEWED_COMPANY', {
-            companyId: props.companyId,
+          .dispatch('companies/FETCH_CURRENTLY_VIEWED_PRODUCT', {
+            productId: props.productId,
           })
-          .then(async () => {
-            currentCompany.value = unref(
+          .then(() => {
+            currentProduct.value = unref(
               computed(
                 () =>
                   store.getters[
-                    'companies/GET_CURRENTLY_VIEWED_COMPANY'
-                  ] as CurrentlyViewedCompany
+                    'companies/GET_CURRENTLY_VIEWED_PRODUCT'
+                  ] as CurrentlyViewedProduct
               )
             );
-
-            isPersonalBrand.value = currentCompany?.value?.type === 'personal';
-            name.value = currentCompany?.value?.name ?? '';
-            email.value = currentCompany?.value?.email ?? '';
-            phoneNumber.value = currentCompany?.value?.phone_number ?? '';
-            address.value = currentCompany?.value?.address ?? '';
-            city.value = currentCompany?.value?.city ?? '';
-            size.value = currentCompany?.value?.companySize?.id ?? null;
-            website.value = currentCompany?.value?.website ?? '';
-            countryId.value = currentCompany?.value?.country?.id ?? null;
-            // Fetch the states for the current country
-            if (countryId.value) {
-              await store
-                .dispatch('countries_states/FETCH_COUNTRY_STATES_FOR_SELECT', {
-                  countryId: countryId.value,
-                })
-                .then(() => {
-                  // Then update the current state
-                  stateId.value = currentCompany?.value?.state?.id ?? null;
-                });
-            } else {
-              // Then update the current state
-              countryId.value = currentCompany?.value?.state?.id ?? null;
-            }
           });
       }
     });
@@ -547,17 +353,17 @@ export default defineComponent({
     );
 
     onBeforeMount(() => {
-      stopFetchCurrentlyViewedCompany();
+      stopFetchCurrentlyViewedProduct();
       stopFetchCountriesForSelect();
-      stopFetchCompanySizesForSelect();
+      stopAttributeSetsForSelect();
     });
 
     onBeforeRouteLeave((to, from, next) => {
-      if (companyCreated.value) {
+      if (productCreated.value) {
         return next();
       }
 
-      const didFormValuesChange = !isEqual(initialValues, values);
+      /* const didFormValuesChange = !isEqual(initialValues, values);
       if (didFormValuesChange) {
         $q.dialog({
           message: 'Form has changed. Do you really want to leave this page?',
@@ -571,11 +377,11 @@ export default defineComponent({
           .onCancel(() => {
             return false;
           });
-      } else return next();
+      } else return next(); */
     });
 
     return {
-      company: currentCompany,
+      product: currentProduct,
       text: ref(''),
       ph: ref(''),
       dense: ref(false),
@@ -589,9 +395,10 @@ export default defineComponent({
         list: PERMISSION.CAN_LIST_COMPANIES,
       }),
       CAN_EDIT_COMPANIES,
-      isSubmitting,
+      attributeSets,
+      /* isSubmitting,
       onSubmit,
-      formErrors,
+      formErrors, */
     };
   },
 });

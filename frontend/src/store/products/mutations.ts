@@ -9,6 +9,13 @@ const mutation: MutationTree<ProductStateInterface> = {
   ) {
     state.productTypesForSelect = payload;
   },
+
+  SET_CURRENTLY_EDITED_PRODUCT_TYPE(
+    state: ProductStateInterface,
+    payload: SelectOption
+  ) {
+    state.currentlyEditedProductType = payload;
+  },
 };
 
 export default mutation;

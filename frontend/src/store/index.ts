@@ -57,6 +57,10 @@ import products from './products';
 import { ProductStateInterface } from './products/state';
 import { ProductGetterInterface } from './products/getters';
 
+import attributes from './attributes';
+import { AttributeStateInterface } from './attributes/state';
+import { AttributeGetterInterface } from './attributes/getters';
+
 //import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -110,6 +114,7 @@ export interface StateInterface {
   banners?: BannerStateInterface;
   companies?: CompanyStateInterface;
   products?: ProductStateInterface;
+  attributes?: AttributeStateInterface;
 }
 
 export interface StoreGettersInterface {
@@ -124,6 +129,7 @@ export interface StoreGettersInterface {
   banners?: BannerGettersInterface;
   companies?: CompanyGetterInterface;
   products?: ProductGetterInterface;
+  attributes?: AttributeGetterInterface;
 }
 
 export type StoreGetters = RootGetterInterface & StoreGettersInterface;
@@ -224,6 +230,7 @@ export default function () {
       banners,
       companies,
       products,
+      attributes,
     },
 
     plugins:

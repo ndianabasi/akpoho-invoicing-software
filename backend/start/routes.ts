@@ -107,10 +107,15 @@ Route.group(() => {
   Route.delete('/customers', 'CustomersController.destroy')
 
   // General product routes
-  // Get all product types for selection
+  // Get all product types for selections
   Route.get(
     '/product-types/product-types-for-select',
     'ProductTypesController.productTypesForSelect'
+  )
+  // Get all attribute sets for selections
+  Route.get(
+    '/attribute-sets/attribute-sets-for-select',
+    'AttributeSetsController.attributeSetsForSelect'
   )
 })
   .prefix('/v1')

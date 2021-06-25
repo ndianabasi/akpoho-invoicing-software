@@ -87,7 +87,7 @@ const routes: CustomRouteRecord[] = [
         redirect: '/inventories/products',
         meta: {
           label: 'Inventories',
-          icon: 'people',
+          icon: 'inventory',
           permission: 'can_list_inventories',
         },
         children: [
@@ -151,6 +151,7 @@ const routes: CustomRouteRecord[] = [
                 name: 'create_product_index',
                 meta: {
                   label: 'New Product',
+                  icon: 'add_circle',
                   permission: 'can_create_inventories',
                 },
                 children: [

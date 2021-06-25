@@ -10,6 +10,8 @@ export type ProductGetterInterface = GetterTree<
 const getters: ProductGetterInterface = {
   GET_PRODUCT_TYPES_FOR_SELECT: (state: ProductStateInterface) =>
     state.productTypesForSelect,
+  GET_CURRENTLY_EDITED_PRODUCT_TYPE: (state: ProductStateInterface) =>
+    state.currentlyEditedProductType,
 };
 
 export default getters;

@@ -394,3 +394,13 @@ export type ResourceNamePlural =
   | 'Invoices'
   | 'Receipts'
   | 'Customers';
+
+export type CurrentlyViewedProduct = {
+  id: string;
+  name: string;
+  attributeSetId: string;
+};
+
+export interface ProductFormShape {
+  attributeSetId: string;
+}
