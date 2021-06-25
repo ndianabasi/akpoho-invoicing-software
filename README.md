@@ -12,6 +12,10 @@ Akpoho Invoicing Software is developed with the following technologies:
 3. MySQL is used for data persistence on the backend,
 4. Redis is used for data caching and caching of authentication tokens
 
+## Demo
+
+You can explore the application through the demo site: https://demo.akpoho.com. Please note that Akpoho Software is still under active development and has not be released yet.
+
 ## Pre-requisites for Installation
 
 1. Make sure that you have fully setup MySQL on your preferred environment. Please research how to install MySQL on your preferred environment (Windows, MacOS, or Linux).
