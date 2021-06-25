@@ -7,9 +7,13 @@ export default class ProductTypeSeeder extends BaseSeeder {
     for (let index = 0; index < productTypes.length; index++) {
       const productType = productTypes[index]
 
-      await ProductType.firstOrCreate({
-        name: productType,
-      })
+      await ProductType.updateOrCreate(
+        { name: productType },
+        {
+          name: productType,
+          sortOrder: index + 1,
+        }
+      )
     }
   }
 }

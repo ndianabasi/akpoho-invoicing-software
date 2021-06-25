@@ -230,8 +230,6 @@ export default defineComponent({
     const activeMenu: Ref<Menu | null> = ref(null);
 
     const setActiveLink = function (index: number) {
-      console.log(index);
-
       activeLinkIndex.value = index;
       activeMenu.value = links1.value[activeLinkIndex.value];
       if (activeMenu.value && activeMenu.value.subMenu) return;

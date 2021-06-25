@@ -12,6 +12,9 @@ export default class ProductType extends BaseModel {
   @column()
   public name: string
 
+  @column()
+  public sortOrder: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

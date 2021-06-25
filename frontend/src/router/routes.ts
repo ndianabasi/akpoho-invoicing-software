@@ -145,12 +145,37 @@ const routes: CustomRouteRecord[] = [
               {
                 path: 'new',
                 component: () =>
-                  import('pages/inventories/products/CreateProduct.vue'),
-                name: 'create_product',
+                  import(
+                    'pages/inventories/products/new/CreateProductIndex.vue'
+                  ),
+                name: 'create_product_index',
                 meta: {
                   label: 'New Product',
                   permission: 'can_create_inventories',
                 },
+                children: [
+                  {
+                    path: '',
+                    redirect: '/inventories/products/new/simple-product',
+                    name: 'create_product',
+                    meta: {
+                      label: 'New Product',
+                      icon: 'local_grocery_store',
+                    },
+                  },
+                  {
+                    path: 'simple-product',
+                    component: () =>
+                      import(
+                        'pages/inventories/products/new/CreateSimpleProduct.vue'
+                      ),
+                    name: 'create_simple_product',
+                    meta: {
+                      label: 'New Simple Product',
+                      permission: 'can_create_inventories',
+                    },
+                  },
+                ],
               },
             ],
           },

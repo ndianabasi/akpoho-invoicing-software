@@ -105,6 +105,13 @@ Route.group(() => {
 
   // Delete requested customers
   Route.delete('/customers', 'CustomersController.destroy')
+
+  // General product routes
+  // Get all product types for selection
+  Route.get(
+    '/product-types/product-types-for-select',
+    'ProductTypesController.productTypesForSelect'
+  )
 })
   .prefix('/v1')
   .middleware('auth')

@@ -18,18 +18,53 @@
       title: 'New Company',
     }"
     :resource-action-permissions="resourceActionPermissions"
-  ></quasar-table>
+  >
+    <template #topAddNew>
+      <q-btn-dropdown
+        split
+        unelevated
+        ripple
+        class="q-ml-md-md q-ml-sm-sm"
+        color="accent"
+        label="New Product"
+        @click="onNewProductDropdownMainClick"
+      >
+        <q-list
+          v-for="type in productTypesForSelect"
+          :key="'product_type_' + type.value"
+        >
+          <q-item
+            v-close-popup
+            clickable
+            @click="onNewProductDropdownItemClick(type.label)"
+          >
+            <q-item-section>
+              <q-item-label>{{ type.label }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
+    </template>
+  </quasar-table>
 </template>
 
 <!-- eslint-disable @typescript-eslint/no-unsafe-return -->
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { defineComponent, reactive, ref, computed } from 'vue';
+import {
+  defineComponent,
+  reactive,
+  ref,
+  computed,
+  watchEffect,
+  onBeforeUnmount,
+} from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import companyColumns from '../../../components/data/table-definitions/companies';
 import QuasarTable from '../../../components/QuasarTable.vue';
-import { PERMISSION } from '../../../store/types';
+import { PERMISSION, SelectOption } from '../../../store/types';
 
 export default defineComponent({
   name: 'AllCompanies',
@@ -39,6 +74,7 @@ export default defineComponent({
   setup() {
     const tableName = ref('All Companies');
     const store = useStore();
+    const router = useRouter();
 
     const defaultSort = {
       sortBy: 'email',
@@ -57,6 +93,29 @@ export default defineComponent({
       stickyTable: false,
     });
 
+    const onNewProductDropdownMainClick = () => {
+      // console.log('Clicked on main button')
+    };
+
+    const onNewProductDropdownItemClick = (name: SelectOption['label']) => {
+      console.log(name);
+      if (name === 'Simple Product')
+        void router.push({ name: 'create_simple_product' });
+    };
+
+    const stopFetchProductTypesEffect = watchEffect(
+      () => void store.dispatch('products/FETCH_PRODUCT_TYPES_FOR_SELECT')
+    );
+
+    const productTypesForSelect = computed(
+      () =>
+        store.getters['products/GET_PRODUCT_TYPES_FOR_SELECT'] as SelectOption[]
+    );
+
+    onBeforeUnmount(() => {
+      stopFetchProductTypesEffect();
+    });
+
     return {
       tableName,
       columns: data.columns,
@@ -71,6 +130,9 @@ export default defineComponent({
         edit: PERMISSION.CAN_EDIT_COMPANIES,
         delete: PERMISSION.CAN_DELETE_COMPANIES,
       }),
+      onNewProductDropdownMainClick,
+      onNewProductDropdownItemClick,
+      productTypesForSelect,
     };
   },
 });

@@ -205,6 +205,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    productType: {
+      type: String,
+      default: 'simple_product',
+    },
   },
 
   setup(props) {
