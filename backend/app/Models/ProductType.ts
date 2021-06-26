@@ -13,6 +13,9 @@ export default class ProductType extends BaseModel {
   public name: string
 
   @column()
+  public isActive: boolean
+
+  @column()
   public sortOrder: number
 
   @column.dateTime({ autoCreate: true })

@@ -59,7 +59,7 @@ import { ProductGetterInterface } from './products/getters';
 
 import attributes from './attributes';
 import { AttributeStateInterface } from './attributes/state';
-import { AttributeGetterInterface } from './attributes/getters';
+import { AttributesGettersInterface } from './attributes/getters';
 
 //import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
@@ -129,7 +129,7 @@ export interface StoreGettersInterface {
   banners?: BannerGettersInterface;
   companies?: CompanyGetterInterface;
   products?: ProductGetterInterface;
-  attributes?: AttributeGetterInterface;
+  attributes?: AttributesGettersInterface;
 }
 
 export type StoreGetters = RootGetterInterface & StoreGettersInterface;

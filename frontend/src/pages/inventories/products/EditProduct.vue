@@ -31,11 +31,11 @@
           >
           </QuasarSelect>
 
-          <template v-for="field in defaultFields">
+          <template v-for="(field, index) in defaultFormFields">
             <q-input
-              v-if="field.componentType === 'input' && field.isVisible"
+              v-if="field.componentType === 'input' && isFieldVisible(index)"
               :key="`field_${field.name}_${field.componentType}`"
-              v-model="form[field.name]"
+              v-model="field.model"
               :type="field.inputType"
               filled
               clearable
@@ -59,10 +59,10 @@
             </q-input>
 
             <quasar-select
-              v-if="field.componentType === 'select' && field.isVisible"
+              v-if="field.componentType === 'select' && isFieldVisible(index)"
               :key="`field_${field.name}_${field.componentType}`"
               :ref="field.name"
-              v-model="form[field.name]"
+              v-model="field.model"
               filled
               aria-autocomplete="off"
               autocomplete="off"
@@ -85,9 +85,9 @@
             </quasar-select>
 
             <q-toggle
-              v-if="field.componentType === 'toggle' && field.isVisible"
+              v-if="field.componentType === 'toggle' && isFieldVisible(index)"
               :key="`field_${field.name}_${field.componentType}`"
-              v-model="form[field.name]"
+              v-model="field.model"
               true-value="Yes"
               false-value="No"
               checked-icon="check"
@@ -175,7 +175,6 @@ import {
   unref,
   Ref,
   reactive,
-  nextTick,
 } from 'vue';
 
 import ViewCard from '../../../components/ViewCard.vue';
@@ -187,20 +186,15 @@ import {
   PERMISSION,
   TitleInfo,
   ProductFormShape,
-  InputComponentType,
   AttributeSetData,
   FormSchemaProperties,
-  SelectOption,
-  AttributeOption,
 } from '../../../store/types';
-import { onBeforeRouteLeave, useRouter } from 'vue-router';
+import { onBeforeRouteLeave } from 'vue-router';
 import QuasarSelect from '../../../components/QuasarSelect';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useStore } from 'vuex';
 import { useQuasar, QSpinnerFacebook } from 'quasar';
-import { phoneNumberRegex } from '../../../helpers/utils';
-import { isEqual } from 'lodash';
 
 export default defineComponent({
   name: 'EditProduct',
@@ -229,9 +223,7 @@ export default defineComponent({
   setup(props) {
     const productCreated = ref(false);
     const store = useStore();
-    const router = useRouter();
     const $q = useQuasar();
-    const loading = ref(false);
 
     const stopFetchCountriesForSelect = watchEffect(() => {
       void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
@@ -283,28 +275,41 @@ export default defineComponent({
         ] as Array<FormSchemaProperties>
     );
 
+    const defaultFormFields = reactive([...defaultFields.value]);
+
+    const isFieldVisible = (index: number) => {
+      let isVisible = false;
+      const attribute = defaultFormFields[index];
+
+      switch (attribute.name) {
+        case 'weight':
+          isVisible =
+            (attribute?.isVisible ?? false) &&
+            defaultFormFields?.filter(
+              (field) => field.name === 'product_has_weight'
+            )?.[0]?.model === 'Yes';
+          break;
+
+        default:
+          isVisible = attribute?.isVisible ?? false;
+          break;
+      }
+      return Boolean(isVisible);
+    };
+
     // Valiation section starts
 
-    const formSchema = computed(() =>
-      yup.object({
+    const defaultFieldsSchema = computed(() => {
+      const schemaObject = {};
+
+      return yup.object({
         /* isPersonalBrand: yup.boolean(),
-        name: yup.string().required('Name is required').nullable(),
-        email: yup
-          .string()
-          .email('Email is not valid')
-          .required('Email is required'),
         phoneNumber: yup
           .string()
           .matches(phoneNumberRegex, 'Please provide a valid phone number')
-          .nullable(),
-        address: yup.string().optional().nullable(),
-        city: yup.string().required('City is required').nullable(),
-        size: yup.number().required('Product Size is required').nullable(),
-        stateId: yup.number().required('State is required').nullable(),
-        countryId: yup.number().required('Country is required').nullable(),
-        website: yup.string().optional().nullable(), */
-      })
-    );
+          .nullable(), */
+      });
+    });
 
     /* const initialValues: Readonly<ProductFormShape> = {
       isPersonalBrand: false,
@@ -325,7 +330,7 @@ export default defineComponent({
       isSubmitting,
       values,
     } = useForm<ProductFormShape>(/* {
-      validationSchema: formSchema.value,
+      validationSchema: defaultFieldsSchema.value,
       //initialValues,
     } */);
 
@@ -495,7 +500,8 @@ export default defineComponent({
       onSubmit,
       isSubmitting,
       formErrors,
-      defaultFields,
+      defaultFormFields,
+      isFieldVisible,
     };
   },
 });

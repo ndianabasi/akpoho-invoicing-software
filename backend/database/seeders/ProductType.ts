@@ -8,9 +8,10 @@ export default class ProductTypeSeeder extends BaseSeeder {
       const productType = productTypes[index]
 
       await ProductType.updateOrCreate(
-        { name: productType },
+        { name: productType.name },
         {
-          name: productType,
+          name: productType.name,
+          isActive: productType.active,
           sortOrder: index + 1,
         }
       )

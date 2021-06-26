@@ -18,6 +18,7 @@ export default class ProductTypesController {
 
   public async productTypesForSelect({ response }: HttpContextContract) {
     const productTypes = await ProductType.query()
+      .where('is_active', true)
       .orderBy('sort_order', 'asc')
       .select(...['id', 'name'])
 

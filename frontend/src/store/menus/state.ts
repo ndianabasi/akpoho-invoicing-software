@@ -31,6 +31,7 @@ function state(): MenusStateInterface {
       {
         icon: 'inventory',
         title: 'Inventories',
+        link: 'all_products',
         subMenu: [
           {
             icon: 'local_grocery_store',

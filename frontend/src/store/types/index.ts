@@ -363,8 +363,9 @@ export type InputComponentType =
 export interface FormSchemaProperties {
   model?: unknown;
   inputType?: string;
-  options?: SelectOption[];
+  options?: SelectOption[] | null;
   default?: string | number | boolean | null;
+  required?: boolean;
   autocomplete?: string;
   isVisible?: boolean;
   name: string;
@@ -439,6 +440,7 @@ export interface Attribute {
   name: string;
   options: Array<AttributeOption>;
   visibility: number;
+  required: number;
 }
 
 export interface FieldInputType {
@@ -458,3 +460,8 @@ export interface AttributeOption {
   id: string;
   name: string;
 }
+
+export type AttributeGroupsCollection = Record<
+  string,
+  Array<FormSchemaProperties>
+>;

@@ -27,3 +27,12 @@ export const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
 export const phoneNumberRegex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
 export const urlRegex =
   /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+
+export const ALPHA_REGEX = /^\w$/;
+export const DECIMAL_REGEX = /^\d*.\d*$/;
+export const INTEGER_REGEX = /^\d*$/;
+export const ALPHA_NUM_REGEX = /^a-zA-Z0-9$/;
+export const EMAIL_REGEX = /^a-zA-Z0-9$/;
+export const PASSWORD_REGEX = passwordRegex;
+export const URL_REGEX = urlRegex;
+export const PHONE_NUMBER_REGEX = phoneNumberRegex;

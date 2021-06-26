@@ -2,6 +2,7 @@ export default [
   'Text Field',
   'Text Area',
   'Text Editor',
+  'Number',
   'Date',
   'Date and Time',
   'Toggle',
