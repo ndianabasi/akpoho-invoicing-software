@@ -432,7 +432,7 @@ export default [
     'Searchable': 'No',
     'Use in Layered Navigation': 'No',
     'Comparable': 'No',
-    'inputType': 'Text Field',
+    'inputType': 'Number',
     'inputValidation': 'Decimal',
   },
   {

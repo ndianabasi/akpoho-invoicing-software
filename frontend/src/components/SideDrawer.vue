@@ -4,102 +4,127 @@
     bordered
     mini
     behavior="mobile"
-    :width="activeMenu && activeMenu.subMenu ? 600 : 300"
+    :width="300"
     @click="TOGGLE_LEFT_DRAWER"
     @input="TOGGLE_LEFT_DRAWER"
   >
-    <div class="row fit">
-      <div class="col">
-        <q-scroll-area class="fit">
-          <q-toolbar class="AIS__toolbar">
-            <q-toolbar-title class="row items-center">
-              <!-- <img
+    <q-scroll-area class="fit">
+      <q-toolbar class="AIS__toolbar">
+        <q-toolbar-title class="row items-center">
+          <!-- <img
               class="q-pl-md"
               src="https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_clr_74x24px.svg"
             /> -->
-              <span class="q-ml-sm">Akpoho Invoicing Software</span>
-            </q-toolbar-title>
-          </q-toolbar>
+          <span class="q-ml-sm">Akpoho Invoicing Software</span>
+        </q-toolbar-title>
+      </q-toolbar>
 
-          <q-select
-            v-model="selectedCompany"
-            class="q-mx-md"
-            filled
-            :options="userCompanies"
-            label="Choose Company"
-            color="teal"
-            clearable
-            options-selected-class="text-deep-orange"
-            @update:model-value="handleSelectedCompanyUpdate"
+      <q-select
+        v-model="selectedCompany"
+        class="q-mx-md"
+        filled
+        :options="userCompanies"
+        label="Choose Company"
+        color="teal"
+        clearable
+        options-selected-class="text-deep-orange"
+        @update:model-value="handleSelectedCompanyUpdate"
+      >
+        <template #option="scope">
+          <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+            <q-item-section>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <q-item-label v-html="scope.opt.label" />
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
+
+      <q-list padding>
+        <template v-if="links1 && !!links1.length">
+          <template v-for="(link, index) in links1">
+            <q-item
+              v-if="!link.subMenu"
+              :key="link.title"
+              clickable
+              class="AIS__drawer-item"
+              active-class="AIS__drawer-item__active"
+              @click.prevent="setActiveLink(index)"
+            >
+              <q-item-section avatar>
+                <q-icon :name="link.icon" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ link.title }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-expansion-item
+              v-else
+              :key="link.title"
+              group="side_drawer_group"
+              :icon="link.icon"
+              :label="link.title"
+              header-class="AIS__drawer-item AIS__drawer-expansion-header"
+            >
+              <q-list class="AIS__drawer-expansion-list">
+                <q-item
+                  v-for="subMenu in link.subMenu"
+                  :key="'submenu_' + subMenu.title"
+                  v-ripple
+                  :to="{ name: subMenu.link }"
+                  class="AIS__drawer-item subitem"
+                >
+                  <q-item-section avatar>
+                    <q-icon :name="subMenu.icon" />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>{{ subMenu.title }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-expansion-item>
+          </template>
+        </template>
+
+        <template v-if="links2 && !!links2.length">
+          <q-separator inset class="q-my-md" />
+          <q-item
+            v-for="link in links2"
+            :key="link.title"
+            clickable
+            class="AIS__drawer-item"
+            :to="{ name: link.link }"
+            active-class="AIS__drawer-item__active"
           >
-            <template #option="scope">
-              <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
-                <q-item-section>
-                  <!-- eslint-disable-next-line vue/no-v-html -->
-                  <q-item-label v-html="scope.opt.label" />
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
+            <q-item-section avatar>
+              <q-icon :name="link.icon" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ link.title }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </template>
 
-          <q-list padding>
-            <template v-if="links1 && !!links1.length">
-              <q-item
-                v-for="(link, index) in links1"
-                :key="link.title"
-                clickable
-                class="AIS__drawer-item"
-                active-class="AIS__drawer-item__active"
-                @click.prevent="setActiveLink(index)"
-              >
-                <q-item-section avatar>
-                  <q-icon :name="link.icon" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>{{ link.title }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
+        <template v-if="links3 && !!links3.length">
+          <q-separator class="q-my-md" />
+          <q-item
+            v-for="link in links3"
+            :key="link.title"
+            clickable
+            class="AIS__drawer-item"
+            :to="{ name: link.link }"
+            active-class="AIS__drawer-item__active"
+          >
+            <q-item-section avatar>
+              <q-icon :name="link.icon" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ link.title }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </template>
 
-            <template v-if="links2 && !!links2.length">
-              <q-separator inset class="q-my-md" />
-              <q-item
-                v-for="link in links2"
-                :key="link.title"
-                clickable
-                class="AIS__drawer-item"
-                :to="{ name: link.link }"
-                active-class="AIS__drawer-item__active"
-              >
-                <q-item-section avatar>
-                  <q-icon :name="link.icon" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>{{ link.title }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
-
-            <template v-if="links3 && !!links3.length">
-              <q-separator class="q-my-md" />
-              <q-item
-                v-for="link in links3"
-                :key="link.title"
-                clickable
-                class="AIS__drawer-item"
-                :to="{ name: link.link }"
-                active-class="AIS__drawer-item__active"
-              >
-                <q-item-section avatar>
-                  <q-icon :name="link.icon" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>{{ link.title }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
-
-            <!--<q-separator class="q-my-md" />
+        <!--
         <q-item
             clickable
             class="AIS__drawer-item AIS__drawer-item--storage"
@@ -113,27 +138,15 @@
               <q-item-label caption>2.6 GB of 15 GB</q-item-label>
             </q-item-section>
           </q-item> -->
-          </q-list>
-        </q-scroll-area>
-      </div>
+      </q-list>
+    </q-scroll-area>
+    <!-- <div class="row fit">
+
       <q-separator vertical inset />
       <div v-if="activeMenu && activeMenu.subMenu" class="col">
-        <q-list>
-          <q-item-label class="header text-h5" header>{{
-            activeMenu.title
-          }}</q-item-label>
 
-          <q-item
-            v-for="subMenu in activeMenu.subMenu"
-            :key="'submenu_' + subMenu.title"
-            v-ripple
-            :to="{ name: subMenu.link }"
-          >
-            <q-item-section>{{ subMenu.title }}</q-item-section>
-          </q-item>
-        </q-list>
       </div>
-    </div>
+    </div> -->
   </q-drawer>
 </template>
 

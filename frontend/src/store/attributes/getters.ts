@@ -10,6 +10,14 @@ import {
   InputComponentType,
   SelectOption,
 } from '../types';
+import {
+  ALPHA_NUM_REGEX,
+  ALPHA_REGEX,
+  DECIMAL_REGEX,
+  EMAIL_REGEX,
+  INTEGER_REGEX,
+  URL_REGEX,
+} from 'src/helpers/utils';
 
 type AttributeGetters = {
   [K in keyof AttributesGettersInterface]: ReturnType<
@@ -76,8 +84,6 @@ const getters: AttributesGettersInterface = {
             groupAttributeCollector.push({
               name: attribute.attribute_code,
               label: attribute.name,
-              default: '',
-              model: '',
               componentType: computed(() => {
                 const fieldType = attribute.fieldInputType.name;
                 let type: InputComponentType = 'none';
@@ -150,6 +156,77 @@ const getters: AttributesGettersInterface = {
                     break;
                 }
                 return type;
+              }).value,
+
+              model: computed(() => {
+                let defaultValue:
+                  | string
+                  | null
+                  | boolean
+                  | number
+                  | Array<string | number> = '';
+                const attributeDefaultValue = attribute.default_value;
+                switch (fieldType) {
+                  case 'Text Field':
+                  case 'Text Editor':
+                  case 'Text Area':
+                  case 'Date':
+                    defaultValue = (attributeDefaultValue as string) || '';
+                    break;
+                  case 'Image':
+                    defaultValue = null;
+                    break;
+                  case 'Price':
+                  case 'Number':
+                    defaultValue = Number(attributeDefaultValue) || null;
+                    break;
+                  case 'Multi-select':
+                    defaultValue =
+                      (attributeDefaultValue as Array<string | number>) || [];
+                    break;
+                  case 'Select':
+                    defaultValue = attributeDefaultValue || '';
+                    break;
+                  case 'Toggle':
+                    defaultValue = (attributeDefaultValue as string) || 'No';
+                    break;
+
+                  default:
+                    defaultValue = null;
+                    break;
+                }
+                return defaultValue;
+              }).value,
+
+              regex: computed(() => {
+                let regExValue: RegExp | undefined | null = undefined;
+                const attributeValidationCode =
+                  attribute.fieldInputValidationType.code;
+                switch (attributeValidationCode) {
+                  case 'email':
+                    regExValue = EMAIL_REGEX;
+                    break;
+                  case 'integer':
+                    regExValue = INTEGER_REGEX;
+                    break;
+                  case 'alphanumeric':
+                    regExValue = ALPHA_NUM_REGEX;
+                    break;
+                  case 'url':
+                    regExValue = URL_REGEX;
+                    break;
+                  case 'decimal':
+                    regExValue = DECIMAL_REGEX;
+                    break;
+                  case 'alpha':
+                    regExValue = ALPHA_REGEX;
+                    break;
+
+                  default:
+                    regExValue = null;
+                    break;
+                }
+                return regExValue;
               }).value,
 
               isVisible: true,

@@ -259,20 +259,27 @@ export default defineComponent({
     height: 64px
   &__toolbar-input
     width: 35%
-  &__drawer-item
-    line-height: 24px
-    border-radius: 0 24px 24px 0
-    margin-right: 12px
-    .q-item__section--avatar
-      padding-left: 12px
-      .q-icon
-        color: #5f6368
-    .q-item__label:not(.q-item__label--caption)
-      color: #3c4043
-      letter-spacing: .01785714em
-      font-size: .875rem
-      font-weight: 500
-      line-height: 1.25rem
+  &__drawer
+    &-item
+      line-height: 24px
+      border-radius: 0 24px 24px 0
+      margin-right: 12px
+      .q-item__section--avatar
+        padding-left: 12px
+        .q-icon
+          color: #5f6368
+      .q-item__label:not(.q-item__label--caption)
+        color: #3c4043
+        letter-spacing: .01785714em
+        font-size: .875rem
+        font-weight: 500
+        line-height: 1.25rem
+      &.subitem
+        padding-left: 24px
+    &-expansion-list
+      &:after
+        border-bottom: 1px $accent solid
+
   &__side-btn
     &__label
       font-size: 12px

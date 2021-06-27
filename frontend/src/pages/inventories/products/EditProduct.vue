@@ -10,7 +10,7 @@
         <form class="q-pa-md" @submit="onSubmit">
           <QuasarSelect
             ref="attributeSet"
-            v-model="form.attributeSetId"
+            v-model="attributeSetId"
             filled
             aria-autocomplete="off"
             autocomplete="off"
@@ -44,17 +44,14 @@
               :aria-autocomplete="field?.autocomplete ?? 'off'"
               :autocomplete="field?.autocomplete ?? 'off'"
               :dense="dense"
-              :error="form$?.[field.name]?.$invalid ?? false"
+              :error="!!formErrors?.[field.name]?.length ?? false"
               class="q-mb-md q-mb-sm-sm"
+              @update:model-value="
+                setValidationFieldsValues($event, field.name)
+              "
             >
               <template #error>
-                {{
-                  form$ && form$[field.name]
-                    ? form$[field.name].$silentErrors
-                        .map((error) => error.$message)
-                        .join(', ')
-                    : ''
-                }}
+                {{ formErrors[field.name] }}
               </template>
             </q-input>
 
@@ -73,14 +70,23 @@
               bottom-slots
               options-dense
               use-input
+              @update:model-value="
+                setValidationFieldsValues($event, field.name)
+              "
               :input-debounce="200"
+              :error="!!formErrors?.[field.name]?.length ?? false"
               class="q-mb-md q-mb-sm-sm"
               transition-show="scale"
               transition-hide="scale"
               emit-value
               map-options
-              ><template v-if="field?.icon" #before>
+            >
+              <template v-if="field?.icon" #before>
                 <q-icon :name="field?.icon ?? ''" />
+              </template>
+
+              <template #error>
+                {{ formErrors[field.name] }}
               </template>
             </quasar-select>
 
@@ -96,6 +102,9 @@
               :label="field.label"
               :name="field.name"
               class="q-mb-md-md q-mb-sm-sm"
+              @update:model-value="
+                setValidationFieldsValues($event, field.name)
+              "
             />
           </template>
         </form>
@@ -168,13 +177,14 @@
 import {
   defineComponent,
   ref,
-  onBeforeMount,
+  onBeforeUnmount,
   watchEffect,
   watch,
   computed,
   unref,
   Ref,
   reactive,
+  readonly,
 } from 'vue';
 
 import ViewCard from '../../../components/ViewCard.vue';
@@ -185,7 +195,6 @@ import {
   SelectionOption,
   PERMISSION,
   TitleInfo,
-  ProductFormShape,
   AttributeSetData,
   FormSchemaProperties,
 } from '../../../store/types';
@@ -264,9 +273,7 @@ export default defineComponent({
         )
       : ref(null);
 
-    const form: ProductFormShape = reactive({
-      attributeSetId: '',
-    });
+    const attributeSetId = ref('');
 
     const defaultFields = computed(
       () =>
@@ -276,6 +283,7 @@ export default defineComponent({
     );
 
     const defaultFormFields = reactive([...defaultFields.value]);
+    const readonlyDefaultFormFields = readonly(defaultFormFields);
 
     const isFieldVisible = (index: number) => {
       let isVisible = false;
@@ -302,52 +310,75 @@ export default defineComponent({
     const defaultFieldsSchema = computed(() => {
       const schemaObject = {};
 
-      return yup.object({
-        /* isPersonalBrand: yup.boolean(),
-        phoneNumber: yup
-          .string()
-          .matches(phoneNumberRegex, 'Please provide a valid phone number')
-          .nullable(), */
+      defaultFormFields.forEach((field) => {
+        let propertyValue = null;
+        const inputType = field.inputType;
+        switch (inputType) {
+          case 'text':
+          case 'number':
+            propertyValue = yup
+              .string()
+              .matches(
+                field.regex as RegExp,
+                `Value for ${field.label} is invalid`
+              )
+              .nullable();
+            if (field.required) propertyValue?.required();
+            break;
+          case 'multiple':
+            propertyValue = yup.array().nullable();
+            if (field.required) propertyValue?.required();
+            break;
+          case 'toggle':
+            propertyValue = yup.mixed().oneOf(['Yes', 'No']).nullable();
+            if (field.required) propertyValue?.required();
+            break;
+
+          default:
+            break;
+        }
+        Object.defineProperty(schemaObject, field.name, {
+          value: propertyValue,
+        });
       });
+
+      return yup.object(schemaObject);
     });
 
-    /* const initialValues: Readonly<ProductFormShape> = {
-      isPersonalBrand: false,
-      name: '',
-      email: '',
-      phoneNumber: '',
-      address: '',
-      city: '',
-      size: null,
-      stateId: null,
-      countryId: null,
-      website: '',
-    }; */
+    const initialValues = computed(() => {
+      const newObject = {};
+      readonlyDefaultFormFields.forEach((field) => {
+        Object.defineProperty(newObject, field.name, {
+          value: field.model,
+        });
+      });
+
+      return newObject;
+    });
 
     const {
       handleSubmit,
       errors: formErrors,
       isSubmitting,
-      values,
-    } = useForm<ProductFormShape>(/* {
+      //values,
+      setFieldValue,
+    } = useForm({
       validationSchema: defaultFieldsSchema.value,
-      //initialValues,
-    } */);
+      initialValues,
+    });
 
-    const { value: isPersonalBrand } = useField('isPersonalBrand');
-    const { value: name } = useField('name');
-    const { value: email } = useField('email');
-    const { value: phoneNumber } = useField('phoneNumber');
-    const { value: address } = useField('address');
-    const { value: city } = useField('city');
-    const { value: size } = useField('size');
-    const { value: stateId } = useField('stateId');
-    const { value: countryId } = useField('countryId');
-    const { value: website } = useField('website');
+    const setValidationFieldsValues = function (
+      value: never,
+      fieldName: never
+    ) {
+      setFieldValue(fieldName, value);
+    };
 
     // Valiation section ends
 
     const onSubmit = handleSubmit((form) => {
+      console.log(form);
+
       /* void nextTick(() => {
         const isCreationMode = props.creationMode;
         void store
@@ -413,47 +444,42 @@ export default defineComponent({
       }
     });
 
-    watch(
-      () => form.attributeSetId,
-      async (id) => {
-        if (id) {
-          stateId.value = null;
+    watch(attributeSetId, async (id) => {
+      if (id) {
+        $q.loading.show({
+          spinner: QSpinnerFacebook,
+          spinnerSize: 50,
+          message: 'Loading form data',
+        });
 
-          $q.loading.show({
-            spinner: QSpinnerFacebook,
-            spinnerSize: 50,
-            message: 'Loading form data',
+        await store
+          .dispatch('attributes/FETCH_ATTRIBUTE_SET_DATA', {
+            id,
+            type: 'product',
+          })
+          .then(() => {
+            $q.loading.hide();
+
+            attributeSetData.value = store.getters[
+              'attributes/GET_ATTRIBUTE_SET_DATA'
+            ] as AttributeSetData;
+          })
+          .catch(() => {
+            $q.loading.hide();
           });
 
-          await store
-            .dispatch('attributes/FETCH_ATTRIBUTE_SET_DATA', {
-              id,
-              type: 'product',
-            })
-            .then(() => {
-              $q.loading.hide();
-
-              attributeSetData.value = store.getters[
-                'attributes/GET_ATTRIBUTE_SET_DATA'
-              ] as AttributeSetData;
-            })
-            .catch(() => {
-              $q.loading.hide();
-            });
-
-          attributeSetData.value = store.getters[
-            'attributes/GET_ATTRIBUTE_SET_DATA'
-          ] as AttributeSetData;
-        }
+        attributeSetData.value = store.getters[
+          'attributes/GET_ATTRIBUTE_SET_DATA'
+        ] as AttributeSetData;
       }
-    );
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const CAN_EDIT_COMPANIES = computed(() =>
       store.getters['permissions/GET_USER_PERMISSION']('can_edit_companies')
     );
 
-    onBeforeMount(() => {
+    onBeforeUnmount(() => {
       stopFetchCurrentlyViewedProduct();
       stopFetchCountriesForSelect();
       stopAttributeSetsForSelect();
@@ -487,7 +513,7 @@ export default defineComponent({
       ph: ref(''),
       dense: ref(false),
       dismissed: ref(false),
-      form,
+      attributeSetId,
       titleInfo,
       countries,
       attributeSetData,
@@ -502,6 +528,7 @@ export default defineComponent({
       formErrors,
       defaultFormFields,
       isFieldVisible,
+      setValidationFieldsValues,
     };
   },
 });

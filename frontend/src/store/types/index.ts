@@ -364,10 +364,11 @@ export interface FormSchemaProperties {
   model?: unknown;
   inputType?: string;
   options?: SelectOption[] | null;
-  default?: string | number | boolean | null;
+  default?: string | number | boolean | null | Array<string | number>;
   required?: boolean;
   autocomplete?: string;
   isVisible?: boolean;
+  regex?: RegExp | undefined | null;
   name: string;
   label: string;
   componentType: InputComponentType;
@@ -441,6 +442,7 @@ export interface Attribute {
   options: Array<AttributeOption>;
   visibility: number;
   required: number;
+  default_value: string | number | boolean | null | Array<string | number>;
 }
 
 export interface FieldInputType {
