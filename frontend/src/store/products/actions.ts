@@ -5,7 +5,8 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { ProductStateInterface /* Users */ } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpResponse } from '../types';
+import { HttpError, HttpResponse } from '../types';
+import { Notify } from 'quasar';
 
 const actions: ActionTree<ProductStateInterface, StateInterface> = {
   async FETCH_PRODUCT_TYPES_FOR_SELECT({ commit }) {
@@ -16,6 +17,41 @@ const actions: ActionTree<ProductStateInterface, StateInterface> = {
           commit('SET_PRODUCT_TYPES_FOR_SELECT', res.data.data);
 
           resolve(res.data);
+        });
+    });
+  },
+
+  async CREATE_PRODUCT(
+    ctx,
+    {
+      form,
+      attributeSetId,
+    }: { form: { [index: string]: unknown }; attributeSetId: string }
+  ) {
+    console.log(form);
+
+    return new Promise(async (resolve, reject) => {
+      await $http
+        .post('/products', { ...form, attributeSetId })
+        .then((res: HttpResponse) => {
+          Notify.create({
+            message: 'Product was successfully created',
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
         });
     });
   },

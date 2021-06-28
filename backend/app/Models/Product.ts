@@ -21,8 +21,92 @@ export default class Product extends BaseModel {
   @column({ isPrimary: true })
   public productTypeId: string
 
-  @column({ isPrimary: true })
+  @column()
   public attributeSetId: string
+
+  @column()
+  public name: string
+
+  @column()
+  public slug: string
+
+  @column()
+  public sku: string
+
+  @column()
+  public price: number
+
+  @column()
+  public isEnabled: boolean
+
+  @column()
+  public visibility: 'Catalogue Only' | 'Search Only' | 'Catalogue and Search' | 'Embedded'
+
+  @column()
+  public stockStatus: 'In Stock' | 'Out of Stock' | 'Made to Order' | 'Drop-shipped'
+
+  @column()
+  public productHasWeight: boolean
+
+  @column()
+  public description: string
+
+  @column()
+  public shortDescription: string
+
+  @column()
+  public productImages: number
+
+  @column()
+  public weight: number
+
+  @column()
+  public countryOfManufacture: number
+
+  @column()
+  public activeFrom: DateTime
+
+  @column()
+  public activeTo: DateTime
+
+  @column()
+  public metaDescription: string
+
+  @column()
+  public metaKeywords: string
+
+  @column()
+  public metaRobots: string
+
+  @column()
+  public metaTitle: string
+
+  @column()
+  public minimumAdvertisedPrice: number
+
+  @column()
+  public displayActualPrice: boolean
+
+  @column()
+  public productNewFromDate: DateTime
+
+  @column()
+  public productNewToDate: DateTime
+
+  @column()
+  public seoName: string
+
+  @column()
+  public specialPrice: number
+
+  @column()
+  public specialPriceFromDate: DateTime
+
+  @column()
+  public specialPriceToDate: DateTime
+
+  @column()
+  public isForOneTimePurchase: boolean
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

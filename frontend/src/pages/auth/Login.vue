@@ -195,6 +195,7 @@ import { useStore } from 'vuex';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
 import AuthForm from '../../components/AuthForm.vue';
+import { MinMaxParams } from '../../store/types';
 
 type DemoCredentials = {
   admin: string;
@@ -221,13 +222,6 @@ export default defineComponent({
           email: '',
           password: '',
         });
-
-    type MinMaxParams = {
-      $params: {
-        min?: number;
-        max?: number;
-      };
-    };
 
     const rules = {
       email: {

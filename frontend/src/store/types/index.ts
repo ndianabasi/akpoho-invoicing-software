@@ -328,6 +328,11 @@ export enum PERMISSION {
   CAN_VIEW_COMPANIES = 'can_view_companies',
   CAN_EDIT_COMPANIES = 'can_edit_companies',
   CAN_DELETE_COMPANIES = 'can_delete_companies',
+  CAN_LIST_INVENTORIES = 'can_list_inventories',
+  CAN_CREATE_INVENTORIES = 'can_create_inventories',
+  CAN_VIEW_INVENTORIES = 'can_view_inventories',
+  CAN_EDIT_INVENTORIES = 'can_edit_inventories',
+  CAN_DELETE_INVENTORIES = 'can_delete_inventories',
 }
 
 export interface FileMultiFormats {
@@ -367,7 +372,7 @@ export interface FormSchemaProperties {
   default?: string | number | boolean | null | Array<string | number>;
   required?: boolean;
   autocomplete?: string;
-  isVisible?: boolean;
+  isVisible?: boolean | unknown;
   regex?: RegExp | undefined | null;
   name: string;
   label: string;
@@ -410,7 +415,20 @@ export type CurrentlyViewedProduct = {
 };
 
 export interface ProductFormShape {
-  attributeSetId: string;
+  productTypeId: string;
+  attributeSetId?: string;
+  name: string;
+  sku: string;
+  price: number | null;
+  isEnabled: boolean;
+  visibility?: PRODUCT_VISIBILITY;
+  stockStatus: PRODUCT_STOCK_STATUS;
+  productHasWeight: boolean;
+  description: string;
+  shortDescription: string;
+  productImages: '';
+  weight: number | null;
+  countryOfManufacture: number | null;
 }
 
 export interface AttributeSetData {
@@ -467,3 +485,24 @@ export type AttributeGroupsCollection = Record<
   string,
   Array<FormSchemaProperties>
 >;
+
+export type PRODUCT_STOCK_STATUS =
+  | 'In Stock'
+  | 'Out of Stock'
+  | 'Made to Order'
+  | 'Drop-shipped'
+  | '';
+
+export type PRODUCT_VISIBILITY =
+  | 'Catalogue Only'
+  | 'Search Only'
+  | 'Catalogue and Search'
+  | 'Embedded'
+  | '';
+
+export type MinMaxParams = {
+  $params: {
+    min?: number;
+    max?: number;
+  };
+};
