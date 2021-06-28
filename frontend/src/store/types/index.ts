@@ -417,7 +417,7 @@ export type CurrentlyViewedProduct = {
 export interface ProductFormShape {
   productTypeId: string;
   attributeSetId?: string;
-  name: string;
+  productName: string;
   sku: string;
   price: number | null;
   isEnabled: boolean;

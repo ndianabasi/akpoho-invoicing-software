@@ -5,17 +5,21 @@ export default class Products extends BaseSchema {
 
   public async up() {
     this.schema.table(this.tableName, (table) => {
-      table.string('name').index()
-      table.string('slug').index().unique()
+      table.string('name').index().notNullable()
+      table.string('slug').index().unique().notNullable()
       table.string('sku').index().unique()
-      table.decimal('price', 15, 4).index()
+      table.decimal('price', 15, 4).index().notNullable()
       table.boolean('is_enabled').index().defaultTo(true)
       table
         .enum('visibility', ['Catalogue Only', 'Search Only', 'Catalogue and Search', 'Embedded'])
+        .defaultTo('Catalogue and Search')
+        .notNullable()
         .index()
       table
         .enum('stock_status', ['In Stock', 'Out of Stock', 'Made to Order', 'Drop-shipped'])
         .index()
+        .defaultTo('In Stock')
+        .notNullable()
       table.boolean('product_has_weight').defaultTo(true)
       table.text('description')
       table.text('short_description')

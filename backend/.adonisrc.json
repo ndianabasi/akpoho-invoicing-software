@@ -39,7 +39,8 @@
     "@adonisjs/redis",
     "@adonisjs/shield",
     "@adonisjs/bouncer",
-    "@adonisjs/mail"
+    "@adonisjs/mail",
+    "@adonisjs/lucid-slugify"
   ],
   "metaFiles": [
     {

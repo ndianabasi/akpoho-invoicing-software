@@ -32,6 +32,7 @@
     "@adonisjs/bouncer": "^2.2.3",
     "@adonisjs/core": "^5.1.8",
     "@adonisjs/lucid": "^15.0.1",
+    "@adonisjs/lucid-slugify": "^2.1.0",
     "@adonisjs/mail": "^7.2.1",
     "@adonisjs/redis": "^7.0.6",
     "@adonisjs/repl": "^3.1.4",

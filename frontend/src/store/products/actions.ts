@@ -5,7 +5,7 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { ProductStateInterface /* Users */ } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpError, HttpResponse } from '../types';
+import { HttpError, HttpResponse, StringIDNameInterface } from '../types';
 import { Notify } from 'quasar';
 
 const actions: ActionTree<ProductStateInterface, StateInterface> = {
@@ -22,7 +22,7 @@ const actions: ActionTree<ProductStateInterface, StateInterface> = {
   },
 
   async CREATE_PRODUCT(
-    ctx,
+    { rootGetters },
     {
       form,
       attributeSetId,
@@ -30,9 +30,14 @@ const actions: ActionTree<ProductStateInterface, StateInterface> = {
   ) {
     console.log(form);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const currentCompany = rootGetters[
+      'auth/GET_CURRENT_COMPANY'
+    ] as StringIDNameInterface;
+
     return new Promise(async (resolve, reject) => {
       await $http
-        .post('/products', { ...form, attributeSetId })
+        .post(`${currentCompany.id}/products`, { ...form, attributeSetId })
         .then((res: HttpResponse) => {
           Notify.create({
             message: 'Product was successfully created',

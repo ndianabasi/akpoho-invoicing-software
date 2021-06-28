@@ -139,6 +139,7 @@ export default class Company extends BaseModel {
 
   @manyToMany(() => Product, {
     pivotTimestamps: true,
+    pivotColumns: ['ownership'],
   })
   public products: ManyToMany<typeof Product>
 

@@ -189,6 +189,14 @@
     abstract-logging "^2.0.1"
     pino "^6.11.3"
 
+"@adonisjs/lucid-slugify@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@adonisjs/lucid-slugify/-/lucid-slugify-2.1.0.tgz#ca82da147d8f1066187915d9cafbbf878c0e2024"
+  integrity sha512-Ggy28nL8lc5zlacAvtyMxTAMQkuY42ZUCLhefSyEoh7jAmNnJkiIQPZszZ4Hm4pMAIVeJTtw4toPOwMkEx/yug==
+  dependencies:
+    "@poppinss/utils" "^3.1.3"
+    nanoid "^3.1.23"
+
 "@adonisjs/lucid@^15.0.1":
   version "15.0.1"
   resolved "https://registry.yarnpkg.com/@adonisjs/lucid/-/lucid-15.0.1.tgz#a8cdf12f3ae6bc5fa88d452e80423cf3afb8e598"
@@ -3829,6 +3837,11 @@ mysql@^2.18.1:
     readable-stream "2.3.7"
     safe-buffer "5.1.2"
     sqlstring "2.3.1"
+
+nanoid@^3.1.23:
+  version "3.1.23"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.23.tgz#f744086ce7c2bc47ee0a8472574d5c78e4183a81"
+  integrity sha512-FiB0kzdP0FFVGDKlRLEQ1BgDzU87dy5NnzjeW9YZNt+/c3+q82EQDUwniSAUxp/F0gFNI1ZhKU1FqYsMuqZVnw==
 
 nanomatch@^1.2.9:
   version "1.2.13"

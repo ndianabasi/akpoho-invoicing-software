@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon'
+import { slugify } from '@ioc:Adonis/Addons/LucidSlugify'
 import {
   BaseModel,
+  beforeCreate,
   BelongsTo,
   belongsTo,
   column,
@@ -11,9 +13,37 @@ import ProductType from 'App/Models/ProductType'
 import AttributeSet from 'App/Models/AttributeSet'
 import ProductCategory from 'App/Models/ProductCategory'
 import Company from 'App/Models/Company'
+import UUIDHook from './Hooks/UUIDHook'
+import Country from './Country'
+
+export const PRODUCT_STOCK_STATUS_OPTIONS = [
+  'In Stock',
+  'Out of Stock',
+  'Made to Order',
+  'Drop-shipped',
+]
+
+export type PRODUCT_STOCK_STATUS_TYPES =
+  | 'In Stock'
+  | 'Out of Stock'
+  | 'Made to Order'
+  | 'Drop-shipped'
+
+export type PRODUCT_VISIBILITY_TYPES =
+  | 'Catalogue Only'
+  | 'Search Only'
+  | 'Catalogue and Search'
+  | 'Embedded'
+
+export type PRODUCT_OWNERSHIP_TYPES = 'owner' | 'consumer'
 
 export default class Product extends BaseModel {
   public static selfAssignPrimaryKey = true
+
+  /**
+   * Serialize the `$extras` object as it is
+   */
+  public serializeExtras = true
 
   @column({ isPrimary: true })
   public id: string
@@ -28,6 +58,10 @@ export default class Product extends BaseModel {
   public name: string
 
   @column()
+  @slugify({
+    strategy: 'shortId',
+    fields: ['name'],
+  })
   public slug: string
 
   @column()
@@ -40,10 +74,10 @@ export default class Product extends BaseModel {
   public isEnabled: boolean
 
   @column()
-  public visibility: 'Catalogue Only' | 'Search Only' | 'Catalogue and Search' | 'Embedded'
+  public visibility: PRODUCT_VISIBILITY_TYPES
 
   @column()
-  public stockStatus: 'In Stock' | 'Out of Stock' | 'Made to Order' | 'Drop-shipped'
+  public stockStatus: PRODUCT_STOCK_STATUS_TYPES
 
   @column()
   public productHasWeight: boolean
@@ -117,14 +151,22 @@ export default class Product extends BaseModel {
   @belongsTo(() => ProductType)
   public type: BelongsTo<typeof ProductType>
 
+  @belongsTo(() => Country, { foreignKey: 'countryOfManufacture' })
+  public country: BelongsTo<typeof Country>
+
   @belongsTo(() => AttributeSet)
   public attributeSet: BelongsTo<typeof AttributeSet>
 
   @manyToMany(() => ProductCategory, {
     pivotTimestamps: true,
   })
-  public categories: ManyToMany<typeof ProductCategory>
+  public productCategories: ManyToMany<typeof ProductCategory>
 
-  @manyToMany(() => Company, { pivotTimestamps: true })
+  @manyToMany(() => Company, { pivotTimestamps: true, pivotColumns: ['ownership'] })
   public companies: ManyToMany<typeof Company>
+
+  @beforeCreate()
+  public static generateUUID(model: Product) {
+    UUIDHook.generateUUID(model, 'id')
+  }
 }

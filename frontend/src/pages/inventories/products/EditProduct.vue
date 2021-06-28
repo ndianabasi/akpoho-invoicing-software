@@ -216,7 +216,7 @@ export default defineComponent({
 
     const initialForm: ProductFormShape = reactive({
       productTypeId: '',
-      name: '',
+      productName: '',
       sku: '',
       price: null,
       isEnabled: true,
@@ -280,15 +280,14 @@ export default defineComponent({
     const formSchema = computed(() =>
       yup.object({
         productTypeId: yup.string().required('Product type is required'),
-        name: yup
+        productName: yup
           .string()
-          .required('Name is required')
-          .min(6, 'Name should be a minimum of ${min} characters')
-          .max(50, 'Name should be a maximum of ${max} characters')
+          .required('Product Name is required')
+          .min(6, 'Product Name should be a minimum of ${min} characters')
+          .max(50, 'Product Name should be a maximum of ${max} characters')
           .nullable(),
         sku: yup
           .string()
-          .required('SKU is required')
           .min(4, 'SKU should be a minimum of ${min} characters')
           .max(16, 'SKU should be a maximum of ${max} characters')
           .nullable(),
@@ -300,14 +299,8 @@ export default defineComponent({
         productHasWeight: yup
           .boolean()
           .required('Product Has Weight is required'),
-        description: yup
-          .string()
-          .required('Description is required')
-          .nullable(),
-        shortDescription: yup
-          .string()
-          .required('Description is required')
-          .nullable(),
+        description: yup.string().optional().nullable(),
+        shortDescription: yup.string().optional().nullable(),
         weight: yup.number().optional().nullable(),
         countryOfManufacture: yup.number().optional().nullable(),
       })
@@ -324,7 +317,7 @@ export default defineComponent({
     });
 
     const { value: productTypeId } = useField('productTypeId');
-    const { value: name } = useField('name');
+    const { value: productName } = useField('productName');
     const { value: sku } = useField('sku');
     const { value: price } = useField('price');
     const { value: isEnabled } = useField('isEnabled');
@@ -347,13 +340,13 @@ export default defineComponent({
         autocomplete: 'off',
         isVisible: false,
       },
-      name: {
-        model: name,
-        name: 'name',
+      productName: {
+        model: productName,
+        name: 'productName',
         componentType: 'input',
         inputType: 'text',
-        label: 'Name',
-        default: initialForm['name'],
+        label: 'Product Name',
+        default: initialForm['productName'],
         autocomplete: 'off',
         isVisible: true,
       },

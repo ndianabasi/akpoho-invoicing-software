@@ -202,6 +202,8 @@ Route.group(() => {
     '/:company_id/attribute-sets/:type/:attribute_set_id',
     'AttributeSetsController.attributeSetData'
   ).middleware('findRequestedAttributeSet')
+
+  Route.post('/:company_id/products', 'ProductsController.store')
 })
   .prefix('/v1')
   .middleware('auth')
