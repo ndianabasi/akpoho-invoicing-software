@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md">
     <view-card
-      v-if="!!companyProperties.length"
+      v-if="!!productProperties.length"
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
@@ -9,7 +9,7 @@
       <template #body-panel>
         <div class="q-gutter-y-sm">
           <q-list padding>
-            <q-item v-for="property in companyProperties" :key="property.name">
+            <q-item v-for="property in productProperties" :key="property.name">
               <q-item-section>
                 <q-item-label class="text-uppercase">{{
                   property.name
@@ -35,8 +35,8 @@
               <q-item
                 v-if="resourcePermissions.canEdit"
                 :to="{
-                  name: 'edit_company',
-                  params: { companyId: companyId }, //companyId from route props
+                  name: 'edit_product',
+                  params: { productId: productId }, //productId from route props
                 }"
               >
                 <q-item-section>
@@ -53,19 +53,19 @@
                 <q-item-section>
                   <q-btn flat icon="delete" />
                 </q-item-section>
-                <q-item-section>Delete Company</q-item-section>
+                <q-item-section>Delete Product</q-item-section>
               </q-item>
 
               <q-item
                 v-if="resourcePermissions.canList"
                 :to="{
-                  name: 'all_companies',
+                  name: 'all_products',
                 }"
               >
                 <q-item-section>
                   <q-btn flat icon="view_list" />
                 </q-item-section>
-                <q-item-section>All Companies</q-item-section>
+                <q-item-section>All Products</q-item-section>
               </q-item>
             </q-list>
           </q-menu>
@@ -93,8 +93,9 @@ import useTitleInfo from '../../../composables/useTitleInfo';
 import useResourcePermissions from '../../../composables/useResourcePermissions';
 import useDeleteResource from '../../../composables/useDeleteResource';
 import {
-  CurrentlyViewedCompany,
+  CurrentlyViewedProduct,
   PERMISSION,
+  ProductResultRowInterface,
   TitleInfo,
 } from '../../../store/types';
 import { store } from '../../../store';
@@ -102,14 +103,14 @@ import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 
 export default defineComponent({
-  name: 'ViewCompany',
+  name: 'ViewProduct',
 
   components: {
     ViewCard,
   },
 
   props: {
-    companyId: {
+    productId: {
       type: String,
       required: false,
       default: '',
@@ -120,20 +121,20 @@ export default defineComponent({
     const router = useRouter();
     const $q = useQuasar();
 
-    const currentCompany = computed(
+    const currentProduct = computed(
       () =>
         store.getters[
-          'companies/GET_CURRENTLY_VIEWED_COMPANY'
-        ] as CurrentlyViewedCompany
+          'products/GET_CURRENTLY_VIEWED_PRODUCT'
+        ] as ProductResultRowInterface
     );
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
     watch(
-      currentCompany,
+      currentProduct,
       () => {
         const title = useTitleInfo({
-          title: currentCompany?.value?.name ?? '',
+          title: currentProduct?.value?.name ?? '',
           avatar: undefined,
         });
 
@@ -142,46 +143,47 @@ export default defineComponent({
       { deep: true }
     );
 
-    const stopFetchCurrentlyViewedCompany = watchEffect(() => {
-      void store.dispatch('companies/FETCH_CURRENTLY_VIEWED_COMPANY', {
-        companyId: props.companyId,
+    const stopFetchCurrentlyViewedProduct = watchEffect(() => {
+      void store.dispatch('products/FETCH_CURRENTLY_VIEWED_PRODUCT', {
+        productId: props.productId,
       });
     });
 
-    const companyProperties = computed(() => {
-      const company = currentCompany.value;
+    const productProperties = computed(() => {
+      const product = currentProduct.value;
       return [
-        { name: 'ID', value: company?.id },
-        { name: 'Name', value: company?.name },
-        { name: 'Type', value: company?.type?.toUpperCase() ?? '' },
-        { name: 'Email', value: company?.email },
-        { name: 'Phone Number', value: company?.phone_number ?? '' },
-        { name: 'Address', value: company?.address },
-        { name: 'Website', value: company?.website ?? '' },
-        { name: 'Company Size', value: company?.companySize?.size ?? '' },
-        { name: 'City', value: company?.city ?? '' },
-        { name: 'Country', value: company?.country?.name ?? '' },
-        { name: 'State', value: company?.state?.name ?? '' },
-        { name: 'Slug', value: company?.slug },
+        { name: 'ID', value: product?.id },
+        { name: 'Name', value: product?.name },
+        { name: 'Type', value: product?.type?.name },
+        { name: 'SKU', value: product?.sku },
+        { name: 'Price', value: product?.price },
+        { name: 'Stock Status', value: product?.stock_status },
+        { name: 'Is Enabled', value: Boolean(product?.is_enabled) },
         {
-          name: 'Is Company Approved',
-          value: company?.is_approved ? true : false,
+          name: 'Product Has Weight?',
+          value: Boolean(product?.product_has_weight),
         },
-        { name: 'Approved At', value: company?.approved_at },
-        { name: 'Created At', value: company?.created_at },
-        { name: 'Updated At', value: company?.updated_at },
+        {
+          name: 'Weight',
+          value: `${product?.weight} ${product?.meta?.weight_unit}`,
+        },
+        { name: 'Country of Manufacture', value: product?.country?.name },
+        { name: 'Short Description', value: product?.short_description },
+        { name: 'Description', value: product?.description },
+        { name: 'Created At', value: product?.created_at },
+        { name: 'Updated At', value: product?.updated_at },
       ];
     });
 
     const handleDeletion = async function () {
       await useDeleteResource({
-        resource: 'company',
-        resourceName: 'Company',
-        payload: props.companyId,
+        resource: 'product',
+        resourceName: 'Product',
+        payload: props.productId,
       })
         .then(() => {
           const postDeletionAction = {
-            routeName: 'all_companies',
+            routeName: 'all_products',
             routeParams: undefined,
           };
 
@@ -201,19 +203,19 @@ export default defineComponent({
     };
 
     onBeforeMount(() => {
-      stopFetchCurrentlyViewedCompany();
+      stopFetchCurrentlyViewedProduct();
     });
 
     return {
       tab: ref('user_account'),
       titleInfo,
       resourcePermissions: useResourcePermissions({
-        edit: PERMISSION.CAN_EDIT_COMPANIES,
-        list: PERMISSION.CAN_LIST_COMPANIES,
-        delete: PERMISSION.CAN_DELETE_COMPANIES,
+        edit: PERMISSION.CAN_EDIT_INVENTORIES,
+        list: PERMISSION.CAN_LIST_INVENTORIES,
+        delete: PERMISSION.CAN_DELETE_INVENTORIES,
       }),
       handleDeletion,
-      companyProperties,
+      productProperties,
     };
   },
 });

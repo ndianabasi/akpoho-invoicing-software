@@ -388,7 +388,8 @@ export type ResourceType =
   | 'quotation'
   | 'invoice'
   | 'receipt'
-  | 'customer';
+  | 'customer'
+  | 'product';
 
 export type ResourceName =
   | 'User'
@@ -397,7 +398,8 @@ export type ResourceName =
   | 'Quotation'
   | 'Invoice'
   | 'Receipt'
-  | 'Customer';
+  | 'Customer'
+  | 'Product';
 
 export type ResourceNamePlural =
   | 'Users'
@@ -406,7 +408,8 @@ export type ResourceNamePlural =
   | 'Quotations'
   | 'Invoices'
   | 'Receipts'
-  | 'Customers';
+  | 'Customers'
+  | 'Products';
 
 export type CurrentlyViewedProduct = {
   id: string;

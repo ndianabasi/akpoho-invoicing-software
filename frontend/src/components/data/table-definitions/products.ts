@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { watchEffect, onBeforeUnmount } from 'vue';
-import { store } from 'src/store';
 import { TableRow } from '../../../types/table';
 import { stockStatusForSelect, yesNoOptionsForSelect } from 'src/helpers/utils';
 import { ProductResultRowInterface, PRODUCT_TYPE } from 'src/store/types';
@@ -27,10 +25,6 @@ enum ProductColumns {
   weight = 'weight',
   country_of_manufacture = 'country_of_manufacture',
 }
-
-const stopFetchProductSizesForSelect = watchEffect(() => {
-  void store.dispatch('companies/FETCH_PRODUCT_SIZES_FOR_SELECT');
-});
 
 const columns: ProductHeaders[] = [
   {
@@ -165,9 +159,5 @@ const columns: ProductHeaders[] = [
     filterInputType: 'date',
   },
 ];
-
-onBeforeUnmount(() => {
-  stopFetchProductSizesForSelect();
-});
 
 export default columns;
