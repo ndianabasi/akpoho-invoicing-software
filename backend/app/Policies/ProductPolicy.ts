@@ -40,4 +40,9 @@ export default class ProductPolicy extends BasePolicy {
     const resourcePermission = 'can_view_inventories'
     return await accessProducts(resourcePermission, user, requestedProduct)
   }
+
+  public async edit(user: User, requestedProduct: Product) {
+    const resourcePermission = 'can_edit_inventories'
+    return await accessProducts(resourcePermission, user, requestedProduct, 'edit')
+  }
 }

@@ -201,40 +201,44 @@ export default class ProductsController {
     }
   }
 
-  public async showAddresses({
-    response,
-    requestedCompany,
-    requestedCustomer,
-    bouncer,
-  }: HttpContextContract) {
-    await bouncer.with('CustomerPolicy').authorize('view', requestedCompany!, requestedCustomer!)
+  public async update({ response, requestedProduct, bouncer, request }: HttpContextContract) {
+    if (requestedProduct) {
+      // Check authorisation
+      await bouncer.with('ProductPolicy').authorize('edit', requestedProduct)
 
-    const addresses = await Database.from('customer_addresses')
-      .select(
-        'customer_addresses.address_type',
-        'customer_addresses.city',
-        'customer_addresses.created_at',
-        'customer_addresses.id',
-        'customer_addresses.postal_code',
-        'customer_addresses.street_address',
-        'customer_addresses.updated_at',
-        'countries.name as country',
-        'states.name as state'
-      )
-      .leftJoin('countries', (query) => {
-        query.on('countries.id', '=', 'customer_addresses.country_id')
-      })
-      .leftJoin('states', (query) => {
-        query.on('states.id', '=', 'customer_addresses.state_id')
-      })
-      .where('customer_addresses.customer_id', requestedCustomer?.id!)
+      const {
+        productTypeId,
+        productName,
+        sku,
+        price,
+        weight,
+        countryOfManufacture,
+        isEnabled,
+        productHasWeight,
+        stockStatus,
+        description,
+        shortDescription,
+      } = await request.validate(ProductValidator)
 
-    return response.ok({ data: addresses })
+      requestedProduct.merge({
+        productTypeId,
+        name: productName,
+        sku: sku ?? null,
+        price,
+        weight: weight ?? null,
+        countryOfManufacture: countryOfManufacture ?? null,
+        isEnabled,
+        productHasWeight,
+        stockStatus: stockStatus as PRODUCT_STOCK_STATUS_TYPES,
+        description: description ?? null,
+        shortDescription: shortDescription ?? null,
+      })
+
+      await requestedProduct.save()
+
+      return response.ok({ data: requestedProduct.id })
+    } else return response.abort('Requested Product not found')
   }
-
-  public async edit({}: HttpContextContract) {}
-
-  public async update({}: HttpContextContract) {}
 
   public async destroy({}: HttpContextContract) {}
 }

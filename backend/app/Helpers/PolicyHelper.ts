@@ -185,7 +185,8 @@ export const accessCustomers = async (
 export const accessProducts = async (
   resourcePermission: string,
   authUser: User,
-  requestedProducts: Product | string[]
+  requestedProducts: Product | string[],
+  mode: 'edit' | 'view' = 'view'
 ): Promise<boolean | [string, number]> => {
   const resourcePermitted = await PermissionHelper.hasResourcePermission({
     resourcePermission,
@@ -216,9 +217,28 @@ export const accessProducts = async (
           (authUserCompanyId) => productCompaniesIds[productCompaniesIds.indexOf(authUserCompanyId)]
         )
 
-        if (belongToSameCompany && resourcePermitted) {
-          permitted.push(true)
-        } else permitted.push(false)
+        if (mode === 'view') {
+          if (belongToSameCompany && resourcePermitted) {
+            permitted.push(true)
+          } else permitted.push(false)
+        } else {
+          // Check if user belongs to a company which can edit the product
+          // 1. Get the company with `edit` privilege for the product
+          const companyWithEditAccess = await product
+            .related('companies')
+            .query()
+            .whereInPivot('ownership', ['owner'])
+            .first()
+
+          // 2. Now check if the authUser belongs to this company
+          const authUserBelongsToEditAccessCompany = authUserCompanyIds.some(
+            (authUserCompanyId) => authUserCompanyId === companyWithEditAccess?.id
+          )
+
+          if (belongToSameCompany && authUserBelongsToEditAccessCompany && resourcePermitted) {
+            permitted.push(true)
+          } else permitted.push(false)
+        }
       }
 
       if (permitted.every((value) => value)) return true
@@ -237,9 +257,28 @@ export const accessProducts = async (
       (authUserCompanyId) => productCompaniesIds[productCompaniesIds.indexOf(authUserCompanyId)]
     )
 
-    if (belongToSameCompany && resourcePermitted) {
-      return true
-    } else return Bouncer.deny('You are not permitted to perform this action!')
+    if (mode === 'view') {
+      if (belongToSameCompany && resourcePermitted) {
+        return true
+      } else return Bouncer.deny('You are not permitted to perform this action!')
+    } else {
+      // Check if user belongs to a company which can edit the product
+      // 1. Get the company with `edit` privilege for the product
+      const companyWithEditAccess = await product
+        .related('companies')
+        .query()
+        .whereInPivot('ownership', ['owner'])
+        .first()
+
+      // 2. Now check if the authUser belongs to this company
+      const authUserBelongsToEditAccessCompany = authUserCompanyIds.some(
+        (authUserCompanyId) => authUserCompanyId === companyWithEditAccess?.id
+      )
+
+      if (belongToSameCompany && authUserBelongsToEditAccessCompany && resourcePermitted) {
+        return true
+      } else return Bouncer.deny('You are not permitted to perform this action!')
+    }
   }
 }
 

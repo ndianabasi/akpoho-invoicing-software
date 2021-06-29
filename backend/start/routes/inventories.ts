@@ -14,6 +14,10 @@ Route.group(() => {
   )
   // Get details of the requested product
   Route.get('/products/:product_id', 'ProductsController.show').middleware('findRequestedProduct')
+  // Get details of the requested product
+  Route.patch('/products/:product_id', 'ProductsController.update').middleware(
+    'findRequestedProduct'
+  )
 })
   .prefix('/v1')
   .middleware('auth')

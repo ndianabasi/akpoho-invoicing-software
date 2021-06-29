@@ -28,8 +28,6 @@ const actions: ActionTree<ProductStateInterface, StateInterface> = {
       attributeSetId,
     }: { form: { [index: string]: unknown }; attributeSetId: string }
   ) {
-    console.log(form);
-
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const currentCompany = rootGetters[
       'auth/GET_CURRENT_COMPANY'
@@ -41,6 +39,43 @@ const actions: ActionTree<ProductStateInterface, StateInterface> = {
         .then((res: HttpResponse) => {
           Notify.create({
             message: 'Product was successfully created',
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            timeout: 5000,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+              },
+            ],
+          });
+
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  async EDIT_PRODUCT(
+    ctx,
+    {
+      form,
+      productId,
+    }: {
+      form: { [index: string]: unknown };
+      attributeSetId: string;
+      productId: string;
+    }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      await $http
+        .patch(`/products/${productId}`, { ...form })
+        .then((res: HttpResponse) => {
+          Notify.create({
+            message: 'Product was successfully edited',
             type: 'positive',
             position: 'top',
             progress: true,

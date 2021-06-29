@@ -65,7 +65,7 @@ export default class Product extends BaseModel {
   public slug: string
 
   @column()
-  public sku: string
+  public sku: string | null
 
   @column()
   public price: number
@@ -83,19 +83,19 @@ export default class Product extends BaseModel {
   public productHasWeight: boolean
 
   @column()
-  public description: string
+  public description: string | null
 
   @column()
-  public shortDescription: string
+  public shortDescription: string | null
 
   @column()
   public productImages: number
 
   @column()
-  public weight: number
+  public weight: number | null
 
   @column()
-  public countryOfManufacture: number
+  public countryOfManufacture: number | null
 
   @column()
   public activeFrom: DateTime
@@ -104,43 +104,43 @@ export default class Product extends BaseModel {
   public activeTo: DateTime
 
   @column()
-  public metaDescription: string
+  public metaDescription: string | null
 
   @column()
-  public metaKeywords: string
+  public metaKeywords: string | null
 
   @column()
-  public metaRobots: string
+  public metaRobots: string | null
 
   @column()
-  public metaTitle: string
+  public metaTitle: string | null
 
   @column()
-  public minimumAdvertisedPrice: number
+  public minimumAdvertisedPrice: number | null
 
   @column()
-  public displayActualPrice: boolean
+  public displayActualPrice: boolean | null
 
   @column()
-  public productNewFromDate: DateTime
+  public productNewFromDate: DateTime | null
 
   @column()
-  public productNewToDate: DateTime
+  public productNewToDate: DateTime | null
 
   @column()
-  public seoName: string
+  public seoName: string | null
 
   @column()
-  public specialPrice: number
+  public specialPrice: number | null
 
   @column()
-  public specialPriceFromDate: DateTime
+  public specialPriceFromDate: DateTime | null
 
   @column()
-  public specialPriceToDate: DateTime
+  public specialPriceToDate: DateTime | null
 
   @column()
-  public isForOneTimePurchase: boolean
+  public isForOneTimePurchase: boolean | null
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

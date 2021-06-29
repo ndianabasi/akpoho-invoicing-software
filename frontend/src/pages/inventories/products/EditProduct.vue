@@ -177,7 +177,7 @@ import {
   SelectOption,
   ProductResultRowInterface,
 } from '../../../store/types';
-import { onBeforeRouteLeave } from 'vue-router';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../../components/QuasarSelect';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
@@ -214,6 +214,7 @@ export default defineComponent({
     const productCreated = ref(false);
     const store = useStore();
     const $q = useQuasar();
+    const router = useRouter();
 
     const initialForm: ProductFormShape = reactive({
       productTypeId: '',
@@ -434,8 +435,6 @@ export default defineComponent({
     // Valiation section ends
 
     const onSubmit = handleSubmit((form) => {
-      console.log(form);
-
       isSubmitting.value = true;
       void nextTick(() => {
         const isCreationMode = props.creationMode;
@@ -456,10 +455,10 @@ export default defineComponent({
             productCreated.value = true;
             void store.dispatch('auth/FETCH_AUTH_PROFILE');
             void nextTick(() => {
-              /* void router.push({
+              void router.push({
                 name: 'view_product',
                 params: { productId: id },
-              }); */
+              });
             });
           })
           .catch((error) => {
