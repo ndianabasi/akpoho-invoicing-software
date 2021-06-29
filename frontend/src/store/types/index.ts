@@ -509,7 +509,7 @@ export type MinMaxParams = {
 
 export type PRODUCT_OWNERSHIP_TYPES = 'owner' | 'consumer';
 
-export type PRODUCT_TYPES =
+export type PRODUCT_TYPE =
   | 'Simple Product'
   | 'Variable Product'
   | 'Compound Product'
@@ -517,3 +517,28 @@ export type PRODUCT_TYPES =
   | 'Bundle Product'
   | 'Downloadable Product'
   | 'Gift Card';
+
+export interface ProductResultRowInterface {
+  id: string;
+  product_type: string;
+  name: string;
+  sku: string;
+  price: number;
+  is_enabled: number;
+  stock_status: string;
+  product_has_weight: number;
+  created_at: string;
+  updated_at: string;
+  slug: string;
+  weight: string;
+  country_of_manufacture: string;
+  meta?: {
+    weight_unit?: 'kg' | 'lb';
+    product_type?: PRODUCT_TYPE;
+  };
+  type?: { id: string; name: PRODUCT_TYPE };
+  country?: { id: string; name: string };
+  productCategories?: { id: string; name: string }[];
+  description?: string;
+  short_description?: string;
+}

@@ -79,7 +79,7 @@ export default defineComponent({
     const router = useRouter();
 
     const defaultSort = {
-      sortBy: 'email',
+      sortBy: 'name',
       descending: false,
     };
 

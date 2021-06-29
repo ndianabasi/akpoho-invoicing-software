@@ -51,5 +51,8 @@ export const stockStatusForSelect = computed(() =>
 );
 
 export const yesNoOptionsForSelect = computed(() =>
-  yesNoOptions.map((option) => ({ label: option, value: option }))
+  yesNoOptions.map((option) => ({
+    label: option,
+    value: option ? option : null,
+  }))
 );

@@ -168,7 +168,6 @@ import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
 import useResourcePermissions from '../../../composables/useResourcePermissions';
 import {
-  CurrentlyViewedProduct,
   SelectionOption,
   PERMISSION,
   TitleInfo,
@@ -176,6 +175,7 @@ import {
   ProductFormShape,
   FormSchema,
   SelectOption,
+  ProductResultRowInterface,
 } from '../../../store/types';
 import { onBeforeRouteLeave } from 'vue-router';
 import QuasarSelect from '../../../components/QuasarSelect';
@@ -254,14 +254,14 @@ export default defineComponent({
         ] as SelectOption
     );
 
-    let currentProduct: Ref<CurrentlyViewedProduct | null>;
+    let currentProduct: Ref<ProductResultRowInterface | null>;
 
     currentProduct = !props.creationMode
       ? computed(
           () =>
             store.getters[
               'products/GET_CURRENTLY_VIEWED_PRODUCT'
-            ] as CurrentlyViewedProduct
+            ] as ProductResultRowInterface
         )
       : ref(null);
 
@@ -492,7 +492,7 @@ export default defineComponent({
       { deep: true }
     );
 
-    const stopFetchCurrentlyViewedProduct = watchEffect(() => {
+    const stopFetchProductResultRowInterface = watchEffect(() => {
       if (!props.creationMode) {
         void store
           .dispatch('products/FETCH_CURRENTLY_VIEWED_PRODUCT', {
@@ -504,9 +504,23 @@ export default defineComponent({
                 () =>
                   store.getters[
                     'products/GET_CURRENTLY_VIEWED_PRODUCT'
-                  ] as CurrentlyViewedProduct
+                  ] as ProductResultRowInterface
               )
             );
+
+            productTypeId.value = currentProduct?.value?.type?.id;
+            productName.value = currentProduct?.value?.name;
+            sku.value = currentProduct?.value?.sku;
+            price.value = currentProduct?.value?.price;
+            isEnabled.value = Boolean(currentProduct?.value?.is_enabled);
+            stockStatus.value = currentProduct?.value?.stock_status;
+            productHasWeight.value = Boolean(
+              currentProduct?.value?.product_has_weight
+            );
+            description.value = currentProduct?.value?.description;
+            shortDescription.value = currentProduct?.value?.short_description;
+            weight.value = currentProduct?.value?.weight;
+            countryOfManufacture.value = currentProduct?.value?.country?.id;
           });
       }
     });
@@ -521,7 +535,7 @@ export default defineComponent({
     });
 
     onBeforeUnmount(() => {
-      stopFetchCurrentlyViewedProduct();
+      stopFetchProductResultRowInterface();
       stopFetchCountriesForSelect();
     });
 

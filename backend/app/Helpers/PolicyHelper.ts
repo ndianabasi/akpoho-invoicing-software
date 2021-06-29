@@ -180,19 +180,20 @@ export const accessCustomers = async (
  * @param authUser The authenticated user
  * @param requestedCompany The company whose product(s) are requested
  * @param requestedProducts An array of Products or Product IDs
- * @returns {boolean} Returns true/false
+ * @returns {Promise<boolean>} Returns true/false
  */
 export const accessProducts = async (
   resourcePermission: string,
   authUser: User,
-  requestedCompany: Company,
   requestedProducts: Product | string[]
-) => {
+): Promise<boolean | [string, number]> => {
   const resourcePermitted = await PermissionHelper.hasResourcePermission({
     resourcePermission,
     user: authUser,
     loggable: true,
   })
+
+  const authUserCompanyIds = await serialisedAuthUserCompanyIds(authUser)
 
   if (requestedProducts && Array.isArray(requestedProducts)) {
     if (requestedProducts.every((product) => typeof product === 'string')) {
@@ -210,15 +211,16 @@ export const accessProducts = async (
         const productCompanies = product.companies
         const productCompaniesIds: string[] = productCompanies.map((company) => company.id)
 
-        if (
-          productCompaniesIds.some(
-            (productCompanyId) => productCompanyId === requestedCompany.id
-          ) &&
-          resourcePermitted
-        ) {
+        // Check is user belongs to any of the product companies
+        const belongToSameCompany = authUserCompanyIds.some(
+          (authUserCompanyId) => productCompaniesIds[productCompaniesIds.indexOf(authUserCompanyId)]
+        )
+
+        if (belongToSameCompany && resourcePermitted) {
           permitted.push(true)
         } else permitted.push(false)
       }
+
       if (permitted.every((value) => value)) return true
       else return Bouncer.deny('You are not permitted to perform this action!')
       //
@@ -230,10 +232,12 @@ export const accessProducts = async (
     const productCompanies = product.companies
     const productCompaniesIds: string[] = productCompanies.map((company) => company.id)
 
-    if (
-      productCompaniesIds.some((productCompanyId) => productCompanyId === requestedCompany.id) &&
-      resourcePermitted
-    ) {
+    // Check is user belongs to any of the product companies
+    const belongToSameCompany = authUserCompanyIds.some(
+      (authUserCompanyId) => productCompaniesIds[productCompaniesIds.indexOf(authUserCompanyId)]
+    )
+
+    if (belongToSameCompany && resourcePermitted) {
       return true
     } else return Bouncer.deny('You are not permitted to perform this action!')
   }

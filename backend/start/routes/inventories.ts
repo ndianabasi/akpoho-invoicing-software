@@ -12,6 +12,8 @@ Route.group(() => {
     '/attribute-sets/attribute-sets-for-select',
     'AttributeSetsController.attributeSetsForSelect'
   )
+  // Get details of the requested product
+  Route.get('/products/:product_id', 'ProductsController.show').middleware('findRequestedProduct')
 })
   .prefix('/v1')
   .middleware('auth')

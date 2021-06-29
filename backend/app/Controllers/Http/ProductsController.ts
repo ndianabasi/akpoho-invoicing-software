@@ -104,8 +104,6 @@ export default class ProductsController {
     }
   }
 
-  public async create({}: HttpContextContract) {}
-
   public async store({ response, request, bouncer, requestedCompany }: HttpContextContract) {
     const {
       productTypeId,
@@ -151,7 +149,88 @@ export default class ProductsController {
     } else return response.abort({ message: 'Company not found' })
   }
 
-  public async show({}: HttpContextContract) {}
+  public async show({ response, requestedProduct, bouncer }: HttpContextContract) {
+    if (requestedProduct) {
+      // Check authorisation
+      await bouncer.with('ProductPolicy').authorize('view', requestedProduct)
+
+      await requestedProduct?.load('type')
+      await requestedProduct?.load('country')
+      await requestedProduct?.load('productCategories')
+
+      const serialisedRequestedProduct = requestedProduct.serialize({
+        fields: {
+          pick: [
+            'id',
+            'product_type',
+            'name',
+            'sku',
+            'price',
+            'is_enabled',
+            'stock_status',
+            'product_has_weight',
+            'created_at',
+            'updated_at',
+            'slug',
+            'weight',
+            'country_of_manufacture',
+            'description',
+            'short_description',
+          ],
+        },
+        relations: {
+          type: {
+            fields: {
+              pick: ['id', 'name'],
+            },
+          },
+          country: {
+            fields: {
+              pick: ['id', 'name'],
+            },
+          },
+          productCategories: {
+            fields: {
+              pick: ['name', 'id'],
+            },
+          },
+        },
+      })
+
+      return response.ok({ data: serialisedRequestedProduct })
+    }
+  }
+
+  public async showAddresses({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    bouncer,
+  }: HttpContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('view', requestedCompany!, requestedCustomer!)
+
+    const addresses = await Database.from('customer_addresses')
+      .select(
+        'customer_addresses.address_type',
+        'customer_addresses.city',
+        'customer_addresses.created_at',
+        'customer_addresses.id',
+        'customer_addresses.postal_code',
+        'customer_addresses.street_address',
+        'customer_addresses.updated_at',
+        'countries.name as country',
+        'states.name as state'
+      )
+      .leftJoin('countries', (query) => {
+        query.on('countries.id', '=', 'customer_addresses.country_id')
+      })
+      .leftJoin('states', (query) => {
+        query.on('states.id', '=', 'customer_addresses.state_id')
+      })
+      .where('customer_addresses.customer_id', requestedCustomer?.id!)
+
+    return response.ok({ data: addresses })
+  }
 
   public async edit({}: HttpContextContract) {}
 

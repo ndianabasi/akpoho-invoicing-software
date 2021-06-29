@@ -60,6 +60,19 @@ const actions: ActionTree<ProductStateInterface, StateInterface> = {
         });
     });
   },
+
+  async FETCH_CURRENTLY_VIEWED_PRODUCT(
+    { commit },
+    { productId }: { productId: string }
+  ) {
+    return new Promise(async (resolve) => {
+      await $http.get(`/products/${productId}`).then((res: HttpResponse) => {
+        commit('SET_CURRENTLY_VIEWED_PRODUCT', res.data.data);
+
+        resolve(res.data);
+      });
+    });
+  },
 };
 
 export default actions;

@@ -12,6 +12,8 @@ const getters: ProductGetterInterface = {
     state.productTypesForSelect,
   GET_CURRENTLY_EDITED_PRODUCT_TYPE: (state: ProductStateInterface) =>
     state.currentlyEditedProductType,
+  GET_CURRENTLY_VIEWED_PRODUCT: (state: ProductStateInterface) =>
+    state.currentlyViewedProduct,
 };
 
 export default getters;

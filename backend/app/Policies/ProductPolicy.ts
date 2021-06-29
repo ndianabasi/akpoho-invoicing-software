@@ -2,6 +2,8 @@ import { BasePolicy } from '@ioc:Adonis/Addons/Bouncer'
 import User from 'App/Models/User'
 import PermissionHelper from 'App/Helpers/PermissionHelper'
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
+import Product from 'App/Models/Product'
+import { accessProducts } from 'App/Helpers/PolicyHelper'
 
 export default class ProductPolicy extends BasePolicy {
   public async create(user: User) {
@@ -32,5 +34,10 @@ export default class ProductPolicy extends BasePolicy {
     if (isPermitted) return true
 
     return Bouncer.deny('You are not permitted to perform this action!')
+  }
+
+  public async view(user: User, requestedProduct: Product) {
+    const resourcePermission = 'can_view_inventories'
+    return await accessProducts(resourcePermission, user, requestedProduct)
   }
 }

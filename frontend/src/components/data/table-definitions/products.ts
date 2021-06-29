@@ -3,11 +3,13 @@ import { watchEffect, onBeforeUnmount } from 'vue';
 import { store } from 'src/store';
 import { TableRow } from '../../../types/table';
 import { stockStatusForSelect, yesNoOptionsForSelect } from 'src/helpers/utils';
-import { PRODUCT_OWNERSHIP_TYPES, PRODUCT_TYPES } from 'src/store/types';
+import { ProductResultRowInterface, PRODUCT_TYPE } from 'src/store/types';
 
 interface ProductHeaders extends TableRow {
   name: ProductColumns;
-  field: ProductColumns | ((row: ProductResultRowInterface) => unknown);
+  field:
+    | ProductColumns
+    | ((row: ProductResultRowInterface) => PRODUCT_TYPE | undefined);
 }
 
 enum ProductColumns {
@@ -24,26 +26,6 @@ enum ProductColumns {
   slug = 'slug',
   weight = 'weight',
   country_of_manufacture = 'country_of_manufacture',
-}
-
-interface ProductResultRowInterface {
-  id: string;
-  product_type: string;
-  name: string;
-  sku: string;
-  price: number;
-  is_enabled: number;
-  stock_status: string;
-  product_has_weight: number;
-  created_at: string;
-  updated_at: string;
-  slug: string;
-  weight: string;
-  country_of_manufacture: string;
-  meta: {
-    pivot_ownership: PRODUCT_OWNERSHIP_TYPES;
-    product_type: PRODUCT_TYPES;
-  };
 }
 
 const stopFetchProductSizesForSelect = watchEffect(() => {
@@ -75,7 +57,7 @@ const columns: ProductHeaders[] = [
     required: true,
     label: 'Product Type',
     align: 'center',
-    field: (row) => row.meta.product_type,
+    field: (row) => row?.meta?.product_type,
     sortable: true,
     filterable: true,
     filterInputType: 'text',
