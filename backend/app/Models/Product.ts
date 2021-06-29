@@ -48,7 +48,7 @@ export default class Product extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
-  @column({ isPrimary: true })
+  @column()
   public productTypeId: string
 
   @column()

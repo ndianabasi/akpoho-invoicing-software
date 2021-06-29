@@ -26,54 +26,30 @@ export default class ProductsController {
     if (requestedCompany) {
       await bouncer.with('ProductPolicy').authorize('create', requestedCompany)
 
-      const trx = await Database.transaction()
+      let newProduct: Product | null = null
+      await Database.transaction(async (trx) => {
+        requestedCompany.useTransaction(trx)
+        newProduct = await requestedCompany?.related('products').create(
+          {
+            productTypeId,
+            name: productName,
+            sku,
+            price,
+            weight,
+            countryOfManufacture,
+            isEnabled,
+            productHasWeight,
+            stockStatus: stockStatus as PRODUCT_STOCK_STATUS_TYPES,
+            description,
+            shortDescription,
+          },
+          { ownership: 'owner' }
+        )
 
-      // Not used due to QueryBuilder bug
-      /* requestedCompany.useTransaction(trx)
+        // TODO: implement products/company_product cache/clearing of cache
 
-      const newProduct = await requestedCompany?.related('products').create(
-        {
-          productTypeId,
-          name: productName,
-          sku,
-          price,
-          weight,
-          countryOfManufacture,
-          isEnabled,
-          productHasWeight,
-          stockStatus: stockStatus as PRODUCT_STOCK_STATUS_TYPES,
-          description,
-          shortDescription,
-        },
-        { ownership: 'owner' }
-      ) */
-
-      let newProduct = new Product()
-      newProduct.useTransaction(trx)
-
-      newProduct.merge({
-        productTypeId,
-        name: productName,
-        sku,
-        price,
-        weight,
-        countryOfManufacture,
-        isEnabled,
-        productHasWeight,
-        stockStatus: stockStatus as PRODUCT_STOCK_STATUS_TYPES,
-        description,
-        shortDescription,
+        return response.created({ data: newProduct?.id })
       })
-
-      newProduct = await newProduct.save()
-
-      await newProduct.related('companies').attach({
-        [requestedCompany.id]: { ownership: 'owner' },
-      })
-
-      // TODO: implement product cache/clearing of cache
-
-      return response.created({ data: newProduct?.id })
     } else return response.abort({ message: 'Company not found' })
   }
 
