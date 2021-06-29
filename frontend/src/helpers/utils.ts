@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
 import { DateTime } from 'luxon';
-//import { Format, TableRow } from 'src/types/table';
+import { computed } from 'vue';
 
 export const stringSortFn = function (a: string, b: string) {
   if (a.toLowerCase() > b.toLowerCase()) return 1;
@@ -36,3 +36,20 @@ export const EMAIL_REGEX = /^a-zA-Z0-9$/;
 export const PASSWORD_REGEX = passwordRegex;
 export const URL_REGEX = urlRegex;
 export const PHONE_NUMBER_REGEX = phoneNumberRegex;
+
+export const stockStatusArray = [
+  'In Stock',
+  'Out of Stock',
+  'Made to Order',
+  'Drop-shipped',
+];
+
+export const yesNoOptions = ['', 'Yes', 'No'];
+
+export const stockStatusForSelect = computed(() =>
+  stockStatusArray.map((status) => ({ label: status, value: status }))
+);
+
+export const yesNoOptionsForSelect = computed(() =>
+  yesNoOptions.map((option) => ({ label: option, value: option }))
+);

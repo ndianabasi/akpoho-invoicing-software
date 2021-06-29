@@ -484,6 +484,10 @@ export default defineComponent({
         );
       },
     },
+    isCompanySpecific: {
+      type: Boolean,
+      default: false,
+    },
     showNewRouteButton: {
       type: Boolean,
       default: false,
@@ -618,6 +622,7 @@ export default defineComponent({
             : {},
           entityEndPoint: props.tableDataFetchEndPoint,
           queryObject: props.useMultiFilter ? queryObject : {},
+          isCompanySpecific: props.isCompanySpecific,
         })
         .then((response: ResponseData) => {
           void nextTick(() => {

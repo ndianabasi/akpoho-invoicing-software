@@ -5,7 +5,7 @@ import { ActionContext, ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { QuasarTableStateInterface, DataRows } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpResponse, HttpError } from '../types';
+import { HttpResponse, HttpError, StringIDNameInterface } from '../types';
 import { PaginationParams } from '../../types/table';
 
 export interface QuasarTableActionsContract
@@ -16,25 +16,38 @@ export interface QuasarTableActionsContract
       paginationParams: PaginationParams;
       entityEndPoint: string;
       queryObject: { [index: string]: string };
+      isCompanySpecific: boolean;
     }
   ) => Promise<unknown>;
 }
 
 const actions: QuasarTableActionsContract = {
   async FETCH_TABLE_DATA(
-    { commit },
-    { paginationParams, entityEndPoint, queryObject }
+    { commit, rootGetters },
+    { paginationParams, entityEndPoint, queryObject, isCompanySpecific }
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const currentCompany = rootGetters[
+      'auth/GET_CURRENT_COMPANY'
+    ] as StringIDNameInterface;
+
     return new Promise(async (resolve, reject) => {
       commit('SET_TABLE_DATA', []);
 
       await $http
-        .get(`${entityEndPoint}`, {
-          params:
-            paginationParams && queryObject
-              ? { ...paginationParams, ...queryObject }
-              : {},
-        })
+        .get(
+          `${
+            isCompanySpecific
+              ? `${currentCompany.id}/${entityEndPoint}`
+              : entityEndPoint
+          }`,
+          {
+            params:
+              paginationParams && queryObject
+                ? { ...paginationParams, ...queryObject }
+                : {},
+          }
+        )
         .then((res: HttpResponse) => {
           commit(
             'SET_TABLE_DATA',

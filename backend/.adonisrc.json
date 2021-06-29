@@ -16,17 +16,13 @@
     "Contracts": "contracts"
   },
   "preloads": [
-    "./start/routes",
+    "./start/routes/index",
     "./start/kernel",
     "./start/bouncer",
     {
       "file": "./start/events",
       "optional": true,
-      "environment": [
-        "web",
-        "console",
-        "test"
-      ]
+      "environment": ["web", "console", "test"]
     }
   ],
   "providers": [
@@ -52,7 +48,5 @@
       "reloadServer": false
     }
   ],
-  "aceProviders": [
-    "@adonisjs/repl"
-  ]
+  "aceProviders": ["@adonisjs/repl"]
 }

@@ -184,6 +184,7 @@ import { useQuasar } from 'quasar';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { isEqual } from 'lodash';
+import { stockStatusArray, stockStatusForSelect } from '../../../helpers/utils';
 
 export default defineComponent({
   name: 'EditProduct',
@@ -264,17 +265,6 @@ export default defineComponent({
         )
       : ref(null);
 
-    const stockStatusArray = ref([
-      'In Stock',
-      'Out of Stock',
-      'Made to Order',
-      'Drop-shipped',
-    ]);
-
-    const stockStatusForSelect = computed(() =>
-      stockStatusArray.value.map((status) => ({ label: status, value: status }))
-    );
-
     // Valiation section starts
 
     const formSchema = computed(() =>
@@ -295,7 +285,7 @@ export default defineComponent({
         isEnabled: yup.boolean().required('Is Enabled is required'),
         stockStatus: yup
           .mixed()
-          .oneOf(stockStatusArray.value, 'Stock Status is not valid'),
+          .oneOf(stockStatusArray, 'Stock Status is not valid'),
         productHasWeight: yup
           .boolean()
           .required('Product Has Weight is required'),

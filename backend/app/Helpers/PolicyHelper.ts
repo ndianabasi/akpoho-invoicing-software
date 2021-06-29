@@ -5,8 +5,13 @@ import PermissionHelper from '../Helpers/PermissionHelper'
 import Company from 'App/Models/Company'
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
 import AttributeSet from 'App/Models/AttributeSet'
+import Product from 'App/Models/Product'
 
-const accessCompany = async (resourcePermission: string, authUser: User, company: Company) => {
+const accessCompany = async (
+  resourcePermission: string,
+  authUser: User,
+  requestedCompany: Company
+) => {
   const isPermitted = await PermissionHelper.hasResourcePermission({
     resourcePermission,
     user: authUser,
@@ -17,7 +22,9 @@ const accessCompany = async (resourcePermission: string, authUser: User, company
   const serialisedUser = authUser.serialize()
 
   if (
-    serialisedUser.companies.some((serialisedCompany) => serialisedCompany.id === company.id) &&
+    serialisedUser.companies.some(
+      (serialisedCompany) => serialisedCompany.id === requestedCompany.id
+    ) &&
     isPermitted
   ) {
     return true
@@ -64,7 +71,6 @@ const accessCompanyUser = async (
     return belongToSameCompany && isPermitted
   } else {
     if (
-      authUserCompanyIds.some((authCompanyId) => authCompanyId === requestedCompany.id) &&
       reqUserCompanies.some((reqCompany) => reqCompany.id === requestedCompany.id) &&
       isPermitted
     ) {
@@ -108,11 +114,7 @@ const accessCompanyCustomer = async (
 
     return belongToSameCompany && isPermitted
   } else {
-    if (
-      authUserCompanyIds.some((authCompanyId) => authCompanyId === requestedCompany?.id) &&
-      requestedCustomer.companyId === requestedCompany?.id &&
-      isPermitted
-    ) {
+    if (requestedCustomer.companyId === requestedCompany?.id && isPermitted) {
       return true
     }
   }
@@ -165,6 +167,71 @@ export const accessCustomers = async (
 
     if (
       authUserCompanies.some((authUserCompany) => authUserCompany.id === customerCompany.id) &&
+      resourcePermitted
+    ) {
+      return true
+    } else return Bouncer.deny('You are not permitted to perform this action!')
+  }
+}
+
+/**
+ * Checks if the authenticated user has access to the requested products
+ * @param resourcePermission The resource permission
+ * @param authUser The authenticated user
+ * @param requestedCompany The company whose product(s) are requested
+ * @param requestedProducts An array of Products or Product IDs
+ * @returns {boolean} Returns true/false
+ */
+export const accessProducts = async (
+  resourcePermission: string,
+  authUser: User,
+  requestedCompany: Company,
+  requestedProducts: Product | string[]
+) => {
+  const resourcePermitted = await PermissionHelper.hasResourcePermission({
+    resourcePermission,
+    user: authUser,
+    loggable: true,
+  })
+
+  if (requestedProducts && Array.isArray(requestedProducts)) {
+    if (requestedProducts.every((product) => typeof product === 'string')) {
+      /**
+       * Array to hold each permitted customer
+       */
+      const permitted: boolean[] = []
+
+      for (let i = 0; i < requestedProducts.length; i++) {
+        const productId = requestedProducts[i]
+        const product = await Product.findOrFail(productId)
+
+        // Load product companies
+        await product.load('companies')
+        const productCompanies = product.companies
+        const productCompaniesIds: string[] = productCompanies.map((company) => company.id)
+
+        if (
+          productCompaniesIds.some(
+            (productCompanyId) => productCompanyId === requestedCompany.id
+          ) &&
+          resourcePermitted
+        ) {
+          permitted.push(true)
+        } else permitted.push(false)
+      }
+      if (permitted.every((value) => value)) return true
+      else return Bouncer.deny('You are not permitted to perform this action!')
+      //
+    } else throw new Error('Array of string ids expected')
+  } else {
+    const product = requestedProducts
+    // Load product companies
+    await product.load('companies')
+    const productCompanies = product.companies
+    const productCompaniesIds: string[] = productCompanies.map((company) => company.id)
+
+    if (
+      productCompaniesIds.some((productCompanyId) => productCompanyId === requestedCompany.id) &&
       resourcePermitted
     ) {
       return true

@@ -506,3 +506,14 @@ export type MinMaxParams = {
     max?: number;
   };
 };
+
+export type PRODUCT_OWNERSHIP_TYPES = 'owner' | 'consumer';
+
+export type PRODUCT_TYPES =
+  | 'Simple Product'
+  | 'Variable Product'
+  | 'Compound Product'
+  | 'Virtual Product'
+  | 'Bundle Product'
+  | 'Downloadable Product'
+  | 'Gift Card';

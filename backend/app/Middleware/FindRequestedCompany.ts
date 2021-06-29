@@ -8,14 +8,27 @@ export default class FindRequestedCompany {
 
     if (!company_id) throw new NoEntityDefinedException('No company is provided!')
 
-    let company
+    let requestedCompany
     try {
-      company = await Company.findOrFail(company_id)
+      requestedCompany = await Company.findOrFail(company_id)
     } catch (error) {
       return ctx.response.notFound({ message: 'Unknown company was requested' })
     }
 
-    ctx.requestedCompany = company
+    const authUser = ctx.auth.user ?? null
+    await authUser?.load('companies')
+    const authCompanies = authUser?.companies
+
+    const belongsToRequestedCompany = authCompanies?.some(
+      (authCompany) => authCompany.id === requestedCompany.id
+    )
+
+    if (!belongsToRequestedCompany)
+      return ctx.response.forbidden({
+        message: 'You are not allowed to access this company. Please check your current company',
+      })
+
+    ctx.requestedCompany = requestedCompany
 
     await next()
   }

@@ -4,20 +4,21 @@
     :table-name="tableName"
     :table-data-getter-type="tableDataGetterType"
     :default-sort="defaultSort"
-    no-results-label="Sorry! No companies were found. Please check your filters too."
-    row-view-route-name="view_company"
-    row-edit-route-name="edit_company"
-    route-param="companyId"
-    row-delete-action-type="companies/DELETE_COMPANY"
-    entity-name="Company"
-    table-data-fetch-end-point="companies"
+    no-results-label="Sorry! No products were found. Please check your filters too."
+    row-view-route-name="view_product"
+    row-edit-route-name="edit_product"
+    route-param="productId"
+    row-delete-action-type="products/DELETE_PRODUCT"
+    entity-name="Product"
+    table-data-fetch-end-point="products"
     show-new-route-button
     :new-route-object="{
-      routeName: 'add_company',
-      icon: 'person_add_alt',
-      title: 'New Company',
+      routeName: 'add_product',
+      icon: 'library_add',
+      title: 'New Product',
     }"
     :resource-action-permissions="resourceActionPermissions"
+    is-company-specific
   >
     <template #topAddNew>
       <q-btn-dropdown
@@ -63,17 +64,17 @@ import {
 } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import companyColumns from '../../../components/data/table-definitions/companies';
+import productColumns from '../../../components/data/table-definitions/products';
 import QuasarTable from '../../../components/QuasarTable.vue';
 import { PERMISSION, SelectOption } from '../../../store/types';
 
 export default defineComponent({
-  name: 'AllCompanies',
+  name: 'AllProducts',
   components: {
     QuasarTable,
   },
   setup() {
-    const tableName = ref('All Companies');
+    const tableName = ref('All Products');
     const store = useStore();
     const router = useRouter();
 
@@ -90,7 +91,7 @@ export default defineComponent({
     );
 
     const data = reactive({
-      columns: companyColumns,
+      columns: productColumns,
       stickyTable: false,
     });
 
@@ -135,10 +136,10 @@ export default defineComponent({
       tableDataGetterType,
       defaultSort,
       resourceActionPermissions: ref({
-        new: PERMISSION.CAN_CREATE_COMPANIES,
-        view: PERMISSION.CAN_VIEW_COMPANIES,
-        edit: PERMISSION.CAN_EDIT_COMPANIES,
-        delete: PERMISSION.CAN_DELETE_COMPANIES,
+        new: PERMISSION.CAN_CREATE_INVENTORIES,
+        view: PERMISSION.CAN_VIEW_INVENTORIES,
+        edit: PERMISSION.CAN_EDIT_INVENTORIES,
+        delete: PERMISSION.CAN_DELETE_INVENTORIES,
       }),
       onNewProductDropdownMainClick,
       onNewProductDropdownItemClick,

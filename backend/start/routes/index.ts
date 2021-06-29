@@ -19,6 +19,7 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
+import './inventories'
 
 Route.get('/views/test', async ({ view }) => {
   return view.render('emails/new-account-verification')
@@ -105,18 +106,6 @@ Route.group(() => {
 
   // Delete requested customers
   Route.delete('/customers', 'CustomersController.destroy')
-
-  // General product routes
-  // Get all product types for selections
-  Route.get(
-    '/product-types/product-types-for-select',
-    'ProductTypesController.productTypesForSelect'
-  )
-  // Get all attribute sets for selections
-  Route.get(
-    '/attribute-sets/attribute-sets-for-select',
-    'AttributeSetsController.attributeSetsForSelect'
-  )
 })
   .prefix('/v1')
   .middleware('auth')
@@ -196,14 +185,6 @@ Route.group(() => {
   )
 
   Route.post('/:company_id/users', 'UsersController.store')
-
-  // Get all attribute set data
-  Route.get(
-    '/:company_id/attribute-sets/:type/:attribute_set_id',
-    'AttributeSetsController.attributeSetData'
-  ).middleware('findRequestedAttributeSet')
-
-  Route.post('/:company_id/products', 'ProductsController.store')
 })
   .prefix('/v1')
   .middleware('auth')
