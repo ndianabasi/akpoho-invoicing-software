@@ -84,7 +84,7 @@ import AuthForm from '../../components/AuthForm.vue';
 //const strongPassword = helpers.regex('strongPassword', //)
 
 export default defineComponent({
-  name: 'RequestPasswordReset',
+  name: 'ForgotPasswordForm',
   components: { AuthForm },
   setup() {
     const submitting = ref(false);

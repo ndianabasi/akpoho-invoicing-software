@@ -6,7 +6,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'UsersIndex',
+  name: 'ProductsIndex',
   components: {},
   setup() {
     return {};

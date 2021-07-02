@@ -162,7 +162,7 @@ const rows = [
 ];
 
 export default defineComponent({
-  name: 'Quotations',
+  name: 'QuotationIndex',
   setup() {
     const selected = ref([]);
 
