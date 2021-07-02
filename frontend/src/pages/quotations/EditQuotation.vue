@@ -5,84 +5,193 @@
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
+      card-container-classes="col-md-10 col-xl-9 col-sm-12 col-xs-12"
     >
       <template #body-panel="{ isSmallScreen }">
         <form class="q-pa-md" @submit="onSubmit">
-          <template v-for="field in form">
-            <q-toggle
-              v-if="field.componentType === 'toggle' && field.isVisible"
-              :key="`field_${field.name}_${field.componentType}`"
-              v-model="field.model"
-              checked-icon="check"
-              color="green"
-              unchecked-icon="clear"
-              :label="field.label"
-              class="q-ml-lg q-mb-md"
-              :dense="isSmallScreen"
-            />
+          <div class="row">
+            <div class="col col-md-4 col-lg-3 col-sm-6 col-xs-12">
+              <q-input
+                v-model="form.date"
+                label="Quotation Date"
+                filled
+                mask="####-##-##"
+                :dense="isSmallScreen"
+                class="q-mb-sm-sm q-mb-md-md"
+              >
+                <template #append>
+                  <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy
+                      ref="qDateProxy"
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-date
+                        v-model="form.date"
+                        today-btn
+                        minimal
+                        mask="YYYY-MM-DD"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+            <div class="col col-md-4 col-lg-3 col-sm-6 col-xs-12">
+              <q-input
+                v-model="form.code"
+                type="text"
+                for="quotationCode"
+                filled
+                clearable
+                bottom-slots
+                label="Quotation Code"
+                aria-autocomplete="off"
+                autocomplete="off"
+                class="q-ml-sm-sm q-ml-md-md q-mb-sm-sm q-mb-md-md"
+                :dense="isSmallScreen"
+              >
+                <!-- <template #error>
+                  {{ formErrors[field.name] }}
+                </template> -->
 
-            <q-input
-              v-if="field.componentType === 'input' && field.isVisible"
-              :key="`field_${field.name}_${field.componentType}`"
-              v-model="field.model"
-              :type="
-                field.inputType !== 'password'
-                  ? field.inputType
-                  : revealPasswords[field.name]
-                  ? 'text'
-                  : 'password'
-              "
-              :for="field.name"
-              filled
-              clearable
-              bottom-slots
-              :label="field.label"
-              :aria-autocomplete="field?.autocomplete ?? 'off'"
-              :autocomplete="field?.autocomplete ?? 'off'"
-              :error="!!formErrors?.[field.name]?.length ?? false"
-              class="q-mb-sm-sm q-mb-md-md"
-              :dense="isSmallScreen"
-            >
-              <template #error>
-                {{ formErrors[field.name] }}
-              </template>
-
-              <template #hint></template>
-            </q-input>
-
-            <quasar-select
-              v-if="field.componentType === 'select' && field.isVisible"
-              :key="`field_${field.name}_${field.componentType}`"
-              :ref="field.name"
-              v-model="field.model"
-              filled
-              aria-autocomplete="list"
-              autocomplete="off"
-              :options="field.options"
-              :label="field.label"
-              :name="field.name"
-              :for="field.name"
-              clearable
-              bottom-slots
-              :options-dense="isSmallScreen"
-              use-input
-              :input-debounce="200"
-              class="q-mb-md"
-              transition-show="scale"
-              transition-hide="scale"
-              emit-value
-              map-options
-              :dense="isSmallScreen"
-              :error="!!formErrors?.[field.name]?.length ?? false"
-            >
-              <template v-if="field?.icon" #before>
+                <template #hint></template>
+              </q-input>
+            </div>
+            <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
+              <quasar-select
+                ref="customerSelect"
+                v-model="form.customerId"
+                filled
+                aria-autocomplete="list"
+                autocomplete="off"
+                :options="customersForSelect"
+                label="Customer"
+                name="customerSelect"
+                for="customerSelect"
+                clearable
+                bottom-slots
+                :options-dense="isSmallScreen"
+                use-input
+                :input-debounce="250"
+                class="q-ml-sm-sm q-ml-md-md q-mb-sm-sm q-mb-md-md"
+                transition-show="scale"
+                transition-hide="scale"
+                emit-value
+                map-options
+                :dense="isSmallScreen"
+                async-filter-action="customers/FETCH_CUSTOMERS_FOR_SELECT"
+                async-filter-mode
+              >
+                <!-- <template v-if="field?.icon" #before>
                 <q-icon :name="field?.icon ?? ''" />
               </template>
               <template #error>
                 {{ formErrors[field.name] }}
+              </template> -->
+                <template #hint> Search for customer </template>
+              </quasar-select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
+              <quasar-select
+                ref="customerAddressSelect"
+                v-model="form.customerAddressId"
+                filled
+                aria-autocomplete="list"
+                autocomplete="off"
+                :options="customerAddresses"
+                label="Billing Address"
+                name="customerAddressSelect"
+                for="customerAddressSelect"
+                clearable
+                bottom-slots
+                :options-dense="isSmallScreen"
+                use-input
+                :input-debounce="250"
+                class="q-mb-sm-sm q-mb-md-md"
+                transition-show="scale"
+                transition-hide="scale"
+                emit-value
+                map-options
+                :dense="isSmallScreen"
+                :disable="!form.customerId"
+              >
+                <!-- <template v-if="field?.icon" #before>
+                <q-icon :name="field?.icon ?? ''" />
               </template>
-            </quasar-select>
-          </template>
+              <template #error>
+                {{ formErrors[field.name] }}
+              </template> -->
+                <template #hint>
+                  <div v-if="!form.customerId">Select customer first</div>
+                  <div v-else>
+                    {{
+                      customerAddresses && customerAddresses.length
+                        ? `${customerAddresses.length} address(es) available`
+                        : ''
+                    }}
+                  </div>
+                </template>
+              </quasar-select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
+              <q-input
+                v-model="form.description"
+                type="text"
+                for="description"
+                filled
+                clearable
+                bottom-slots
+                label="Description"
+                aria-autocomplete="off"
+                autocomplete="off"
+                class="q-mb-sm-sm q-mb-md-md"
+                :dense="isSmallScreen"
+              >
+                <!-- <template #error>
+                  {{ formErrors[field.name] }}
+                </template> -->
+
+                <template #hint></template>
+              </q-input>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
+              <q-input
+                v-model="form.description"
+                type="text"
+                for="description"
+                filled
+                clearable
+                bottom-slots
+                label="Description"
+                aria-autocomplete="off"
+                autocomplete="off"
+                class="q-mb-sm-sm q-mb-md-md"
+                :dense="isSmallScreen"
+              >
+                <!-- <template #error>
+                  {{ formErrors[field.name] }}
+                </template> -->
+
+                <template #hint></template>
+              </q-input>
+            </div>
+          </div>
         </form>
       </template>
 
@@ -173,6 +282,8 @@ import {
   TitleInfo,
   CompanyFormShape,
   FormSchema,
+  CustomerAddressType,
+  SelectOption,
 } from '../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../components/QuasarSelect';
@@ -236,6 +347,14 @@ export default defineComponent({
       set: (value) => value,
     });
 
+    const customerAddresses = computed({
+      get: () =>
+        store.getters[
+          'customers/GET_CUSTOMER_ADDRESSES_FOR_SELECT'
+        ] as SelectOption[],
+      set: (value) => value,
+    });
+
     const companySizes = computed(
       () =>
         store.getters[
@@ -252,6 +371,14 @@ export default defineComponent({
             ] as CurrentlyViewedCompany
         )
       : ref(null);
+
+    const form = reactive({
+      date: null,
+      code: '',
+      customerId: null,
+      customerAddressId: null,
+      description: '',
+    });
 
     // Valiation section starts
 
@@ -276,144 +403,23 @@ export default defineComponent({
       })
     );
 
-    const initialValues: Readonly<CompanyFormShape> = {
-      isPersonalBrand: false,
-      name: '',
-      email: '',
-      phoneNumber: '',
-      address: '',
-      city: '',
-      size: null,
-      stateId: null,
-      countryId: null,
-      website: '',
-    };
-
     const {
       handleSubmit,
       errors: formErrors,
       isSubmitting,
       values,
     } = useForm<CompanyFormShape>({
-      validationSchema: formSchema.value,
-      initialValues,
+      /* validationSchema: formSchema.value,
+      initialValues, */
     });
 
-    const { value: isPersonalBrand } = useField('isPersonalBrand');
-    const { value: name } = useField('name');
-    const { value: email } = useField('email');
-    const { value: phoneNumber } = useField('phoneNumber');
-    const { value: address } = useField('address');
-    const { value: city } = useField('city');
-    const { value: size } = useField('size');
-    const { value: stateId } = useField('stateId');
-    const { value: countryId } = useField('countryId');
-    const { value: website } = useField('website');
+    /* const { value: isPersonalBrand } = useField('isPersonalBrand'); */
 
     // Form schema for form generation
-    const form: FormSchema = reactive({
-      isPersonalBrand: {
-        model: isPersonalBrand,
-        name: 'isPersonalBrand',
-        componentType: 'toggle',
-        label: 'Create as Personal Brand',
-        default: false,
-        isVisible: true,
-      },
-      name: {
-        model: name,
-        name: 'name',
-        componentType: 'input',
-        inputType: 'text',
-        label: 'Name',
-        default: '',
-        autocomplete: 'organization',
-        isVisible: true,
-      },
-      email: {
-        model: email,
-        name: 'email',
-        componentType: 'input',
-        inputType: 'email',
-        label: 'Email',
-        default: '',
-        autocomplete: 'work email',
-        isVisible: true,
-      },
-      phoneNumber: {
-        model: phoneNumber,
-        name: 'phoneNumber',
-        componentType: 'input',
-        inputType: 'text',
-        label: 'Phone Number',
-        default: '',
-        autocomplete: 'work tel',
-        isVisible: true,
-      },
-      address: {
-        model: address,
-        name: 'address',
-        componentType: 'input',
-        inputType: 'textarea',
-        label: 'Address',
-        default: '',
-        autocomplete: 'work street-address',
-        isVisible: true,
-      },
-      city: {
-        model: city,
-        name: 'city',
-        componentType: 'input',
-        inputType: 'text',
-        label: 'City',
-        default: '',
-        autocomplete: 'work address-level2',
-        isVisible: true,
-      },
-      size: {
-        model: size,
-        name: 'size',
-        componentType: 'select',
-        label: 'Company Size',
-        default: null,
-        isVisible: true,
-        options: computed(() => companySizes.value),
-      },
-      countryId: {
-        model: countryId,
-        name: 'countryId',
-        componentType: 'select',
-        label: 'Country',
-        default: null,
-        autocomplete: 'work country-name',
-        isVisible: true,
-        options: unref(countries),
-      },
-      stateId: {
-        model: stateId,
-        name: 'stateId',
-        componentType: 'select',
-        label: 'State',
-        default: null,
-        autocomplete: 'work address-level1',
-        isVisible: true,
-        options: computed(() => countryStates.value),
-      },
-      website: {
-        model: website,
-        name: 'website',
-        componentType: 'input',
-        inputType: 'text',
-        label: 'Website',
-        default: null,
-        autocomplete: 'url',
-        isVisible: true,
-      },
-    });
 
     // Valiation section ends
 
-    watch(
+    /* watch(
       () => form.countryId.model,
       (newCountry) => {
         stateId.value = null;
@@ -428,7 +434,7 @@ export default defineComponent({
           ] as SelectionOption[];
         }
       }
-    );
+    ); */
 
     const onSubmit = handleSubmit((form) => {
       void nextTick(() => {
@@ -477,7 +483,29 @@ export default defineComponent({
       { deep: true }
     );
 
-    const stopFetchCurrentlyViewedCompany = watchEffect(() => {
+    watch(
+      () => form.customerId,
+      async (customerId) => {
+        if (!customerId) {
+          customerAddresses.value = [];
+          form.customerAddressId = null;
+          return;
+        }
+
+        await store
+          .dispatch('customers/FETCH_CUSTOMER_ADDRESSES_FOR_SELECT', {
+            type: 'billing_address' as CustomerAddressType,
+            customerId,
+          })
+          .then(() => {
+            customerAddresses.value = store.getters[
+              'countries_states/GET_CUSTOMER_ADDRESSES_FOR_SELECT'
+            ] as SelectionOption[];
+          });
+      }
+    );
+
+    /* const stopFetchCurrentlyViewedCompany = watchEffect(() => {
       if (!props.creationMode) {
         void store
           .dispatch('companies/FETCH_CURRENTLY_VIEWED_COMPANY', {
@@ -518,9 +546,9 @@ export default defineComponent({
             }
           });
       }
-    });
+    }); */
 
-    watch(
+    /* watch(
       () => countryId.value,
       (country) => {
         if (country) {
@@ -535,7 +563,7 @@ export default defineComponent({
           ] as SelectionOption[];
         }
       }
-    );
+    ); */
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const CAN_EDIT_COMPANIES = computed(() =>
@@ -543,18 +571,18 @@ export default defineComponent({
     );
 
     onBeforeMount(() => {
-      stopFetchCurrentlyViewedCompany();
+      //stopFetchCurrentlyViewedCompany();
       stopFetchCountriesForSelect();
       stopFetchCompanySizesForSelect();
     });
 
-    onBeforeRouteLeave((to, from, next) => {
+    /*onBeforeRouteLeave((to, from, next) => {
       if (companyCreated.value) {
         return next();
       }
 
-      const didFormValuesChange = !isEqual(initialValues, values);
-      if (didFormValuesChange) {
+      const didFormValuesChange = !isEqual(initialValues , values);
+       if (didFormValuesChange) {
         $q.dialog({
           message: 'Form has changed. Do you really want to leave this page?',
           title: 'Data loss warning',
@@ -568,7 +596,7 @@ export default defineComponent({
             return false;
           });
       } else return next();
-    });
+    });*/
 
     return {
       company: currentCompany,
@@ -580,6 +608,7 @@ export default defineComponent({
       titleInfo,
       countries,
       countryStates,
+      customerAddresses,
       resourcePermissions: useResourcePermissions({
         view: PERMISSION.CAN_VIEW_COMPANIES,
         list: PERMISSION.CAN_LIST_COMPANIES,
