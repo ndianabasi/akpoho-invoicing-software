@@ -17,21 +17,21 @@ function state(): MenusStateInterface {
   return {
     links1: [
       {
-        icon: 'people',
         title: 'Customers',
         link: 'customers',
+        icon: 'people',
         subMenu: [
           { icon: 'people', title: 'All Customers', link: 'customers' },
           { icon: 'people', title: 'Customer Groups', link: 'customers' },
         ],
       },
-      { icon: 'request_page', title: 'Quotations', link: 'quotations' },
-      { icon: 'list_alt', title: 'Invoices', link: 'invoices' },
-      { icon: 'receipt', title: 'Receipts', link: 'receipts' },
+      { title: 'Quotations', link: 'quotations', icon: 'request_page' },
+      { title: 'Invoices', link: 'invoices', icon: 'list_alt' },
+      { title: 'Receipts', link: 'receipts', icon: 'receipt' },
       {
-        icon: 'inventory',
         title: 'Inventories',
         link: 'all_products',
+        icon: 'inventory',
         subMenu: [
           {
             icon: 'local_grocery_store',
@@ -52,7 +52,7 @@ function state(): MenusStateInterface {
     ],
     links3: [
       { icon: 'settings', title: 'Settings', link: 'all_settings' },
-      { icon: 'help', title: 'Help & Feedback' /* link: 'help' */ },
+      /* { icon: 'help', title: 'Help & Feedback', link: 'help' }, */
     ],
     createMenu: [
       { icon: 'person_add_alt', title: 'Customer', link: 'create_customer' },

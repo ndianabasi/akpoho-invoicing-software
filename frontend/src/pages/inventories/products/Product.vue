@@ -93,7 +93,6 @@ import useTitleInfo from '../../../composables/useTitleInfo';
 import useResourcePermissions from '../../../composables/useResourcePermissions';
 import useDeleteResource from '../../../composables/useDeleteResource';
 import {
-  CurrentlyViewedProduct,
   PERMISSION,
   ProductResultRowInterface,
   TitleInfo,
