@@ -3,6 +3,7 @@ import auth from './routes/auth';
 import customers from './routes/customers';
 import inventories from './routes/inventories';
 import settings from './settings';
+import quotations from './routes/quotations';
 
 export type CustomRouteRecord = RouteRecordRaw & {
   meta?: {
@@ -25,9 +26,6 @@ const routes: CustomRouteRecord[] = [
     },
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { ...customers },
-      { ...inventories },
-      { ...settings },
       {
         path: '/dashboard',
         component: () => import('pages/PagesIndex.vue'),
@@ -39,25 +37,10 @@ const routes: CustomRouteRecord[] = [
           permission: 'can_view_company_dashboard',
         },
       },
-      {
-        path: 'quotations',
-        name: 'quotations',
-        component: () => import('pages/quotations/QuotationIndex.vue'),
-        meta: {
-          label: 'All Quotations',
-          icon: 'request_page',
-          permission: 'can_list_quotations',
-        },
-      },
-      {
-        path: '/quotations/new',
-        component: () => import('pages/quotations/CreateQuotation.vue'),
-        name: 'create_quotation',
-        meta: {
-          label: 'New Quotation',
-          permission: 'can_create_quotations',
-        },
-      },
+      { ...customers },
+      { ...inventories },
+      { ...settings },
+      { ...quotations },
       {
         path: 'invoices',
         name: 'invoices',
