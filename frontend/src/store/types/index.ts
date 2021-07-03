@@ -369,6 +369,7 @@ export type InputComponentType =
   | 'none';
 
 export type InputComponentTypeVariant =
+  | 'text'
   | 'textarea'
   | 'multi-select'
   | 'single-select'

@@ -256,4 +256,10 @@ input[type='file'] {
       border: none !important;
     }
   }
+  .add-item-dropdown {
+    > .q-btn {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
 }

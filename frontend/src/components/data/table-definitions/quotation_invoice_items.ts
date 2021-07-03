@@ -7,6 +7,16 @@ interface QuotationInvoiceHeaders extends TableRow {
   field: Columns;
   componentType?: InputComponentType;
   componentTypeVariant?: InputComponentTypeVariant;
+  inputClass?: string;
+  mask?: string;
+  fillMask?: string;
+  unMaskValue?: boolean;
+  reverseFillMask?: boolean;
+  hint?: string;
+  disabled?: boolean;
+  columnClass?: string;
+  columnStyle?: Record<string | number, string>;
+  autoWidth?: boolean;
 }
 
 enum Columns {
@@ -41,6 +51,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     filterable: false,
     componentType: 'input',
     componentTypeVariant: 'textarea',
+    inputClass: 'text-right',
   },
   {
     name: Columns.qty,
@@ -52,6 +63,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     filterable: false,
     componentType: 'input',
     componentTypeVariant: 'number',
+    inputClass: 'text-right',
   },
   {
     name: Columns.UOM,
@@ -63,6 +75,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     filterable: false,
     componentType: 'select',
     componentTypeVariant: 'single-select',
+    autoWidth: true,
   },
   {
     name: Columns.unitPrice,
@@ -74,6 +87,11 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     filterable: false,
     componentType: 'input',
     componentTypeVariant: 'number',
+    mask: '#.##',
+    fillMask: '0',
+    reverseFillMask: true,
+    hint: '',
+    inputClass: 'text-right',
   },
   {
     name: Columns.unitDiscount,

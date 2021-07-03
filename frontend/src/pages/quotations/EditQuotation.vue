@@ -1,7 +1,6 @@
 <template>
   <div class="q-pa-md">
     <view-card
-      v-if="creationMode || company"
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
@@ -15,6 +14,7 @@
                 v-model="form.date"
                 label="Quotation Date"
                 filled
+                fill-mask
                 mask="####-##-##"
                 dense
                 class="q-mb-sm-sm q-mb-md-md"
@@ -180,31 +180,161 @@
                 table-header-class="quotation-invoice-table-header"
                 no-data-label="No items added yet"
                 :rows-per-page-options="[0]"
-              />
-              <div>
-                <q-btn-dropdown
-                  split
-                  label="Add Items"
-                  auto-close
-                  unelevated
-                  ripple
-                  :color="$q.dark ? 'accent' : 'primary'"
-                  @click="addItemLines"
-                >
-                  <q-list>
-                    <q-item
-                      v-for="(number, index) in addItemsDropdownList"
-                      :key="'add_' + number + 'items'"
-                      clickable
-                      @click="addItemLines(addItemsDropdownList[index])"
+              >
+                <template #header="props">
+                  <q-tr :props="props">
+                    <!-- Use for auto-numbering -->
+                    <q-th auto-width />
+                    <!-- Use for reordering handle -->
+                    <q-th auto-width />
+                    <q-th
+                      v-for="col in props.cols"
+                      :key="col.name"
+                      :props="props"
                     >
-                      <q-item-section>
-                        <q-item-label>Add {{ number }} lines</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-btn-dropdown>
-              </div>
+                      {{ col.label }}
+                    </q-th>
+                    <q-th auto-width />
+                  </q-tr>
+                </template>
+
+                <template #body="props">
+                  <q-tr :props="props">
+                    <q-td auto-width>
+                      <div>{{ props.rowIndex + 1 }}</div>
+                    </q-td>
+                    <q-td auto-width>
+                      <q-btn
+                        class="drag-handle"
+                        size="sm"
+                        color="accent"
+                        round
+                        dense
+                        icon="unfold_more"
+                        flat
+                      />
+                    </q-td>
+                    <q-td
+                      v-for="col in props.cols"
+                      :key="col.name"
+                      :props="props"
+                      :auto-width="col.autoWidth"
+                    >
+                      <q-input
+                        v-if="
+                          col.componentType === 'input' &&
+                          form.items[props.rowIndex]
+                        "
+                        :key="`field_${col.name}_${col.componentType}__index_${props.rowIndex}`"
+                        :ref="col.name + '__index_' + props.rowIndex"
+                        v-model="form.items[props.rowIndex][col.name]"
+                        :type="col.componentTypeVariant"
+                        :autogrow="
+                          col.componentTypeVariant === 'textarea' ||
+                          col.componentTypeVariant === 'text'
+                        "
+                        :mask="col.mask ?? undefined"
+                        :fill-mask="col.fillMask ?? undefined"
+                        :reverse-fill-mask="col.reverseFillMask"
+                        :hint="col.hint ?? undefined"
+                        :input-class="col.inputClass"
+                        :for="col.name + '__index_' + props.rowIndex"
+                        filled
+                        bottom-slots
+                        aria-autocomplete="off"
+                        autocomplete="off"
+                        class=""
+                        dense
+                        :aria-disabled="col.disabled"
+                        :disable="col.disabled"
+                      >
+                        <!-- <template #error>
+                          {{ formErrors[col.name] }}
+                        </template>
+
+                        <template #hint></template> -->
+                      </q-input>
+
+                      <quasar-select
+                        v-if="
+                          col.componentType === 'select' &&
+                          form.items[props.rowIndex]
+                        "
+                        :key="`field_${col.name}_${col.componentType}__index_${props.rowIndex}`"
+                        :ref="col.name + '__index_' + props.rowIndex"
+                        v-model="form.items[props.rowIndex][col.name]"
+                        :multiple="col.componentTypeVariant === 'multi-select'"
+                        filled
+                        aria-autocomplete="list"
+                        autocomplete="off"
+                        :options="col.options"
+                        :name="col.name + '__index_' + props.rowIndex"
+                        :for="col.name + '__index_' + props.rowIndex"
+                        bottom-slots
+                        options-dense
+                        use-input
+                        :input-debounce="200"
+                        class=""
+                        transition-show="scale"
+                        transition-hide="scale"
+                        emit-value
+                        map-options
+                        dense
+                        :aria-disabled="col.disabled"
+                        :disable="col.disabled"
+                        :clearable="false"
+                      >
+                        <!-- <template v-if="col?.icon" #before>
+                          <q-icon :name="col?.icon ?? ''" />
+                        </template>
+                        <template #error>
+                          {{ formErrors[col.name] }}
+                        </template> -->
+                      </quasar-select>
+                    </q-td>
+                    <q-td auto-width>
+                      <q-btn
+                        v-if="!isLastItem(props.rowIndex)"
+                        color="danger"
+                        round
+                        flat
+                        dense
+                        icon="delete_outline"
+                        @click="removeItem(props.rowIndex)"
+                      />
+                      <q-btn-dropdown
+                        v-if="isLastItem(props.rowIndex)"
+                        class="add-item-dropdown"
+                        icon="playlist_add"
+                        split
+                        flat
+                        auto-close
+                        unelevated
+                        ripple
+                        :color="$q.dark ? 'accent' : 'primary'"
+                        @click="addItemLines(1)"
+                      >
+                        <q-list>
+                          <q-item
+                            v-for="(number, listIndex) in addItemsDropdownList"
+                            :key="'add_' + number + 'items'"
+                            clickable
+                            @click="
+                              addItemLines(addItemsDropdownList[listIndex])
+                            "
+                          >
+                            <q-item-section>
+                              <q-item-label
+                                >Add {{ number }} lines</q-item-label
+                              >
+                            </q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-btn-dropdown>
+                    </q-td>
+                  </q-tr>
+                </template>
+              </q-table>
             </div>
           </div>
         </form>
@@ -285,6 +415,7 @@ import {
   Ref,
   reactive,
   nextTick,
+  onMounted,
 } from 'vue';
 
 import ViewCard from '../../components/ViewCard.vue';
@@ -342,29 +473,6 @@ export default defineComponent({
     const router = useRouter();
     const $q = useQuasar();
 
-    const stopFetchCountriesForSelect = watchEffect(() => {
-      void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
-    });
-
-    const stopFetchCompanySizesForSelect = watchEffect(() => {
-      void store.dispatch('companies/FETCH_COMPANY_SIZES_FOR_SELECT');
-    });
-
-    const countries = computed(
-      () =>
-        store.getters[
-          'countries_states/GET_COUNTRIES_FOR_SELECT'
-        ] as SelectionOption[]
-    );
-
-    const countryStates = computed({
-      get: () =>
-        store.getters[
-          'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-        ] as SelectionOption[],
-      set: (value) => value,
-    });
-
     const customerAddresses = computed({
       get: () =>
         store.getters[
@@ -372,23 +480,6 @@ export default defineComponent({
         ] as SelectOption[],
       set: (value) => value,
     });
-
-    const companySizes = computed(
-      () =>
-        store.getters[
-          'companies/GET_COMPANY_SIZES_FOR_SELECT'
-        ] as SelectionOption[]
-    );
-    let currentCompany: Ref<CurrentlyViewedCompany | null>;
-
-    currentCompany = !props.creationMode
-      ? computed(
-          () =>
-            store.getters[
-              'companies/GET_CURRENTLY_VIEWED_COMPANY'
-            ] as CurrentlyViewedCompany
-        )
-      : ref(null);
 
     const form: QuotationInvoiceFormShape = reactive({
       date: null,
@@ -410,13 +501,16 @@ export default defineComponent({
     };
 
     const addItemLines = (numberOfLines = 1) => {
-      const newArray: QuotationInvoiceItemShape[] = [];
       for (let i = 0; i < numberOfLines; i++) {
-        newArray.push(quotationItemShape);
+        // Spread operator used to clone object to avoid
+        // object reference issues
+        form.items.push({ ...quotationItemShape });
       }
-
-      form.items = [...form.items, ...newArray];
     };
+
+    const removeItem = (index: number) => form.items.splice(index, 1);
+
+    const isLastItem = (index: number) => form.items.length - 1 === index;
 
     const visibleColumns = computed(() => {
       return ItemsColumns.filter((column) => column.required);
@@ -506,7 +600,7 @@ export default defineComponent({
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
-    watch(
+    /* watch(
       currentCompany,
       () => {
         const title =
@@ -525,7 +619,7 @@ export default defineComponent({
         titleInfo.value = title.value;
       },
       { deep: true }
-    );
+    ); */
 
     watch(
       () => form.customerId,
@@ -614,10 +708,15 @@ export default defineComponent({
       store.getters['permissions/GET_USER_PERMISSION']('can_edit_companies')
     );
 
+    onMounted(() => {
+      /* if (props.creationMode)  */
+      void addItemLines(3);
+    });
+
     onBeforeMount(() => {
       //stopFetchCurrentlyViewedCompany();
-      stopFetchCountriesForSelect();
-      stopFetchCompanySizesForSelect();
+      /* stopFetchCountriesForSelect();
+      stopFetchCompanySizesForSelect(); */
     });
 
     /*onBeforeRouteLeave((to, from, next) => {
@@ -643,15 +742,13 @@ export default defineComponent({
     });*/
 
     return {
-      company: currentCompany,
+      //quotation: currentQuotation,
       text: ref(''),
       ph: ref(''),
       dense: ref(false),
       dismissed: ref(false),
       form,
       titleInfo,
-      countries,
-      countryStates,
       customerAddresses,
       resourcePermissions: useResourcePermissions({
         view: PERMISSION.CAN_VIEW_COMPANIES,
@@ -662,6 +759,8 @@ export default defineComponent({
       onSubmit,
       formErrors,
       addItemLines,
+      removeItem,
+      isLastItem,
       addItemsDropdownList,
       visibleColumns,
       ItemsColumns,
