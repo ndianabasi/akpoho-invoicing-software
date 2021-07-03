@@ -9,7 +9,7 @@ interface QuotationInvoiceHeaders extends TableRow {
   componentTypeVariant?: InputComponentTypeVariant;
   inputClass?: string;
   mask?: string;
-  fillMask?: string;
+  fillMask?: string | boolean;
   unMaskValue?: boolean;
   reverseFillMask?: boolean;
   hint?: string;
@@ -17,6 +17,10 @@ interface QuotationInvoiceHeaders extends TableRow {
   columnClass?: string;
   columnStyle?: Record<string | number, string>;
   autoWidth?: boolean;
+  asyncFilterAction?: string;
+  asyncFilterMode?: boolean;
+  min?: number;
+  max?: number;
 }
 
 enum Columns {
@@ -40,6 +44,9 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     filterable: false,
     componentType: 'select',
     componentTypeVariant: 'single-select',
+    options: [],
+    asyncFilterAction: 'products/FETCH_PRODUCTS_FOR_SELECT',
+    asyncFilterMode: true,
   },
   {
     name: Columns.description,
@@ -63,7 +70,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     filterable: false,
     componentType: 'input',
     componentTypeVariant: 'number',
-    inputClass: 'text-right',
+    min: 0,
   },
   {
     name: Columns.UOM,
@@ -87,11 +94,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     filterable: false,
     componentType: 'input',
     componentTypeVariant: 'number',
-    mask: '#.##',
-    fillMask: '0',
-    reverseFillMask: true,
-    hint: '',
-    inputClass: 'text-right',
+    min: 0,
   },
   {
     name: Columns.unitDiscount,
@@ -103,6 +106,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     filterable: false,
     componentType: 'input',
     componentTypeVariant: 'number',
+    min: 0,
   },
   {
     name: Columns.discountType,

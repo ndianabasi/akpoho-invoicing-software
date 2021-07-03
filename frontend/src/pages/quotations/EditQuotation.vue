@@ -199,7 +199,7 @@
                 </template>
 
                 <template #body="props">
-                  <q-tr :props="props">
+                  <q-tr :props="props" class="q-my-auto">
                     <q-td auto-width>
                       <div>{{ props.rowIndex + 1 }}</div>
                     </q-td>
@@ -233,10 +233,10 @@
                           col.componentTypeVariant === 'textarea' ||
                           col.componentTypeVariant === 'text'
                         "
-                        :mask="col.mask ?? undefined"
-                        :fill-mask="col.fillMask ?? undefined"
+                        :mask="col.mask"
+                        :fill-mask="col.fillMask"
                         :reverse-fill-mask="col.reverseFillMask"
-                        :hint="col.hint ?? undefined"
+                        :hint="col.hint"
                         :input-class="col.inputClass"
                         :for="col.name + '__index_' + props.rowIndex"
                         filled
@@ -247,6 +247,7 @@
                         dense
                         :aria-disabled="col.disabled"
                         :disable="col.disabled"
+                        :min="col.min"
                       >
                         <!-- <template #error>
                           {{ formErrors[col.name] }}
@@ -283,6 +284,8 @@
                         :aria-disabled="col.disabled"
                         :disable="col.disabled"
                         :clearable="false"
+                        :async-filter-action="col.asyncFilterAction"
+                        :async-filter-mode="col.asyncFilterMode"
                       >
                         <!-- <template v-if="col?.icon" #before>
                           <q-icon :name="col?.icon ?? ''" />
@@ -493,10 +496,10 @@ export default defineComponent({
     const quotationItemShape: QuotationInvoiceItemShape = {
       productId: null,
       description: '',
-      qty: 0,
+      qty: null,
       UOM: 'set',
-      unitPrice: 0,
-      unitDiscount: 0,
+      unitPrice: null,
+      unitDiscount: null,
       discountType: 'number',
     };
 

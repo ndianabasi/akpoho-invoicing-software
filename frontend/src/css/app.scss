@@ -254,6 +254,9 @@ input[type='file'] {
     tr,
     td {
       border: none !important;
+      /* > label {
+        padding-bottom: 0 !important;
+      } */
     }
   }
   .add-item-dropdown {

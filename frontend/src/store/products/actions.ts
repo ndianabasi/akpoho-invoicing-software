@@ -108,6 +108,26 @@ const actions: ActionTree<ProductStateInterface, StateInterface> = {
       });
     });
   },
+
+  async FETCH_PRODUCTS_FOR_SELECT({ rootGetters }, query: string) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      await $http
+        .get(`/${currentCompany.id}/products-for-select`, {
+          params: { query },
+        })
+        .then((res: HttpResponse) => {
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
 };
 
 export default actions;

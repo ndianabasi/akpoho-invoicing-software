@@ -36,6 +36,9 @@ Route.group(() => {
 
   // Fetch all products for the company_id
   Route.get('/:company_id/products', 'ProductsController.index')
+
+  // Fetch products for the company_id for selection
+  Route.get('/:company_id/products-for-select', 'ProductsController.productsForSelect')
 })
   .prefix('/v1')
   .middleware('auth')

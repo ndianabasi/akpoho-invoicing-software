@@ -240,5 +240,34 @@ export default class ProductsController {
     } else return response.abort('Requested Product not found')
   }
 
+  public async productsForSelect({
+    response,
+    requestedCompany,
+    request,
+    bouncer,
+  }: HttpContextContract) {
+    await bouncer.with('ProductPolicy').authorize('list')
+
+    const { query } = request.qs()
+
+    const searchedProducts = await requestedCompany
+      ?.related('products')
+      .query()
+      .where(function (whereQuery) {
+        whereQuery.whereRaw(`products.name LIKE '%${query}%'`)
+      })
+      .orderBy('products.name', 'asc')
+
+    const transformedSearchedProducts = searchedProducts?.map((product) => {
+      const serialisedProduct = product.serialize()
+      return {
+        label: serialisedProduct.name,
+        value: serialisedProduct.id,
+      }
+    })
+
+    return response.ok({ data: transformedSearchedProducts })
+  }
+
   public async destroy({}: HttpContextContract) {}
 }

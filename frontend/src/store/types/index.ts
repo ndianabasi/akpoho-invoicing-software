@@ -591,10 +591,10 @@ export type UnitOfMeasurement =
 export interface QuotationInvoiceItemShape {
   productId: string | null;
   description: string | null;
-  qty: number;
+  qty: number | null;
   UOM: UnitOfMeasurement;
-  unitPrice: number;
-  unitDiscount: number;
+  unitPrice: number | null;
+  unitDiscount: number | null;
   discountType: 'percentage' | 'number';
 }
 

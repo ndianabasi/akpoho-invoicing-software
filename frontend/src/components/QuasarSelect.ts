@@ -81,10 +81,6 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
-    asyncServerOptions: {
-      type: Boolean,
-      default: false,
-    },
     asyncFilterMode: {
       type: Boolean,
       default: false,
