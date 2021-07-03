@@ -11,6 +11,9 @@ const getters: CustomersGetterInterface = {
   GET_CUSTOMER_TITLES_FOR_SELECT: (state: CustomersStateInterface) =>
     state.customerTitlesForSelect,
 
+  GET_CUSTOMER_ADDRESSES_FOR_SELECT: (state: CustomersStateInterface) =>
+    state.customerAddressesForSelect,
+
   GET_CURRENTLY_VIEWED_CUSTOMER: (state: CustomersStateInterface) =>
     state.currentlyViewedCustomer,
 

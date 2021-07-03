@@ -7,7 +7,7 @@
       show-title-panel-side
       card-container-classes="col-md-10 col-xl-9 col-sm-12 col-xs-12"
     >
-      <template #body-panel="{ isSmallScreen }">
+      <template #body-panel>
         <form class="q-pa-md" @submit="onSubmit">
           <div class="row">
             <div class="col col-md-4 col-lg-3 col-sm-6 col-xs-12">
@@ -16,7 +16,7 @@
                 label="Quotation Date"
                 filled
                 mask="####-##-##"
-                :dense="isSmallScreen"
+                dense
                 class="q-mb-sm-sm q-mb-md-md"
               >
                 <template #append>
@@ -58,7 +58,7 @@
                 aria-autocomplete="off"
                 autocomplete="off"
                 class="q-ml-sm-sm q-ml-md-md q-mb-sm-sm q-mb-md-md"
-                :dense="isSmallScreen"
+                dense
               >
                 <!-- <template #error>
                   {{ formErrors[field.name] }}
@@ -80,7 +80,7 @@
                 for="customerSelect"
                 clearable
                 bottom-slots
-                :options-dense="isSmallScreen"
+                options-dense
                 use-input
                 :input-debounce="250"
                 class="q-ml-sm-sm q-ml-md-md q-mb-sm-sm q-mb-md-md"
@@ -88,7 +88,7 @@
                 transition-hide="scale"
                 emit-value
                 map-options
-                :dense="isSmallScreen"
+                dense
                 async-filter-action="customers/FETCH_CUSTOMERS_FOR_SELECT"
                 async-filter-mode
               >
@@ -102,7 +102,7 @@
               </quasar-select>
             </div>
           </div>
-          <div class="row">
+          <div class="row q-gutter-lg-md q-gutter-md-sm">
             <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
               <quasar-select
                 ref="customerAddressSelect"
@@ -116,7 +116,7 @@
                 for="customerAddressSelect"
                 clearable
                 bottom-slots
-                :options-dense="isSmallScreen"
+                options-dense
                 use-input
                 :input-debounce="250"
                 class="q-mb-sm-sm q-mb-md-md"
@@ -124,7 +124,7 @@
                 transition-hide="scale"
                 emit-value
                 map-options
-                :dense="isSmallScreen"
+                dense
                 :disable="!form.customerId"
               >
                 <!-- <template v-if="field?.icon" #before>
@@ -145,8 +145,6 @@
                 </template>
               </quasar-select>
             </div>
-          </div>
-          <div class="row">
             <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
               <q-input
                 v-model="form.description"
@@ -159,7 +157,7 @@
                 aria-autocomplete="off"
                 autocomplete="off"
                 class="q-mb-sm-sm q-mb-md-md"
-                :dense="isSmallScreen"
+                dense
               >
                 <!-- <template #error>
                   {{ formErrors[field.name] }}
@@ -170,33 +168,50 @@
             </div>
           </div>
           <div class="row">
-            <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
-              <q-input
-                v-model="form.description"
-                type="text"
-                for="description"
-                filled
-                clearable
-                bottom-slots
-                label="Description"
-                aria-autocomplete="off"
-                autocomplete="off"
-                class="q-mb-sm-sm q-mb-md-md"
-                :dense="isSmallScreen"
-              >
-                <!-- <template #error>
-                  {{ formErrors[field.name] }}
-                </template> -->
-
-                <template #hint></template>
-              </q-input>
+            <div class="col col-12">
+              <q-table
+                :rows="form.items"
+                :columns="ItemsColumns"
+                :visible-columns="visibleColumns"
+                row-key="productId"
+                dense
+                flat
+                table-class="quotation-invoice-table"
+                table-header-class="quotation-invoice-table-header"
+                no-data-label="No items added yet"
+                :rows-per-page-options="[0]"
+              />
+              <div>
+                <q-btn-dropdown
+                  split
+                  label="Add Items"
+                  auto-close
+                  unelevated
+                  ripple
+                  :color="$q.dark ? 'accent' : 'primary'"
+                  @click="addItemLines"
+                >
+                  <q-list>
+                    <q-item
+                      v-for="(number, index) in addItemsDropdownList"
+                      :key="'add_' + number + 'items'"
+                      clickable
+                      @click="addItemLines(addItemsDropdownList[index])"
+                    >
+                      <q-item-section>
+                        <q-item-label>Add {{ number }} lines</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-btn-dropdown>
+              </div>
             </div>
           </div>
         </form>
       </template>
 
       <template #footer-panel>
-        <div class="row justify-center q-mb-xl">
+        <div class="row justify-center q-my-xl">
           <q-btn
             type="submit"
             :loading="isSubmitting"
@@ -284,6 +299,8 @@ import {
   FormSchema,
   CustomerAddressType,
   SelectOption,
+  QuotationInvoiceItemShape,
+  QuotationInvoiceFormShape,
 } from '../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../components/QuasarSelect';
@@ -293,6 +310,7 @@ import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import { phoneNumberRegex } from '../../helpers/utils';
 import { isEqual } from 'lodash';
+import ItemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
 
 export default defineComponent({
   name: 'EditQuotation',
@@ -372,13 +390,39 @@ export default defineComponent({
         )
       : ref(null);
 
-    const form = reactive({
+    const form: QuotationInvoiceFormShape = reactive({
       date: null,
       code: '',
       customerId: null,
       customerAddressId: null,
       description: '',
+      items: [],
     });
+
+    const quotationItemShape: QuotationInvoiceItemShape = {
+      productId: null,
+      description: '',
+      qty: 0,
+      UOM: 'set',
+      unitPrice: 0,
+      unitDiscount: 0,
+      discountType: 'number',
+    };
+
+    const addItemLines = (numberOfLines = 1) => {
+      const newArray: QuotationInvoiceItemShape[] = [];
+      for (let i = 0; i < numberOfLines; i++) {
+        newArray.push(quotationItemShape);
+      }
+
+      form.items = [...form.items, ...newArray];
+    };
+
+    const visibleColumns = computed(() => {
+      return ItemsColumns.filter((column) => column.required);
+    });
+
+    const addItemsDropdownList = ref([2, 5, 10, 20]);
 
     // Valiation section starts
 
@@ -617,6 +661,10 @@ export default defineComponent({
       isSubmitting,
       onSubmit,
       formErrors,
+      addItemLines,
+      addItemsDropdownList,
+      visibleColumns,
+      ItemsColumns,
     };
   },
 });

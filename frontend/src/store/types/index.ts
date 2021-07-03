@@ -229,9 +229,11 @@ export interface CurrentlyViewedCustomer extends CurrentCustomerBaseInterface {
   };
 }
 
+export type CustomerAddressType = 'billing_address' | 'shipping_address';
+
 export interface CurrentlyViewedAddress {
   id: string;
-  address_type: string;
+  address_type: CustomerAddressType;
   city: string;
   created_at: string;
   postal_code: string;
@@ -361,9 +363,23 @@ export type InputComponentType =
   | 'select'
   | 'input'
   | 'date'
+  | 'time'
   | 'toggle'
   | 'editor'
   | 'none';
+
+export type InputComponentTypeVariant =
+  | 'textarea'
+  | 'multi-select'
+  | 'single-select'
+  | 'date'
+  | 'number'
+  | 'password'
+  | 'email'
+  | 'search'
+  | 'tel'
+  | 'url'
+  | 'time';
 
 export interface FormSchemaProperties {
   model?: unknown;
@@ -544,4 +560,48 @@ export interface ProductResultRowInterface {
   productCategories?: { id: string; name: string }[];
   description?: string;
   short_description?: string;
+}
+
+export type UnitOfMeasurement =
+  | 'set'
+  | 'kg'
+  | 'lb'
+  | 'piece'
+  | 'pack'
+  | 'carton'
+  | 'box'
+  | 'bottle'
+  | 'truck'
+  | 'container'
+  | 'wrap'
+  | 'roll'
+  | 'm'
+  | 'yd'
+  | 'ft'
+  | 'in'
+  | 'cm'
+  | 'sq.m'
+  | 'sq.ft'
+  | 'sq.in'
+  | 'cu.m'
+  | 'cu.ft'
+  | 'cu.in';
+
+export interface QuotationInvoiceItemShape {
+  productId: string | null;
+  description: string | null;
+  qty: number;
+  UOM: UnitOfMeasurement;
+  unitPrice: number;
+  unitDiscount: number;
+  discountType: 'percentage' | 'number';
+}
+
+export interface QuotationInvoiceFormShape {
+  date: string | null;
+  code: string | null | undefined;
+  customerId: string | null | undefined;
+  customerAddressId: string | null | undefined;
+  description: string | null | undefined;
+  items: Array<QuotationInvoiceItemShape>;
 }

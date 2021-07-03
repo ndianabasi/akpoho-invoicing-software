@@ -6,6 +6,7 @@ import {
 
 export interface CustomersStateInterface {
   customerTitlesForSelect: SelectOption[];
+  customerAddressesForSelect: SelectOption[];
   currentlyViewedCustomer: CurrentlyViewedCustomer | null;
   currentlyViewedAddress: CurrentlyViewedAddress | null;
 }
@@ -15,6 +16,7 @@ function state(): CustomersStateInterface {
     customerTitlesForSelect: [],
     currentlyViewedCustomer: null,
     currentlyViewedAddress: null,
+    customerAddressesForSelect: [],
   };
 }
 

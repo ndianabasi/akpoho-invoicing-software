@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { defineComponent, ref, PropType, Ref, computed, h } from 'vue';
+import { defineComponent, ref, Ref, PropType, computed, h } from 'vue';
 import { QSelect } from 'quasar';
+import { useStore } from 'vuex';
+import { SelectOption } from 'src/store/types';
 
 interface SelectCallback {
   (val: string, update: (fn?: () => void) => void): void;
@@ -79,14 +81,28 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    asyncServerOptions: {
+      type: Boolean,
+      default: false,
+    },
+    asyncFilterMode: {
+      type: Boolean,
+      default: false,
+    },
+    asyncFilterAction: {
+      type: String,
+      default: '',
+    },
     inputDebounce: {
       type: Number,
       default: 0,
     },
   },
 
-  setup(props, { attrs, slots, emit }) {
+  setup(props, { attrs, slots }) {
+    const store = useStore();
     const filter = ref('');
+    const filteredOptions: Ref<Array<{ [index: string]: string }>> = ref([]);
 
     const normalize = (text: string) => {
       if (!text) return '';
@@ -97,19 +113,25 @@ export default defineComponent({
         .trim();
     };
 
-    const needle = computed(() => normalize(filter.value));
+    const selectFilterFn: SelectCallback = async function (val, update) {
+      const needle = computed(() => normalize(val));
 
-    const filteredOptions = computed(() => {
-      if (!needle.value) {
-        return props.options;
+      if (!needle.value && !props.asyncFilterMode) {
+        filteredOptions.value = props.options;
+      } else {
+        filteredOptions.value = props.options.filter(
+          (v) => normalize(v[props.optionLabel]).indexOf(needle.value) > -1
+        );
       }
-      return props.options.filter(
-        (v) => normalize(v[props.optionLabel]).indexOf(needle.value) > -1
-      );
-    });
 
-    const selectFilterFn: SelectCallback = function (val, update) {
-      filter.value = val;
+      if (props.asyncFilterMode && needle.value) {
+        await store
+          .dispatch(props.asyncFilterAction, needle.value)
+          .then((options: Array<{ [index: string]: string }>) => {
+            filteredOptions.value = options;
+          });
+      }
+
       update();
     };
 

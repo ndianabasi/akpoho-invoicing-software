@@ -227,3 +227,33 @@ input[type='file'] {
 .AIS__sticky-sidebar-item:hover > .q-focus-helper {
   background: none !important;
 }
+
+.quotation-invoice-table {
+  table {
+    border: none !important;
+  }
+  thead,
+  tbody {
+    border: none !important;
+  }
+  .quotation-invoice-table-header {
+    border: none !important;
+    th {
+      border: none !important;
+    }
+  }
+  & ~ .q-table__bottom {
+    border: none !important;
+    justify-content: center;
+    margin-top: 1rem;
+    .q-table__control {
+      display: none !important;
+    }
+  }
+  tbody {
+    tr,
+    td {
+      border: none !important;
+    }
+  }
+}
