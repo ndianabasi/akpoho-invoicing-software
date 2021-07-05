@@ -588,7 +588,8 @@ export type UnitOfMeasurement =
   | 'cu.ft'
   | 'cu.in';
 
-export type DiscountType = 'Per' | 'Num';
+export type DiscountType = 'percentage' | 'number';
+export type RoundingType = 'none' | 'nearest' | 'down' | 'up';
 
 export interface QuotationInvoiceItemShape {
   productId: string | null;
@@ -609,11 +610,11 @@ export type QuotationInvoiceFormShape = {
   customerAddressId: string | null | undefined;
   description: string | null | undefined;
   items: Array<QuotationInvoiceItemShape>;
-
+  numberOfDecimals: number;
   simpleQuantity: boolean;
   amountsAreTaxInclusive: boolean;
   roundAmounts: boolean;
-  roundAmountType: 'none' | 'nearest' | 'down' | 'up';
+  roundAmountType: RoundingType;
   addDiscounts: boolean;
   discountType: DiscountType;
   setDiscountTypePerLine: boolean;

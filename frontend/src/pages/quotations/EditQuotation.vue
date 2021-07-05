@@ -282,6 +282,10 @@
                               filled
                               :options="options"
                               dense
+                              transition-show="scale"
+                              transition-hide="scale"
+                              emit-value
+                              map-options
                             />
                             <div>of</div>
                             <q-input
@@ -304,12 +308,18 @@
                           <div
                             v-if="
                               col.name === 'unitDiscount' &&
-                              form.items[props.rowIndex].discountType ===
-                                'percentage' &&
+                              form.discountType === 'percentage' &&
                               !form.setDiscountTypePerLine
                             "
+                            class="
+                              row
+                              inline
+                              justify-center
+                              items-center
+                              q-gutter-sm q-my-auto
+                            "
                           >
-                            {{ '%' }}
+                            <div class="col">%</div>
                           </div>
                           <div
                             v-if="
@@ -324,6 +334,10 @@
                               dense
                               options-dense
                               class="discount-type-select-input"
+                              transition-show="scale"
+                              transition-hide="scale"
+                              emit-value
+                              map-options
                             />
                           </div>
                         </template>
@@ -439,69 +453,117 @@
             label="Settings"
             dense
           >
-            <div class="column">
-              <div class="col">
-                <q-toggle
-                  v-model="form.simpleQuantity"
-                  checked-icon="check"
-                  color="positive"
-                  label="Use simple quantities"
-                  unchecked-icon="clear"
-                />
-              </div>
-              <div class="col">
-                <q-toggle
-                  v-model="form.amountsAreTaxInclusive"
-                  checked-icon="check"
-                  color="positive"
-                  label="Amounts include taxes"
-                  unchecked-icon="clear"
-                />
-              </div>
-              <div class="col">
-                <q-toggle
-                  v-model="form.changeProductPrices"
-                  checked-icon="check"
-                  color="positive"
-                  label="Change product prices"
-                  unchecked-icon="clear"
-                />
-              </div>
-              <div class="col">
-                <q-toggle
-                  v-model="form.roundAmounts"
-                  checked-icon="check"
-                  color="positive"
-                  label="Round amounts"
-                  unchecked-icon="clear"
-                />
-              </div>
-              <div class="col">
-                <q-toggle
-                  v-model="form.showTotalAmount"
-                  checked-icon="check"
-                  color="positive"
-                  label="Show total amount"
-                  unchecked-icon="clear"
-                />
-              </div>
-              <div class="col">
-                <q-toggle
-                  v-model="form.addDiscounts"
-                  checked-icon="check"
-                  color="positive"
-                  label="Show discounts"
-                  unchecked-icon="clear"
-                />
-              </div>
-              <div class="col">
-                <q-toggle
-                  v-model="form.setDiscountTypePerLine"
-                  checked-icon="check"
-                  color="positive"
-                  label="Set discount type per line"
-                  unchecked-icon="clear"
-                />
+            <div class="row">
+              <div class="col column col-sm-12 col-md-6 col-lg-4">
+                <div class="col">
+                  <q-toggle
+                    v-model="form.simpleQuantity"
+                    checked-icon="check"
+                    color="positive"
+                    label="Use simple quantities"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col">
+                  <q-toggle
+                    v-model="form.amountsAreTaxInclusive"
+                    checked-icon="check"
+                    color="positive"
+                    label="Amounts include taxes"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col">
+                  <q-toggle
+                    v-model="form.changeProductPrices"
+                    checked-icon="check"
+                    color="positive"
+                    label="Change product prices"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col">
+                  <div class="row q-gutter-lg">
+                    <q-toggle
+                      v-model="form.roundAmounts"
+                      checked-icon="check"
+                      color="positive"
+                      label="Round amounts"
+                      unchecked-icon="clear"
+                    />
+                    <q-select
+                      v-if="form.roundAmounts"
+                      v-model="form.roundAmountType"
+                      filled
+                      :options="roundTypeOptions"
+                      dense
+                      options-dense
+                      transition-show="scale"
+                      transition-hide="scale"
+                      emit-value
+                      map-options
+                    />
+                  </div>
+                </div>
+                <div class="col">
+                  <q-toggle
+                    v-model="form.showTotalAmount"
+                    checked-icon="check"
+                    color="positive"
+                    label="Show total amount"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col">
+                  <div class="row q-gutter-lg">
+                    <q-toggle
+                      v-model="form.addDiscounts"
+                      checked-icon="check"
+                      color="positive"
+                      label="Show discounts"
+                      unchecked-icon="clear"
+                    />
+                    <q-select
+                      v-if="form.addDiscounts"
+                      v-model="form.discountType"
+                      filled
+                      :options="discountTypeOptions"
+                      dense
+                      options-dense
+                      transition-show="scale"
+                      transition-hide="scale"
+                      emit-value
+                      map-options
+                    />
+                  </div>
+                </div>
+                <div class="col">
+                  <q-toggle
+                    v-model="form.setDiscountTypePerLine"
+                    checked-icon="check"
+                    color="positive"
+                    label="Set discount type per line"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col">
+                  <div class="row">
+                    <div class="col col-sm-12 col-md-6">
+                      <q-select
+                        v-model="form.numberOfDecimals"
+                        label="Number of decimals"
+                        stack-label
+                        filled
+                        :options="numberOfDecimalOptions"
+                        options-dense
+                        transition-show="scale"
+                        transition-hide="scale"
+                        emit-value
+                        map-options
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </q-expansion-item>
@@ -599,6 +661,7 @@ import {
   SelectOption,
   QuotationInvoiceItemShape,
   QuotationInvoiceFormShape,
+  RoundingType,
 } from '../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../components/QuasarSelect';
@@ -645,6 +708,19 @@ export default defineComponent({
       { label: 'Num', value: 'number' },
       { label: '%', value: 'percentage' },
     ]);
+    const roundTypeOptions = ref([
+      { label: 'None', value: 'none' },
+      { label: 'Nearest', value: 'nearest' },
+      { label: 'Down', value: 'down' },
+      { label: 'Up', value: 'up' },
+    ]);
+    const numberOfDecimalOptionValues = [0, 1, 2, 3, 4, 5, 6];
+    const numberOfDecimalOptions = computed(() => {
+      return numberOfDecimalOptionValues.map((value) => ({
+        label: value,
+        value,
+      }));
+    });
 
     const customerAddresses = computed({
       get: () =>
@@ -666,10 +742,11 @@ export default defineComponent({
       roundAmounts: false,
       roundAmountType: 'none',
       addDiscounts: false,
-      discountType: 'Num',
+      discountType: 'number',
       setDiscountTypePerLine: false,
       showTotalAmount: true,
       changeProductPrices: false,
+      numberOfDecimals: 2,
       notes: '',
       theme: null,
     });
@@ -682,7 +759,7 @@ export default defineComponent({
       groupQty: null,
       unitPrice: null,
       unitDiscount: null,
-      discountType: 'Num',
+      discountType: 'number',
       total: 0,
     };
 
@@ -704,36 +781,86 @@ export default defineComponent({
 
     const addItemsDropdownList = ref([2, 5, 10, 20]);
 
+    const getRoundedTotal = function (
+      amount: string | number,
+      roundingType: RoundingType,
+      numberOfDecimals: number
+    ) {
+      let total: string | number = '';
+      switch (roundingType) {
+        case 'none':
+          total = Number.parseFloat(amount as string).toFixed(numberOfDecimals);
+          break;
+        case 'nearest':
+          total = Math.round(amount as number);
+          break;
+        case 'down':
+          total = Math.floor(amount as number);
+          break;
+        case 'up':
+          total = Math.ceil(amount as number);
+          break;
+      }
+      return total;
+    };
+
+    const getTotalArray = function (
+      items: QuotationInvoiceItemShape[]
+    ): number[] {
+      const totalArray: number[] = [];
+      if (items && items.length) {
+        items.forEach((item, index) => {
+          const unitPrice = Number(item?.unitPrice ?? 0);
+          const qty = Number(item?.qty ?? 0);
+          const roundingType = form.roundAmountType;
+          const numberOfDecimals = form.numberOfDecimals;
+          if (form.addDiscounts) {
+            const unitDiscount = Number(item?.unitDiscount ?? 0);
+            let discountedPrice = 0;
+            if (form.discountType === 'percentage') {
+              discountedPrice = (1 - unitDiscount / 100) * unitPrice;
+            } else {
+              discountedPrice = unitPrice - unitDiscount;
+            }
+
+            if (form.roundAmounts) {
+              totalArray[index] = Number(
+                getRoundedTotal(
+                  qty * discountedPrice,
+                  roundingType,
+                  numberOfDecimals
+                )
+              );
+            } else {
+              totalArray[index] = qty * discountedPrice;
+            }
+          } else {
+            if (form.roundAmounts) {
+              totalArray[index] = Number(
+                getRoundedTotal(qty * unitPrice, roundingType, numberOfDecimals)
+              );
+            } else {
+              totalArray[index] = qty * unitPrice;
+            }
+          }
+        });
+      }
+      return totalArray;
+    };
+
     const itemTotals = computed({
       get: () => {
-        const items = form.items;
-        const totalArray: number[] = [];
-        if (items && items.length) {
-          items.forEach((item, index) => {
-            // @ts-ignore Object is possibly 'null'
-            totalArray[index] =
-              Number(item?.qty ?? 0) * Number(item?.unitPrice ?? 0);
-          });
-        }
-        return totalArray;
+        return getTotalArray(form.items);
       },
       set: (value) => value,
     });
 
+    // Watch for changes in quotation settings and items
+    // and re-compute (set) the total row
     watch(
       () => form,
       (form) => {
-        const items = form.items;
-        const totalArray: number[] = [];
-        if (items && items.length) {
-          items.forEach((item, index) => {
-            // @ts-ignore Object is possibly 'null'
-            totalArray[index] =
-              Number(item?.qty ?? 0) * Number(item?.unitPrice ?? 0);
-          });
-        }
-
-        itemTotals.value = totalArray;
+        itemTotals.value = getTotalArray(form.items);
       },
       { deep: true }
     );
@@ -1054,6 +1181,8 @@ export default defineComponent({
       itemsColumns,
       discountTypeOptions,
       itemTotals,
+      roundTypeOptions,
+      numberOfDecimalOptions,
     };
   },
 });
