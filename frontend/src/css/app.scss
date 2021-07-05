@@ -229,6 +229,14 @@ input[type='file'] {
 }
 
 .quotation-invoice-table {
+  &.scroll {
+    overflow-y: hidden;
+  }
+
+  .q-field--with-bottom {
+    padding-bottom: unset;
+  }
+
   table {
     border: none !important;
   }
@@ -272,5 +280,70 @@ input[type='file'] {
 
   .desc-column {
     min-width: 350px !important;
+  }
+
+  .ghost-item {
+    opacity: 0.5;
+    background: $pink-1;
+  }
+
+  .qty-column {
+    :has(.composite-qty) {
+      width: 300px !important;
+    }
+    /* :not(:has(.composite-qty)) {
+      width: 60px !important;
+    } */
+    > label,
+    .group-qty-input {
+      > .q-field__inner {
+        width: 60px !important;
+      }
+    }
+  }
+
+  .unit-discount-column {
+    :has(.discount-type-select-input) {
+      width: 180px !important;
+    }
+    :not(:has(.discount-type-select-input)) {
+      width: 60px !important;
+    }
+
+    > label,
+    .group-qty-input {
+      > .q-field__inner {
+        width: 60px !important;
+      }
+    }
+  }
+
+  .group-qty-total {
+    width: 80px !important;
+  }
+
+  .price-column {
+    width: 120px !important;
+    > label > .q-field__inner {
+      width: 100px !important;
+    }
+  }
+
+  .total-column {
+    width: 150px !important;
+    > label > .q-field__inner {
+      width: 140px !important;
+    }
+    .filled {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 4px 4px 0 0;
+      line-height: 18px;
+      min-height: 36px;
+    }
+  }
+
+  .q-field--dense .q-field__control,
+  .q-field--dense .q-field__marginal {
+    height: unset;
   }
 }

@@ -588,6 +588,8 @@ export type UnitOfMeasurement =
   | 'cu.ft'
   | 'cu.in';
 
+export type DiscountType = 'Per' | 'Num';
+
 export interface QuotationInvoiceItemShape {
   productId: string | null;
   description: string | null;
@@ -596,14 +598,27 @@ export interface QuotationInvoiceItemShape {
   UOM: UnitOfMeasurement;
   unitPrice: number | null;
   unitDiscount: number | null;
-  discountType: 'percentage' | 'number';
+  discountType: DiscountType;
+  readonly total: number;
 }
 
-export interface QuotationInvoiceFormShape {
+export type QuotationInvoiceFormShape = {
   date: string | null;
   code: string | null | undefined;
   customerId: string | null | undefined;
   customerAddressId: string | null | undefined;
   description: string | null | undefined;
   items: Array<QuotationInvoiceItemShape>;
-}
+
+  simpleQuantity: boolean;
+  amountsAreTaxInclusive: boolean;
+  roundAmounts: boolean;
+  roundAmountType: 'none' | 'nearest' | 'down' | 'up';
+  addDiscounts: boolean;
+  discountType: DiscountType;
+  setDiscountTypePerLine: boolean;
+  showTotalAmount: boolean;
+  changeProductPrices: boolean;
+  notes: string;
+  theme: string | null;
+};

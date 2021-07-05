@@ -5,7 +5,7 @@ import { InputComponentType, InputComponentTypeVariant } from 'src/store/types';
 interface QuotationInvoiceHeaders extends TableRow {
   name: Columns;
   field: Columns;
-  componentType?: InputComponentType;
+  componentType?: InputComponentType | 'computed';
   componentTypeVariant?: InputComponentTypeVariant;
   inputClass?: string;
   mask?: string;
@@ -47,6 +47,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     options: [],
     asyncFilterAction: 'products/FETCH_PRODUCTS_FOR_SELECT',
     asyncFilterMode: true,
+    columnClass: 'product-id-column',
   },
   {
     name: Columns.description,
@@ -71,8 +72,8 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     filterable: false,
     componentType: 'input',
     componentTypeVariant: 'text',
-    inputClass: 'text-right',
-    inputStyle: 'max-width: 35px',
+    inputClass: 'text-center',
+    //inputStyle: 'max-width: 35px',
     columnClass: 'qty-column',
     min: 0,
   },
@@ -87,9 +88,10 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     componentType: 'input',
     componentTypeVariant: 'text',
     inputClass: 'text-right',
-    inputStyle: 'max-width: 100px',
+    //inputStyle: 'max-width: 100px',
     columnClass: 'price-column',
     min: 0,
+    disabled: true,
   },
   {
     name: Columns.unitDiscount,
@@ -103,6 +105,8 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     componentTypeVariant: 'text',
     min: 0,
     inputClass: 'text-right',
+    //inputStyle: 'max-width: 35px',
+    columnClass: 'unit-discount-column',
   },
   {
     name: Columns.discountType,
@@ -114,15 +118,19 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     filterable: false,
     componentType: 'select',
     componentTypeVariant: 'single-select',
+    //inputStyle: 'max-width: 35px',
+    columnClass: 'discount-type-column',
   },
   {
     name: Columns.total,
-    required: false,
+    required: true,
     label: 'Total',
     align: 'center',
     field: Columns.total,
     sortable: false,
     filterable: false,
+    columnClass: 'total-column',
+    componentType: 'computed',
   },
 ]);
 export default columns;

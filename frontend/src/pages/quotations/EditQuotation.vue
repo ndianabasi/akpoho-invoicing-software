@@ -4,12 +4,12 @@
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
-      card-container-classes="col-md-10 col-xl-9 col-sm-12 col-xs-12"
+      card-container-classes="col-12"
     >
       <template #body-panel>
         <form class="q-pa-md" @submit="onSubmit">
-          <div class="row">
-            <div class="col col-md-4 col-lg-3 col-sm-6 col-xs-12">
+          <div class="row q-gutter-sm">
+            <div class="col col-md-2 col-lg-2 col-sm-6 col-xs-12">
               <q-input
                 v-model="form.date"
                 label="Quotation Date"
@@ -46,7 +46,7 @@
                 </template>
               </q-input>
             </div>
-            <div class="col col-md-4 col-lg-3 col-sm-6 col-xs-12">
+            <div class="col col-md-2 col-lg-2 col-sm-6 col-xs-12">
               <q-input
                 v-model="form.code"
                 type="text"
@@ -57,7 +57,7 @@
                 label="Quotation Code"
                 aria-autocomplete="off"
                 autocomplete="off"
-                class="q-ml-sm-sm q-ml-md-md q-mb-sm-sm q-mb-md-md"
+                class="q-mb-sm-sm q-mb-md-md"
                 dense
               >
                 <!-- <template #error>
@@ -67,7 +67,9 @@
                 <template #hint></template>
               </q-input>
             </div>
-            <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
+          </div>
+          <div class="row q-gutter-sm">
+            <div class="col col-md-4 col-lg-4 col-sm-12 col-xs-12">
               <quasar-select
                 ref="customerSelect"
                 v-model="form.customerId"
@@ -83,7 +85,7 @@
                 options-dense
                 use-input
                 :input-debounce="250"
-                class="q-ml-sm-sm q-ml-md-md q-mb-sm-sm q-mb-md-md"
+                class="q-mb-sm-sm q-mb-md-md"
                 transition-show="scale"
                 transition-hide="scale"
                 emit-value
@@ -106,9 +108,7 @@
                 </template>
               </quasar-select>
             </div>
-          </div>
-          <div class="row q-gutter-lg-md q-gutter-md-sm">
-            <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
+            <div class="col col-md-4 col-lg-4 col-sm-12 col-xs-12">
               <quasar-select
                 ref="customerAddressSelect"
                 v-model="form.customerAddressId"
@@ -154,7 +154,9 @@
                 </template>
               </quasar-select>
             </div>
-            <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
+          </div>
+          <div class="row q-gutter-sm">
+            <div class="col col-md-8 col-lg-8 col-sm-12 col-xs-12">
               <q-input
                 v-model="form.description"
                 type="text"
@@ -176,7 +178,7 @@
               </q-input>
             </div>
           </div>
-          <div class="row">
+          <div class="row q-gutter-sm">
             <div class="col col-12">
               <q-table
                 :rows="form.items"
@@ -236,7 +238,6 @@
                           form.items[props.rowIndex]
                         "
                         :key="`field_${col.name}_${col.componentType}__index_${props.rowIndex}`"
-                        :ref="col.name + '__index_' + props.rowIndex"
                         v-model="form.items[props.rowIndex][col.name]"
                         :type="col.componentTypeVariant"
                         :autogrow="
@@ -247,6 +248,7 @@
                         :fill-mask="col.fillMask"
                         :reverse-fill-mask="col.reverseFillMask"
                         :hint="col.hint"
+                        class="main-column-input"
                         :input-class="col.inputClass"
                         :input-style="col.inputStyle"
                         :for="col.name + '__index_' + props.rowIndex"
@@ -254,11 +256,9 @@
                         bottom-slots
                         aria-autocomplete="off"
                         autocomplete="off"
-                        class=""
                         dense
                         :aria-disabled="col.disabled"
                         :disable="col.disabled"
-                        :min="col.min"
                       >
                         <template
                           v-if="
@@ -266,33 +266,65 @@
                           "
                           #after
                         >
-                          <div v-if="col.name === 'qty'">
-                            <div
-                              class="
-                                row
-                                inline
-                                justify-center
-                                items-center
-                                q-gutter-sm
-                              "
-                            >
-                              <q-select
-                                v-model="form.items[props.rowIndex].UOM"
-                                filled
-                                :options="options"
-                                dense
-                              />
-                              <div>of</div>
-                              <q-input
-                                v-model="form.items[props.rowIndex].groupQty"
-                                filled
-                                dense
-                                input-style="max-width: 35px"
-                              />
-                            </div>
+                          <div
+                            v-if="col.name === 'qty' && !form.simpleQuantity"
+                            class="
+                              row
+                              inline
+                              justify-center
+                              items-center
+                              q-gutter-sm
+                              composite-qty
+                            "
+                          >
+                            <q-select
+                              v-model="form.items[props.rowIndex].UOM"
+                              filled
+                              :options="options"
+                              dense
+                            />
+                            <div>of</div>
+                            <q-input
+                              v-model="form.items[props.rowIndex].groupQty"
+                              filled
+                              dense
+                              class="group-qty-input"
+                              autogrow
+                            />
+                            <q-input
+                              v-model="form.items[props.rowIndex].total"
+                              filled
+                              dense
+                              class="group-qty-total"
+                              autogrow
+                              label="Total"
+                              disable
+                            />
                           </div>
-                          <div v-if="col.name === 'unitDiscount'">
-                            {{ '%' }} of
+                          <div
+                            v-if="
+                              col.name === 'unitDiscount' &&
+                              form.items[props.rowIndex].discountType ===
+                                'percentage' &&
+                              !form.setDiscountTypePerLine
+                            "
+                          >
+                            {{ '%' }}
+                          </div>
+                          <div
+                            v-if="
+                              col.name === 'unitDiscount' &&
+                              form.setDiscountTypePerLine
+                            "
+                          >
+                            <q-select
+                              v-model="form.items[props.rowIndex].discountType"
+                              filled
+                              :options="discountTypeOptions"
+                              dense
+                              options-dense
+                              class="discount-type-select-input"
+                            />
                           </div>
                         </template>
 
@@ -309,7 +341,6 @@
                           form.items[props.rowIndex]
                         "
                         :key="`field_${col.name}_${col.componentType}__index_${props.rowIndex}`"
-                        :ref="col.name + '__index_' + props.rowIndex"
                         v-model="form.items[props.rowIndex][col.name]"
                         :multiple="col.componentTypeVariant === 'multi-select'"
                         filled
@@ -349,11 +380,17 @@
                           </div>
                         </template>
                       </quasar-select>
+                      <div
+                        v-if="col.componentType === 'computed'"
+                        class="filled row flex-center justify-center"
+                      >
+                        <div>{{ itemTotals?.[props.rowIndex] ?? 0 }}</div>
+                      </div>
                     </q-td>
                     <q-td auto-width>
                       <q-btn
                         v-if="!isLastItem(props.rowIndex)"
-                        color="danger"
+                        color="negative"
                         round
                         flat
                         dense
@@ -369,7 +406,7 @@
                         auto-close
                         unelevated
                         ripple
-                        :color="$q.dark ? 'accent' : 'primary'"
+                        color="positive"
                         @click="addItemLines(1)"
                       >
                         <q-list>
@@ -395,6 +432,79 @@
               </q-table>
             </div>
           </div>
+          <q-expansion-item
+            expand-separator
+            icon="settings"
+            color="accent"
+            label="Settings"
+            dense
+          >
+            <div class="column">
+              <div class="col">
+                <q-toggle
+                  v-model="form.simpleQuantity"
+                  checked-icon="check"
+                  color="positive"
+                  label="Use simple quantities"
+                  unchecked-icon="clear"
+                />
+              </div>
+              <div class="col">
+                <q-toggle
+                  v-model="form.amountsAreTaxInclusive"
+                  checked-icon="check"
+                  color="positive"
+                  label="Amounts include taxes"
+                  unchecked-icon="clear"
+                />
+              </div>
+              <div class="col">
+                <q-toggle
+                  v-model="form.changeProductPrices"
+                  checked-icon="check"
+                  color="positive"
+                  label="Change product prices"
+                  unchecked-icon="clear"
+                />
+              </div>
+              <div class="col">
+                <q-toggle
+                  v-model="form.roundAmounts"
+                  checked-icon="check"
+                  color="positive"
+                  label="Round amounts"
+                  unchecked-icon="clear"
+                />
+              </div>
+              <div class="col">
+                <q-toggle
+                  v-model="form.showTotalAmount"
+                  checked-icon="check"
+                  color="positive"
+                  label="Show total amount"
+                  unchecked-icon="clear"
+                />
+              </div>
+              <div class="col">
+                <q-toggle
+                  v-model="form.addDiscounts"
+                  checked-icon="check"
+                  color="positive"
+                  label="Show discounts"
+                  unchecked-icon="clear"
+                />
+              </div>
+              <div class="col">
+                <q-toggle
+                  v-model="form.setDiscountTypePerLine"
+                  checked-icon="check"
+                  color="positive"
+                  label="Set discount type per line"
+                  unchecked-icon="clear"
+                />
+              </div>
+            </div>
+          </q-expansion-item>
         </form>
       </template>
 
@@ -531,6 +641,10 @@ export default defineComponent({
     const router = useRouter();
     const $q = useQuasar();
     //const dragging = ref(false);
+    const discountTypeOptions = ref([
+      { label: 'Num', value: 'number' },
+      { label: '%', value: 'percentage' },
+    ]);
 
     const customerAddresses = computed({
       get: () =>
@@ -541,23 +655,35 @@ export default defineComponent({
     });
 
     const form: QuotationInvoiceFormShape = reactive({
+      items: [] as QuotationInvoiceFormShape['items'],
       date: null,
       code: '',
       customerId: null,
       customerAddressId: null,
       description: '',
-      items: [],
+      simpleQuantity: true,
+      amountsAreTaxInclusive: false,
+      roundAmounts: false,
+      roundAmountType: 'none',
+      addDiscounts: false,
+      discountType: 'Num',
+      setDiscountTypePerLine: false,
+      showTotalAmount: true,
+      changeProductPrices: false,
+      notes: '',
+      theme: null,
     });
 
     const quotationItemShape: QuotationInvoiceItemShape = {
       productId: null,
       description: '',
-      qty: 1,
+      qty: null,
       UOM: 'set',
-      groupQty: 1,
+      groupQty: null,
       unitPrice: null,
       unitDiscount: null,
-      discountType: 'number',
+      discountType: 'Num',
+      total: 0,
     };
 
     const addItemLines = (numberOfLines = 1) => {
@@ -577,6 +703,40 @@ export default defineComponent({
     });
 
     const addItemsDropdownList = ref([2, 5, 10, 20]);
+
+    const itemTotals = computed({
+      get: () => {
+        const items = form.items;
+        const totalArray: number[] = [];
+        if (items && items.length) {
+          items.forEach((item, index) => {
+            // @ts-ignore Object is possibly 'null'
+            totalArray[index] =
+              Number(item?.qty ?? 0) * Number(item?.unitPrice ?? 0);
+          });
+        }
+        return totalArray;
+      },
+      set: (value) => value,
+    });
+
+    watch(
+      () => form,
+      (form) => {
+        const items = form.items;
+        const totalArray: number[] = [];
+        if (items && items.length) {
+          items.forEach((item, index) => {
+            // @ts-ignore Object is possibly 'null'
+            totalArray[index] =
+              Number(item?.qty ?? 0) * Number(item?.unitPrice ?? 0);
+          });
+        }
+
+        itemTotals.value = totalArray;
+      },
+      { deep: true }
+    );
 
     // Valiation section starts
 
@@ -700,6 +860,29 @@ export default defineComponent({
               'countries_states/GET_CUSTOMER_ADDRESSES_FOR_SELECT'
             ] as SelectionOption[];
           });
+      }
+    );
+
+    watch(
+      [
+        () => form.showTotalAmount,
+        () => form.addDiscounts,
+        () => form.changeProductPrices,
+      ],
+      ([showTotalAmount, addDiscounts, changeProductPrices]) => {
+        const totalColumnHeader = itemsColumns.filter(
+          (column) => column.name === 'total'
+        )[0];
+        const discountColumnHeader = itemsColumns.filter(
+          (column) => column.name === 'unitDiscount'
+        )[0];
+        const unitPriceColumnHeader = itemsColumns.filter(
+          (column) => column.name === 'unitPrice'
+        )[0];
+
+        totalColumnHeader.required = showTotalAmount;
+        discountColumnHeader.required = addDiscounts;
+        unitPriceColumnHeader.disabled = !changeProductPrices;
       }
     );
 
@@ -869,14 +1052,9 @@ export default defineComponent({
       addItemsDropdownList,
       visibleColumns,
       itemsColumns,
+      discountTypeOptions,
+      itemTotals,
     };
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.ghost-item {
-  opacity: 0.5;
-  background: $pink-1;
-}
-</style>
