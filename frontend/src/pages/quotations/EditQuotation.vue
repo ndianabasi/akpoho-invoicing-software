@@ -99,6 +99,11 @@
                 {{ formErrors[field.name] }}
               </template> -->
                 <template #hint> Search for customer </template>
+                <template #no-option="{ inputValue }">
+                  <div v-if="inputValue" class="q-ml-sm">
+                    No customer found for query: <b>{{ inputValue }}</b>
+                  </div>
+                </template>
               </quasar-select>
             </div>
           </div>
@@ -138,7 +143,11 @@
                   <div v-else>
                     {{
                       customerAddresses && customerAddresses.length
-                        ? `${customerAddresses.length} address(es) available`
+                        ? `${
+                            customerAddresses.length === 1
+                              ? '1 address'
+                              : customerAddresses.length + ' addresses'
+                          } available`
                         : ''
                     }}
                   </div>
@@ -171,7 +180,7 @@
             <div class="col col-12">
               <q-table
                 :rows="form.items"
-                :columns="ItemsColumns"
+                :columns="itemsColumns"
                 :visible-columns="visibleColumns"
                 row-key="productId"
                 dense
@@ -186,7 +195,7 @@
                     <!-- Use for auto-numbering -->
                     <q-th auto-width />
                     <!-- Use for reordering handle -->
-                    <q-th auto-width />
+                    <!-- <q-th auto-width /> -->
                     <q-th
                       v-for="col in props.cols"
                       :key="col.name"
@@ -203,7 +212,7 @@
                     <q-td auto-width>
                       <div>{{ props.rowIndex + 1 }}</div>
                     </q-td>
-                    <q-td auto-width>
+                    <!-- <q-td auto-width>
                       <q-btn
                         class="drag-handle"
                         size="sm"
@@ -213,12 +222,13 @@
                         icon="unfold_more"
                         flat
                       />
-                    </q-td>
+                    </q-td> -->
                     <q-td
                       v-for="col in props.cols"
                       :key="col.name"
                       :props="props"
                       :auto-width="col.autoWidth"
+                      :class="col.columnClass"
                     >
                       <q-input
                         v-if="
@@ -238,6 +248,7 @@
                         :reverse-fill-mask="col.reverseFillMask"
                         :hint="col.hint"
                         :input-class="col.inputClass"
+                        :input-style="col.inputStyle"
                         :for="col.name + '__index_' + props.rowIndex"
                         filled
                         bottom-slots
@@ -249,6 +260,42 @@
                         :disable="col.disabled"
                         :min="col.min"
                       >
+                        <template
+                          v-if="
+                            col.name === 'qty' || col.name === 'unitDiscount'
+                          "
+                          #after
+                        >
+                          <div v-if="col.name === 'qty'">
+                            <div
+                              class="
+                                row
+                                inline
+                                justify-center
+                                items-center
+                                q-gutter-sm
+                              "
+                            >
+                              <q-select
+                                v-model="form.items[props.rowIndex].UOM"
+                                filled
+                                :options="options"
+                                dense
+                              />
+                              <div>of</div>
+                              <q-input
+                                v-model="form.items[props.rowIndex].groupQty"
+                                filled
+                                dense
+                                input-style="max-width: 35px"
+                              />
+                            </div>
+                          </div>
+                          <div v-if="col.name === 'unitDiscount'">
+                            {{ '%' }} of
+                          </div>
+                        </template>
+
                         <!-- <template #error>
                           {{ formErrors[col.name] }}
                         </template>
@@ -293,6 +340,14 @@
                         <template #error>
                           {{ formErrors[col.name] }}
                         </template> -->
+                        <template
+                          v-if="col.name === 'productId'"
+                          #no-option="{ inputValue }"
+                        >
+                          <div v-if="inputValue" class="q-ml-sm">
+                            No product found for query: <b>{{ inputValue }}</b>
+                          </div>
+                        </template>
                       </quasar-select>
                     </q-td>
                     <q-td auto-width>
@@ -306,7 +361,7 @@
                         @click="removeItem(props.rowIndex)"
                       />
                       <q-btn-dropdown
-                        v-if="isLastItem(props.rowIndex)"
+                        v-else
                         class="add-item-dropdown"
                         icon="playlist_add"
                         split
@@ -414,7 +469,6 @@ import {
   watchEffect,
   watch,
   computed,
-  unref,
   Ref,
   reactive,
   nextTick,
@@ -444,7 +498,8 @@ import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import { phoneNumberRegex } from '../../helpers/utils';
 import { isEqual } from 'lodash';
-import ItemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
+import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
+//import Sortable from 'sortablejs';
 
 export default defineComponent({
   name: 'EditQuotation',
@@ -475,6 +530,7 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
     const $q = useQuasar();
+    //const dragging = ref(false);
 
     const customerAddresses = computed({
       get: () =>
@@ -496,8 +552,9 @@ export default defineComponent({
     const quotationItemShape: QuotationInvoiceItemShape = {
       productId: null,
       description: '',
-      qty: null,
+      qty: 1,
       UOM: 'set',
+      groupQty: 1,
       unitPrice: null,
       unitDiscount: null,
       discountType: 'number',
@@ -516,7 +573,7 @@ export default defineComponent({
     const isLastItem = (index: number) => form.items.length - 1 === index;
 
     const visibleColumns = computed(() => {
-      return ItemsColumns.filter((column) => column.required);
+      return itemsColumns.filter((column) => column.required);
     });
 
     const addItemsDropdownList = ref([2, 5, 10, 20]);
@@ -714,6 +771,51 @@ export default defineComponent({
     onMounted(() => {
       /* if (props.creationMode)  */
       void addItemLines(3);
+
+      /* const sortableListElement = document.querySelector(
+        '.quotation-invoice-table tbody'
+      );
+      const sortable = Sortable.create(sortableListElement as HTMLElement, {
+        draggable: 'tr',
+        animation: 150,
+        sort: true,
+        easing: 'cubic-bezier(1, 0, 0, 1)',
+        handle: '.drag-handle',
+        ghostClass: '.ghost-item',
+        onStart: function (evt) {
+          dragging.value = true;
+        },
+        onEnd: function (evt) {
+          dragging.value = false;
+        },
+        onSort: function (evt) {
+          const { oldIndex, newIndex } = evt;
+          console.log({ oldIndex, newIndex });
+
+          const swapItems = function (
+            items: QuotationInvoiceItemShape[],
+            oldElementIndex: number | undefined,
+            newElementIndex: number | undefined
+          ) {
+            const unRefItems = [...items];
+            if (unRefItems.length === 1) return unRefItems;
+            if (oldElementIndex && newElementIndex) {
+              unRefItems.splice(
+                newElementIndex,
+                1,
+                unRefItems.splice(
+                  oldElementIndex,
+                  1,
+                  unRefItems[newElementIndex]
+                )[0]
+              );
+              return unRefItems;
+            } else return unRefItems;
+          };
+
+          form.items = swapItems(form.items, oldIndex, newIndex);
+        },
+      }); */
     });
 
     onBeforeMount(() => {
@@ -766,8 +868,15 @@ export default defineComponent({
       isLastItem,
       addItemsDropdownList,
       visibleColumns,
-      ItemsColumns,
+      itemsColumns,
     };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.ghost-item {
+  opacity: 0.5;
+  background: $pink-1;
+}
+</style>

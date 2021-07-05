@@ -236,6 +236,7 @@ input[type='file'] {
   tbody {
     border: none !important;
   }
+
   .quotation-invoice-table-header {
     border: none !important;
     th {
@@ -258,11 +259,18 @@ input[type='file'] {
         padding-bottom: 0 !important;
       } */
     }
+    .q-field__after {
+      font-size: 1rem;
+    }
   }
   .add-item-dropdown {
     > .q-btn {
       padding-left: 0;
       padding-right: 0;
     }
+  }
+
+  .desc-column {
+    min-width: 350px !important;
   }
 }

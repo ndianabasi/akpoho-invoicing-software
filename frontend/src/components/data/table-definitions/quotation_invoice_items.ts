@@ -15,7 +15,7 @@ interface QuotationInvoiceHeaders extends TableRow {
   hint?: string;
   disabled?: boolean;
   columnClass?: string;
-  columnStyle?: Record<string | number, string>;
+  columnStyle?: Record<string, string | number>;
   autoWidth?: boolean;
   asyncFilterAction?: string;
   asyncFilterMode?: boolean;
@@ -59,30 +59,22 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     componentType: 'input',
     componentTypeVariant: 'textarea',
     inputClass: 'text-right',
+    columnClass: 'desc-column',
   },
   {
     name: Columns.qty,
     required: true,
-    label: 'Qty',
+    label: 'Quantity',
     align: 'center',
     field: Columns.qty,
     sortable: false,
     filterable: false,
     componentType: 'input',
-    componentTypeVariant: 'number',
+    componentTypeVariant: 'text',
+    inputClass: 'text-right',
+    inputStyle: 'max-width: 35px',
+    columnClass: 'qty-column',
     min: 0,
-  },
-  {
-    name: Columns.UOM,
-    required: true,
-    label: 'UOM',
-    align: 'center',
-    field: Columns.UOM,
-    sortable: false,
-    filterable: false,
-    componentType: 'select',
-    componentTypeVariant: 'single-select',
-    autoWidth: true,
   },
   {
     name: Columns.unitPrice,
@@ -93,7 +85,10 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     sortable: false,
     filterable: false,
     componentType: 'input',
-    componentTypeVariant: 'number',
+    componentTypeVariant: 'text',
+    inputClass: 'text-right',
+    inputStyle: 'max-width: 100px',
+    columnClass: 'price-column',
     min: 0,
   },
   {
@@ -105,8 +100,9 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     sortable: false,
     filterable: false,
     componentType: 'input',
-    componentTypeVariant: 'number',
+    componentTypeVariant: 'text',
     min: 0,
+    inputClass: 'text-right',
   },
   {
     name: Columns.discountType,

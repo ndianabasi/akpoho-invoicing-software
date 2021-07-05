@@ -138,7 +138,6 @@ import { defineComponent, computed, ref, watch, Ref, watchEffect } from 'vue';
 import { useStore } from 'vuex';
 import { SelectOption, StringIDNameInterface } from '../store/types';
 import { Menu } from '../store/menus/state';
-import { useRoute, useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'SideDrawer',
@@ -151,8 +150,6 @@ export default defineComponent({
   },
   setup(/* props */) {
     const store = useStore();
-    const route = useRoute();
-    const router = useRouter();
 
     const selectedCompany: Ref<SelectOption | null> = ref(null);
     let currentCompany: Ref<StringIDNameInterface | null> = ref(null);

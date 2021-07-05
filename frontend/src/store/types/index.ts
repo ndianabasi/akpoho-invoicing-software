@@ -592,6 +592,7 @@ export interface QuotationInvoiceItemShape {
   productId: string | null;
   description: string | null;
   qty: number | null;
+  groupQty: number | null;
   UOM: UnitOfMeasurement;
   unitPrice: number | null;
   unitDiscount: number | null;
