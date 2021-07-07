@@ -31,7 +31,7 @@ enum Columns {
   UOM = 'UOM',
   unitPrice = 'unitPrice',
   unitDiscount = 'unitDiscount',
-  discountType = 'discountType',
+  lineDiscount = 'lineDiscount',
   total = 'total',
 }
 
@@ -120,17 +120,16 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     columnClass: 'unit-discount-column',
   },
   {
-    name: Columns.discountType,
+    name: Columns.lineDiscount,
     required: false,
-    label: 'Discount Type',
+    label: 'Line Discount',
     align: 'center',
-    field: Columns.discountType,
+    field: Columns.lineDiscount,
     sortable: false,
     filterable: false,
-    componentType: 'select',
-    componentTypeVariant: 'single-select',
+    componentType: 'computed',
     //inputStyle: 'max-width: 35px',
-    columnClass: 'discount-type-column',
+    columnClass: 'line-discount-column',
   },
   {
     name: Columns.total,

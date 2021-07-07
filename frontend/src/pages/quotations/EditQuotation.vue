@@ -481,9 +481,14 @@
                       </quasar-select>
                       <div
                         v-if="col.componentType === 'computed'"
-                        class="filled row flex-center justify-center"
+                        class="filled row items-center justify-end"
                       >
-                        <div>{{ itemTotals?.[props.rowIndex] ?? 0 }}</div>
+                        <div v-if="col.name === 'total'">
+                          {{ itemTotals?.[props.rowIndex] ?? 0 }}
+                        </div>
+                        <div v-if="col.name === 'lineDiscount'">
+                          {{ itemLineDiscounts?.[props.rowIndex] ?? 0 }}
+                        </div>
                       </div>
                     </q-td>
                     <q-td auto-width>
@@ -526,6 +531,77 @@
                         </q-list>
                       </q-btn-dropdown>
                     </q-td>
+                  </q-tr>
+                </template>
+                <template #bottom-row>
+                  <q-tr class="bottom-row">
+                    <q-td auto-width></q-td>
+                    <q-td class="text-right" :colspan="2">
+                      <div class="">Sub-totals</div>
+                    </q-td>
+                    <q-td class="text-right total-qty-cell">
+                      <div class="filled row flex-center justify-center">
+                        <div>{{ totalQuantities }}</div>
+                      </div>
+                    </q-td>
+                    <q-td
+                      v-if="
+                        form.setDiscountTypePerLine ||
+                        !form.showDiscounts ||
+                        (form.showDiscounts && !form.setDiscountTypePerLine)
+                      "
+                      class="text-right"
+                      :colspan="
+                        form.showDiscounts &&
+                        sameLineDiscountTypes &&
+                        (form.showLineDiscount || form.setDiscountTypePerLine)
+                          ? 2
+                          : 1
+                      "
+                    >
+                      <div class="row flex-center justify-center">&nbsp;</div>
+                    </q-td>
+                    <q-td
+                      v-if="
+                        form.showDiscounts &&
+                        form.showLineDiscount &&
+                        (!form.setDiscountTypePerLine || sameLineDiscountTypes)
+                      "
+                      class="text-right total-discount-cell"
+                    >
+                      <div class="filled row items-center justify-end">
+                        <div>
+                          {{ totalDiscounts }}
+                        </div>
+                      </div>
+                    </q-td>
+                    <q-td
+                      v-if="
+                        form.showDiscounts &&
+                        !form.setDiscountTypePerLine &&
+                        !form.showLineDiscount
+                      "
+                      :colspan="1"
+                    >
+                      &nbsp;
+                    </q-td>
+                    <q-td
+                      v-if="
+                        form.showDiscounts &&
+                        !form.setDiscountTypePerLine &&
+                        sameLineDiscountTypes &&
+                        form.setDiscountTypePerLine
+                      "
+                      :colspan="1"
+                    >
+                      &nbsp;
+                    </q-td>
+                    <q-td class="text-right subtotal-cell">
+                      <div class="filled row items-center justify-end">
+                        <div>{{ subTotal }}</div>
+                      </div>
+                    </q-td>
+                    <q-td auto-width> &nbsp; </q-td>
                   </q-tr>
                 </template>
               </q-table>
@@ -603,14 +679,14 @@
                 <div class="col">
                   <div class="row q-gutter-lg">
                     <q-toggle
-                      v-model="form.addDiscounts"
+                      v-model="form.showDiscounts"
                       checked-icon="check"
                       color="positive"
                       label="Show discounts"
                       unchecked-icon="clear"
                     />
                     <q-select
-                      v-if="form.addDiscounts"
+                      v-if="form.showDiscounts && !form.setDiscountTypePerLine"
                       v-model="form.discountType"
                       filled
                       :options="discountTypeOptions"
@@ -623,12 +699,21 @@
                     />
                   </div>
                 </div>
-                <div class="col">
+                <div v-if="form.showDiscounts" class="col">
                   <q-toggle
                     v-model="form.setDiscountTypePerLine"
                     checked-icon="check"
                     color="positive"
                     label="Set discount type per line"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div v-if="form.showDiscounts" class="col">
+                  <q-toggle
+                    v-model="form.showLineDiscount"
+                    checked-icon="check"
+                    color="positive"
+                    label="Show line discount"
                     unchecked-icon="clear"
                   />
                 </div>
@@ -907,9 +992,10 @@ export default defineComponent({
       amountsAreTaxInclusive: false,
       roundAmounts: false,
       roundAmountType: 'none',
-      addDiscounts: false,
+      showDiscounts: false,
       discountType: 'number',
       setDiscountTypePerLine: false,
+      showLineDiscount: false,
       showTotalAmount: true,
       changeProductPrices: false,
       numberOfDecimals: 2,
@@ -987,7 +1073,7 @@ export default defineComponent({
           const numberOfDecimals = form.numberOfDecimals;
           //const thousandSeparator = form.thousandSeparatorType;
 
-          if (form.addDiscounts) {
+          if (form.showDiscounts) {
             const unitDiscount = Number(item?.unitDiscount ?? 0);
             let discountedPrice = 0;
             if (form.discountType === 'percentage') {
@@ -1019,9 +1105,52 @@ export default defineComponent({
       return totalArray;
     };
 
+    const getLineDiscountArray = function (
+      items: QuotationInvoiceItemShape[]
+    ): number[] {
+      const discountArray: number[] = [];
+      if (items && items.length) {
+        items.forEach((item, index) => {
+          const unitPrice = Number(item?.unitPrice ?? 0);
+          const qty = Number(item?.qty ?? 0);
+          const roundingType = form.roundAmountType;
+          const numberOfDecimals = form.numberOfDecimals;
+          //const thousandSeparator = form.thousandSeparatorType;
+
+          if (form.showDiscounts) {
+            const unitDiscount = Number(item?.unitDiscount ?? 0);
+            let discount = 0;
+            if (form.discountType === 'percentage') {
+              discount = (unitDiscount / 100) * unitPrice;
+            } else {
+              discount = unitDiscount;
+            }
+
+            if (form.roundAmounts) {
+              discountArray[index] = Number(
+                getRoundedTotal(qty * discount, roundingType, numberOfDecimals)
+              );
+            } else {
+              discountArray[index] = qty * discount;
+            }
+          } else {
+            discountArray[index] = 0;
+          }
+        });
+      }
+      return discountArray;
+    };
+
     const itemTotals = computed({
       get: () => {
         return getTotalArray(form.items);
+      },
+      set: (value) => value,
+    });
+
+    const itemLineDiscounts = computed({
+      get: () => {
+        return getLineDiscountArray(form.items);
       },
       set: (value) => value,
     });
@@ -1032,6 +1161,7 @@ export default defineComponent({
       () => form,
       (form) => {
         itemTotals.value = getTotalArray(form.items);
+        itemLineDiscounts.value = getLineDiscountArray(form.items);
       },
       { deep: true }
     );
@@ -1053,6 +1183,34 @@ export default defineComponent({
       return productNameTypeOptions.filter(
         (option) => option.value === activeProductNameType
       )[0].label;
+    });
+
+    const totalQuantities = computed(() => {
+      return form.items
+        .map((item) => item.qty)
+        .reduce((prevQty, curQty) => Number(prevQty) + Number(curQty), 0);
+    });
+
+    const subTotal = computed(() => {
+      return itemTotals.value.reduce(
+        (prevTotal, curTotal) => Number(prevTotal) + Number(curTotal),
+        0
+      );
+    });
+
+    const totalDiscounts = computed(() => {
+      return itemLineDiscounts.value.reduce(
+        (prevDiscount, curDiscount) =>
+          Number(prevDiscount) + Number(curDiscount),
+        0
+      );
+    });
+
+    const sameLineDiscountTypes = computed(() => {
+      return (
+        form.items.every((item) => item.discountType === 'number') ||
+        form.items.every((item) => item.discountType === 'percentage')
+      );
     });
 
     // Valiation section starts
@@ -1183,15 +1341,17 @@ export default defineComponent({
     watch(
       [
         () => form.showTotalAmount,
-        () => form.addDiscounts,
+        () => form.showDiscounts,
         () => form.changeProductPrices,
         () => form.simpleQuantities,
+        () => form.showLineDiscount,
       ],
       ([
         showTotalAmount,
-        addDiscounts,
+        showDiscounts,
         changeProductPrices,
         simpleQuantities,
+        showLineDiscount,
       ]) => {
         const totalColumnHeader = itemsColumns.filter(
           (column) => column.name === 'total'
@@ -1202,13 +1362,17 @@ export default defineComponent({
         const unitPriceColumnHeader = itemsColumns.filter(
           (column) => column.name === 'unitPrice'
         )[0];
+        const lineDiscountColumnHeader = itemsColumns.filter(
+          (column) => column.name === 'lineDiscount'
+        )[0];
 
         totalColumnHeader.required = showTotalAmount;
-        discountColumnHeader.required = addDiscounts;
+        discountColumnHeader.required = showDiscounts;
         unitPriceColumnHeader.disabled = !changeProductPrices;
         simpleQuantities
           ? (unitPriceColumnHeader.label = 'Unit Price')
           : (unitPriceColumnHeader.label = 'Price Per Collection');
+        lineDiscountColumnHeader.required = showLineDiscount;
       }
     );
 
@@ -1384,6 +1548,11 @@ export default defineComponent({
       productNameTypeOptions,
       setProductNameType,
       getProductNameType,
+      totalQuantities,
+      subTotal,
+      totalDiscounts,
+      itemLineDiscounts,
+      sameLineDiscountTypes,
     };
   },
 });

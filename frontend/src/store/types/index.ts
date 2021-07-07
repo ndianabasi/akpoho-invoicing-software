@@ -666,9 +666,10 @@ export type QuotationInvoiceFormShape = {
   amountsAreTaxInclusive: boolean;
   roundAmounts: boolean;
   roundAmountType: RoundingType;
-  addDiscounts: boolean;
+  showDiscounts: boolean;
   discountType: DiscountType;
   setDiscountTypePerLine: boolean;
+  showLineDiscount: boolean;
   showTotalAmount: boolean;
   changeProductPrices: boolean;
   useThousandSeparator: boolean;
