@@ -283,6 +283,19 @@
                         :aria-disabled="col.disabled"
                         :disable="col.disabled"
                       >
+                        <template #prepend>
+                          <div
+                            v-if="col.name === 'unitDiscount'"
+                            class="text-body2"
+                          >
+                            {{
+                              form.items[props.rowIndex].unitDiscount &&
+                              form.items[props.rowIndex].unitDiscount > 0
+                                ? '-'
+                                : ''
+                            }}
+                          </div>
+                        </template>
                         <template #append>
                           <div
                             v-if="
@@ -487,7 +500,11 @@
                           {{ itemTotals?.[props.rowIndex] ?? 0 }}
                         </div>
                         <div v-if="col.name === 'lineDiscount'">
-                          {{ itemLineDiscounts?.[props.rowIndex] ?? 0 }}
+                          {{
+                            (itemLineDiscounts?.[props.rowIndex] ?? 0) > 0
+                              ? '- ' + itemLineDiscounts?.[props.rowIndex] ?? 0
+                              : 0
+                          }}
                         </div>
                       </div>
                     </q-td>
@@ -554,7 +571,9 @@
                       :colspan="
                         form.showDiscounts &&
                         sameLineDiscountTypes &&
-                        (form.showLineDiscount || form.setDiscountTypePerLine)
+                        form.setDiscountTypePerLine
+                          ? 2
+                          : form.showDiscounts && !form.setDiscountTypePerLine
                           ? 2
                           : 1
                       "
@@ -564,27 +583,22 @@
                     <q-td
                       v-if="
                         form.showDiscounts &&
-                        form.showLineDiscount &&
                         (!form.setDiscountTypePerLine || sameLineDiscountTypes)
                       "
                       class="text-right total-discount-cell"
                     >
                       <div class="filled row items-center justify-end">
                         <div>
-                          {{ totalDiscounts }}
+                          {{ totalDiscounts > 0 ? '- ' + totalDiscounts : 0 }}
                         </div>
                       </div>
                     </q-td>
-                    <q-td
-                      v-if="
-                        form.showDiscounts &&
-                        !form.setDiscountTypePerLine &&
-                        !form.showLineDiscount
-                      "
+                    <!-- <q-td
+                      v-if="form.showDiscounts && !form.setDiscountTypePerLine"
                       :colspan="1"
                     >
                       &nbsp;
-                    </q-td>
+                    </q-td> -->
                     <q-td
                       v-if="
                         form.showDiscounts &&
@@ -603,6 +617,42 @@
                     </q-td>
                     <q-td auto-width> &nbsp; </q-td>
                   </q-tr>
+                  <q-tr class="bottom-row">
+                    <q-td auto-width></q-td>
+                    <q-td
+                      class="text-right"
+                      :colspan="visibleColumns.length - 1"
+                    >
+                      <div class="">Additional discount</div>
+                    </q-td>
+                    <q-td class="text-right additional-discount-cell">
+                      <div class="filled row items-center justify-end">
+                        <div>
+                          {{
+                            additionalSubtotalDiscount > 0
+                              ? '- ' + additionalSubtotalDiscount
+                              : 0
+                          }}
+                        </div>
+                      </div>
+                    </q-td>
+                    <q-td auto-width> &nbsp; </q-td>
+                  </q-tr>
+                  <q-tr class="bottom-row">
+                    <q-td auto-width></q-td>
+                    <q-td
+                      class="text-right"
+                      :colspan="visibleColumns.length - 1"
+                    >
+                      <div class="">Grand total</div>
+                    </q-td>
+                    <q-td class="text-right grand-total-cell">
+                      <div class="filled row items-center justify-end">
+                        <div>{{ grandTotal }}</div>
+                      </div>
+                    </q-td>
+                    <q-td auto-width> &nbsp; </q-td>
+                  </q-tr>
                 </template>
               </q-table>
             </div>
@@ -616,7 +666,7 @@
             dense
           >
             <div class="row">
-              <div class="col column col-sm-12 col-md-6 col-lg-4">
+              <div class="col column col-sm-12 col-md-6 col-lg-6">
                 <div class="col">
                   <q-toggle
                     v-model="form.simpleQuantities"
@@ -708,15 +758,6 @@
                     unchecked-icon="clear"
                   />
                 </div>
-                <div v-if="form.showDiscounts" class="col">
-                  <q-toggle
-                    v-model="form.showLineDiscount"
-                    checked-icon="check"
-                    color="positive"
-                    label="Show line discount"
-                    unchecked-icon="clear"
-                  />
-                </div>
                 <div class="col">
                   <div class="row">
                     <div class="col col-sm-12 col-md-6">
@@ -769,6 +810,47 @@
                     />
                   </div>
                 </div> -->
+                <div class="col q-mt-sm">
+                  <div class="row q-gutter-lg">
+                    <q-toggle
+                      v-model="form.showAdditionalSubtotalDiscount"
+                      checked-icon="check"
+                      color="positive"
+                      label="Show additional subtotal discount"
+                      unchecked-icon="clear"
+                    />
+                    <q-select
+                      v-if="form.showAdditionalSubtotalDiscount"
+                      v-model="form.additionalDiscountType"
+                      filled
+                      :options="discountTypeOptions"
+                      dense
+                      options-dense
+                      transition-show="scale"
+                      transition-hide="scale"
+                      emit-value
+                      map-options
+                      class="additional-discount-select"
+                    />
+                    <q-input
+                      v-if="form.showAdditionalSubtotalDiscount"
+                      v-model="form.additionalDiscountAmount"
+                      filled
+                      dense
+                      class="additional-discount-input"
+                      autogrow
+                      label="Discount amount"
+                      stack-label
+                    >
+                      <template
+                        v-if="form.additionalDiscountType === 'percentage'"
+                        #append
+                      >
+                        <div class="text-body2">%</div>
+                      </template>
+                    </q-input>
+                  </div>
+                </div>
               </div>
             </div>
           </q-expansion-item>
@@ -995,7 +1077,6 @@ export default defineComponent({
       showDiscounts: false,
       discountType: 'number',
       setDiscountTypePerLine: false,
-      showLineDiscount: false,
       showTotalAmount: true,
       changeProductPrices: false,
       numberOfDecimals: 2,
@@ -1003,6 +1084,9 @@ export default defineComponent({
       thousandSeparatorType: 'comma',
       notes: '',
       theme: null,
+      showAdditionalSubtotalDiscount: false,
+      additionalDiscountType: 'percentage',
+      additionalDiscountAmount: null,
     });
 
     const quotationItemShape: QuotationInvoiceItemShape = {
@@ -1213,6 +1297,18 @@ export default defineComponent({
       );
     });
 
+    const additionalSubtotalDiscount = computed(() => {
+      if (form.additionalDiscountType === 'number') {
+        return form?.additionalDiscountAmount ?? 0;
+      } else {
+        return ((form?.additionalDiscountAmount ?? 0) / 100) * subTotal.value;
+      }
+    });
+
+    const grandTotal = computed(
+      () => subTotal.value - additionalSubtotalDiscount.value
+    );
+
     // Valiation section starts
 
     const formSchema = computed(() =>
@@ -1344,14 +1440,12 @@ export default defineComponent({
         () => form.showDiscounts,
         () => form.changeProductPrices,
         () => form.simpleQuantities,
-        () => form.showLineDiscount,
       ],
       ([
         showTotalAmount,
         showDiscounts,
         changeProductPrices,
         simpleQuantities,
-        showLineDiscount,
       ]) => {
         const totalColumnHeader = itemsColumns.filter(
           (column) => column.name === 'total'
@@ -1367,12 +1461,12 @@ export default defineComponent({
         )[0];
 
         totalColumnHeader.required = showTotalAmount;
-        discountColumnHeader.required = showDiscounts;
+        discountColumnHeader.required = lineDiscountColumnHeader.required =
+          showDiscounts;
         unitPriceColumnHeader.disabled = !changeProductPrices;
         simpleQuantities
           ? (unitPriceColumnHeader.label = 'Unit Price')
           : (unitPriceColumnHeader.label = 'Price Per Collection');
-        lineDiscountColumnHeader.required = showLineDiscount;
       }
     );
 
@@ -1553,6 +1647,8 @@ export default defineComponent({
       totalDiscounts,
       itemLineDiscounts,
       sameLineDiscountTypes,
+      additionalSubtotalDiscount,
+      grandTotal,
     };
   },
 });

@@ -669,13 +669,15 @@ export type QuotationInvoiceFormShape = {
   showDiscounts: boolean;
   discountType: DiscountType;
   setDiscountTypePerLine: boolean;
-  showLineDiscount: boolean;
   showTotalAmount: boolean;
   changeProductPrices: boolean;
   useThousandSeparator: boolean;
   thousandSeparatorType: ThousandSeparator;
   notes: string;
   theme: string | null;
+  showAdditionalSubtotalDiscount: boolean;
+  additionalDiscountType: DiscountType;
+  additionalDiscountAmount: number | null;
 };
 
 export interface SelectNewValueCallback {
