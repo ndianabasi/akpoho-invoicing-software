@@ -156,18 +156,41 @@
             </div>
           </div>
           <div class="row q-gutter-sm">
-            <div class="col col-md-8 col-lg-8 col-sm-12 col-xs-12">
+            <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
               <q-input
-                v-model="form.description"
+                v-model="form.title"
                 type="text"
-                for="description"
+                for="title"
                 filled
                 clearable
                 bottom-slots
-                label="Description"
+                autogrow
+                label="Title"
                 aria-autocomplete="off"
                 autocomplete="off"
-                class="q-mb-sm-sm q-mb-md-md"
+                class="q-mb-sm-sm q-mb-md-sm"
+                dense
+              >
+                <!-- <template #error>
+                  {{ formErrors[field.name] }}
+                </template> -->
+
+                <template #hint></template>
+              </q-input>
+            </div>
+            <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
+              <q-input
+                v-model="form.introduction"
+                type="textarea"
+                for="introduction"
+                filled
+                clearable
+                bottom-slots
+                autogrow
+                label="Introduction"
+                aria-autocomplete="off"
+                autocomplete="off"
+                class="q-mb-sm-sm q-mb-md-sm"
                 dense
               >
                 <!-- <template #error>
@@ -195,7 +218,7 @@
                 <template #header="props">
                   <q-tr :props="props">
                     <!-- Use for auto-numbering -->
-                    <q-th auto-width />
+                    <q-th auto-width><span>#</span></q-th>
                     <!-- Use for reordering handle -->
                     <!-- <q-th auto-width /> -->
                     <q-th
@@ -203,7 +226,7 @@
                       :key="col.name"
                       :props="props"
                     >
-                      {{ col.label }}
+                      <span>{{ col.label }}</span>
                     </q-th>
                     <q-th auto-width />
                   </q-tr>
@@ -260,6 +283,18 @@
                         :aria-disabled="col.disabled"
                         :disable="col.disabled"
                       >
+                        <template #append>
+                          <div
+                            v-if="
+                              col.name === 'unitDiscount' &&
+                              form.discountType === 'percentage' &&
+                              !form.setDiscountTypePerLine
+                            "
+                            class="text-body2"
+                          >
+                            %
+                          </div>
+                        </template>
                         <template
                           v-if="
                             col.name === 'qty' || col.name === 'unitDiscount'
@@ -267,7 +302,7 @@
                           #after
                         >
                           <div
-                            v-if="col.name === 'qty' && !form.simpleQuantity"
+                            v-if="col.name === 'qty' && !form.simpleQuantities"
                             class="
                               row
                               inline
@@ -278,10 +313,13 @@
                             "
                           >
                             <q-select
-                              v-model="form.items[props.rowIndex].UOM"
+                              v-model="
+                                form.items[props.rowIndex].collectionType
+                              "
                               filled
-                              :options="options"
+                              :options="collectionTypeOptions"
                               dense
+                              options-dense
                               transition-show="scale"
                               transition-hide="scale"
                               emit-value
@@ -295,31 +333,40 @@
                               class="group-qty-input"
                               autogrow
                             />
-                            <q-input
-                              v-model="form.items[props.rowIndex].total"
+                            <q-select
+                              v-model="form.items[props.rowIndex].UOM"
                               filled
+                              :options="UOMTypeOptions"
                               dense
-                              class="group-qty-total"
-                              autogrow
-                              label="Total"
-                              disable
+                              options-dense
+                              transition-show="scale"
+                              transition-hide="scale"
+                              emit-value
+                              map-options
                             />
                           </div>
                           <div
-                            v-if="
-                              col.name === 'unitDiscount' &&
-                              form.discountType === 'percentage' &&
-                              !form.setDiscountTypePerLine
-                            "
+                            v-if="col.name === 'qty' && form.simpleQuantities"
                             class="
                               row
                               inline
                               justify-center
                               items-center
-                              q-gutter-sm q-my-auto
+                              q-gutter-sm
+                              composite-qty
                             "
                           >
-                            <div class="col">%</div>
+                            <q-select
+                              v-model="form.items[props.rowIndex].UOM"
+                              filled
+                              :options="UOMTypeOptions"
+                              dense
+                              options-dense
+                              transition-show="scale"
+                              transition-hide="scale"
+                              emit-value
+                              map-options
+                            />
                           </div>
                           <div
                             v-if="
@@ -366,6 +413,7 @@
                         bottom-slots
                         options-dense
                         use-input
+                        hide-dropdown-icon
                         :input-debounce="200"
                         class=""
                         transition-show="scale"
@@ -375,21 +423,58 @@
                         dense
                         :aria-disabled="col.disabled"
                         :disable="col.disabled"
-                        :clearable="false"
-                        :async-filter-action="col.asyncFilterAction"
-                        :async-filter-mode="col.asyncFilterMode"
+                        clearable
+                        :new-value-mode="
+                          form.items[props.rowIndex].productNameType ===
+                          'custom_product'
+                            ? 'add-unique'
+                            : undefined
+                        "
+                        :async-filter-action="
+                          form.items[props.rowIndex].productNameType ===
+                          'real_product'
+                            ? col.asyncFilterAction
+                            : undefined
+                        "
+                        :async-filter-mode="
+                          form.items[props.rowIndex].productNameType ===
+                          'real_product'
+                            ? col.asyncFilterMode
+                            : undefined
+                        "
                       >
-                        <!-- <template v-if="col?.icon" #before>
-                          <q-icon :name="col?.icon ?? ''" />
+                        <template #append>
+                          <ProductNameTypeSelect
+                            v-if="col.name === 'productId'"
+                            :label="getProductNameType(props.rowIndex)"
+                            :product-name-type-options="productNameTypeOptions"
+                            :row-index="props.rowIndex"
+                            @typeSelected="setProductNameType"
+                          />
                         </template>
-                        <template #error>
-                          {{ formErrors[col.name] }}
-                        </template> -->
                         <template
                           v-if="col.name === 'productId'"
                           #no-option="{ inputValue }"
                         >
-                          <div v-if="inputValue" class="q-ml-sm">
+                          <div
+                            v-if="
+                              inputValue &&
+                              inputValue.length > 0 &&
+                              !form.items[props.rowIndex].productNameType
+                            "
+                            class="q-ml-sm"
+                          >
+                            No product found for query: <b>{{ inputValue }}</b>
+                          </div>
+                          <div
+                            v-if="
+                              inputValue &&
+                              inputValue.length > 0 &&
+                              form.items[props.rowIndex].productNameType ===
+                                'real_product'
+                            "
+                            class="q-ml-sm"
+                          >
                             No product found for query: <b>{{ inputValue }}</b>
                           </div>
                         </template>
@@ -451,13 +536,14 @@
             icon="settings"
             color="accent"
             label="Settings"
+            class="quotation-settings-accordion"
             dense
           >
             <div class="row">
               <div class="col column col-sm-12 col-md-6 col-lg-4">
                 <div class="col">
                   <q-toggle
-                    v-model="form.simpleQuantity"
+                    v-model="form.simpleQuantities"
                     checked-icon="check"
                     color="positive"
                     label="Use simple quantities"
@@ -551,19 +637,53 @@
                     <div class="col col-sm-12 col-md-6">
                       <q-select
                         v-model="form.numberOfDecimals"
-                        label="Number of decimals"
-                        stack-label
                         filled
                         :options="numberOfDecimalOptions"
                         options-dense
+                        dense
                         transition-show="scale"
                         transition-hide="scale"
                         emit-value
                         map-options
-                      />
+                      >
+                        <template #before>
+                          <div
+                            class="
+                              before-select-label
+                              q-pl-sm
+                              text-body1 text-weight-regular text-black
+                            "
+                          >
+                            Number of decimals
+                          </div>
+                        </template>
+                      </q-select>
                     </div>
                   </div>
                 </div>
+                <!-- <div class="col q-mt-sm">
+                  <div class="row q-gutter-lg">
+                    <q-toggle
+                      v-model="form.useThousandSeparator"
+                      checked-icon="check"
+                      color="positive"
+                      label="Use thousand separators"
+                      unchecked-icon="clear"
+                    />
+                    <q-select
+                      v-if="form.useThousandSeparator"
+                      v-model="form.thousandSeparatorType"
+                      filled
+                      :options="thousandSeparatorOptions"
+                      dense
+                      options-dense
+                      transition-show="scale"
+                      transition-hide="scale"
+                      emit-value
+                      map-options
+                    />
+                  </div>
+                </div> -->
               </div>
             </div>
           </q-expansion-item>
@@ -662,17 +782,38 @@ import {
   QuotationInvoiceItemShape,
   QuotationInvoiceFormShape,
   RoundingType,
+  itemCollectionTypes,
+  ItemCollectionType,
+  unitOfMeasurementTypes,
+  UnitOfMeasurement,
+  productNameTypeOptions,
+  ProductNameType,
+  SelectNewValueCallback,
 } from '../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../components/QuasarSelect';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useStore } from 'vuex';
-import { useQuasar } from 'quasar';
+import { useQuasar, format } from 'quasar';
 import { phoneNumberRegex } from '../../helpers/utils';
 import { isEqual } from 'lodash';
 import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
+import ProductNameTypeSelect from '../../components/ProductNameTypeSelect.vue';
 //import Sortable from 'sortablejs';
+//import thousandFormatter from 'format-thousands/index';
+
+const { capitalize } = format;
+
+const typeSortFn = function <T>(a: T, b: T): number {
+  {
+    if (new String(a).toLocaleLowerCase() > new String(b).toLocaleLowerCase())
+      return 1;
+    if (new String(a).toLocaleLowerCase() < new String(b).toLocaleLowerCase())
+      return -1;
+    return 0;
+  }
+};
 
 export default defineComponent({
   name: 'EditQuotation',
@@ -680,6 +821,7 @@ export default defineComponent({
   components: {
     ViewCard,
     QuasarSelect,
+    ProductNameTypeSelect,
   },
 
   props: {
@@ -721,6 +863,29 @@ export default defineComponent({
         value,
       }));
     });
+    const collectionTypeOptions = computed(() => {
+      return itemCollectionTypes
+        .sort((a, b) => typeSortFn<ItemCollectionType>(a, b))
+        .map((type) => ({
+          label: capitalize(type),
+          value: type,
+        }));
+    });
+    const UOMTypeOptions = computed(() => {
+      return unitOfMeasurementTypes
+        .sort((a, b) =>
+          typeSortFn<ItemCollectionType | UnitOfMeasurement>(a, b)
+        )
+        .map((type) => ({
+          label: type,
+          value: type,
+        }));
+    });
+    const thousandSeparatorOptions = ref([
+      { label: 'None', value: 'none' },
+      { label: 'Comma', value: 'comma' },
+      { label: 'Period', value: 'period' },
+    ]);
 
     const customerAddresses = computed({
       get: () =>
@@ -736,8 +901,9 @@ export default defineComponent({
       code: '',
       customerId: null,
       customerAddressId: null,
-      description: '',
-      simpleQuantity: true,
+      introduction: '',
+      title: '',
+      simpleQuantities: true,
       amountsAreTaxInclusive: false,
       roundAmounts: false,
       roundAmountType: 'none',
@@ -747,15 +913,20 @@ export default defineComponent({
       showTotalAmount: true,
       changeProductPrices: false,
       numberOfDecimals: 2,
+      useThousandSeparator: true,
+      thousandSeparatorType: 'comma',
       notes: '',
       theme: null,
     });
 
     const quotationItemShape: QuotationInvoiceItemShape = {
       productId: null,
+      productNameType: 'real_product',
+      productName: null,
       description: '',
       qty: null,
-      UOM: 'set',
+      UOM: 'kg',
+      collectionType: 'set(s)',
       groupQty: null,
       unitPrice: null,
       unitDiscount: null,
@@ -814,6 +985,8 @@ export default defineComponent({
           const qty = Number(item?.qty ?? 0);
           const roundingType = form.roundAmountType;
           const numberOfDecimals = form.numberOfDecimals;
+          //const thousandSeparator = form.thousandSeparatorType;
+
           if (form.addDiscounts) {
             const unitDiscount = Number(item?.unitDiscount ?? 0);
             let discountedPrice = 0;
@@ -835,13 +1008,11 @@ export default defineComponent({
               totalArray[index] = qty * discountedPrice;
             }
           } else {
-            if (form.roundAmounts) {
-              totalArray[index] = Number(
-                getRoundedTotal(qty * unitPrice, roundingType, numberOfDecimals)
-              );
-            } else {
-              totalArray[index] = qty * unitPrice;
-            }
+            // The effect is the same for when `form.roundAmounts`
+            // is true or false
+            totalArray[index] = Number(
+              getRoundedTotal(qty * unitPrice, roundingType, numberOfDecimals)
+            );
           }
         });
       }
@@ -864,6 +1035,25 @@ export default defineComponent({
       },
       { deep: true }
     );
+
+    const setProductNameType = function ({
+      index,
+      type,
+    }: {
+      index: number;
+      type: ProductNameType;
+    }) {
+      // clear the productId to cleanup the input area
+      form.items[index].productId = '';
+      form.items[index].productNameType = type;
+    };
+
+    const getProductNameType = computed(() => (index: number) => {
+      const activeProductNameType = form.items[index].productNameType;
+      return productNameTypeOptions.filter(
+        (option) => option.value === activeProductNameType
+      )[0].label;
+    });
 
     // Valiation section starts
 
@@ -995,8 +1185,14 @@ export default defineComponent({
         () => form.showTotalAmount,
         () => form.addDiscounts,
         () => form.changeProductPrices,
+        () => form.simpleQuantities,
       ],
-      ([showTotalAmount, addDiscounts, changeProductPrices]) => {
+      ([
+        showTotalAmount,
+        addDiscounts,
+        changeProductPrices,
+        simpleQuantities,
+      ]) => {
         const totalColumnHeader = itemsColumns.filter(
           (column) => column.name === 'total'
         )[0];
@@ -1010,6 +1206,9 @@ export default defineComponent({
         totalColumnHeader.required = showTotalAmount;
         discountColumnHeader.required = addDiscounts;
         unitPriceColumnHeader.disabled = !changeProductPrices;
+        simpleQuantities
+          ? (unitPriceColumnHeader.label = 'Unit Price')
+          : (unitPriceColumnHeader.label = 'Price Per Collection');
       }
     );
 
@@ -1158,10 +1357,6 @@ export default defineComponent({
 
     return {
       //quotation: currentQuotation,
-      text: ref(''),
-      ph: ref(''),
-      dense: ref(false),
-      dismissed: ref(false),
       form,
       titleInfo,
       customerAddresses,
@@ -1183,6 +1378,12 @@ export default defineComponent({
       itemTotals,
       roundTypeOptions,
       numberOfDecimalOptions,
+      collectionTypeOptions,
+      UOMTypeOptions,
+      thousandSeparatorOptions,
+      productNameTypeOptions,
+      setProductNameType,
+      getProductNameType,
     };
   },
 });

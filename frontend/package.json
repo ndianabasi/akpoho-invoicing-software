@@ -38,7 +38,8 @@
     "vue-router": "^4.0.10",
     "vuex": "^4.0.1",
     "vuex-persistedstate": "^4.0.0-beta.3",
-    "yup": "^0.32.9"
+    "yup": "^0.32.9",
+    "format-thousands": "https://github.com/ndianabasi/format-thousands.git"
   },
   "devDependencies": {
     "@quasar/app": "^3.0.0-beta.23",

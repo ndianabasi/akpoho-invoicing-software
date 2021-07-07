@@ -564,18 +564,8 @@ export interface ProductResultRowInterface {
 }
 
 export type UnitOfMeasurement =
-  | 'set'
   | 'kg'
   | 'lb'
-  | 'piece'
-  | 'pack'
-  | 'carton'
-  | 'box'
-  | 'bottle'
-  | 'truck'
-  | 'container'
-  | 'wrap'
-  | 'roll'
   | 'm'
   | 'yd'
   | 'ft'
@@ -588,15 +578,75 @@ export type UnitOfMeasurement =
   | 'cu.ft'
   | 'cu.in';
 
+export type ItemCollectionType =
+  | 'set(s)'
+  | 'piece(s)'
+  | 'pack(s)'
+  | 'carton(s)'
+  | 'box(es)'
+  | 'bottle(s)'
+  | 'truck(s)'
+  | 'container(s)'
+  | 'dozen(s)'
+  | 'wrap(s)'
+  | 'roll(s)';
+
 export type DiscountType = 'percentage' | 'number';
 export type RoundingType = 'none' | 'nearest' | 'down' | 'up';
+export type ThousandSeparator = 'comma' | 'period' | 'none' | 'space';
+
+export const itemCollectionTypes: ItemCollectionType[] = [
+  'set(s)',
+  'piece(s)',
+  'pack(s)',
+  'carton(s)',
+  'box(es)',
+  'bottle(s)',
+  'truck(s)',
+  'container(s)',
+  'dozen(s)',
+  'wrap(s)',
+  'roll(s)',
+];
+
+export const unitOfMeasurementTypes: Array<
+  ItemCollectionType | UnitOfMeasurement
+> = [
+  ...itemCollectionTypes,
+  'kg',
+  'lb',
+  'm',
+  'yd',
+  'ft',
+  'in',
+  'cm',
+  'sq.m',
+  'sq.ft',
+  'sq.in',
+  'cu.m',
+  'cu.ft',
+  'cu.in',
+];
+
+export type ProductNameType = 'custom_product' | 'real_product';
+
+export const productNameTypeOptions: Array<{
+  label: string;
+  value: ProductNameType;
+}> = [
+  { label: 'Custom', value: 'custom_product' },
+  { label: 'Product', value: 'real_product' },
+];
 
 export interface QuotationInvoiceItemShape {
   productId: string | null;
+  productName: string | null;
+  productNameType: ProductNameType;
   description: string | null;
   qty: number | null;
   groupQty: number | null;
   UOM: UnitOfMeasurement;
+  collectionType: ItemCollectionType;
   unitPrice: number | null;
   unitDiscount: number | null;
   discountType: DiscountType;
@@ -608,10 +658,11 @@ export type QuotationInvoiceFormShape = {
   code: string | null | undefined;
   customerId: string | null | undefined;
   customerAddressId: string | null | undefined;
-  description: string | null | undefined;
+  introduction: string | null | undefined;
+  title: string | null | undefined;
   items: Array<QuotationInvoiceItemShape>;
   numberOfDecimals: number;
-  simpleQuantity: boolean;
+  simpleQuantities: boolean;
   amountsAreTaxInclusive: boolean;
   roundAmounts: boolean;
   roundAmountType: RoundingType;
@@ -620,6 +671,12 @@ export type QuotationInvoiceFormShape = {
   setDiscountTypePerLine: boolean;
   showTotalAmount: boolean;
   changeProductPrices: boolean;
+  useThousandSeparator: boolean;
+  thousandSeparatorType: ThousandSeparator;
   notes: string;
   theme: string | null;
 };
+
+export interface SelectNewValueCallback {
+  (val: string, done: (fn?: () => void) => void): void;
+}

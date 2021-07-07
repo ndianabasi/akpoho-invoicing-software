@@ -3506,6 +3506,10 @@ fork-ts-checker-webpack-plugin@6.1.0:
     semver "^7.3.2"
     tapable "^1.0.0"
 
+"format-thousands@https://github.com/ndianabasi/format-thousands.git":
+  version "2.0.0"
+  resolved "https://github.com/ndianabasi/format-thousands.git#de30acbe17587f4babdcc1ce258151c28f32e75e"
+
 forwarded@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.1.2.tgz#98c23dab1175657b8c0573e8ceccd91b0ff18c84"
