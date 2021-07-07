@@ -664,6 +664,7 @@ export type QuotationInvoiceFormShape = {
   numberOfDecimals: number;
   simpleQuantities: boolean;
   amountsAreTaxInclusive: boolean;
+  taxPercentage: number;
   roundAmounts: boolean;
   roundAmountType: RoundingType;
   showDiscounts: boolean;
@@ -677,9 +678,13 @@ export type QuotationInvoiceFormShape = {
   theme: string | null;
   showAdditionalSubtotalDiscount: boolean;
   additionalDiscountType: DiscountType;
-  additionalDiscountAmount: number | null;
+  additionalDiscountAmount: number;
+  showAdditionalFees: boolean;
+  additionalFees: Array<AdditionalFee>;
 };
 
 export interface SelectNewValueCallback {
   (val: string, done: (fn?: () => void) => void): void;
 }
+
+export type AdditionalFee = { name: string; amount: number };

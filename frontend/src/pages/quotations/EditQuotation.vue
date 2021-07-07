@@ -617,7 +617,10 @@
                     </q-td>
                     <q-td auto-width> &nbsp; </q-td>
                   </q-tr>
-                  <q-tr class="bottom-row">
+                  <q-tr
+                    v-if="form.showAdditionalSubtotalDiscount"
+                    class="bottom-row"
+                  >
                     <q-td auto-width></q-td>
                     <q-td
                       class="text-right"
@@ -638,13 +641,91 @@
                     </q-td>
                     <q-td auto-width> &nbsp; </q-td>
                   </q-tr>
+                  <template v-if="form.showAdditionalFees">
+                    <q-tr
+                      v-for="(fee, index) in form.additionalFees"
+                      :key="'additional_fees__' + index"
+                      class="bottom-row"
+                    >
+                      <q-td auto-width></q-td>
+                      <q-td
+                        class="text-right"
+                        :colspan="visibleColumns.length - 3"
+                      >
+                        &nbsp;
+                      </q-td>
+                      <q-td class="text-right" :colspan="2">
+                        <q-input
+                          v-model="form.additionalFees[index].name"
+                          filled
+                          dense
+                          class="additional-fee-input"
+                          input-class=" text-right"
+                          stack-label
+                          autogrow
+                        />
+                      </q-td>
+                      <q-td class="text-right additional-fee-cell">
+                        <q-input
+                          v-model="form.additionalFees[index].amount"
+                          filled
+                          dense
+                          class="additional-fee-input"
+                          input-class=" text-right"
+                          stack-label
+                          autogrow
+                        />
+                      </q-td>
+                      <q-td auto-width>
+                        <q-btn
+                          v-if="!isAdditionalFeeLastItem(index)"
+                          color="negative"
+                          round
+                          flat
+                          dense
+                          icon="delete_outline"
+                          @click="removeAdditionalFee(index)"
+                        />
+                        <q-btn
+                          v-else
+                          color="positive"
+                          round
+                          flat
+                          dense
+                          icon="library_add"
+                          @click="addAdditionalFee(index)"
+                        />
+                      </q-td>
+                    </q-tr>
+                  </template>
+
+                  <q-tr v-if="!form.amountsAreTaxInclusive" class="bottom-row">
+                    <q-td auto-width></q-td>
+                    <q-td
+                      class="text-right"
+                      :colspan="visibleColumns.length - 1"
+                    >
+                      <div class="">Tax</div>
+                    </q-td>
+                    <q-td class="text-right grand-total-cell">
+                      <div class="filled row items-center justify-end">
+                        <div>{{ taxAmount }}</div>
+                      </div>
+                    </q-td>
+                    <q-td auto-width> &nbsp; </q-td>
+                  </q-tr>
                   <q-tr class="bottom-row">
                     <q-td auto-width></q-td>
                     <q-td
                       class="text-right"
                       :colspan="visibleColumns.length - 1"
                     >
-                      <div class="">Grand total</div>
+                      <div class="">
+                        Grand total
+                        {{
+                          form.amountsAreTaxInclusive ? '(tax inclusive)' : ''
+                        }}
+                      </div>
                     </q-td>
                     <q-td class="text-right grand-total-cell">
                       <div class="filled row items-center justify-end">
@@ -677,13 +758,31 @@
                   />
                 </div>
                 <div class="col">
-                  <q-toggle
-                    v-model="form.amountsAreTaxInclusive"
-                    checked-icon="check"
-                    color="positive"
-                    label="Amounts include taxes"
-                    unchecked-icon="clear"
-                  />
+                  <div class="row q-gutter-lg">
+                    <q-toggle
+                      v-model="form.amountsAreTaxInclusive"
+                      checked-icon="check"
+                      color="positive"
+                      label="Amounts include taxes"
+                      unchecked-icon="clear"
+                    />
+                    <q-input
+                      v-if="!form.amountsAreTaxInclusive"
+                      v-model="form.taxPercentage"
+                      filled
+                      dense
+                      class="tax-input"
+                      input-class=" text-right"
+                      stack-label
+                    >
+                      <template #append>
+                        <div class="text-body2">%</div>
+                      </template>
+                      <template #prepend>
+                        <div class="text-body2">Tax</div>
+                      </template>
+                    </q-input>
+                  </div>
                 </div>
                 <div class="col">
                   <q-toggle
@@ -810,7 +909,7 @@
                     />
                   </div>
                 </div> -->
-                <div class="col q-mt-sm">
+                <div class="col q-my-sm">
                   <div class="row q-gutter-lg">
                     <q-toggle
                       v-model="form.showAdditionalSubtotalDiscount"
@@ -850,6 +949,15 @@
                       </template>
                     </q-input>
                   </div>
+                </div>
+                <div class="col">
+                  <q-toggle
+                    v-model="form.showAdditionalFees"
+                    checked-icon="check"
+                    color="positive"
+                    label="Set additional fees"
+                    unchecked-icon="clear"
+                  />
                 </div>
               </div>
             </div>
@@ -956,6 +1064,7 @@ import {
   productNameTypeOptions,
   ProductNameType,
   SelectNewValueCallback,
+  AdditionalFee,
 } from '../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../components/QuasarSelect';
@@ -1072,6 +1181,7 @@ export default defineComponent({
       title: '',
       simpleQuantities: true,
       amountsAreTaxInclusive: false,
+      taxPercentage: 0,
       roundAmounts: false,
       roundAmountType: 'none',
       showDiscounts: false,
@@ -1086,7 +1196,9 @@ export default defineComponent({
       theme: null,
       showAdditionalSubtotalDiscount: false,
       additionalDiscountType: 'percentage',
-      additionalDiscountAmount: null,
+      additionalDiscountAmount: 0,
+      showAdditionalFees: false,
+      additionalFees: [] as QuotationInvoiceFormShape['additionalFees'],
     });
 
     const quotationItemShape: QuotationInvoiceItemShape = {
@@ -1104,6 +1216,8 @@ export default defineComponent({
       total: 0,
     };
 
+    const additionalFeeShape: AdditionalFee = { name: '', amount: 0 };
+
     const addItemLines = (numberOfLines = 1) => {
       for (let i = 0; i < numberOfLines; i++) {
         // Spread operator used to clone object to avoid
@@ -1112,9 +1226,28 @@ export default defineComponent({
       }
     };
 
+    const addAdditionalFee = () => {
+      // Spread operator used to clone object to avoid
+      // object reference issues
+      form.additionalFees.push({ ...additionalFeeShape });
+    };
+
+    const addDefaultAdditionalFees = () => {
+      form.additionalFees = [
+        { name: 'Shipping Fee', amount: 0 },
+        { name: 'Installation Fee', amount: 0 },
+      ];
+    };
+
     const removeItem = (index: number) => form.items.splice(index, 1);
 
     const isLastItem = (index: number) => form.items.length - 1 === index;
+
+    const removeAdditionalFee = (index: number) =>
+      form.additionalFees.splice(index, 1);
+
+    const isAdditionalFeeLastItem = (index: number) =>
+      form.additionalFees.length - 1 === index;
 
     const visibleColumns = computed(() => {
       return itemsColumns.filter((column) => column.required);
@@ -1271,22 +1404,30 @@ export default defineComponent({
 
     const totalQuantities = computed(() => {
       return form.items
-        .map((item) => item.qty)
-        .reduce((prevQty, curQty) => Number(prevQty) + Number(curQty), 0);
+        .map((item) => Number(item.qty))
+        .reduce((prevQty, curQty) => prevQty + curQty, 0);
     });
 
     const subTotal = computed(() => {
-      return itemTotals.value.reduce(
+      let total = itemTotals.value.reduce(
         (prevTotal, curTotal) => Number(prevTotal) + Number(curTotal),
         0
+      );
+
+      return Number(
+        getRoundedTotal(total, form.roundAmountType, form.numberOfDecimals)
       );
     });
 
     const totalDiscounts = computed(() => {
-      return itemLineDiscounts.value.reduce(
+      const discounts = itemLineDiscounts.value.reduce(
         (prevDiscount, curDiscount) =>
           Number(prevDiscount) + Number(curDiscount),
         0
+      );
+
+      return Number(
+        getRoundedTotal(discounts, form.roundAmountType, form.numberOfDecimals)
       );
     });
 
@@ -1298,15 +1439,48 @@ export default defineComponent({
     });
 
     const additionalSubtotalDiscount = computed(() => {
+      let discount = 0;
       if (form.additionalDiscountType === 'number') {
-        return form?.additionalDiscountAmount ?? 0;
+        discount = form?.additionalDiscountAmount ?? 0;
       } else {
-        return ((form?.additionalDiscountAmount ?? 0) / 100) * subTotal.value;
+        discount =
+          ((form?.additionalDiscountAmount ?? 0) / 100) * subTotal.value;
       }
+
+      return Number(
+        getRoundedTotal(discount, form.roundAmountType, form.numberOfDecimals)
+      );
     });
 
-    const grandTotal = computed(
-      () => subTotal.value - additionalSubtotalDiscount.value
+    const totalAdditionalFees = computed(() => {
+      if (!form.additionalFees.length) return 0;
+      return form.additionalFees
+        .map((fee) => Number(fee.amount))
+        .reduce((prevFee, curFee) => prevFee + curFee);
+    });
+
+    const grandTotalBeforeTax = computed(
+      () =>
+        subTotal.value +
+        totalAdditionalFees.value -
+        additionalSubtotalDiscount.value
+    );
+
+    const taxAmount = computed(() => {
+      const tax = (grandTotalBeforeTax.value * form?.taxPercentage ?? 0) / 100;
+      return Number(
+        getRoundedTotal(tax, form.roundAmountType, form.numberOfDecimals)
+      );
+    });
+
+    const grandTotal = computed(() =>
+      Number(
+        getRoundedTotal(
+          taxAmount.value + grandTotalBeforeTax.value,
+          form.roundAmountType,
+          form.numberOfDecimals
+        )
+      )
     );
 
     // Valiation section starts
@@ -1440,12 +1614,14 @@ export default defineComponent({
         () => form.showDiscounts,
         () => form.changeProductPrices,
         () => form.simpleQuantities,
+        () => form.showAdditionalFees,
       ],
       ([
         showTotalAmount,
         showDiscounts,
         changeProductPrices,
         simpleQuantities,
+        showAdditionalFees,
       ]) => {
         const totalColumnHeader = itemsColumns.filter(
           (column) => column.name === 'total'
@@ -1467,6 +1643,28 @@ export default defineComponent({
         simpleQuantities
           ? (unitPriceColumnHeader.label = 'Unit Price')
           : (unitPriceColumnHeader.label = 'Price Per Collection');
+
+        if (showAdditionalFees) {
+          if (props.creationMode) {
+            if (!form.additionalFees.length) {
+              void addDefaultAdditionalFees();
+            }
+          } else {
+            if (!form.additionalFees.length) {
+              void addDefaultAdditionalFees();
+            }
+          }
+        } else {
+          $q.dialog({
+            message:
+              'Disabling this will remove all additional fees. Do you want to proceed?',
+            persistent: true,
+            noEscDismiss: true,
+            cancel: true,
+          })
+            .onCancel(() => (form.showAdditionalFees = true))
+            .onOk(() => (form.additionalFees.length = 0));
+        }
       }
     );
 
@@ -1649,6 +1847,10 @@ export default defineComponent({
       sameLineDiscountTypes,
       additionalSubtotalDiscount,
       grandTotal,
+      taxAmount,
+      addAdditionalFee,
+      isAdditionalFeeLastItem,
+      removeAdditionalFee,
     };
   },
 });
