@@ -11,7 +11,7 @@ import {
   belongsTo,
   BelongsTo,
 } from '@ioc:Adonis/Lucid/Orm'
-import CompanyHook from './Hooks/CompanyHook'
+import CompanyHook from 'App/Models/Hooks/CompanyHook'
 import User from 'App/Models/User'
 import Customer from 'App/Models/Customer'
 import UploadedFile from 'App/Models/UploadedFile'
@@ -19,6 +19,10 @@ import CompanySize from 'App/Models/CompanySize'
 import State from 'App/Models/State'
 import Country from 'App/Models/Country'
 import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import Attribute from 'App/Models/Attribute'
+import AttributeSet from 'App/Models/AttributeSet'
+import Product from 'App/Models/Product'
+import ProductCategory from 'App/Models/ProductCategory'
 
 export type CompanyType = 'personal' | 'corporate'
 
@@ -122,4 +126,25 @@ export default class Company extends BaseModel {
 
   @belongsTo(() => Country)
   public country: BelongsTo<typeof Country>
+
+  @manyToMany(() => Attribute, {
+    pivotTimestamps: true,
+  })
+  public attributes: ManyToMany<typeof Attribute>
+
+  @manyToMany(() => AttributeSet, {
+    pivotTimestamps: true,
+  })
+  public attributeSets: ManyToMany<typeof AttributeSet>
+
+  @manyToMany(() => Product, {
+    pivotTimestamps: true,
+    pivotColumns: ['ownership'],
+  })
+  public products: ManyToMany<typeof Product>
+
+  @manyToMany(() => ProductCategory, {
+    pivotTimestamps: true,
+  })
+  public productCategories: ManyToMany<typeof ProductCategory>
 }

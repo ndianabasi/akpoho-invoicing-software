@@ -27,7 +27,7 @@ export interface TableRow {
     | typeof SortNumberFn
     | typeof SortStringToNumberFn;
   field: string | FieldFn | unknown;
-  required?: boolean;
+  required?: boolean; // Use of `required` is important to avoid breaking QTable
   format?: Formatter<unknown, unknown, unknown> | null;
   filterable?: boolean;
   filterInputType?: InputTypes;

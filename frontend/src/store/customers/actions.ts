@@ -11,6 +11,7 @@ import {
   StringIDNameInterface,
   CustomerFormShape,
   CustomerAddressInterface,
+  CustomerAddressType,
 } from '../types';
 import { PaginationParams } from '../../types/table';
 import { Notify } from 'quasar';
@@ -332,6 +333,53 @@ const actions: ActionTree<CustomersStateInterface, StateInterface> = {
             ],
           });
           return resolve(res.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  async FETCH_CUSTOMERS_FOR_SELECT({ rootGetters }, query: string) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      await $http
+        .get(`/${currentCompany.id}/customers-for-select`, {
+          params: { query },
+        })
+        .then((res: HttpResponse) => {
+          return resolve(res.data.data);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
+        });
+    });
+  },
+
+  async FETCH_CUSTOMER_ADDRESSES_FOR_SELECT(
+    { rootGetters, commit },
+    { type, customerId }: { type: CustomerAddressType; customerId: string }
+  ) {
+    return new Promise(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const currentCompany = rootGetters[
+        'auth/GET_CURRENT_COMPANY'
+      ] as StringIDNameInterface;
+
+      await $http
+        .get(
+          `/${currentCompany.id}/customers/${customerId}/customer-addresses-for-select`,
+          {
+            params: { type },
+          }
+        )
+        .then((res: HttpResponse) => {
+          commit('SET_CUSTOMER_ADDRESSES_FOR_SELECT', res.data.data);
+          return resolve(res.data.data);
         })
         .catch((error: HttpError) => {
           return reject(error);

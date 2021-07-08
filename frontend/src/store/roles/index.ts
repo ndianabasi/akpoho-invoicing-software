@@ -5,7 +5,7 @@ import actions from './actions';
 import getters from './getters';
 import mutations from './mutations';
 
-const UsersModule: Module<RolesStateInterface, StateInterface> = {
+const RolesModule: Module<RolesStateInterface, StateInterface> = {
   namespaced: true,
   actions,
   getters,
@@ -13,4 +13,4 @@ const UsersModule: Module<RolesStateInterface, StateInterface> = {
   state,
 };
 
-export default UsersModule;
+export default RolesModule;

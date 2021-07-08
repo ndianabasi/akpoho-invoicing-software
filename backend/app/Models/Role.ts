@@ -10,7 +10,7 @@ import {
 } from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
 import Permission from 'App/Models/Permission'
-import UUIDHook from './Hooks/UUIDHook'
+import UUIDHook from 'App/Models/Hooks/UUIDHook'
 
 export default class Role extends BaseModel {
   public static selfAssignPrimaryKey = true

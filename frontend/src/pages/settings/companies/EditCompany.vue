@@ -334,10 +334,10 @@ export default defineComponent({
         model: email,
         name: 'email',
         componentType: 'input',
-        inputType: 'work email',
+        inputType: 'email',
         label: 'Email',
         default: '',
-        autocomplete: 'email',
+        autocomplete: 'work email',
         isVisible: true,
       },
       phoneNumber: {

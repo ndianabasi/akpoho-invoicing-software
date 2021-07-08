@@ -4,7 +4,7 @@ import UUIDHook from 'App/Models/Hooks/UUIDHook'
 import Customer from 'App/Models/Customer'
 import Country from 'App/Models/Country'
 import State from 'App/Models/State'
-import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import { ADDRESS_TYPE, TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
 export default class CustomerAddress extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -25,13 +25,13 @@ export default class CustomerAddress extends BaseModel {
   public postalCode: string
 
   @column()
-  public addressType: string
+  public addressType: ADDRESS_TYPE
 
   @column({ serializeAs: null })
-  public stateId: number
+  public stateId: number | null
 
   @column({ serializeAs: null })
-  public countryId: number
+  public countryId: number | null
 
   @column.dateTime({
     autoCreate: true,

@@ -1,6 +1,6 @@
 <template>
   <div class="row justify-center">
-    <div class="col-md-6 col-sm-12 col-xs-12">
+    <div :class="cardContainerClasses">
       <q-card flat bordered>
         <slot v-if="showTitlePanel" name="title-panel">
           <q-item v-if="titleInfo">
@@ -58,6 +58,11 @@ export default defineComponent({
     showTitlePanel: {
       type: Boolean,
       default: true,
+    },
+
+    cardContainerClasses: {
+      type: [String, Array, Object],
+      default: () => 'col-md-6 col-sm-12 col-xs-12',
     },
 
     titleInfo: {

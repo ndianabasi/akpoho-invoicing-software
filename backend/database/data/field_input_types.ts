@@ -1,0 +1,15 @@
+export default [
+  'Text Field',
+  'Text Area',
+  'Text Editor',
+  'Number',
+  'Date',
+  'Date and Time',
+  'Toggle',
+  'Select',
+  'Multi-select',
+  'Price',
+  'Image',
+  'Visual Swatch',
+  'Text Swatch',
+]

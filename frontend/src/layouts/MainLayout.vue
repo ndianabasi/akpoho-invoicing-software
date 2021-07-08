@@ -14,7 +14,7 @@
 
     <secondary-toolbar />
 
-    <sticky-sidebar />
+    <!-- <sticky-sidebar /> -->
 
     <q-page-container class="AIS__page-container q-my-xl q-mx-sm-xs q-mx-lg-md">
       <akpoho-banners />
@@ -71,7 +71,7 @@ import {
   onBeforeUnmount,
 } from 'vue';
 import SecondaryToolbar from '../components/SecondaryToolbar.vue';
-import StickySidebar from '../components/StickySidebar.vue';
+//import StickySidebar from '../components/StickySidebar.vue';
 import GoToTop from '../components/GoToTop.vue';
 import SideDrawer from '../components/SideDrawer.vue';
 import PrimaryToolbar from '../components/PrimaryToolbar.vue';
@@ -146,7 +146,7 @@ export default defineComponent({
 
   components: {
     SecondaryToolbar,
-    StickySidebar,
+    /* StickySidebar, */
     GoToTop,
     SideDrawer,
     PrimaryToolbar,
@@ -259,27 +259,31 @@ export default defineComponent({
     height: 64px
   &__toolbar-input
     width: 35%
-  &__drawer-item
-    line-height: 24px
-    border-radius: 0 24px 24px 0
-    margin-right: 12px
-    .q-item__section--avatar
-      padding-left: 12px
-      .q-icon
-        color: #5f6368
-    .q-item__label:not(.q-item__label--caption)
-      color: #3c4043
-      letter-spacing: .01785714em
-      font-size: .875rem
-      font-weight: 500
-      line-height: 1.25rem
+  &__drawer
+    &-item
+      line-height: 24px
+      border-radius: 0 24px 24px 0
+      margin-right: 12px
+      .q-item__section--avatar
+        padding-left: 12px
+        .q-icon
+          color: #5f6368
+      .q-item__label:not(.q-item__label--caption)
+        color: #3c4043
+        letter-spacing: .01785714em
+        font-size: .875rem
+        font-weight: 500
+        line-height: 1.25rem
+      &.subitem
+        padding-left: 24px
+    &-expansion-list
+      &:after
+        border-bottom: 1px $accent solid
+
   &__side-btn
     &__label
       font-size: 12px
       line-height: 24px
       letter-spacing: .01785714em
       font-weight: 500
-  @media (min-width: 1024px)
-    &__page-container
-      padding-left: 94px
 </style>

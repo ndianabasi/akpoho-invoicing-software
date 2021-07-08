@@ -5,6 +5,9 @@
     }
   ],
   "settings": {
-    "cSpell.words": ["akpoho"]
+    "cSpell.words": [
+      "akpoho",
+      "upcase"
+    ]
   }
 }

@@ -23,6 +23,9 @@ export default class CustomersController {
       is_corporate,
       created_at,
       updated_at,
+      company_name,
+      company_email,
+      company_phone,
     } = request.qs()
 
     const searchQuery = {
@@ -34,21 +37,25 @@ export default class CustomersController {
       is_corporate: is_corporate ? is_corporate : null,
       created_at: created_at ? created_at : null,
       updated_at: updated_at ? updated_at : null,
+      company_name: company_name ? company_name : null,
+      company_email: company_email ? company_email : null,
+      company_phone: company_phone ? company_phone : null,
     }
 
-    let subquery = Database.from('customers')
+    let subquery = Customer.query()
       .select(
         'customers.id',
         'customers.first_name',
         'customers.last_name',
         'customers.email',
         'customers.phone_number',
-        'customers.is_corporate',
         'customers.created_at',
         'customers.updated_at',
+        'customers.is_corporate',
         'customers.corporate_has_rep',
         'customers.company_name',
         'customers.company_email',
+        'customers.company_phone',
         'customer_titles.name as title'
       )
       .where({ company_id: requestedCompany?.id })
@@ -86,6 +93,55 @@ export default class CustomersController {
     const customers = await subquery.paginate(page ? page : 1, perPage ? perPage : 20)
 
     return response.ok({ data: customers })
+  }
+
+  public async customersForSelect({
+    response,
+    requestedCompany,
+    request,
+    bouncer,
+  }: HttpContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('list', requestedCompany!)
+
+    const { query } = request.qs()
+
+    const searchedCustomers = await Customer.query()
+      .select(
+        'customers.id',
+        'customers.first_name',
+        'customers.last_name',
+        'customers.company_name',
+        'customers.is_corporate',
+        'customers.corporate_has_rep'
+      )
+      .where({ company_id: requestedCompany?.id })
+      .where(function (whereQuery) {
+        /**
+         * We will use both fulltext search matching and pattern matching
+         * to return the best results. If complete names are supplied,
+         * fulltext search will be used. Else pattern matching will
+         * return a result.
+         */
+        whereQuery
+          .whereRaw(`customers.first_name LIKE '%${query}%'`)
+          .orWhereRaw(`customers.middle_name LIKE '%${query}%'`)
+          .orWhereRaw(`customers.last_name LIKE '%${query}%'`)
+          .orWhereRaw(`customers.company_name LIKE '%${query}%'`)
+      })
+      .orderBy('customers.first_name', 'asc')
+
+    const transformedSearchedCustomers = searchedCustomers.map((customer) => {
+      const serialisedCustomer = customer.serialize()
+      const isCorporate = Boolean(serialisedCustomer.is_corporate)
+      const fullName = `${serialisedCustomer.first_name} ${serialisedCustomer.last_name}`
+
+      return {
+        label: isCorporate ? serialisedCustomer.company_name : fullName,
+        value: serialisedCustomer.id,
+      }
+    })
+
+    return response.ok({ data: transformedSearchedCustomers })
   }
 
   public async store({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -408,6 +464,60 @@ export default class CustomersController {
       message: 'Customer address was deleted successfully.',
       data: requestedCustomerAddress?.id,
     })
+  }
+
+  public async customerAddressesForSelect({
+    response,
+    requestedCompany,
+    requestedCustomer,
+    bouncer,
+    request,
+  }: HttpContextContract) {
+    await bouncer
+      .with('CustomerPolicy')
+      .authorize('view', requestedCompany ?? null, requestedCustomer!)
+
+    if (requestedCustomer) {
+      const { type } = request.qs()
+
+      const addresses = await requestedCustomer
+        ?.related('addresses')
+        .query()
+        .select(
+          'customer_addresses.city',
+          'customer_addresses.created_at',
+          'customer_addresses.id',
+          'customer_addresses.postal_code',
+          'customer_addresses.street_address',
+          'countries.name as country',
+          'states.name as state'
+        )
+        .if(type, (query) => query.where('customer_addresses.address_type', type))
+        .leftJoin('countries', (query) => {
+          query.on('countries.id', '=', 'customer_addresses.country_id')
+        })
+        .leftJoin('states', (query) => {
+          query.on('states.id', '=', 'customer_addresses.state_id')
+        })
+
+      const transformedSearchedAddresses = addresses.map((address) => {
+        const serialisedAddress = address.serialize()
+        const fullName = `${serialisedAddress.street_address}${
+          serialisedAddress.city ? ', ' + serialisedAddress.city : ''
+        }${serialisedAddress.state ? ', ' + serialisedAddress.state : ''}${
+          serialisedAddress.country ? ', ' + serialisedAddress.country : ''
+        }`
+
+        return {
+          label: fullName,
+          value: serialisedAddress.id,
+        }
+      })
+
+      return response.ok({ data: transformedSearchedAddresses })
+    } else {
+      return response.abort({ message: 'Invalid request made' })
+    }
   }
 
   public async customerTitlesForSelect({ response }: HttpContextContract) {

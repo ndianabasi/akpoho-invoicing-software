@@ -181,7 +181,7 @@
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
-  name: 'NewCustomer',
+  name: 'NewInvoice',
 
   setup() {
     return { text: ref(''), ph: ref(''), dense: ref(false) };

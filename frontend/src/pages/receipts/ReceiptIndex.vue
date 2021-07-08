@@ -162,7 +162,7 @@ const rows = [
 ];
 
 export default defineComponent({
-  name: 'Receipts',
+  name: 'ReceiptIndex',
   setup() {
     const selected = ref([]);
 

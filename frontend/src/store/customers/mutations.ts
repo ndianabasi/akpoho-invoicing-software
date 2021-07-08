@@ -27,6 +27,13 @@ const mutation: MutationTree<CustomersStateInterface> = {
   ) {
     state.currentlyViewedAddress = payload;
   },
+
+  SET_CUSTOMER_ADDRESSES_FOR_SELECT(
+    state: CustomersStateInterface,
+    payload: SelectOption[]
+  ) {
+    state.customerAddressesForSelect = payload;
+  },
 };
 
 export default mutation;

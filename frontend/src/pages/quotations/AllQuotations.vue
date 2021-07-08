@@ -32,7 +32,7 @@ import QuasarTable from '../../components/QuasarTable.vue';
 import { PERMISSION } from '../../store/types';
 
 export default defineComponent({
-  name: 'AllCompanies',
+  name: 'AllQuotations',
   components: {
     QuasarTable,
   },

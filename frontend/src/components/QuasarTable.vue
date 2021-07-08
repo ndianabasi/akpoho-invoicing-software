@@ -6,6 +6,7 @@
       v-model:selected="selectedRows"
       v-model:pagination="paginationModel"
       :grid="gridMode"
+      :grid-header="gridHeader"
       :hide-pagination="!usePagination"
       :rows="tableDataRows"
       :columns="columns"
@@ -13,8 +14,9 @@
       :selection="showSelections ? 'multiple' : 'none'"
       :class="{
         'my-sticky-header-column-table': stickyTable,
-        'no-border no-box-shadow': gridMode,
+        'no-border no-box-shadow': !useTableBox,
       }"
+      :card-class="gridCardClass"
       :visible-columns="visibleColumns"
       :loading="loading"
       :filter="filter"
@@ -100,7 +102,7 @@
         </div>
 
         <q-input
-          v-if="gridMode"
+          v-if="useClientFilterAndPagination"
           v-model="filter"
           dense
           debounce="300"
@@ -185,6 +187,24 @@
         </div>
       </template>
 
+      <template v-if="gridMode" #item="props">
+        <slot
+          name="gridModeItems"
+          v-bind="{
+            props,
+            fetch: fetchTableData,
+            showSelections,
+            showActions: showActions_,
+            resourcePermissions,
+            routeParam,
+            rowViewRouteName,
+            rowEditRouteName,
+            deleteRow,
+          }"
+        >
+        </slot>
+      </template>
+
       <template #header="props">
         <q-tr :props="props">
           <q-th auto-width />
@@ -198,86 +218,101 @@
         </q-tr>
       </template>
 
-      <template v-if="gridMode" #item="props">
-        <slot name="gridModeItems" v-bind="{ props, fetch: fetchTableData }">
-        </slot>
-      </template>
-
       <template #body="props">
-        <q-tr :props="props">
-          <q-td auto-width>
-            <q-btn
-              size="sm"
-              color="accent"
-              round
-              dense
-              :icon="props.expand ? 'remove' : 'add'"
-              @click="props.expand = !props.expand"
-            />
-          </q-td>
-          <q-td v-if="showSelections" auto-width>
-            <q-checkbox v-model="props.selected" />
-          </q-td>
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            {{ col.value }}
-          </q-td>
-          <q-td v-if="showActions_">
-            <q-btn-dropdown split class="glossy" color="accent" label="Actions">
-              <q-list>
-                <q-item
-                  v-if="resourcePermissions?.canView ?? false"
-                  v-close-popup
-                  clickable
-                  :to="{
-                    name: rowViewRouteName,
-                    params: { [routeParam]: props.row.id },
-                  }"
-                >
-                  <q-item-section avatar>
-                    <q-icon name="remove_red_eye" size="md" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>View</q-item-label>
-                  </q-item-section>
-                </q-item>
+        <slot
+          name="tableRow"
+          v-bind="{
+            props,
+            showSelections,
+            showActions: showActions_,
+            resourcePermissions,
+            routeParam,
+            rowViewRouteName,
+            rowEditRouteName,
+            deleteRow,
+          }"
+        >
+          <q-tr :props="props">
+            <q-td auto-width>
+              <q-btn
+                size="sm"
+                color="accent"
+                round
+                dense
+                :icon="props.expand ? 'remove' : 'add'"
+                @click="props.expand = !props.expand"
+              />
+            </q-td>
+            <q-td v-if="showSelections" auto-width>
+              <q-checkbox v-model="props.selected" />
+            </q-td>
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              {{ col.value }}
+            </q-td>
+            <q-td v-if="showActions_">
+              <q-btn-dropdown
+                split
+                class="glossy"
+                color="accent"
+                label="Actions"
+              >
+                <q-list>
+                  <q-item
+                    v-if="resourcePermissions?.canView ?? false"
+                    v-close-popup
+                    clickable
+                    :to="{
+                      name: rowViewRouteName,
+                      params: { [routeParam]: props.row.id },
+                    }"
+                  >
+                    <q-item-section avatar>
+                      <q-icon name="remove_red_eye" size="md" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>View</q-item-label>
+                    </q-item-section>
+                  </q-item>
 
-                <q-item
-                  v-if="resourcePermissions?.canEdit ?? false"
-                  v-close-popup
-                  clickable
-                  :to="{
-                    name: rowEditRouteName,
-                    params: { [routeParam]: props.row.id },
-                  }"
-                >
-                  <q-item-section avatar>
-                    <q-icon size="md" name="edit" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Edit</q-item-label>
-                  </q-item-section>
-                </q-item>
+                  <q-item
+                    v-if="resourcePermissions?.canEdit ?? false"
+                    v-close-popup
+                    clickable
+                    :to="{
+                      name: rowEditRouteName,
+                      params: { [routeParam]: props.row.id },
+                    }"
+                  >
+                    <q-item-section avatar>
+                      <q-icon size="md" name="edit" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Edit</q-item-label>
+                    </q-item-section>
+                  </q-item>
 
-                <q-item
-                  v-if="resourcePermissions?.canDelete ?? false"
-                  v-close-popup
-                  clickable
-                  @click="deleteRow(props.row.id)"
-                >
-                  <q-item-section avatar>
-                    <q-icon size="md" name="delete_forever" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Delete</q-item-label>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-icon name="info" color="amber" />
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-btn-dropdown>
-          </q-td>
-        </q-tr>
+                  <q-item
+                    v-if="resourcePermissions?.canDelete ?? false"
+                    v-close-popup
+                    clickable
+                    @click="deleteRow(props.row.id)"
+                  >
+                    <q-item-section avatar>
+                      <q-icon size="md" name="delete_forever" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Delete</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-icon name="info" color="amber" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
+            </q-td>
+          </q-tr>
+        </slot>
+
         <q-tr v-show="props.expand" :props="props">
           <q-td colspan="100%">
             <div class="text-left">
@@ -345,6 +380,18 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    gridHeader: {
+      type: Boolean,
+      default: false,
+    },
+    gridCardClass: {
+      type: [String, Array, Object],
+      default: () => '',
+    },
+    useTableBox: {
+      type: Boolean,
+      default: true,
+    },
     embedMode: {
       type: Boolean,
       default: false,
@@ -356,6 +403,10 @@ export default defineComponent({
     usePagination: {
       type: Boolean,
       default: true,
+    },
+    useClientFilterAndPagination: {
+      type: Boolean,
+      default: false,
     },
     useVisibleColumns: {
       type: Boolean,
@@ -432,6 +483,10 @@ export default defineComponent({
           Object.prototype.hasOwnProperty.call(value, prop)
         );
       },
+    },
+    isCompanySpecific: {
+      type: Boolean,
+      default: false,
     },
     showNewRouteButton: {
       type: Boolean,
@@ -567,6 +622,7 @@ export default defineComponent({
             : {},
           entityEndPoint: props.tableDataFetchEndPoint,
           queryObject: props.useMultiFilter ? queryObject : {},
+          isCompanySpecific: props.isCompanySpecific,
         })
         .then((response: ResponseData) => {
           void nextTick(() => {

@@ -14,6 +14,8 @@
     :table-data-fetch-end-point="`/${currentCompanyId}/customers/${customerId}/customer-addresses`"
     show-new-route-button
     :resource-action-permissions="resourceActionPermissions"
+    use-client-filter-and-pagination
+    :use-table-box="false"
   >
     <template #topAddNew="{ fetch }">
       <q-btn

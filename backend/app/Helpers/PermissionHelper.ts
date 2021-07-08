@@ -32,8 +32,9 @@ class PermissionHelper {
             return resolve(true)
           } else {
             if (loggable) {
-              Logger.error(
-                'PermissionHelper.js -> hasResourcePermission(): You do not have the permission for this operation. Requested permission: %s',
+              Logger.warn(
+                'PermissionHelper: User (%s) does not have resource permission (%s)',
+                user.id,
                 resourcePermission
               )
             }

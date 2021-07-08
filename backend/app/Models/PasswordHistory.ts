@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import { BaseModel, beforeCreate, column } from '@ioc:Adonis/Lucid/Orm'
-import UUIDHook from './Hooks/UUIDHook'
+import UUIDHook from 'App/Models/Hooks/UUIDHook'
 
 export default class PasswordHistory extends BaseModel {
   @column({ isPrimary: true })

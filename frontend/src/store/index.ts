@@ -53,6 +53,14 @@ import companies from './companies';
 import { CompanyStateInterface } from './companies/state';
 import { CompanyGetterInterface } from './companies/getters';
 
+import products from './products';
+import { ProductStateInterface } from './products/state';
+import { ProductGetterInterface } from './products/getters';
+
+import attributes from './attributes';
+import { AttributeStateInterface } from './attributes/state';
+import { AttributesGettersInterface } from './attributes/getters';
+
 //import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -105,6 +113,8 @@ export interface StateInterface {
   permissions?: PermissionStateInterface;
   banners?: BannerStateInterface;
   companies?: CompanyStateInterface;
+  products?: ProductStateInterface;
+  attributes?: AttributeStateInterface;
 }
 
 export interface StoreGettersInterface {
@@ -118,6 +128,8 @@ export interface StoreGettersInterface {
   permissions?: PermissionGettersInterface;
   banners?: BannerGettersInterface;
   companies?: CompanyGetterInterface;
+  products?: ProductGetterInterface;
+  attributes?: AttributesGettersInterface;
 }
 
 export type StoreGetters = RootGetterInterface & StoreGettersInterface;
@@ -217,6 +229,8 @@ export default function () {
       permissions,
       banners,
       companies,
+      products,
+      attributes,
     },
 
     plugins:

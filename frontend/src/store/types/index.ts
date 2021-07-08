@@ -229,9 +229,11 @@ export interface CurrentlyViewedCustomer extends CurrentCustomerBaseInterface {
   };
 }
 
+export type CustomerAddressType = 'billing_address' | 'shipping_address';
+
 export interface CurrentlyViewedAddress {
   id: string;
-  address_type: string;
+  address_type: CustomerAddressType;
   city: string;
   created_at: string;
   postal_code: string;
@@ -328,6 +330,11 @@ export enum PERMISSION {
   CAN_VIEW_COMPANIES = 'can_view_companies',
   CAN_EDIT_COMPANIES = 'can_edit_companies',
   CAN_DELETE_COMPANIES = 'can_delete_companies',
+  CAN_LIST_INVENTORIES = 'can_list_inventories',
+  CAN_CREATE_INVENTORIES = 'can_create_inventories',
+  CAN_VIEW_INVENTORIES = 'can_view_inventories',
+  CAN_EDIT_INVENTORIES = 'can_edit_inventories',
+  CAN_DELETE_INVENTORIES = 'can_delete_inventories',
 }
 
 export interface FileMultiFormats {
@@ -352,15 +359,38 @@ export type FileFormatAttributes = {
   url: string;
 };
 
-type InputComponentType = 'select' | 'input' | 'date' | 'toggle';
+export type InputComponentType =
+  | 'select'
+  | 'input'
+  | 'date'
+  | 'time'
+  | 'toggle'
+  | 'editor'
+  | 'none';
+
+export type InputComponentTypeVariant =
+  | 'text'
+  | 'textarea'
+  | 'multi-select'
+  | 'single-select'
+  | 'date'
+  | 'number'
+  | 'password'
+  | 'email'
+  | 'search'
+  | 'tel'
+  | 'url'
+  | 'time';
 
 export interface FormSchemaProperties {
   model?: unknown;
   inputType?: string;
-  options?: SelectOption[];
-  default?: string | number | boolean | null;
+  options?: SelectOption[] | null;
+  default?: string | number | boolean | null | Array<string | number>;
+  required?: boolean;
   autocomplete?: string;
-  isVisible?: boolean;
+  isVisible?: boolean | unknown;
+  regex?: RegExp | undefined | null;
   name: string;
   label: string;
   componentType: InputComponentType;
@@ -375,7 +405,8 @@ export type ResourceType =
   | 'quotation'
   | 'invoice'
   | 'receipt'
-  | 'customer';
+  | 'customer'
+  | 'product';
 
 export type ResourceName =
   | 'User'
@@ -384,7 +415,8 @@ export type ResourceName =
   | 'Quotation'
   | 'Invoice'
   | 'Receipt'
-  | 'Customer';
+  | 'Customer'
+  | 'Product';
 
 export type ResourceNamePlural =
   | 'Users'
@@ -393,4 +425,268 @@ export type ResourceNamePlural =
   | 'Quotations'
   | 'Invoices'
   | 'Receipts'
-  | 'Customers';
+  | 'Customers'
+  | 'Products';
+
+export type CurrentlyViewedProduct = {
+  id: string;
+  name: string;
+  attributeSetId: string;
+};
+
+export interface ProductFormShape {
+  productTypeId: string;
+  attributeSetId?: string;
+  productName: string;
+  sku: string;
+  price: number | null;
+  isEnabled: boolean;
+  visibility?: PRODUCT_VISIBILITY;
+  stockStatus: PRODUCT_STOCK_STATUS;
+  productHasWeight: boolean;
+  description: string;
+  shortDescription: string;
+  productImages: '';
+  weight: number | null;
+  countryOfManufacture: number | null;
+}
+
+export interface AttributeSetData {
+  id: string;
+  is_system: number;
+  name: string;
+  sort_order: number;
+  attributeGroups: Array<AttributeGroup>;
+}
+
+export interface AttributeGroup {
+  id: string;
+  attribute_set_id: string;
+  is_system: number;
+  name: string;
+  sort_order: number;
+  attributes: Array<Attribute>;
+}
+
+export interface Attribute {
+  attribute_code: string;
+  fieldInputType: FieldInputType;
+  fieldInputValidationType: FieldInputValidationType;
+  field_input_type_id: string;
+  field_input_validation_type_id: string;
+  id: string;
+  is_system_attribute: number;
+  name: string;
+  options: Array<AttributeOption>;
+  visibility: number;
+  required: number;
+  default_value: string | number | boolean | null | Array<string | number>;
+}
+
+export interface FieldInputType {
+  id: string;
+  name: string;
+  code: string;
+}
+
+export interface FieldInputValidationType {
+  id: string;
+  name: string;
+  code: string;
+  regex: string;
+}
+
+export interface AttributeOption {
+  id: string;
+  name: string;
+}
+
+export type AttributeGroupsCollection = Record<
+  string,
+  Array<FormSchemaProperties>
+>;
+
+export type PRODUCT_STOCK_STATUS =
+  | 'In Stock'
+  | 'Out of Stock'
+  | 'Made to Order'
+  | 'Drop-shipped'
+  | '';
+
+export type PRODUCT_VISIBILITY =
+  | 'Catalogue Only'
+  | 'Search Only'
+  | 'Catalogue and Search'
+  | 'Embedded'
+  | '';
+
+export type MinMaxParams = {
+  $params: {
+    min?: number;
+    max?: number;
+  };
+};
+
+export type PRODUCT_OWNERSHIP_TYPES = 'owner' | 'consumer';
+
+export type PRODUCT_TYPE =
+  | 'Simple Product'
+  | 'Variable Product'
+  | 'Compound Product'
+  | 'Virtual Product'
+  | 'Bundle Product'
+  | 'Downloadable Product'
+  | 'Gift Card';
+
+export interface ProductResultRowInterface {
+  id: string;
+  product_type: string;
+  name: string;
+  sku: string;
+  price: number;
+  is_enabled: number;
+  stock_status: string;
+  product_has_weight: number;
+  created_at: string;
+  updated_at: string;
+  slug: string;
+  weight: string;
+  country_of_manufacture: string;
+  meta?: {
+    weight_unit?: 'kg' | 'lb';
+    product_type?: PRODUCT_TYPE;
+  };
+  type?: { id: string; name: PRODUCT_TYPE };
+  country?: { id: string; name: string };
+  productCategories?: { id: string; name: string }[];
+  description?: string;
+  short_description?: string;
+}
+
+export type UnitOfMeasurement =
+  | 'kg'
+  | 'lb'
+  | 'm'
+  | 'yd'
+  | 'ft'
+  | 'in'
+  | 'cm'
+  | 'sq.m'
+  | 'sq.ft'
+  | 'sq.in'
+  | 'cu.m'
+  | 'cu.ft'
+  | 'cu.in';
+
+export type ItemCollectionType =
+  | 'set(s)'
+  | 'piece(s)'
+  | 'pack(s)'
+  | 'carton(s)'
+  | 'box(es)'
+  | 'bottle(s)'
+  | 'truck(s)'
+  | 'container(s)'
+  | 'dozen(s)'
+  | 'wrap(s)'
+  | 'roll(s)';
+
+export type DiscountType = 'percentage' | 'number';
+export type RoundingType = 'none' | 'nearest' | 'down' | 'up';
+export type ThousandSeparator = 'comma' | 'period' | 'none' | 'space';
+
+export const itemCollectionTypes: ItemCollectionType[] = [
+  'set(s)',
+  'piece(s)',
+  'pack(s)',
+  'carton(s)',
+  'box(es)',
+  'bottle(s)',
+  'truck(s)',
+  'container(s)',
+  'dozen(s)',
+  'wrap(s)',
+  'roll(s)',
+];
+
+export const unitOfMeasurementTypes: Array<
+  ItemCollectionType | UnitOfMeasurement
+> = [
+  ...itemCollectionTypes,
+  'kg',
+  'lb',
+  'm',
+  'yd',
+  'ft',
+  'in',
+  'cm',
+  'sq.m',
+  'sq.ft',
+  'sq.in',
+  'cu.m',
+  'cu.ft',
+  'cu.in',
+];
+
+export type ProductNameType = 'custom_product' | 'real_product';
+
+export const productNameTypeOptions: Array<{
+  label: string;
+  value: ProductNameType;
+}> = [
+  { label: 'Custom', value: 'custom_product' },
+  { label: 'Product', value: 'real_product' },
+];
+
+export interface QuotationInvoiceItemShape {
+  productId: string | null;
+  productName: string | null;
+  productNameType: ProductNameType;
+  description: string | null;
+  qty: number | null;
+  groupQty: number | null;
+  UOM: UnitOfMeasurement;
+  collectionType: ItemCollectionType;
+  unitPrice: number | null;
+  unitDiscount: number | null;
+  discountType: DiscountType;
+  readonly total: number;
+  files: Array<File>;
+}
+
+export type QuotationInvoiceFormShape = {
+  date: string | null;
+  code: string | null | undefined;
+  customerId: string | null | undefined;
+  customerAddressId: string | null | undefined;
+  introduction: string | null | undefined;
+  title: string | null | undefined;
+  items: Array<QuotationInvoiceItemShape>;
+  numberOfDecimals: number;
+  simpleQuantities: boolean;
+  amountsAreTaxInclusive: boolean;
+  taxPercentage: number;
+  roundAmounts: boolean;
+  roundAmountType: RoundingType;
+  showDiscounts: boolean;
+  discountType: DiscountType;
+  setDiscountTypePerLine: boolean;
+  calculateTotals: boolean;
+  changeProductPrices: boolean;
+  useThousandSeparator: boolean;
+  thousandSeparatorType: ThousandSeparator;
+  notes: string;
+  theme: string | null;
+  showAdditionalSubtotalDiscount: boolean;
+  additionalDiscountType: DiscountType;
+  additionalDiscountAmount: number;
+  showAdditionalFees: boolean;
+  additionalFees: Array<AdditionalFee>;
+  showImages: boolean;
+};
+
+export interface SelectNewValueCallback {
+  (val: string, done: (fn?: () => void) => void): void;
+}
+
+export type AdditionalFee = { name: string; amount: number };

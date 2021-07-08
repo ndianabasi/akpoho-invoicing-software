@@ -20,7 +20,8 @@
     show-selections
     route-param="customerId"
     :selection-actions="selectionActions"
-  ></quasar-table>
+  >
+  </quasar-table>
 </template>
 
 <script lang="ts">
