@@ -1,5 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
+import { ADDRESS_TYPE } from 'App/Helpers/utils'
 import Customer from 'App/Models/Customer'
 import CustomerTitle from 'App/Models/CustomerTitle'
 import CustomerAddressValidator from 'App/Validators/CustomerAddressValidator'
@@ -345,7 +346,7 @@ export default class CustomersController {
     await bouncer.with('CustomerPolicy').authorize('edit', requestedCompany!, requestedCustomer!)
 
     requestedCustomerAddress?.merge({
-      addressType: type,
+      addressType: type as ADDRESS_TYPE,
       streetAddress: address,
       city: lga,
       countryId: country,
@@ -387,7 +388,7 @@ export default class CustomersController {
       }
     } else {
       await requestedCustomer?.related('addresses').create({
-        addressType: type,
+        addressType: type as ADDRESS_TYPE,
         streetAddress: address,
         city: lga,
         countryId: country,
