@@ -404,7 +404,7 @@ export default defineComponent({
         model: description,
         name: 'description',
         componentType: 'input',
-        inputType: 'texarea',
+        inputType: 'textarea',
         label: 'Description',
         default: initialForm['description'],
         autocomplete: 'off',
@@ -414,7 +414,7 @@ export default defineComponent({
         model: shortDescription,
         name: 'website',
         componentType: 'input',
-        inputType: 'text',
+        inputType: 'textarea',
         label: 'Short Description',
         default: initialForm['shortDescription'],
         autocomplete: 'off',
@@ -530,7 +530,7 @@ export default defineComponent({
     );
 
     onMounted(() => {
-      form.productTypeId.model = currentlyEditedProductType.value.value;
+      form.productTypeId.model = currentlyEditedProductType.value?.value ?? '';
     });
 
     onBeforeUnmount(() => {
