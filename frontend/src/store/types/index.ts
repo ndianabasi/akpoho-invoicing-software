@@ -651,6 +651,7 @@ export interface QuotationInvoiceItemShape {
   unitDiscount: number | null;
   discountType: DiscountType;
   readonly total: number;
+  files: Array<File>;
 }
 
 export type QuotationInvoiceFormShape = {
@@ -670,7 +671,7 @@ export type QuotationInvoiceFormShape = {
   showDiscounts: boolean;
   discountType: DiscountType;
   setDiscountTypePerLine: boolean;
-  showTotalAmount: boolean;
+  calculateTotals: boolean;
   changeProductPrices: boolean;
   useThousandSeparator: boolean;
   thousandSeparatorType: ThousandSeparator;
@@ -681,6 +682,7 @@ export type QuotationInvoiceFormShape = {
   additionalDiscountAmount: number;
   showAdditionalFees: boolean;
   additionalFees: Array<AdditionalFee>;
+  showImages: boolean;
 };
 
 export interface SelectNewValueCallback {

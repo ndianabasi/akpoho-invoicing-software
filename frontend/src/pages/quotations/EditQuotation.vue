@@ -221,6 +221,8 @@
                     <q-th auto-width><span>#</span></q-th>
                     <!-- Use for reordering handle -->
                     <!-- <q-th auto-width /> -->
+                    <!-- Use for expanding row -->
+                    <q-th v-if="form.showImages" auto-width />
                     <q-th
                       v-for="col in props.cols"
                       :key="col.name"
@@ -248,6 +250,16 @@
                         flat
                       />
                     </q-td> -->
+                    <q-td v-if="form.showImages" auto-width>
+                      <q-btn
+                        size="sm"
+                        color="accent"
+                        round
+                        dense
+                        :icon="props.expand ? 'remove' : 'add'"
+                        @click="props.expand = !props.expand"
+                      />
+                    </q-td>
                     <q-td
                       v-for="col in props.cols"
                       :key="col.name"
@@ -549,10 +561,55 @@
                       </q-btn-dropdown>
                     </q-td>
                   </q-tr>
+                  <q-tr v-show="props.expand" :props="props">
+                    <q-td auto-width />
+                    <q-td v-if="form.showImages" auto-width />
+                    <q-td :colspan="2">
+                      <div class="row q-pb-lg">
+                        <div class="col col-12">
+                          <q-file
+                            :model-value="form.items[props.rowIndex].files"
+                            label="Pick files"
+                            outlined
+                            multiple
+                            append
+                            counter
+                            accept="image/*"
+                            :max-file-size="1024 * 1024"
+                            :clearable="!areFilesUploading(props.rowIndex)"
+                            @update:model-value="
+                              updateFiles($event, props.rowIndex)
+                            "
+                          >
+                            <template #file="{ index }">
+                              <q-avatar class="q-ma-sm" square size="100px">
+                                <img
+                                  :src="fileObjectUrls[props.rowIndex][index]"
+                                />
+                                <q-badge floating transparent rounded
+                                  ><q-btn
+                                    size="sm"
+                                    round
+                                    flat
+                                    color="white"
+                                    icon="remove_circle_outline"
+                                    @click.prevent="
+                                      cancelFile(index, props.rowIndex)
+                                    "
+                                /></q-badge>
+                              </q-avatar>
+                            </template>
+                          </q-file>
+                        </div>
+                      </div>
+                    </q-td>
+                    <q-td :colspan="props.cols.length - 1" />
+                  </q-tr>
                 </template>
                 <template #bottom-row>
-                  <q-tr class="bottom-row">
-                    <q-td auto-width></q-td>
+                  <q-tr v-if="form.calculateTotals" class="bottom-row">
+                    <q-td auto-width />
+                    <q-td v-if="form.showImages" auto-width />
                     <q-td class="text-right" :colspan="2">
                       <div class="">Sub-totals</div>
                     </q-td>
@@ -618,10 +675,14 @@
                     <q-td auto-width> &nbsp; </q-td>
                   </q-tr>
                   <q-tr
-                    v-if="form.showAdditionalSubtotalDiscount"
+                    v-if="
+                      form.calculateTotals &&
+                      form.showAdditionalSubtotalDiscount
+                    "
                     class="bottom-row"
                   >
-                    <q-td auto-width></q-td>
+                    <q-td auto-width />
+                    <q-td v-if="form.showImages" auto-width />
                     <q-td
                       class="text-right"
                       :colspan="visibleColumns.length - 1"
@@ -647,7 +708,8 @@
                       :key="'additional_fees__' + index"
                       class="bottom-row"
                     >
-                      <q-td auto-width></q-td>
+                      <q-td auto-width />
+                      <q-td v-if="form.showImages" auto-width />
                       <q-td
                         class="text-right"
                         :colspan="visibleColumns.length - 3"
@@ -699,8 +761,12 @@
                     </q-tr>
                   </template>
 
-                  <q-tr v-if="!form.amountsAreTaxInclusive" class="bottom-row">
-                    <q-td auto-width></q-td>
+                  <q-tr
+                    v-if="!form.amountsAreTaxInclusive && form.calculateTotals"
+                    class="bottom-row"
+                  >
+                    <q-td auto-width />
+                    <q-td v-if="form.showImages" auto-width />
                     <q-td
                       class="text-right"
                       :colspan="visibleColumns.length - 1"
@@ -714,8 +780,9 @@
                     </q-td>
                     <q-td auto-width> &nbsp; </q-td>
                   </q-tr>
-                  <q-tr class="bottom-row">
-                    <q-td auto-width></q-td>
+                  <q-tr v-if="form.calculateTotals" class="bottom-row">
+                    <q-td auto-width />
+                    <q-td v-if="form.showImages" auto-width />
                     <q-td
                       class="text-right"
                       :colspan="visibleColumns.length - 1"
@@ -818,10 +885,10 @@
                 </div>
                 <div class="col">
                   <q-toggle
-                    v-model="form.showTotalAmount"
+                    v-model="form.calculateTotals"
                     checked-icon="check"
                     color="positive"
-                    label="Show total amount"
+                    label="Calculate totals"
                     unchecked-icon="clear"
                   />
                 </div>
@@ -959,6 +1026,15 @@
                     unchecked-icon="clear"
                   />
                 </div>
+                <div class="col">
+                  <q-toggle
+                    v-model="form.showImages"
+                    checked-icon="check"
+                    color="positive"
+                    label="Show/Add images"
+                    unchecked-icon="clear"
+                  />
+                </div>
               </div>
             </div>
           </q-expansion-item>
@@ -1033,6 +1109,7 @@ import {
   defineComponent,
   ref,
   onBeforeMount,
+  onBeforeUnmount,
   watchEffect,
   watch,
   computed,
@@ -1121,6 +1198,78 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
     const $q = useQuasar();
+    const fileObjectUrls: Ref<string[][]> = ref([]);
+    const fileUploadProgress = ref(
+      [] as Array<
+        { error: boolean; color: string; percent: number; icon: string }[]
+      >
+    );
+    let filesUploading: Ref<null[] | number[]> = ref([]);
+
+    const areFilesUploading = computed(
+      () => (index: number) => filesUploading.value[index] !== null
+    );
+    const canUploadFiles = computed(
+      () => (index: number) => form.items[index].files !== null
+    );
+
+    const cancelFile = (fileIndex: number, rowIndex: number) => {
+      if (fileUploadProgress.value?.[rowIndex]) {
+        fileUploadProgress.value[rowIndex][fileIndex] = {
+          ...fileUploadProgress.value?.[rowIndex]?.[fileIndex],
+          error: true,
+          color: 'orange-2',
+        };
+      }
+
+      form.items[rowIndex].files.splice(fileIndex, 1);
+      window.URL.revokeObjectURL(fileObjectUrls.value[rowIndex][fileIndex]);
+    };
+
+    const updateFiles = (newFiles: Array<File>, rowIndex: number) => {
+      console.log(newFiles, rowIndex);
+
+      if (fileObjectUrls.value?.[rowIndex]?.length) {
+        fileObjectUrls.value[rowIndex].forEach((url) =>
+          window.URL.revokeObjectURL(url)
+        );
+      }
+
+      fileObjectUrls.value[rowIndex] = (newFiles || []).map((file) => {
+        return window.URL.createObjectURL(file);
+      });
+
+      form.items[rowIndex].files = newFiles;
+      fileUploadProgress.value[rowIndex] = (newFiles || []).map((file) => ({
+        error: false,
+        color: 'green-2',
+        percent: 0,
+        icon:
+          file.type.indexOf('video/') === 0
+            ? 'movie'
+            : file.type.indexOf('image/') === 0
+            ? 'photo'
+            : file.type.indexOf('audio/') === 0
+            ? 'audiotrack'
+            : 'insert_drive_file',
+      }));
+    };
+
+    const uploadFiles = (rowIndex: number) => {
+      const allDone = fileUploadProgress.value[rowIndex].every(
+        (progress) => progress.percent === 1
+      );
+
+      fileUploadProgress.value[rowIndex] = fileUploadProgress.value[
+        rowIndex
+      ].map((progress) => ({
+        ...progress,
+        error: false,
+        color: 'green-2',
+        percent: allDone === true ? 0 : progress.percent,
+      }));
+    };
+
     //const dragging = ref(false);
     const discountTypeOptions = ref([
       { label: 'Num', value: 'number' },
@@ -1187,7 +1336,7 @@ export default defineComponent({
       showDiscounts: false,
       discountType: 'number',
       setDiscountTypePerLine: false,
-      showTotalAmount: true,
+      calculateTotals: true,
       changeProductPrices: false,
       numberOfDecimals: 2,
       useThousandSeparator: true,
@@ -1199,6 +1348,7 @@ export default defineComponent({
       additionalDiscountAmount: 0,
       showAdditionalFees: false,
       additionalFees: [] as QuotationInvoiceFormShape['additionalFees'],
+      showImages: true,
     });
 
     const quotationItemShape: QuotationInvoiceItemShape = {
@@ -1214,6 +1364,7 @@ export default defineComponent({
       unitDiscount: null,
       discountType: 'number',
       total: 0,
+      files: [],
     };
 
     const additionalFeeShape: AdditionalFee = { name: '', amount: 0 };
@@ -1610,22 +1761,17 @@ export default defineComponent({
 
     watch(
       [
-        () => form.showTotalAmount,
+        () => form.calculateTotals,
         () => form.showDiscounts,
         () => form.changeProductPrices,
         () => form.simpleQuantities,
-        () => form.showAdditionalFees,
       ],
       ([
-        showTotalAmount,
+        calculateTotals,
         showDiscounts,
         changeProductPrices,
         simpleQuantities,
-        showAdditionalFees,
       ]) => {
-        const totalColumnHeader = itemsColumns.filter(
-          (column) => column.name === 'total'
-        )[0];
         const discountColumnHeader = itemsColumns.filter(
           (column) => column.name === 'unitDiscount'
         )[0];
@@ -1636,14 +1782,20 @@ export default defineComponent({
           (column) => column.name === 'lineDiscount'
         )[0];
 
-        totalColumnHeader.required = showTotalAmount;
-        discountColumnHeader.required = lineDiscountColumnHeader.required =
-          showDiscounts;
+        discountColumnHeader.required = showDiscounts;
+        lineDiscountColumnHeader.required = showDiscounts;
         unitPriceColumnHeader.disabled = !changeProductPrices;
         simpleQuantities
           ? (unitPriceColumnHeader.label = 'Unit Price')
           : (unitPriceColumnHeader.label = 'Price Per Collection');
+      }
+    );
 
+    // Separated to avoid side-effects from the other
+    // properties being watched
+    watch(
+      () => form.showAdditionalFees,
+      (showAdditionalFees) => {
         if (showAdditionalFees) {
           if (props.creationMode) {
             if (!form.additionalFees.length) {
@@ -1789,6 +1941,10 @@ export default defineComponent({
       stopFetchCompanySizesForSelect(); */
     });
 
+    onBeforeUnmount(() => {
+      //void cleanUpFiles()
+    });
+
     /*onBeforeRouteLeave((to, from, next) => {
       if (companyCreated.value) {
         return next();
@@ -1851,6 +2007,12 @@ export default defineComponent({
       addAdditionalFee,
       isAdditionalFeeLastItem,
       removeAdditionalFee,
+      areFilesUploading,
+      fileUploadProgress,
+      canUploadFiles,
+      cancelFile,
+      updateFiles,
+      fileObjectUrls,
     };
   },
 });

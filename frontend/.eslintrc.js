@@ -88,5 +88,6 @@ module.exports = {
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'vue/no-v-model-argument': 'off',
+    'vue/no-multiple-template-root': 'off',
   },
 };
