@@ -64,7 +64,6 @@
               group="side_drawer_group"
               :icon="link.icon"
               :label="link.title"
-              :to="{ name: link.link }"
               header-class="AIS__drawer-item AIS__drawer-expansion-header"
               active-class="AIS__drawer-item__active"
             >
