@@ -5,10 +5,10 @@
     class="AIS__Layout"
   >
     <q-header reveal elevated class="bg-white text-grey-8" height-hint="64">
-      <primary-toolbar @update:leftDrawerOpen="TOGGLE_LEFT_DRAWER($event)" />
+      <primary-toolbar @update:leftDrawerOpen="TOGGLE_LEFT_DRAWER" />
     </q-header>
 
-    <side-drawer v-model="leftDrawerOpen" />
+    <side-drawer :is-open="leftDrawerOpen" @drawer-hidden="hideLeftDrawer" />
 
     <go-to-top />
 
@@ -69,6 +69,7 @@ import {
   computed,
   watchEffect,
   onBeforeUnmount,
+  Ref,
 } from 'vue';
 import SecondaryToolbar from '../components/SecondaryToolbar.vue';
 //import StickySidebar from '../components/StickySidebar.vue';
@@ -173,13 +174,11 @@ export default defineComponent({
 
     watchEffect(() => void store.dispatch('roles/FETCH_GLOBAL_ROLES'));
 
-    const TOGGLE_LEFT_DRAWER = (payload: boolean) => {
-      if (payload) {
-        leftDrawerOpen.value = payload;
-        return;
-      }
-      leftDrawerOpen.value = !leftDrawerOpen.value;
+    const TOGGLE_LEFT_DRAWER = (payload: Ref<boolean>) => {
+      leftDrawerOpen.value = payload.value;
     };
+
+    const hideLeftDrawer = () => (leftDrawerOpen.value = false);
 
     const links1 = computed(
       () => store.getters['menus/GET_LINKS1'] as Array<Menu>
@@ -248,6 +247,7 @@ export default defineComponent({
       breadcrumbsRoutes,
       leftDrawerOpen,
       showCreateSheet,
+      hideLeftDrawer,
     };
   },
 });

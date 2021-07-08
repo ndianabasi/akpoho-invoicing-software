@@ -5,8 +5,7 @@
     mini
     behavior="mobile"
     :width="300"
-    @click="TOGGLE_LEFT_DRAWER"
-    @input="TOGGLE_LEFT_DRAWER"
+    @hide="handleDrawerHide"
   >
     <q-scroll-area class="fit">
       <q-toolbar class="AIS__toolbar">
@@ -142,12 +141,14 @@ export default defineComponent({
   name: 'SideDrawer',
   components: {},
   props: {
-    /* routes: {
-      type: Array,
+    isOpen: {
+      type: Boolean,
+      default: () => false,
       required: true,
-    }, */
+    },
   },
-  setup(/* props */) {
+  emits: ['drawer-hidden'],
+  setup(props, ctx) {
     const store = useStore();
 
     const selectedCompany: Ref<SelectOption | null> = ref(null);
@@ -196,12 +197,16 @@ export default defineComponent({
       { deep: true }
     );
 
+    watch(
+      () => props.isOpen,
+      (isOpen) => (leftDrawerOpen.value = isOpen)
+    );
+
     watchEffect(
       () => store.getters['auth/GET_USER_COMPANIES'] as StringIDNameInterface[],
       { flush: 'pre' }
     );
 
-    //const leftDrawerOpen = unref(GET_LEFT_DRAWER_OPEN) as boolean;
     const leftDrawerOpen = ref(false);
 
     const TOGGLE_LEFT_DRAWER = () => {
@@ -225,6 +230,7 @@ export default defineComponent({
       selectedCompany,
       userCompanies: companies,
       handleSelectedCompanyUpdate,
+      handleDrawerHide: () => ctx.emit('drawer-hidden'),
     };
   },
 });

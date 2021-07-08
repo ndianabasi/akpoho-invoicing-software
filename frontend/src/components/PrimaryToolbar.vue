@@ -1,5 +1,8 @@
 <template>
-  <q-toolbar :class="{ AIS__toolbar: true, dark: isDark }" style="height: 64px">
+  <q-toolbar
+    :class="{ AIS__toolbar: true, dark: isDarkModeActive }"
+    style="height: 64px"
+  >
     <q-btn
       flat
       dense
@@ -7,10 +10,7 @@
       aria-label="Menu"
       icon="menu"
       class="q-mx-md"
-      @click="
-        TOGGLE_LEFT_DRAWER();
-        $emit('update:leftDrawerOpen', leftDrawerOpen);
-      "
+      @click="SHOW_LEFT_DRAWER"
     />
 
     <router-link class="cursor-point no-underline" :to="{ name: 'Dashboard' }"
@@ -227,17 +227,19 @@ export default defineComponent({
 
   emits: ['update:leftDrawerOpen'],
 
-  setup(/* props */) {
+  setup(props, ctx) {
     const store = useStore();
     const leftDrawerOpen = ref(false);
     const link = ref('');
     const search = ref('');
     const router = useRouter();
+    const emit = ctx.emit;
 
     const { toggleDarkMode, isDarkModeActive } = $dark;
 
-    const TOGGLE_LEFT_DRAWER = () => {
-      leftDrawerOpen.value = !leftDrawerOpen.value;
+    const SHOW_LEFT_DRAWER = () => {
+      leftDrawerOpen.value = true;
+      emit('update:leftDrawerOpen', leftDrawerOpen);
     };
 
     const handleLogout = function () {
@@ -273,7 +275,7 @@ export default defineComponent({
     }`;
 
     return {
-      TOGGLE_LEFT_DRAWER,
+      SHOW_LEFT_DRAWER,
       search,
       handleLogout,
       userProfile: ref(userProfile),
