@@ -335,6 +335,11 @@ export enum PERMISSION {
   CAN_VIEW_INVENTORIES = 'can_view_inventories',
   CAN_EDIT_INVENTORIES = 'can_edit_inventories',
   CAN_DELETE_INVENTORIES = 'can_delete_inventories',
+  CAN_LIST_QUOTATIONS = 'can_list_quotations',
+  CAN_CREATE_QUOTATIONS = 'can_create_quotations',
+  CAN_VIEW_QUOTATIONS = 'can_view_quotations',
+  CAN_EDIT_QUOTATIONS = 'can_edit_quotations',
+  CAN_DELETE_QUOTATIONS = 'can_delete_quotations',
 }
 
 export interface FileMultiFormats {
@@ -595,6 +600,15 @@ export type DiscountType = 'percentage' | 'number';
 export type RoundingType = 'none' | 'nearest' | 'down' | 'up';
 export type ThousandSeparator = 'comma' | 'period' | 'none' | 'space';
 
+export const discountTypes: DiscountType[] = ['number', 'percentage'];
+export const roundingTypes: RoundingType[] = ['none', 'nearest', 'down', 'up'];
+export const thousandSeparatorTypes: ThousandSeparator[] = [
+  'comma',
+  'period',
+  'none',
+  'space',
+];
+
 export const itemCollectionTypes: ItemCollectionType[] = [
   'set(s)',
   'piece(s)',
@@ -629,6 +643,11 @@ export const unitOfMeasurementTypes: Array<
 ];
 
 export type ProductNameType = 'custom_product' | 'real_product';
+
+export const ProductNameTypes: ProductNameType[] = [
+  'custom_product',
+  'real_product',
+];
 
 export const productNameTypeOptions: Array<{
   label: string;

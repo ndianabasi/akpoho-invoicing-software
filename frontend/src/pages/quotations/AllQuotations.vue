@@ -4,18 +4,18 @@
     :table-name="tableName"
     :table-data-getter-type="tableDataGetterType"
     :default-sort="defaultSort"
-    no-results-label="Sorry! No companies were found. Please check your filters too."
-    row-view-route-name="view_company"
-    row-edit-route-name="edit_company"
-    route-param="companyId"
-    row-delete-action-type="companies/DELETE_COMPANY"
-    entity-name="Company"
-    table-data-fetch-end-point="companies"
+    no-results-label="Sorry! No quotations were found. Please check your filters too."
+    row-view-route-name="view_quotation"
+    row-edit-route-name="edit_quotation"
+    route-param="quotationId"
+    row-delete-action-type="quotations/DELETE_QUOTATION"
+    entity-name="Quotation"
+    table-data-fetch-end-point="quotations"
     show-new-route-button
     :new-route-object="{
-      routeName: 'add_company',
+      routeName: 'add_quotation',
       icon: 'person_add_alt',
-      title: 'New Company',
+      title: 'New Quotation',
     }"
     :resource-action-permissions="resourceActionPermissions"
   ></quasar-table>
@@ -27,7 +27,7 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import companyColumns from '../../components/data/table-definitions/companies';
+import quotationColumns from '../../components/data/table-definitions/quotations';
 import QuasarTable from '../../components/QuasarTable.vue';
 import { PERMISSION } from '../../store/types';
 
@@ -37,7 +37,7 @@ export default defineComponent({
     QuasarTable,
   },
   setup() {
-    const tableName = ref('All Companies');
+    const tableName = ref('All Quotations');
     const store = useStore();
 
     const defaultSort = {
@@ -53,7 +53,7 @@ export default defineComponent({
     );
 
     const data = reactive({
-      columns: companyColumns,
+      columns: quotationColumns,
       stickyTable: false,
     });
 
@@ -66,10 +66,10 @@ export default defineComponent({
       tableDataGetterType,
       defaultSort,
       resourceActionPermissions: ref({
-        new: PERMISSION.CAN_CREATE_COMPANIES,
-        view: PERMISSION.CAN_VIEW_COMPANIES,
-        edit: PERMISSION.CAN_EDIT_COMPANIES,
-        delete: PERMISSION.CAN_DELETE_COMPANIES,
+        new: PERMISSION.CAN_CREATE_QUOTATIONS,
+        view: PERMISSION.CAN_VIEW_QUOTATIONS,
+        edit: PERMISSION.CAN_EDIT_QUOTATIONS,
+        delete: PERMISSION.CAN_DELETE_QUOTATIONS,
       }),
     };
   },

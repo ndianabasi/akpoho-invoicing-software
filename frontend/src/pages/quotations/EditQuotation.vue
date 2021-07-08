@@ -76,7 +76,7 @@
                 filled
                 aria-autocomplete="list"
                 autocomplete="off"
-                :options="customersForSelect"
+                :options="[]"
                 label="Customer"
                 name="customerSelect"
                 for="customerSelect"
@@ -1142,6 +1142,9 @@ import {
   ProductNameType,
   SelectNewValueCallback,
   AdditionalFee,
+  discountTypes,
+  roundingTypes,
+  thousandSeparatorTypes,
 } from '../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../components/QuasarSelect';
@@ -1178,7 +1181,7 @@ export default defineComponent({
   },
 
   props: {
-    companyId: {
+    quotationId: {
       type: String,
       required: false,
       default: '',
@@ -1194,7 +1197,7 @@ export default defineComponent({
   },
 
   setup(props) {
-    const companyCreated = ref(false);
+    const quotationCreated = ref(false);
     const store = useStore();
     const router = useRouter();
     const $q = useQuasar();
@@ -1322,6 +1325,7 @@ export default defineComponent({
 
     const form: QuotationInvoiceFormShape = reactive({
       items: [] as QuotationInvoiceFormShape['items'],
+      additionalFees: [] as QuotationInvoiceFormShape['additionalFees'],
       date: null,
       code: '',
       customerId: null,
@@ -1347,7 +1351,6 @@ export default defineComponent({
       additionalDiscountType: 'percentage',
       additionalDiscountAmount: 0,
       showAdditionalFees: false,
-      additionalFees: [] as QuotationInvoiceFormShape['additionalFees'],
       showImages: true,
     });
 
@@ -1634,26 +1637,100 @@ export default defineComponent({
       )
     );
 
+    let currentQuotation: Ref<QuotationInvoiceFormShape | null>;
+
+    currentQuotation = !props.creationMode
+      ? computed(
+          () =>
+            store.getters[
+              'quotations/GET_CURRENTLY_VIEWED_QUOTATION'
+            ] as QuotationInvoiceFormShape
+        )
+      : ref(null);
+
     // Valiation section starts
 
     const formSchema = computed(() =>
       yup.object({
-        isPersonalBrand: yup.boolean(),
-        name: yup.string().required('Name is required').nullable(),
-        email: yup
+        items: yup
+          .array()
+          .nullable()
+          .required('Items are required')
+          .of(
+            yup.object({
+              productId: yup
+                .string()
+                .required('Product/service is required')
+                .nullable(),
+              productNameType: yup
+                .mixed()
+                .required('Product name type is required')
+                .oneOf(['custom_product', 'real_product']),
+              productName: yup.string().nullable(),
+              description: yup.string().nullable(),
+              qty: yup.number().required('Quantity is required').nullable(),
+              UOM: yup
+                .mixed()
+                .required('Unit of measurement is required')
+                .oneOf(unitOfMeasurementTypes),
+              collectionType: yup.mixed().oneOf(itemCollectionTypes),
+              groupQty: yup.number().nullable(),
+              unitPrice: yup
+                .number()
+                .required('Unit price is required')
+                .nullable(),
+              unitDiscount: yup.number().nullable(),
+              discountType: yup.mixed().oneOf(discountTypes),
+              total: yup.number().required('Total is required').nullable(),
+              files: yup
+                .array()
+                .nullable()
+                .of(
+                  yup
+                    .mixed()
+                    .nullable()
+                    .test('fileExistence', 'Image Only', (value: File) => {
+                      if (!value) return true;
+                      else return ['image'].includes(value.type);
+                    })
+                ),
+            })
+          ),
+        additionalFees: yup.array().of(
+          yup.object({
+            name: yup.string().nullable(),
+            amount: yup.number().nullable(),
+          })
+        ),
+        date: yup.string().required('Date is required').nullable(),
+        code: yup.string().required('Code is required').nullable(),
+        customerId: yup.string().required('Customer is required').nullable(),
+        customerAddressId: yup
           .string()
-          .email('Email is not valid')
-          .required('Email is required'),
-        phoneNumber: yup
-          .string()
-          .matches(phoneNumberRegex, 'Please provide a valid phone number')
+          .required('Address is required')
           .nullable(),
-        address: yup.string().optional().nullable(),
-        city: yup.string().required('City is required').nullable(),
-        size: yup.number().required('Company Size is required').nullable(),
-        stateId: yup.number().required('State is required').nullable(),
-        countryId: yup.number().required('Country is required').nullable(),
-        website: yup.string().optional().nullable(),
+        introduction: yup.string().nullable(),
+        title: yup.string().required('Title is required').nullable(),
+        simpleQuantities: yup.boolean(),
+        amountsAreTaxInclusive: yup.boolean(),
+        taxPercentage: yup.number().nullable(),
+        roundAmounts: yup.boolean(),
+        roundAmountType: yup.mixed().oneOf(roundingTypes),
+        showDiscounts: yup.boolean(),
+        discountType: yup.mixed().oneOf(discountTypes),
+        setDiscountTypePerLine: yup.boolean(),
+        calculateTotals: yup.boolean(),
+        changeProductPrices: yup.boolean(),
+        numberOfDecimals: yup.number().nullable(),
+        useThousandSeparator: yup.boolean(),
+        thousandSeparatorType: yup.mixed().oneOf(thousandSeparatorTypes),
+        notes: yup.string().nullable(),
+        theme: yup.string().nullable(),
+        showAdditionalSubtotalDiscount: yup.boolean(),
+        additionalDiscountType: yup.mixed().oneOf(discountTypes),
+        additionalDiscountAmount: yup.number().nullable(),
+        showAdditionalFees: yup.boolean(),
+        showImages: yup.boolean(),
       })
     );
 
@@ -1661,50 +1738,28 @@ export default defineComponent({
       handleSubmit,
       errors: formErrors,
       isSubmitting,
-      values,
-    } = useForm<CompanyFormShape>({
-      /* validationSchema: formSchema.value,
-      initialValues, */
+    } = useForm({
+      validationSchema: formSchema.value,
     });
 
-    /* const { value: isPersonalBrand } = useField('isPersonalBrand'); */
-
-    // Form schema for form generation
-
-    // Valiation section ends
-
-    /* watch(
-      () => form.countryId.model,
-      (newCountry) => {
-        stateId.value = null;
-        if (newCountry) {
-          void store.dispatch(
-            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: newCountry }
-          );
-
-          countryStates.value = store.getters[
-            'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-          ] as SelectionOption[];
-        }
-      }
-    ); */
-
     const onSubmit = handleSubmit((form) => {
+      console.log(form);
+
       void nextTick(() => {
         const isCreationMode = props.creationMode;
         void store
           .dispatch(
-            `companies/${isCreationMode ? 'CREATE_COMPANY' : 'EDIT_COMPANY'}`,
-            isCreationMode ? form : { form, companyId: props.companyId }
+            `quotations/${
+              isCreationMode ? 'CREATE_QUOTATION' : 'EDIT_QUOTATION'
+            }`,
+            isCreationMode ? form : { form, quotationId: props.quotationId }
           )
           .then((id: string) => {
-            companyCreated.value = true;
-            void store.dispatch('auth/FETCH_AUTH_PROFILE');
+            quotationCreated.value = true;
             void nextTick(() => {
               void router.push({
-                name: 'view_company',
-                params: { companyId: id },
+                name: 'view_quotation',
+                params: { quotationId: id },
               });
             });
           })
@@ -1716,18 +1771,18 @@ export default defineComponent({
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
-    /* watch(
-      currentCompany,
+    watch(
+      currentQuotation,
       () => {
         const title =
-          currentCompany && currentCompany.value
+          currentQuotation && currentQuotation.value
             ? useTitleInfo({
-                title: currentCompany.value.name ?? '',
+                title: currentQuotation.value.title ?? '',
                 avatar: undefined,
               })
             : props.creationMode
             ? useTitleInfo({
-                title: 'New Company',
+                title: 'New Quotation',
                 avatar: '',
               })
             : ref(null);
@@ -1735,7 +1790,7 @@ export default defineComponent({
         titleInfo.value = title.value;
       },
       { deep: true }
-    ); */
+    );
 
     watch(
       () => form.customerId,
@@ -1761,17 +1816,11 @@ export default defineComponent({
 
     watch(
       [
-        () => form.calculateTotals,
         () => form.showDiscounts,
         () => form.changeProductPrices,
         () => form.simpleQuantities,
       ],
-      ([
-        calculateTotals,
-        showDiscounts,
-        changeProductPrices,
-        simpleQuantities,
-      ]) => {
+      ([showDiscounts, changeProductPrices, simpleQuantities]) => {
         const discountColumnHeader = itemsColumns.filter(
           (column) => column.name === 'unitDiscount'
         )[0];
@@ -1863,26 +1912,9 @@ export default defineComponent({
       }
     }); */
 
-    /* watch(
-      () => countryId.value,
-      (country) => {
-        if (country) {
-          stateId.value = null;
-          void store.dispatch(
-            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: country }
-          );
-
-          countryStates.value = store.getters[
-            'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-          ] as SelectionOption[];
-        }
-      }
-    ); */
-
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const CAN_EDIT_COMPANIES = computed(() =>
-      store.getters['permissions/GET_USER_PERMISSION']('can_edit_companies')
+    const CAN_EDIT_QUOTATIONS = computed(() =>
+      store.getters['permissions/GET_USER_PERMISSION']('can_edit_quotations')
     );
 
     onMounted(() => {
@@ -1937,38 +1969,29 @@ export default defineComponent({
 
     onBeforeMount(() => {
       //stopFetchCurrentlyViewedCompany();
-      /* stopFetchCountriesForSelect();
-      stopFetchCompanySizesForSelect(); */
     });
 
     onBeforeUnmount(() => {
       //void cleanUpFiles()
     });
 
-    /*onBeforeRouteLeave((to, from, next) => {
-      if (companyCreated.value) {
-        return next();
-      }
-
-      const didFormValuesChange = !isEqual(initialValues , values);
-       if (didFormValuesChange) {
-        $q.dialog({
-          message: 'Form has changed. Do you really want to leave this page?',
-          title: 'Data loss warning',
-          persistent: true,
-          cancel: true,
+    onBeforeRouteLeave((to, from, next) => {
+      $q.dialog({
+        message: 'Form has changed. Do you really want to leave this page?',
+        title: 'Data loss warning',
+        persistent: true,
+        cancel: true,
+      })
+        .onOk(() => {
+          return next();
         })
-          .onOk(() => {
-            return next();
-          })
-          .onCancel(() => {
-            return false;
-          });
-      } else return next();
-    });*/
+        .onCancel(() => {
+          return false;
+        });
+    });
 
     return {
-      //quotation: currentQuotation,
+      quotation: currentQuotation,
       form,
       titleInfo,
       customerAddresses,
@@ -1976,7 +1999,7 @@ export default defineComponent({
         view: PERMISSION.CAN_VIEW_COMPANIES,
         list: PERMISSION.CAN_LIST_COMPANIES,
       }),
-      CAN_EDIT_COMPANIES,
+      CAN_EDIT_QUOTATIONS,
       isSubmitting,
       onSubmit,
       formErrors,
