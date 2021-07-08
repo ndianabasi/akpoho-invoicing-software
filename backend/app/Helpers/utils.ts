@@ -52,3 +52,11 @@ export const commonEmailProperties = function () {
 }
 
 export const IS_DEMO_MODE = Env.get('DEMO_MODE')
+
+export type ADDRESS_TYPE = 'billing_address' | 'shipping_address'
+
+export const ADDRESS_TYPES: ADDRESS_TYPE[] = ['billing_address', 'shipping_address']
+
+export type PRODUCT_OWNERSHIP_TYPE = 'owner' | 'consumer'
+
+export const PRODUCT_OWNERSHIP_TYPES: PRODUCT_OWNERSHIP_TYPE[] = ['owner', 'consumer']

@@ -75,24 +75,26 @@ You can explore the application through the demo site: https://demo.akpoho.com. 
 14. You won't be able to log in because there are no users. So, it is time to seed the database.
 15. To prepare (seed) the database with mock data:
     1.  First, let's migrate the database.
+
         ```bash
         node ace migration:run
         ```
-    2.  Next, Let's seed important tables on the database. Run the seeder command below:
-      
-        ```bash
-        node ace db:seed -i
-        ``` 
 
-        1.  On the prompt, select `database\seeders\Role` to create `roles` for authorisation. 
-        2.  After the `roles` table is seeded. Run the seeder command again and select `database\seeders\Permission` and `database\seeders\PermissionRole` to create `permissions` for authorisation and associate `roles` with `permissions`.
-        3.  Run the seeder command again and select `database\seeders\Company` to create companies, users, customers, and customer addresses. Please, take note of the user credentials logged to the console.
-        4. Run the seeder command again and select `database\seeders\CompanySize` to create company sizes.
-        5. Run the seeder command again and select `database\seeders\CustomerTitle` and `database\seeders\FileProvider` to create customer titles and file providers.
-        6.  Run the seeder command again and select `database\seeders\UserExtraCompany` to associate each existing user with two more companies. This ensures that the user belongs to one than one company.
+    2.  Next, Let's seed important tables on the database. Run the index seeder command below to run all configured seeders for the application and fully setup it up in one command:
+      
+        ```bash        
+        node ace db:seed --files="database/seeders/MainSeeder/Index.ts"
+        ```
+        If you are on Windows and having errors, you can run:
+        
+        ```bash        
+        node ace db:seed --files="database\seeders\MainSeeder\Index.ts"
+        ```
+
+        Please note that this operation could take a couple of minutes.
     
-16. After running the `database\seeders\Company` seeder, all users generated will be logged to file. Check the file: `database/data/seeded_users.txt` and take note of the user credentials logged to the file.
-   1.  Copy the email and password of a user with full access from the console and log in.
+16. After running the index seeder, all users generated will be logged to file. Check the file: `database/data/seeded_users.txt` and take note of the user credentials logged to the file.
+   1.  Get an email and password of a user and log in.
    2.  Congratulations. You have successfully set up the Akpoho Invoicing Software.
 17. After you log in, check the role of the logged-in user. Click the avatar on the top-right corner of the user interface. The role is displayed after the user's name. E.g. `CompanyAdmin`, `CompanyEditor`, or `CompanyStaff`. 
 18. If you need to switch to another user with a higher role:
