@@ -1196,6 +1196,7 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
     const $q = useQuasar();
+    const isSubmitting = ref(false);
     const fileObjectUrls: Ref<string[][]> = ref([]);
     const fileUploadProgress = ref(
       [] as Array<
@@ -1643,100 +1644,7 @@ export default defineComponent({
         )
       : ref(null);
 
-    // Valiation section starts
-    const formSchema = computed(() =>
-      yup.object({
-        items: yup
-          .array()
-          .nullable()
-          .required('Items are required')
-          .of(
-            yup.object({
-              productId: yup
-                .string()
-                .required('Product/service is required')
-                .nullable(),
-              productNameType: yup
-                .mixed()
-                .required('Product name type is required')
-                .oneOf(['custom_product', 'real_product']),
-              productName: yup.string().nullable(),
-              description: yup.string().nullable(),
-              qty: yup.number().required('Quantity is required').nullable(),
-              UOM: yup
-                .mixed()
-                .required('Unit of measurement is required')
-                .oneOf(unitOfMeasurementTypes),
-              collectionType: yup.mixed().oneOf(itemCollectionTypes),
-              groupQty: yup.number().nullable(),
-              unitPrice: yup
-                .number()
-                .required('Unit price is required')
-                .nullable(),
-              unitDiscount: yup.number().nullable(),
-              discountType: yup.mixed().oneOf(discountTypes),
-              total: yup.number().required('Total is required').nullable(),
-              files: yup
-                .array()
-                .nullable()
-                .of(
-                  yup
-                    .mixed()
-                    .nullable()
-                    .test('fileExistence', 'Image Only', (value: File) => {
-                      if (!value) return true;
-                      else return ['image'].includes(value.type);
-                    })
-                ),
-            })
-          ),
-        additionalFees: yup.array().of(
-          yup.object({
-            name: yup.string().nullable(),
-            amount: yup.number().nullable(),
-          })
-        ),
-        date: yup.string().required('Date is required').nullable(),
-        code: yup.string().required('Code is required').nullable(),
-        customerId: yup.string().required('Customer is required').nullable(),
-        customerAddressId: yup
-          .string()
-          .required('Address is required')
-          .nullable(),
-        introduction: yup.string().nullable(),
-        title: yup.string().required('Title is required').nullable(),
-        simpleQuantities: yup.boolean(),
-        amountsAreTaxInclusive: yup.boolean(),
-        taxPercentage: yup.number().nullable(),
-        roundAmounts: yup.boolean(),
-        roundAmountType: yup.mixed().oneOf(roundingTypes),
-        showDiscounts: yup.boolean(),
-        discountType: yup.mixed().oneOf(discountTypes),
-        setDiscountTypePerLine: yup.boolean(),
-        calculateTotals: yup.boolean(),
-        changeProductPrices: yup.boolean(),
-        numberOfDecimals: yup.number().nullable(),
-        useThousandSeparator: yup.boolean(),
-        thousandSeparatorType: yup.mixed().oneOf(thousandSeparatorTypes),
-        notes: yup.string().nullable(),
-        theme: yup.string().nullable(),
-        showAdditionalSubtotalDiscount: yup.boolean(),
-        additionalDiscountType: yup.mixed().oneOf(discountTypes),
-        additionalDiscountAmount: yup.number().nullable(),
-        showAdditionalFees: yup.boolean(),
-        showImages: yup.boolean(),
-      })
-    );
-
-    const {
-      handleSubmit,
-      errors: formErrors,
-      isSubmitting,
-    } = useForm({
-      validationSchema: formSchema.value,
-    });
-
-    const onSubmit = handleSubmit((form) => {
+    const onSubmit = () => {
       console.log(form);
 
       void nextTick(() => {
@@ -1761,7 +1669,7 @@ export default defineComponent({
             console.error(error);
           });
       });
-    });
+    };
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
@@ -1996,7 +1904,6 @@ export default defineComponent({
       CAN_EDIT_QUOTATIONS,
       isSubmitting,
       onSubmit,
-      formErrors,
       addItemLines,
       removeItem,
       isLastItem,

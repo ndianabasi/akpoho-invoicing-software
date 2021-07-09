@@ -10,7 +10,7 @@ import Logger from '@ioc:Adonis/Core/Logger'
 import Application from '@ioc:Adonis/Core/Application'
 import { DateTime } from 'luxon'
 import FileUploadHelper from 'App/Helpers/FileUploadHelper'
-import { AttachedFile, FileData } from 'App/Helpers/types/file'
+import { AttachedFile, FileData } from 'types/file'
 
 export default class UsersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
