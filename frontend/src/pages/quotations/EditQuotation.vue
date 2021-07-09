@@ -110,15 +110,15 @@
             </div>
             <div class="col col-md-4 col-lg-4 col-sm-12 col-xs-12">
               <quasar-select
-                ref="customerAddressSelect"
-                v-model="form.customerAddressId"
+                ref="customerBillingAddressSelect"
+                v-model="form.customerBillingAddressId"
                 filled
                 aria-autocomplete="list"
                 autocomplete="off"
-                :options="customerAddresses"
+                :options="customerBillingAddresses"
                 label="Billing Address"
-                name="customerAddressSelect"
-                for="customerAddressSelect"
+                name="customerBillingAddressSelect"
+                for="customerBillingAddressSelect"
                 clearable
                 bottom-slots
                 options-dense
@@ -142,11 +142,61 @@
                   <div v-if="!form.customerId">Select customer first</div>
                   <div v-else>
                     {{
-                      customerAddresses && customerAddresses.length
+                      customerBillingAddresses &&
+                      customerBillingAddresses.length
                         ? `${
-                            customerAddresses.length === 1
-                              ? '1 address'
-                              : customerAddresses.length + ' addresses'
+                            customerBillingAddresses.length === 1
+                              ? '1 billing address'
+                              : customerBillingAddresses.length +
+                                ' billing addresses'
+                          } available`
+                        : ''
+                    }}
+                  </div>
+                </template>
+              </quasar-select>
+            </div>
+            <div class="col col-md-4 col-lg-4 col-sm-12 col-xs-12">
+              <quasar-select
+                ref="customerShippingAddressSelect"
+                v-model="form.customerShippingAddressId"
+                filled
+                aria-autocomplete="list"
+                autocomplete="off"
+                :options="customerShippingAddresses"
+                label="Shipping Address"
+                name="customerShippingAddressSelect"
+                for="customerShippingAddressSelect"
+                clearable
+                bottom-slots
+                options-dense
+                use-input
+                :input-debounce="250"
+                class="q-mb-sm-sm q-mb-md-md"
+                transition-show="scale"
+                transition-hide="scale"
+                emit-value
+                map-options
+                dense
+                :disable="!form.customerId"
+              >
+                <!-- <template v-if="field?.icon" #before>
+                <q-icon :name="field?.icon ?? ''" />
+              </template>
+              <template #error>
+                {{ formErrors[field.name] }}
+              </template> -->
+                <template #hint>
+                  <div v-if="!form.customerId">Select customer first</div>
+                  <div v-else>
+                    {{
+                      customerShippingAddresses &&
+                      customerShippingAddresses.length
+                        ? `${
+                            customerShippingAddresses.length === 1
+                              ? '1 shipping address'
+                              : customerShippingAddresses.length +
+                                ' shipping addresses'
                           } available`
                         : ''
                     }}
@@ -1139,14 +1189,10 @@ import {
   productNameTypeOptions,
   ProductNameType,
   AdditionalFee,
-  discountTypes,
-  roundingTypes,
-  thousandSeparatorTypes,
+  CustomerAddressForSelectPayload,
 } from '../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../components/QuasarSelect';
-import { useForm, useField } from 'vee-validate';
-import * as yup from 'yup';
 import { useStore } from 'vuex';
 import { useQuasar, format } from 'quasar';
 import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
@@ -1311,11 +1357,17 @@ export default defineComponent({
       { label: 'Period', value: 'period' },
     ]);
 
-    const customerAddresses = computed({
+    const customerBillingAddresses = computed({
       get: () =>
-        store.getters[
-          'customers/GET_CUSTOMER_ADDRESSES_FOR_SELECT'
-        ] as SelectOption[],
+        store.getters['customers/GET_CUSTOMER_ADDRESSES_FOR_SELECT']
+          .billingAddresses as SelectOption[],
+      set: (value) => value,
+    });
+
+    const customerShippingAddresses = computed({
+      get: () =>
+        store.getters['customers/GET_CUSTOMER_ADDRESSES_FOR_SELECT']
+          .shippingAddresses as SelectOption[],
       set: (value) => value,
     });
 
@@ -1325,7 +1377,8 @@ export default defineComponent({
       date: null,
       code: '',
       customerId: null,
-      customerAddressId: null,
+      customerBillingAddressId: null,
+      customerShippingAddressId: null,
       introduction: '',
       title: '',
       simpleQuantities: true,
@@ -1698,20 +1751,27 @@ export default defineComponent({
       () => form.customerId,
       async (customerId) => {
         if (!customerId) {
-          customerAddresses.value = [];
-          form.customerAddressId = null;
+          customerBillingAddresses.value = [];
+          customerShippingAddresses.value = [];
+          form.customerBillingAddressId = null;
+          form.customerShippingAddressId = null;
           return;
         }
 
         await store
           .dispatch('customers/FETCH_CUSTOMER_ADDRESSES_FOR_SELECT', {
-            type: 'billing_address' as CustomerAddressType,
+            type: 'both' as CustomerAddressType,
             customerId,
           })
           .then(() => {
-            customerAddresses.value = store.getters[
+            const customerAddresses = store.getters[
               'countries_states/GET_CUSTOMER_ADDRESSES_FOR_SELECT'
-            ] as SelectionOption[];
+            ] as CustomerAddressForSelectPayload;
+
+            customerBillingAddresses.value =
+              customerAddresses?.billingAddresses ?? [];
+            customerShippingAddresses.value =
+              customerAddresses?.shippingAddresses ?? [];
           });
       }
     );
@@ -1896,7 +1956,8 @@ export default defineComponent({
       quotation: currentQuotation,
       form,
       titleInfo,
-      customerAddresses,
+      customerBillingAddresses,
+      customerShippingAddresses,
       resourcePermissions: useResourcePermissions({
         view: PERMISSION.CAN_VIEW_COMPANIES,
         list: PERMISSION.CAN_LIST_COMPANIES,

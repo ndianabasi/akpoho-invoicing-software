@@ -229,7 +229,10 @@ export interface CurrentlyViewedCustomer extends CurrentCustomerBaseInterface {
   };
 }
 
-export type CustomerAddressType = 'billing_address' | 'shipping_address';
+export type CustomerAddressType =
+  | 'billing_address'
+  | 'shipping_address'
+  | 'both';
 
 export interface CurrentlyViewedAddress {
   id: string;
@@ -677,7 +680,8 @@ export type QuotationInvoiceFormShape = {
   date: string | null;
   code: string | null | undefined;
   customerId: string | null | undefined;
-  customerAddressId: string | null | undefined;
+  customerBillingAddressId: string | null | undefined;
+  customerShippingAddressId: string | null | undefined;
   introduction: string | null | undefined;
   title: string | null | undefined;
   items: Array<QuotationInvoiceItemShape>;
@@ -709,3 +713,8 @@ export interface SelectNewValueCallback {
 }
 
 export type AdditionalFee = { name: string; amount: number };
+
+export type CustomerAddressForSelectPayload = {
+  shippingAddresses: SelectOption[];
+  billingAddresses: SelectOption[];
+};

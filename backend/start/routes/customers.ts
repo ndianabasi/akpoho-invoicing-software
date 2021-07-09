@@ -44,19 +44,19 @@ Route.group(() => {
   // Get all addresses of a specific customer within a company
   Route.get(
     '/:company_id/customers/:customer_id/customer-addresses',
-    'CustomersController.showAddresses'
+    'CustomerAddressesController.showAddresses'
   ).middleware('findRequestedCustomer')
 
   // Get all addresses for selection of a specific customer within a company
   Route.get(
     '/:company_id/customers/:customer_id/customer-addresses-for-select',
-    'CustomersController.customerAddressesForSelect'
+    'CustomerAddressesController.customerAddressesForSelect'
   ).middleware('findRequestedCustomer')
 
   // Get specific address details of a specific customer within a company
   Route.get(
     '/:company_id/customers/:customer_id/customer-addresses/:customer_address_id',
-    'CustomersController.showAddress'
+    'CustomerAddressesController.show'
   )
     .middleware('findRequestedCustomer')
     .middleware('findRequestedCustomerAddress')
@@ -64,13 +64,13 @@ Route.group(() => {
   // Create a new address for a specific customer within a company
   Route.post(
     '/:company_id/customers/:customer_id/customer-addresses',
-    'CustomersController.storeAddress'
+    'CustomerAddressesController.store'
   ).middleware('findRequestedCustomer')
 
   // Update a specific address of a specific customer within a company
   Route.patch(
     '/:company_id/customers/:customer_id/customer-addresses/:customer_address_id',
-    'CustomersController.updateAddress'
+    'CustomerAddressesController.update'
   )
     .middleware('findRequestedCustomer')
     .middleware('findRequestedCustomerAddress')
@@ -78,7 +78,7 @@ Route.group(() => {
   // Delete a specific customer address of a specific customer within a company
   Route.delete(
     '/:company_id/customers/:customer_id/customer-addresses/:customer_address_id',
-    'CustomersController.destroyAddress'
+    'CustomerAddressesController.destroy'
   )
     .middleware('findRequestedCustomer')
     .middleware('findRequestedCustomerAddress')

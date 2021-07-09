@@ -12,6 +12,7 @@ import {
   ThousandSeparator,
   UnitOfMeasurement,
 } from 'types/inventory'
+import { ADDRESS_TYPE } from 'types/customer'
 
 export const STANDARD_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss'
 export const TIMEZONE_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss ZZ'
@@ -61,8 +62,6 @@ export const commonEmailProperties = function () {
 }
 
 export const IS_DEMO_MODE = Env.get('DEMO_MODE')
-
-export type ADDRESS_TYPE = 'billing_address' | 'shipping_address'
 
 export const ADDRESS_TYPES: ADDRESS_TYPE[] = ['billing_address', 'shipping_address']
 
