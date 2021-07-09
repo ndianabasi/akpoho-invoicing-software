@@ -9,9 +9,6 @@ export default class UnitOfMeasurements extends BaseSchema {
       table.string('name').index().notNullable().unique()
       table.enum('type', ['collection', 'discrete']).notNullable()
 
-      /**
-       * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
-       */
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

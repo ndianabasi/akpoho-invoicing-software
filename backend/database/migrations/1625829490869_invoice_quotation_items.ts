@@ -13,7 +13,7 @@ export default class InvoiceQuotationItems extends BaseSchema {
       table.text('description').nullable()
       table.decimal('qty', 15, 6).notNullable().index()
       table.integer('unit_of_measurement_id').index().nullable().unsigned()
-      table.integer('collection_type').index().unsigned()
+      table.integer('collection_type').index().unsigned() // changed to collection_type_id
       table.decimal('group_qty', 15, 6)
       table.decimal('unit_price', 15, 6).notNullable().index()
       table.decimal('unit_discount', 15, 6)

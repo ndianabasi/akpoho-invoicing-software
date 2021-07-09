@@ -368,7 +368,7 @@
                           >
                             <q-select
                               v-model="
-                                form.items[props.rowIndex].collectionType
+                                form.items[props.rowIndex].collectionTypeId
                               "
                               filled
                               :options="collectionTypeOptions"
@@ -1391,7 +1391,7 @@ export default defineComponent({
       description: '',
       qty: null,
       UOM: 'kg',
-      collectionType: 'set(s)',
+      collectionTypeId: 'set(s)',
       groupQty: null,
       unitPrice: null,
       unitDiscount: null,
@@ -1654,7 +1654,7 @@ export default defineComponent({
     );
 
     const taxAmount = computed(() => {
-      if(form.amountsAreTaxInclusive) return 0
+      if (form.amountsAreTaxInclusive) return 0;
       const tax = (grandTotalBeforeTax.value * form?.taxPercentage ?? 0) / 100;
       return Number(
         getRoundedTotal(tax, form.roundAmountType, form.numberOfDecimals)

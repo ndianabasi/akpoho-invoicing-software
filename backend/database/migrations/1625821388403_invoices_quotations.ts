@@ -8,7 +8,7 @@ export default class Quotations extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().unique().index().notNullable()
       table.uuid('customer_id').index().notNullable()
-      table.uuid('product_id').index().notNullable()
+      table.uuid('product_id').index().notNullable() // dropped
       table.uuid('customer_shipping_address').nullable()
       table.uuid('customer_billing_address').nullable()
       table.dateTime('date').index().notNullable()

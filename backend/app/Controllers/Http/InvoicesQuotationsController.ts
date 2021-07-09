@@ -1,4 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import InvoicesQuotations from 'App/Models/InvoiceQuotation'
 import QuotationValidator from 'App/Validators/QuotationValidator'
 
 export default class QuotationsController {
@@ -39,13 +40,13 @@ export default class QuotationsController {
       showImages,
     } = await request.validate(QuotationValidator)
 
-    /* if (requestedCompany) {
-      await bouncer.with('ProductPolicy').authorize('create')
+    if (requestedCompany) {
+      await bouncer.with('InvoiceQuotationPolicy').authorize('createQuotation')
 
-      let newProduct: Product | null = null
+      let newQuotation: InvoicesQuotations | null = null
       await Database.transaction(async (trx) => {
         requestedCompany.useTransaction(trx)
-        newProduct = await requestedCompany?.related('products').create(
+        newQuotation = await requestedCompany?.related('products').create(
           {
             productTypeId,
             name: productName,
@@ -64,9 +65,9 @@ export default class QuotationsController {
 
         // TODO: implement products/company_product cache/clearing of cache
 
-        return response.created({ data: newProduct?.id })
+        return response.created({ data: newQuotation?.id })
       })
-    } else return response.abort({ message: 'Company not found' }) */
+    } else return response.abort({ message: 'Company not found' })
   }
 
   public async show({}: HttpContextContract) {}

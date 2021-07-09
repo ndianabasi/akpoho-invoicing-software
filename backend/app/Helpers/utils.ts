@@ -4,15 +4,18 @@ import { Readable } from 'stream'
 import slugify from 'slugify'
 import Env from '@ioc:Adonis/Core/Env'
 import {
-  DiscountType,
   ItemCollectionType,
   PRODUCT_OWNERSHIP_TYPE,
   QUOTATION_PRODUCT_NAME_TYPE,
-  RoundingType,
-  ThousandSeparator,
   UnitOfMeasurement,
 } from 'types/inventory'
 import { ADDRESS_TYPE } from 'types/customer'
+import {
+  DiscountType,
+  InvoiceQuotationType,
+  RoundingType,
+  ThousandSeparator,
+} from 'App/Models/InvoiceQuotation'
 
 export const STANDARD_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss'
 export const TIMEZONE_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss ZZ'
@@ -106,3 +109,5 @@ export const unitOfMeasurementTypes: Array<ItemCollectionType | UnitOfMeasuremen
   'cu.ft',
   'cu.in',
 ]
+
+export const InvoiceQuotationTypes: InvoiceQuotationType[] = ['invoice', 'quotation']

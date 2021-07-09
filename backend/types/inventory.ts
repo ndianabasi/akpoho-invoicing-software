@@ -28,7 +28,3 @@ export type ItemCollectionType =
   | 'dozen(s)'
   | 'wrap(s)'
   | 'roll(s)'
-
-export type DiscountType = 'percentage' | 'number'
-export type RoundingType = 'none' | 'nearest' | 'down' | 'up'
-export type ThousandSeparator = 'comma' | 'period' | 'none' | 'space'

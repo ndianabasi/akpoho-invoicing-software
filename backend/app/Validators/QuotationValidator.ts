@@ -27,7 +27,7 @@ export default class QuotationValidator {
         description: schema.string.optional({ escape: true, trim: true }),
         qty: schema.number(),
         UOM: schema.enum(unitOfMeasurementTypes),
-        collectionType: schema.enum(itemCollectionTypes),
+        collectionTypeId: schema.enum(itemCollectionTypes),
         groupQty: schema.number.optional(),
         unitPrice: schema.number(),
         unitDiscount: schema.number.optional(),
@@ -97,7 +97,7 @@ export default class QuotationValidator {
     'items.*.productName.maxLength': 'Maximum length of product name is {{options.choices}}.',
     'items.*.qty.required': 'Quantity is required for an item',
     'items.*.UOM.required': 'Unit of measurement is required for an item',
-    'items.*.collectionType.enum': 'Invalid collection type was provided for an item.',
+    'items.*.collectionTypeId.enum': 'Invalid collection type was provided for an item.',
     'items.*.unitPrice.required': 'Unit Price is required for an item',
     'items.*.discountType.enum': 'Invalid discount type was provided for an item.',
     'items.*.files.*.file':
