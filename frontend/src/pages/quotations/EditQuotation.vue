@@ -13,38 +13,12 @@
               <q-input
                 v-model="form.date"
                 label="Quotation Date"
-                filled
-                fill-mask
-                mask="####-##-##"
+                stack-label
                 dense
-                class="q-mb-sm-sm q-mb-md-md"
-              >
-                <template #append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy
-                      ref="qDateProxy"
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date
-                        v-model="form.date"
-                        today-btn
-                        minimal
-                        mask="YYYY-MM-DD"
-                      >
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
+                filled
+                type="date"
+                for="date"
+              />
             </div>
             <div class="col col-md-2 col-lg-2 col-sm-6 col-xs-12">
               <q-input
@@ -59,6 +33,7 @@
                 autocomplete="off"
                 class="q-mb-sm-sm q-mb-md-md"
                 dense
+                :debounce="250"
               >
                 <!-- <template #error>
                   {{ formErrors[field.name] }}
@@ -220,6 +195,7 @@
                 autocomplete="off"
                 class="q-mb-sm-sm q-mb-md-sm"
                 dense
+                :debounce="250"
               >
                 <!-- <template #error>
                   {{ formErrors[field.name] }}
@@ -242,6 +218,7 @@
                 autocomplete="off"
                 class="q-mb-sm-sm q-mb-md-sm"
                 dense
+                :debounce="250"
               >
                 <!-- <template #error>
                   {{ formErrors[field.name] }}
@@ -344,6 +321,7 @@
                         dense
                         :aria-disabled="col.disabled"
                         :disable="col.disabled"
+                        :debounce="250"
                       >
                         <template #prepend>
                           <div
@@ -408,6 +386,7 @@
                               dense
                               class="group-qty-input"
                               autogrow
+                              :debounce="250"
                             />
                             <q-select
                               v-model="form.items[props.rowIndex].UOM"
@@ -515,8 +494,6 @@
                         :async-filter-mode="
                           form.items[props.rowIndex].productNameType ===
                           'real_product'
-                            ? col.asyncFilterMode
-                            : undefined
                         "
                       >
                         <template #append>
@@ -776,6 +753,7 @@
                           input-class=" text-right"
                           stack-label
                           autogrow
+                          :debounce="250"
                         />
                       </q-td>
                       <q-td class="text-right additional-fee-cell">
@@ -787,6 +765,7 @@
                           input-class=" text-right"
                           stack-label
                           autogrow
+                          :debounce="250"
                         />
                       </q-td>
                       <q-td auto-width>
@@ -892,6 +871,7 @@
                       class="tax-input"
                       input-class=" text-right"
                       stack-label
+                      :debounce="250"
                     >
                       <template #append>
                         <div class="text-body2">%</div>
@@ -1058,6 +1038,7 @@
                       autogrow
                       label="Discount amount"
                       stack-label
+                      :debounce="250"
                     >
                       <template
                         v-if="form.additionalDiscountType === 'percentage'"
@@ -1582,6 +1563,9 @@ export default defineComponent({
       (form) => {
         itemTotals.value = getTotalArray(form.items);
         itemLineDiscounts.value = getLineDiscountArray(form.items);
+
+        // Update vuex store
+        //store.commit('invoices_quotations/SET_QUOTATION_FORM', form);
       },
       { deep: true }
     );
@@ -1670,6 +1654,7 @@ export default defineComponent({
     );
 
     const taxAmount = computed(() => {
+      if(form.amountsAreTaxInclusive) return 0
       const tax = (grandTotalBeforeTax.value * form?.taxPercentage ?? 0) / 100;
       return Number(
         getRoundedTotal(tax, form.roundAmountType, form.numberOfDecimals)
@@ -1704,7 +1689,7 @@ export default defineComponent({
         const isCreationMode = props.creationMode;
         void store
           .dispatch(
-            `quotations/${
+            `invoices_quotations/${
               isCreationMode ? 'CREATE_QUOTATION' : 'EDIT_QUOTATION'
             }`,
             isCreationMode ? form : { form, quotationId: props.quotationId }

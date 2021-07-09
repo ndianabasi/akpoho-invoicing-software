@@ -20,7 +20,7 @@ export default class QuotationValidator {
           rules.maxLength(50),
         ]),
         productNameType: schema.enum(QUOTATION_PRODUCT_NAME_TYPES),
-        productName: schema.string({ escape: true, trim: true }, [
+        productName: schema.string.optional({ escape: true, trim: true }, [
           rules.minLength(6),
           rules.maxLength(50),
         ]),
@@ -28,9 +28,9 @@ export default class QuotationValidator {
         qty: schema.number(),
         UOM: schema.enum(unitOfMeasurementTypes),
         collectionType: schema.enum(itemCollectionTypes),
-        groupQty: schema.number(),
+        groupQty: schema.number.optional(),
         unitPrice: schema.number(),
-        unitDiscount: schema.number(),
+        unitDiscount: schema.number.optional(),
         discountType: schema.enum(discountTypes),
         files: schema.array.optional().members(
           schema.file({
@@ -89,6 +89,33 @@ export default class QuotationValidator {
 
   public messages = {
     'items.required': 'Items are required. You cannot submit an empty list of items.',
-    'items.*.productId.required': 'Product is required.',
+    'items.*.productId.required': 'Product name/id is required for an item.',
+    'items.*.productId.minLength': 'Minimum length of product name/id is {{options.choices}}.',
+    'items.*.productId.maxLength': 'Maximum length of product name/id is {{options.choices}}.',
+    'items.*.productNameType.enum': 'Invalid product type was provided for an item.',
+    'items.*.productName.minLength': 'Minimum length of product name is {{options.choices}}.',
+    'items.*.productName.maxLength': 'Maximum length of product name is {{options.choices}}.',
+    'items.*.qty.required': 'Quantity is required for an item',
+    'items.*.UOM.required': 'Unit of measurement is required for an item',
+    'items.*.collectionType.enum': 'Invalid collection type was provided for an item.',
+    'items.*.unitPrice.required': 'Unit Price is required for an item',
+    'items.*.discountType.enum': 'Invalid discount type was provided for an item.',
+    'items.*.files.*.file':
+      'Provided file is invalid for an item. Size should be 2MB maximum and accepted file types are JPG, GIF, & PNG.',
+    'additionalFees.*.name.minLength':
+      'Minimum length of additional fee name is {{options.choices}}',
+    'additionalFees.*.name.maxLength':
+      'Maximum length of additional fee name is {{options.choices}}',
+    'date.required': 'Quotation Date is required',
+    'code.minLength': 'Minimum length of quotation code is {{options.choices}}',
+    'code.maxLength': 'Maximum length of quotation code is {{options.choices}}',
+    'customerId.required': 'Customer is required',
+    'customerId.uuid': 'Customer is invalid',
+    'customerShippingAddressId.uuid': 'Customer Shipping Address is invalid',
+    'customerBillingAddressId.uuid': 'Customer Billing Address is invalid',
+    'title.required': 'Quotation Title is required',
+    'title.minLength': 'Minimum length of quotation Title is {{options.choices}}',
+    'title.maxLength': 'Maximum length of quotation Title is {{options.choices}}',
+    'theme.uuid': 'Theme is invalid',
   }
 }
