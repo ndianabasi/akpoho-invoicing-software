@@ -330,6 +330,7 @@
                             v-if="col.name === 'qty' && !form.simpleQuantities"
                             class="
                               row
+                              no-wrap
                               inline
                               justify-center
                               items-center
@@ -1123,12 +1124,9 @@ import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import useResourcePermissions from '../../composables/useResourcePermissions';
 import {
-  CurrentlyViewedCompany,
   SelectionOption,
   PERMISSION,
   TitleInfo,
-  CompanyFormShape,
-  FormSchema,
   CustomerAddressType,
   SelectOption,
   QuotationInvoiceItemShape,
@@ -1140,7 +1138,6 @@ import {
   UnitOfMeasurement,
   productNameTypeOptions,
   ProductNameType,
-  SelectNewValueCallback,
   AdditionalFee,
   discountTypes,
   roundingTypes,
@@ -1152,8 +1149,6 @@ import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useStore } from 'vuex';
 import { useQuasar, format } from 'quasar';
-import { phoneNumberRegex } from '../../helpers/utils';
-import { isEqual } from 'lodash';
 import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
 import ProductNameTypeSelect from '../../components/ProductNameTypeSelect.vue';
 //import Sortable from 'sortablejs';
@@ -1649,7 +1644,6 @@ export default defineComponent({
       : ref(null);
 
     // Valiation section starts
-
     const formSchema = computed(() =>
       yup.object({
         items: yup
