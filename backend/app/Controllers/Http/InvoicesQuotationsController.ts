@@ -19,6 +19,7 @@ export default class QuotationsController {
       customer,
       tax_percentage,
       simple_quantities,
+      date,
       show_discounts,
       created_at,
       updated_at,
@@ -28,6 +29,7 @@ export default class QuotationsController {
     const searchQuery = {
       id: id ? id : null,
       title: title ? title : null,
+      date: date ? date : null,
       customer: customer ? customer : null,
       tax_percentage: tax_percentage ? tax_percentage : null,
       simple_quantities: simple_quantities ? simple_quantities : null,
@@ -40,6 +42,7 @@ export default class QuotationsController {
       .select(
         'invoices_quotations.id',
         'invoices_quotations.title',
+        'invoices_quotations.date',
         'invoices_quotations.tax_percentage',
         'invoices_quotations.simple_quantities',
         'invoices_quotations.show_discounts',

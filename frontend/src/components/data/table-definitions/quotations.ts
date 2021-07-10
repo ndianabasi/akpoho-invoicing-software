@@ -11,6 +11,7 @@ interface Headers extends TableRow {
 enum Columns {
   id = 'id',
   title = 'title',
+  date = 'date',
   customer = 'customer',
   tax_percentage = 'tax_percentage',
   simple_quantities = 'simple_quantities',
@@ -38,6 +39,16 @@ const columns: Headers[] = [
     sortable: true,
     filterable: true,
     filterInputType: 'text',
+  },
+  {
+    name: Columns.date,
+    required: true,
+    label: 'Date',
+    align: 'center',
+    field: Columns.date,
+    sortable: true,
+    filterable: true,
+    filterInputType: 'date',
   },
   {
     name: Columns.customer,
