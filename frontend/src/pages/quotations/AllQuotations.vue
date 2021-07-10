@@ -10,14 +10,16 @@
     route-param="quotationId"
     row-delete-action-type="quotations/DELETE_QUOTATION"
     entity-name="Quotation"
-    table-data-fetch-end-point="quotations"
+    table-data-fetch-end-point="invoices-quotations"
+    is-company-specific
     show-new-route-button
     :new-route-object="{
-      routeName: 'add_quotation',
+      routeName: 'create_quotation',
       icon: 'person_add_alt',
       title: 'New Quotation',
     }"
     :resource-action-permissions="resourceActionPermissions"
+    :extra-query-strings="{ type: 'quotation' }"
   ></quasar-table>
 </template>
 
@@ -25,8 +27,7 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
-import { defineComponent, reactive, ref, computed } from 'vue';
-import { useStore } from 'vuex';
+import { defineComponent, reactive, ref } from 'vue';
 import quotationColumns from '../../components/data/table-definitions/quotations';
 import QuasarTable from '../../components/QuasarTable.vue';
 import { PERMISSION } from '../../store/types';
@@ -38,19 +39,11 @@ export default defineComponent({
   },
   setup() {
     const tableName = ref('All Quotations');
-    const store = useStore();
 
     const defaultSort = {
-      sortBy: 'email',
+      sortBy: 'title',
       descending: false,
     };
-
-    const tableDataFetchActionType = ref('customers/FETCH_ALL_CUSTOMERS');
-    const tableDataGetterType = ref('customers/GET_ALL_CUSTOMERS');
-
-    const customers = computed(
-      () => store.getters['customers/GET_ALL_CUSTOMERS']
-    );
 
     const data = reactive({
       columns: quotationColumns,
@@ -60,10 +53,7 @@ export default defineComponent({
     return {
       tableName,
       columns: data.columns,
-      rows: customers,
       stickyTable: data.stickyTable,
-      tableDataFetchActionType,
-      tableDataGetterType,
       defaultSort,
       resourceActionPermissions: ref({
         new: PERMISSION.CAN_CREATE_QUOTATIONS,

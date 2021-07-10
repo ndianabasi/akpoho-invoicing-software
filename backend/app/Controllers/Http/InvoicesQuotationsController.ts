@@ -1,11 +1,97 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import InvoiceQuotation from 'App/Models/InvoiceQuotation'
 import InvoiceQuotationItem from 'App/Models/InvoiceQuotationItem'
 import UnitOfMeasurement from 'App/Models/UnitOfMeasurement'
 import QuotationValidator from 'App/Validators/QuotationValidator'
 import isUUID from 'validator/lib/isUUID'
 
 export default class QuotationsController {
-  public async index({}: HttpContextContract) {}
+  public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
+    await bouncer.with('CustomerPolicy').authorize('list', requestedCompany!)
+
+    const {
+      page,
+      descending,
+      perPage,
+      sortBy,
+      id,
+      title,
+      customer,
+      tax_percentage,
+      simple_quantities,
+      show_discounts,
+      created_at,
+      updated_at,
+      type,
+    } = request.qs()
+
+    const searchQuery = {
+      id: id ? id : null,
+      title: title ? title : null,
+      customer: customer ? customer : null,
+      tax_percentage: tax_percentage ? tax_percentage : null,
+      simple_quantities: simple_quantities ? simple_quantities : null,
+      show_discounts: show_discounts ? show_discounts : null,
+      created_at: created_at ? created_at : null,
+      updated_at: updated_at ? updated_at : null,
+    }
+
+    let subquery = InvoiceQuotation.query()
+      .select(
+        'invoices_quotations.id',
+        'invoices_quotations.title',
+        'invoices_quotations.tax_percentage',
+        'invoices_quotations.simple_quantities',
+        'invoices_quotations.show_discounts',
+        'invoices_quotations.created_at',
+        'invoices_quotations.updated_at',
+        'customers.is_corporate',
+        'customers.first_name',
+        'customers.last_name',
+        'customers.corporate_has_rep',
+        'customers.company_name',
+        'customers.company_phone'
+      )
+      .where('invoices_quotations.company_id', requestedCompany?.id ?? '')
+      .where({ type })
+      .leftJoin('customers', (query) =>
+        query.on('customers.id', '=', 'invoices_quotations.customer_id')
+      )
+
+    if (sortBy) {
+      subquery = subquery?.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
+    }
+
+    if (searchQuery) {
+      subquery?.where((query) => {
+        for (const param in searchQuery) {
+          if (Object.prototype.hasOwnProperty.call(searchQuery, param)) {
+            let value = searchQuery[param]
+            if (value) {
+              if (value === 'true') value = true
+              if (value === 'false') value = false
+
+              if (param === 'customer') {
+                query
+                  .where('customers.first_name', '=', `%${value}%`)
+                  .orWhere('customers.last_name', '=', `%${value}%`)
+                  .orWhere('customers.company_name', '=', `%${value}%`)
+              } else {
+                query.where(`invoices_quotations.${param}`, value)
+                if (typeof value === 'string') {
+                  query.orWhere(`invoices_quotations.${param}`, 'like', `%${value}%`)
+                }
+              }
+            }
+          }
+        }
+      })
+    }
+
+    const quotations = await subquery?.paginate(page ? page : 1, perPage ? perPage : 20)
+
+    return response.ok({ data: quotations })
+  }
 
   public async create({}: HttpContextContract) {}
 

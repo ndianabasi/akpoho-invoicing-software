@@ -501,6 +501,11 @@ export default defineComponent({
       required: false,
       default: () => [],
     },
+    extraQueryStrings: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
 
   setup(props) {
@@ -621,7 +626,9 @@ export default defineComponent({
               }
             : {},
           entityEndPoint: props.tableDataFetchEndPoint,
-          queryObject: props.useMultiFilter ? queryObject : {},
+          queryObject: props.useMultiFilter
+            ? { ...queryObject, ...props.extraQueryStrings }
+            : { ...props.extraQueryStrings },
           isCompanySpecific: props.isCompanySpecific,
         })
         .then((response: ResponseData) => {

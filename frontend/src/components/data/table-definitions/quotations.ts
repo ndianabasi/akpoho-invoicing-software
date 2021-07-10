@@ -1,160 +1,109 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { computed, watchEffect, onBeforeUnmount } from 'vue';
-import { store } from 'src/store';
-import { SelectOption } from 'src/store/types';
+import { onBeforeUnmount } from 'vue';
 import { TableRow } from '../../../types/table';
 
-interface CompanyHeaders extends TableRow {
-  name: CompanyColumns;
-  field: CompanyColumns;
+interface Headers extends TableRow {
+  name: Columns;
+  field: Columns;
 }
 
-enum CompanyColumns {
+enum Columns {
   id = 'id',
-  email = 'email',
-  name = 'name',
-  phone_number = 'phone_number',
-  address = 'address',
-  city = 'city',
-  is_approved = 'is_approved',
-  approved_at = 'approved_at',
+  title = 'title',
+  customer = 'customer',
+  tax_percentage = 'tax_percentage',
+  simple_quantities = 'simple_quantities',
+  show_discounts = 'show_discounts',
   created_at = 'created_at',
   updated_at = 'updated_at',
-  type = 'type',
-  company_size = 'company_size',
-  country = 'country',
-  state = 'state',
 }
 
-const stopFetchCompanySizesForSelect = watchEffect(() => {
-  void store.dispatch('companies/FETCH_COMPANY_SIZES_FOR_SELECT');
-});
-
-const companySizes = computed(
-  () =>
-    store.getters['companies/GET_COMPANY_SIZES_FOR_SELECT'] as SelectOption[]
-);
-
-const columns: CompanyHeaders[] = [
+const columns: Headers[] = [
   {
-    name: CompanyColumns.id,
+    name: Columns.id,
     required: false,
     label: 'Company ID',
     align: 'center',
-    field: CompanyColumns.id,
+    field: Columns.id,
     filterable: true,
     filterInputType: 'text',
   },
   {
-    name: CompanyColumns.name,
+    name: Columns.title,
     required: true,
-    label: 'Name',
+    label: 'Title',
     align: 'center',
-    field: CompanyColumns.name,
+    field: Columns.title,
     sortable: true,
     filterable: true,
     filterInputType: 'text',
   },
   {
-    name: CompanyColumns.email,
+    name: Columns.customer,
     required: true,
-    label: 'Email Address',
+    label: 'Customer Name',
     align: 'center',
-    field: CompanyColumns.email,
+    field: Columns.customer,
     sortable: true,
     filterable: true,
     filterInputType: 'text',
   },
   {
-    name: CompanyColumns.address,
+    name: Columns.tax_percentage,
     required: true,
-    label: 'Address',
+    label: 'Tax Percentage',
     align: 'center',
-    field: CompanyColumns.address,
-    sortable: false,
-    filterable: false,
+    field: Columns.tax_percentage,
+    sortable: true,
+    filterable: true,
+    filterInputType: 'text',
   },
   {
-    name: CompanyColumns.type,
+    name: Columns.simple_quantities,
     required: true,
-    label: 'Company Type',
+    label: 'Uses Simple Quantities?',
     align: 'center',
-    field: CompanyColumns.type,
+    field: Columns.simple_quantities,
     sortable: true,
     filterable: true,
     filterInputType: 'select',
     filterOptions: [
       { label: '', value: null },
-      { label: 'Personal', value: 'personal' },
-      { label: 'Corporate', value: 'corporate' },
+      { label: 'Yes', value: true },
+      { label: 'No', value: false },
     ],
   },
   {
-    name: CompanyColumns.phone_number,
+    name: Columns.show_discounts,
     required: true,
-    label: 'Phone Number',
+    label: 'Discounts Visible?',
     align: 'center',
-    field: CompanyColumns.phone_number,
-    sortable: false,
-    filterable: false,
-  },
-  {
-    name: CompanyColumns.city,
-    required: false,
-    label: 'City',
-    align: 'center',
-    field: CompanyColumns.city,
-    sortable: true,
-    filterable: true,
-    filterInputType: 'text',
-  },
-  {
-    name: CompanyColumns.company_size,
-    required: false,
-    label: 'Company Size',
-    align: 'center',
-    field: CompanyColumns.company_size,
+    field: Columns.show_discounts,
     sortable: true,
     filterable: true,
     filterInputType: 'select',
-    filterOptions: computed(() => companySizes.value).value,
+    filterOptions: [
+      { label: '', value: null },
+      { label: 'Yes', value: true },
+      { label: 'No', value: false },
+    ],
   },
   {
-    name: CompanyColumns.state,
-    required: false,
-    label: 'State',
-    align: 'center',
-    field: CompanyColumns.state,
-    sortable: true,
-    filterable: true,
-    filterInputType: 'text',
-  },
-  {
-    name: CompanyColumns.country,
-    required: false,
-    label: 'Country',
-    align: 'center',
-    field: CompanyColumns.country,
-    sortable: true,
-    filterable: true,
-    filterInputType: 'text',
-  },
-  {
-    name: CompanyColumns.created_at,
+    name: Columns.created_at,
     required: false,
     label: 'Created At',
     align: 'center',
-    field: CompanyColumns.created_at,
+    field: Columns.created_at,
     sortable: true,
     filterable: true,
     filterInputType: 'date',
   },
   {
-    name: CompanyColumns.updated_at,
+    name: Columns.updated_at,
     required: false,
     label: 'Updated At',
     align: 'center',
-    field: CompanyColumns.updated_at,
+    field: Columns.updated_at,
     sortable: true,
     filterable: true,
     filterInputType: 'date',
@@ -162,7 +111,7 @@ const columns: CompanyHeaders[] = [
 ];
 
 onBeforeUnmount(() => {
-  stopFetchCompanySizesForSelect();
+  //stopFetchCompanySizesForSelect();
 });
 
 export default columns;

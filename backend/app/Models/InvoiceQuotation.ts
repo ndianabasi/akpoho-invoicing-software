@@ -136,13 +136,17 @@ export default class InvoiceQuotation extends BaseModel {
 
   @afterFind()
   public static async parseFormats(invoiceQuotation: InvoiceQuotation) {
-    invoiceQuotation.additionalFees = JSON.parse(invoiceQuotation.additionalFees as string)
+    invoiceQuotation.additionalFees = invoiceQuotation.additionalFees
+      ? JSON.parse(invoiceQuotation.additionalFees as string)
+      : undefined
   }
 
   @afterFetch()
   public static async parseAllFormats(invoiceQuotations: InvoiceQuotation[]) {
     invoiceQuotations.map((invoiceQuotation) => {
-      invoiceQuotation.additionalFees = JSON.parse(invoiceQuotation.additionalFees as string)
+      invoiceQuotation.additionalFees = invoiceQuotation.additionalFees
+        ? JSON.parse(invoiceQuotation.additionalFees as string)
+        : undefined
       return invoiceQuotation
     })
   }
