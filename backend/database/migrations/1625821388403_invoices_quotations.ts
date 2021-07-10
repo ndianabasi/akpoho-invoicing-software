@@ -8,6 +8,7 @@ export default class Quotations extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().unique().index().notNullable()
       table.uuid('customer_id').index().notNullable()
+      // company_id added here in subsequent migration
       table.uuid('product_id').index().notNullable() // dropped
       table.uuid('customer_shipping_address').nullable()
       table.uuid('customer_billing_address').nullable()
@@ -21,7 +22,7 @@ export default class Quotations extends BaseSchema {
       table.boolean('amounts_are_tax_inclusive')
       table.decimal('tax_percentage', 15, 6).nullable()
       table.boolean('round_amounts')
-      table.enum('roundAmountType', roundingTypes)
+      table.enum('round_amount_type', roundingTypes)
       table.boolean('show_discounts')
       table.enum('discount_type', discountTypes)
       table.boolean('set_discount_type_per_line')
@@ -30,9 +31,9 @@ export default class Quotations extends BaseSchema {
       table.integer('number_of_decimals').unsigned()
       table.boolean('use_thousand_separator')
       table.enum('thousand_separator_type', thousandSeparatorTypes)
-      table.boolean('showAdditionalSubtotalDiscount')
+      table.boolean('show_additional_subtotal_discount')
       table.enum('additional_discount_type', discountTypes)
-      table.integer('additional_discount_amount').unsigned()
+      table.decimal('additional_discount_amount', 15, 6).unsigned()
       table.boolean('show_additional_fees')
       table.boolean('show_images')
 

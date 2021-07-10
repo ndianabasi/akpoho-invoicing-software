@@ -24,7 +24,6 @@ export default class IndexSeeder extends BaseSeeder {
     await this.runSeeder(await import('../State'))
     await this.runSeeder(await import('../State_2'))
     await this.runSeeder(await import('../FileProvider'))
-    await this.runSeeder(await import('../UserExtraCompany'))
     await this.runSeeder(await import('../FieldInputValidationType'))
     await this.runSeeder(await import('../FieldInputType'))
     await this.runSeeder(await import('../Attribute'))
@@ -32,5 +31,7 @@ export default class IndexSeeder extends BaseSeeder {
     await this.runSeeder(await import('../ProductType'))
     await this.runSeeder(await import('../Attribute__AttributeGroup'))
     await this.runSeeder(await import('../Company'))
+    await this.runSeeder(await import('../UserExtraCompany'))
+    await this.runSeeder(await import('../UnitOfMeasurementSeeder'))
   }
 }

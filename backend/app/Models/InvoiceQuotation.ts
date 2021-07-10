@@ -14,6 +14,7 @@ import UUIDHook from './Hooks/UUIDHook'
 import Customer from './Customer'
 import CustomerAddress from './CustomerAddress'
 import InvoiceQuotationItem from './InvoiceQuotationItem'
+import Company from './Company'
 
 export type DiscountType = 'percentage' | 'number'
 export type RoundingType = 'none' | 'nearest' | 'down' | 'up'
@@ -32,7 +33,7 @@ export default class InvoiceQuotation extends BaseModel {
   public customerId: string
 
   @column()
-  public productId: string
+  public companyId: string
 
   @column()
   public type: InvoiceQuotationType
@@ -113,7 +114,7 @@ export default class InvoiceQuotation extends BaseModel {
   public showAdditionalFees: boolean
 
   @column()
-  public showImage: boolean
+  public showImages: boolean
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -148,6 +149,9 @@ export default class InvoiceQuotation extends BaseModel {
 
   @belongsTo(() => Customer)
   public customer: BelongsTo<typeof Customer>
+
+  @belongsTo(() => Company)
+  public company: BelongsTo<typeof Company>
 
   @belongsTo(() => CustomerAddress, {
     foreignKey: 'customerShippingAddress',

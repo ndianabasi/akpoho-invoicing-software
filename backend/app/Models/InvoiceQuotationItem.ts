@@ -28,10 +28,10 @@ export default class InvoiceQuotationItem extends BaseModel {
   public productId: string
 
   @column()
-  public productName: string
+  public productName?: string
 
   @column()
-  public description: string
+  public description?: string
 
   @column()
   public qty: number
@@ -43,7 +43,7 @@ export default class InvoiceQuotationItem extends BaseModel {
   public collectionTypeId: number
 
   @column()
-  public groupQty: number
+  public groupQty?: number
 
   @column()
   public unitPrice: number
@@ -52,7 +52,7 @@ export default class InvoiceQuotationItem extends BaseModel {
   public unitDiscount: number
 
   @column()
-  public discountType: DiscountType
+  public discountType?: DiscountType
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -65,8 +65,21 @@ export default class InvoiceQuotationItem extends BaseModel {
     UUIDHook.generateUUID(model, 'id')
   }
 
-  @belongsTo(() => InvoiceQuotation, { foreignKey: 'invoicesQuotationsId' })
-  public invoiceQuotation: BelongsTo<typeof InvoiceQuotation>
+  @belongsTo(() => InvoiceQuotation, {
+    foreignKey: 'invoicesQuotationsId',
+    onQuery: (query) => {
+      query.where('type', 'invoice')
+    },
+  })
+  public invoice: BelongsTo<typeof InvoiceQuotation>
+
+  @belongsTo(() => InvoiceQuotation, {
+    foreignKey: 'invoicesQuotationsId',
+    onQuery: (query) => {
+      query.where('type', 'quotation')
+    },
+  })
+  public quotation: BelongsTo<typeof InvoiceQuotation>
 
   @belongsTo(() => Product)
   public product: BelongsTo<typeof Product>
@@ -74,7 +87,12 @@ export default class InvoiceQuotationItem extends BaseModel {
   @belongsTo(() => UnitOfMeasurement, { foreignKey: 'unitOfMeasurementId' })
   public unitofMeasurement: BelongsTo<typeof UnitOfMeasurement>
 
-  @belongsTo(() => UnitOfMeasurement, { foreignKey: 'collectionTypeId' })
+  @belongsTo(() => UnitOfMeasurement, {
+    foreignKey: 'collectionTypeId',
+    onQuery: (query) => {
+      query.where('type', 'collection')
+    },
+  })
   public collectionType: BelongsTo<typeof UnitOfMeasurement>
 
   @manyToMany(() => UploadedFile, {

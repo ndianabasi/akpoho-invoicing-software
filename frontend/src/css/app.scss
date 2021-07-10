@@ -280,7 +280,11 @@ input[type='file'] {
   }
 
   .desc-column {
-    min-width: 350px !important;
+    min-width: 400px !important;
+    .q-field__native {
+      max-height: 250px;
+      overflow-y: auto;
+    }
   }
 
   .product-id-column {
@@ -360,7 +364,8 @@ input[type='file'] {
     background: rgba(0, 0, 0, 0.05);
     border-radius: 4px 4px 0 0;
     line-height: 18px;
-    height: 100%;
+    min-height: 36px;
+    height: 40px;
     padding-right: 0.75rem;
   }
 
