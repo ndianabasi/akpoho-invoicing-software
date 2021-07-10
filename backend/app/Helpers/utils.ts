@@ -7,7 +7,6 @@ import {
   ItemCollectionType,
   PRODUCT_OWNERSHIP_TYPE,
   QUOTATION_PRODUCT_NAME_TYPE,
-  UnitOfMeasurement,
 } from 'types/inventory'
 import { ADDRESS_TYPE } from 'types/customer'
 import {
@@ -93,7 +92,7 @@ export const itemCollectionTypes: ItemCollectionType[] = [
   'roll(s)',
 ]
 
-export const unitOfMeasurementTypes: Array<ItemCollectionType | UnitOfMeasurement> = [
+export const unitOfMeasurementTypes = [
   ...itemCollectionTypes,
   'kg',
   'lb',
