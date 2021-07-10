@@ -41,8 +41,8 @@ export default defineComponent({
     const tableName = ref('All Quotations');
 
     const defaultSort = {
-      sortBy: 'title',
-      descending: false,
+      sortBy: 'date',
+      descending: true,
     };
 
     const data = reactive({

@@ -3,13 +3,40 @@ import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import InvoiceQuotationItem from './InvoiceQuotationItem'
 
 export type UnitOfMeasurementTypes = 'collection' | 'discrete'
+export type UnitsOfMeasurement =
+  | 'kg'
+  | 'lb'
+  | 'm'
+  | 'yd'
+  | 'ft'
+  | 'in'
+  | 'cm'
+  | 'sq.m'
+  | 'sq.ft'
+  | 'sq.in'
+  | 'cu.m'
+  | 'cu.ft'
+  | 'cu.in'
+
+export type ItemCollectionType =
+  | 'set(s)'
+  | 'piece(s)'
+  | 'pack(s)'
+  | 'carton(s)'
+  | 'box(es)'
+  | 'bottle(s)'
+  | 'truck(s)'
+  | 'container(s)'
+  | 'dozen(s)'
+  | 'wrap(s)'
+  | 'roll(s)'
 
 export default class UnitOfMeasurement extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
   @column()
-  public name: string
+  public name: ItemCollectionType | UnitsOfMeasurement
 
   @column()
   public type: UnitOfMeasurementTypes

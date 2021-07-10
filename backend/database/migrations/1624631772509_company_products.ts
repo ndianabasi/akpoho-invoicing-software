@@ -1,5 +1,6 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
-import { PRODUCT_OWNERSHIP_TYPE, PRODUCT_OWNERSHIP_TYPES } from 'App/Helpers/utils'
+import { PRODUCT_OWNERSHIP_TYPES } from 'App/Helpers/utils'
+import { PRODUCT_OWNERSHIP_TYPE } from 'types/inventory'
 
 export default class CompanyProducts extends BaseSchema {
   protected tableName = 'company_product'

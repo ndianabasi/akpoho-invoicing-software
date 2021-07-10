@@ -3,11 +3,7 @@
 import { Readable } from 'stream'
 import slugify from 'slugify'
 import Env from '@ioc:Adonis/Core/Env'
-import {
-  ItemCollectionType,
-  PRODUCT_OWNERSHIP_TYPE,
-  QUOTATION_PRODUCT_NAME_TYPE,
-} from 'types/inventory'
+import { PRODUCT_OWNERSHIP_TYPE, QUOTATION_PRODUCT_NAME_TYPE } from 'types/inventory'
 import { ADDRESS_TYPE } from 'types/customer'
 import {
   DiscountType,
@@ -15,6 +11,7 @@ import {
   RoundingType,
   ThousandSeparator,
 } from 'App/Models/InvoiceQuotation'
+import { ItemCollectionType } from 'App/Models/UnitOfMeasurement'
 
 export const STANDARD_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss'
 export const TIMEZONE_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss ZZ'
