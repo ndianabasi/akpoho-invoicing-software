@@ -117,8 +117,8 @@ export default class UploadedFile extends BaseModel {
   @manyToMany(() => InvoiceQuotationItem, {
     pivotTable: 'invoices_quotations_items_files',
     pivotTimestamps: true,
-    pivotForeignKey: 'uploadedFileId',
-    pivotRelatedForeignKey: 'invoicesQuotationsItemId',
+    pivotForeignKey: 'uploaded_file_id',
+    pivotRelatedForeignKey: 'invoices_quotations_item_id',
   })
   public invoiceQuotationItems: ManyToMany<typeof InvoiceQuotationItem>
 

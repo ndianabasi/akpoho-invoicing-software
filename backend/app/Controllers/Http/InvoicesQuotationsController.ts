@@ -7,7 +7,7 @@ import isUUID from 'validator/lib/isUUID'
 
 export default class QuotationsController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
-    await bouncer.with('CustomerPolicy').authorize('list', requestedCompany!)
+    await bouncer.with('InvoiceQuotationPolicy').authorize('list')
 
     const {
       page,
@@ -100,8 +100,6 @@ export default class QuotationsController {
     return response.ok({ data: quotations })
   }
 
-  public async create({}: HttpContextContract) {}
-
   public async store({ response, request, bouncer, requestedCompany }: HttpContextContract) {
     const {
       items,
@@ -136,7 +134,7 @@ export default class QuotationsController {
     } = await request.validate(QuotationValidator)
 
     if (requestedCompany) {
-      await bouncer.with('InvoiceQuotationPolicy').authorize('createQuotation')
+      await bouncer.with('InvoiceQuotationPolicy').authorize('create')
 
       const newQuotation = await requestedCompany?.related('quotations').create({
         additionalFees,
@@ -181,6 +179,7 @@ export default class QuotationsController {
 
         // 2. Get other fields
         itemCollector.description = item.description
+        itemCollector.sortOrder = i + 1
         itemCollector.qty = item.qty
         itemCollector.groupQty = item.groupQty
         itemCollector.unitPrice = item.unitPrice
@@ -207,9 +206,24 @@ export default class QuotationsController {
     } else return response.abort({ message: 'Company not found' })
   }
 
-  public async show({}: HttpContextContract) {}
+  public async show({ response, requestedInvoiceQuotation, bouncer }: HttpContextContract) {
+    // Check authorisation
+    await bouncer.with('InvoiceQuotationPolicy').authorize('view', requestedInvoiceQuotation!)
 
-  public async edit({}: HttpContextContract) {}
+    await requestedInvoiceQuotation?.load('company')
+    await requestedInvoiceQuotation?.load('customer')
+    await requestedInvoiceQuotation?.load('shippingAddress')
+    await requestedInvoiceQuotation?.load('billingAddress')
+    await requestedInvoiceQuotation?.load('items', (itemsQuery) => {
+      itemsQuery
+        .preload('collectionType')
+        .preload('files')
+        .preload('product')
+        .preload('unitOfMeasurement')
+    })
+
+    return response.ok({ data: requestedInvoiceQuotation })
+  }
 
   public async update({}: HttpContextContract) {}
 

@@ -1149,13 +1149,13 @@ import {
   reactive,
   nextTick,
   onMounted,
+  unref,
 } from 'vue';
 
 import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import useResourcePermissions from '../../composables/useResourcePermissions';
 import {
-  SelectionOption,
   PERMISSION,
   TitleInfo,
   CustomerAddressType,
@@ -1171,6 +1171,7 @@ import {
   ProductNameType,
   AdditionalFee,
   CustomerAddressForSelectPayload,
+  CurrentlyViewedInvoiceQuotation,
 } from '../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../components/QuasarSelect';
@@ -1337,6 +1338,14 @@ export default defineComponent({
       { label: 'Comma', value: 'comma' },
       { label: 'Period', value: 'period' },
     ]);
+
+    const currentInvoiceQuotation = computed({
+      get: () =>
+        store.getters[
+          'invoices_quotations/GET_CURRENTLY_VIEWED_INVOICE_QUOTATION'
+        ] as CurrentlyViewedInvoiceQuotation,
+      set: (value) => value,
+    });
 
     const customerBillingAddresses = computed({
       get: () =>
@@ -1816,31 +1825,38 @@ export default defineComponent({
       }
     );
 
-    /* const stopFetchCurrentlyViewedCompany = watchEffect(() => {
+    const stopFetchCurrentlyViewedInvoiceQuotation = watchEffect(() => {
       if (!props.creationMode) {
         void store
-          .dispatch('companies/FETCH_CURRENTLY_VIEWED_COMPANY', {
-            companyId: props.companyId,
-          })
+          .dispatch(
+            'invoices_quotations/FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION',
+            {
+              id: props.quotationId,
+            }
+          )
           .then(async () => {
-            currentCompany.value = unref(
+            currentInvoiceQuotation.value = unref(
               computed(
                 () =>
                   store.getters[
-                    'companies/GET_CURRENTLY_VIEWED_COMPANY'
-                  ] as CurrentlyViewedCompany
+                    'invoices_quotations/GET_CURRENTLY_VIEWED_INVOICE_QUOTATION'
+                  ] as CurrentlyViewedInvoiceQuotation
               )
             );
 
-            isPersonalBrand.value = currentCompany?.value?.type === 'personal';
-            name.value = currentCompany?.value?.name ?? '';
-            email.value = currentCompany?.value?.email ?? '';
-            phoneNumber.value = currentCompany?.value?.phone_number ?? '';
-            address.value = currentCompany?.value?.address ?? '';
-            city.value = currentCompany?.value?.city ?? '';
-            size.value = currentCompany?.value?.companySize?.id ?? null;
-            website.value = currentCompany?.value?.website ?? '';
-            countryId.value = currentCompany?.value?.country?.id ?? null;
+            isPersonalBrand.value =
+              currentInvoiceQuotation?.value?.type === 'personal';
+            name.value = currentInvoiceQuotation?.value?.name ?? '';
+            email.value = currentInvoiceQuotation?.value?.email ?? '';
+            phoneNumber.value =
+              currentInvoiceQuotation?.value?.phone_number ?? '';
+            address.value = currentInvoiceQuotation?.value?.address ?? '';
+            city.value = currentInvoiceQuotation?.value?.city ?? '';
+            size.value =
+              currentInvoiceQuotation?.value?.companySize?.id ?? null;
+            website.value = currentInvoiceQuotation?.value?.website ?? '';
+            countryId.value =
+              currentInvoiceQuotation?.value?.country?.id ?? null;
             // Fetch the states for the current country
             if (countryId.value) {
               await store
@@ -1849,15 +1865,17 @@ export default defineComponent({
                 })
                 .then(() => {
                   // Then update the current state
-                  stateId.value = currentCompany?.value?.state?.id ?? null;
+                  stateId.value =
+                    currentInvoiceQuotation?.value?.state?.id ?? null;
                 });
             } else {
               // Then update the current state
-              countryId.value = currentCompany?.value?.state?.id ?? null;
+              countryId.value =
+                currentInvoiceQuotation?.value?.state?.id ?? null;
             }
           });
       }
-    }); */
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const CAN_EDIT_QUOTATIONS = computed(() =>
@@ -1915,7 +1933,7 @@ export default defineComponent({
     });
 
     onBeforeMount(() => {
-      //stopFetchCurrentlyViewedCompany();
+      stopFetchCurrentlyViewedInvoiceQuotation();
     });
 
     onBeforeUnmount(() => {

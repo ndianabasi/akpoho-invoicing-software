@@ -51,4 +51,5 @@ Server.middleware.registerNamed({
   findRequestedCustomerAddress: 'App/Middleware/FindRequestedCustomerAddress',
   findRequestedAttributeSet: 'App/Middleware/FindRequestedAttributeSet',
   findRequestedProduct: 'App/Middleware/FindRequestedProduct',
+  findRequestedInvoiceQuotation: 'App/Middleware/FindRequestedInvoiceQuotation',
 })

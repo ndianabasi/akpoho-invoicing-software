@@ -35,6 +35,9 @@ export default class InvoiceQuotationItem extends BaseModel {
   public description?: string
 
   @column()
+  public sortOrder: number
+
+  @column()
   public qty: number
 
   @column()
@@ -86,7 +89,7 @@ export default class InvoiceQuotationItem extends BaseModel {
   public product: BelongsTo<typeof Product>
 
   @belongsTo(() => UnitOfMeasurement, { foreignKey: 'unitOfMeasurementId' })
-  public unitofMeasurement: BelongsTo<typeof UnitOfMeasurement>
+  public unitOfMeasurement: BelongsTo<typeof UnitOfMeasurement>
 
   @belongsTo(() => UnitOfMeasurement, {
     foreignKey: 'collectionTypeId',
@@ -99,8 +102,8 @@ export default class InvoiceQuotationItem extends BaseModel {
   @manyToMany(() => UploadedFile, {
     pivotTable: 'invoices_quotations_items_files',
     pivotTimestamps: true,
-    pivotForeignKey: 'invoicesQuotationsItemId',
-    pivotRelatedForeignKey: 'uploadedFileId',
+    pivotForeignKey: 'invoices_quotations_item_id',
+    pivotRelatedForeignKey: 'uploaded_file_id',
   })
   public files: ManyToMany<typeof UploadedFile>
 }

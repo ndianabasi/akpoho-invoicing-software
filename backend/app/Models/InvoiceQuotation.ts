@@ -15,6 +15,7 @@ import Customer from './Customer'
 import CustomerAddress from './CustomerAddress'
 import InvoiceQuotationItem from './InvoiceQuotationItem'
 import Company from './Company'
+import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 
 export type DiscountType = 'percentage' | 'number'
 export type RoundingType = 'none' | 'nearest' | 'down' | 'up'
@@ -45,7 +46,11 @@ export default class InvoiceQuotation extends BaseModel {
   @column()
   public customerBillingAddress: string
 
-  @column.dateTime()
+  @column.dateTime({
+    serialize(value: DateTime) {
+      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
+    },
+  })
   public date: DateTime
 
   @column()

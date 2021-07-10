@@ -735,3 +735,7 @@ export interface QuotationResultRowInterface {
     company_name: string;
   };
 }
+
+export interface CurrentlyViewedInvoiceQuotation {
+  id: string;
+}

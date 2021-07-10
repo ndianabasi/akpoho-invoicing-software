@@ -2,11 +2,11 @@ import { BasePolicy } from '@ioc:Adonis/Addons/Bouncer'
 import User from 'App/Models/User'
 import PermissionHelper from 'App/Helpers/PermissionHelper'
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
-import Product from 'App/Models/Product'
-import { accessProducts } from 'App/Helpers/PolicyHelper'
+import { accessInvoicesQuotations } from 'App/Helpers/PolicyHelper'
+import InvoiceQuotation from 'App/Models/InvoiceQuotation'
 
 export default class ProductPolicy extends BasePolicy {
-  public async createQuotation(user: User) {
+  public async create(user: User) {
     // Access to requested company is ascertain in the FindRequestedCompany
     // middleware
     const resourcePermission = 'can_create_quotations'
@@ -21,7 +21,7 @@ export default class ProductPolicy extends BasePolicy {
     return Bouncer.deny('You are not permitted to perform this action!')
   }
 
-  public async listQuotation(user: User) {
+  public async list(user: User) {
     // Access to requested company is ascertain in the FindRequestedCompany
     // middleware
     const resourcePermission = 'can_list_quotations'
@@ -36,13 +36,13 @@ export default class ProductPolicy extends BasePolicy {
     return Bouncer.deny('You are not permitted to perform this action!')
   }
 
-  public async viewQuotation(user: User, requestedProduct: Product) {
+  public async view(user: User, requestedInvoiceQuotation: InvoiceQuotation) {
     const resourcePermission = 'can_view_quotations'
-    return await accessProducts(resourcePermission, user, requestedProduct)
+    return await accessInvoicesQuotations(resourcePermission, user, requestedInvoiceQuotation)
   }
 
-  public async editQuotation(user: User, requestedProduct: Product) {
+  public async edit(user: User, requestedInvoiceQuotation: InvoiceQuotation) {
     const resourcePermission = 'can_edit_quotations'
-    return await accessProducts(resourcePermission, user, requestedProduct, 'edit')
+    return await accessInvoicesQuotations(resourcePermission, user, requestedInvoiceQuotation)
   }
 }

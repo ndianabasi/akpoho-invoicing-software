@@ -6,6 +6,7 @@ import Company from 'App/Models/Company'
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
 import AttributeSet from 'App/Models/AttributeSet'
 import Product from 'App/Models/Product'
+import InvoiceQuotation from 'App/Models/InvoiceQuotation'
 
 const accessCompany = async (
   resourcePermission: string,
@@ -279,6 +280,62 @@ export const accessProducts = async (
         return true
       } else return Bouncer.deny('You are not permitted to perform this action!')
     }
+  }
+}
+
+export const accessInvoicesQuotations = async (
+  resourcePermission: string,
+  authUser: User,
+  invoices_quotations: InvoiceQuotation | string[]
+) => {
+  const resourcePermitted = await PermissionHelper.hasResourcePermission({
+    resourcePermission,
+    user: authUser,
+    loggable: true,
+  })
+
+  await authUser.load('companies')
+  const authUserCompanies = authUser.companies
+
+  if (invoices_quotations && Array.isArray(invoices_quotations)) {
+    /**
+     * Array to hold each permitted invoice_quotation
+     */
+    const permitted: boolean[] = []
+
+    for (let i = 0; i < invoices_quotations.length; i++) {
+      const invoiceQuotationId = invoices_quotations[i]
+      const invoiceQuotation = await InvoiceQuotation.findOrFail(invoiceQuotationId)
+
+      // Load invoice_quotation company
+      await invoiceQuotation.load('company')
+      const invoiceQuotationCompany = invoiceQuotation.company
+
+      if (
+        authUserCompanies.some(
+          (authUserCompany) => authUserCompany.id === invoiceQuotationCompany.id
+        ) &&
+        resourcePermitted
+      ) {
+        permitted.push(true)
+      } else permitted.push(false)
+    }
+    if (permitted.every((value) => value === true)) return true
+    else return Bouncer.deny('You are not permitted to perform this action!')
+  } else {
+    const invoiceQuotation = invoices_quotations
+    // Load invoice_quotation company
+    await invoiceQuotation.load('company')
+    const invoiceQuotationCompany = invoiceQuotation.company
+
+    if (
+      authUserCompanies.some(
+        (authUserCompany) => authUserCompany.id === invoiceQuotationCompany.id
+      ) &&
+      resourcePermitted
+    ) {
+      return true
+    } else return Bouncer.deny('You are not permitted to perform this action!')
   }
 }
 

@@ -8,6 +8,12 @@ Route.group(() => {
   // a quotation request from an invoice request
   // The type should be defined in the query string: e.g type=quotation
   Route.get('/:company_id/invoices-quotations', 'InvoicesQuotationsController.index')
+  // Get data for a single quotation or invoice
+  // The type should be defined in the query string
+  Route.get(
+    '/:company_id/invoices-quotations/:invoice_quotation_id',
+    'InvoicesQuotationsController.show'
+  ).middleware('findRequestedInvoiceQuotation')
 })
   .prefix('/v1')
   .middleware('auth')

@@ -15,7 +15,7 @@
     show-new-route-button
     :new-route-object="{
       routeName: 'create_quotation',
-      icon: 'person_add_alt',
+      icon: 'post_add',
       title: 'New Quotation',
     }"
     :resource-action-permissions="resourceActionPermissions"
