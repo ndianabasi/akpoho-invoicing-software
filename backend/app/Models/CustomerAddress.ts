@@ -1,10 +1,19 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, beforeCreate, BelongsTo, belongsTo } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  column,
+  beforeCreate,
+  BelongsTo,
+  belongsTo,
+  hasMany,
+  HasMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import UUIDHook from 'App/Models/Hooks/UUIDHook'
 import Customer from 'App/Models/Customer'
 import Country from 'App/Models/Country'
 import State from 'App/Models/State'
-import { ADDRESS_TYPE, TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import InvoiceQuotation from './InvoiceQuotation'
 
 export default class CustomerAddress extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -25,7 +34,7 @@ export default class CustomerAddress extends BaseModel {
   public postalCode: string
 
   @column()
-  public addressType: ADDRESS_TYPE
+  public addressType: 'billing_address' | 'shipping_address' | 'both'
 
   @column({ serializeAs: null })
   public stateId: number | null
@@ -63,4 +72,10 @@ export default class CustomerAddress extends BaseModel {
 
   @belongsTo(() => State)
   public addressState: BelongsTo<typeof State>
+
+  @hasMany(() => InvoiceQuotation, { foreignKey: 'customerShippingAddress' })
+  public shippingInvoiceQuotation: HasMany<typeof InvoiceQuotation>
+
+  @hasMany(() => InvoiceQuotation, { foreignKey: 'customerBillingAddress' })
+  public billingInvoiceQuotation: HasMany<typeof InvoiceQuotation>
 }

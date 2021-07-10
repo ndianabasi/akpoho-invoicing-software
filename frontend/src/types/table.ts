@@ -8,9 +8,9 @@ import {
 type FieldFn = (row: TableRow) => string;
 //declare type Format = (value: string) => string;
 
-interface Formatter<ValueType, RowType, FormattedType> {
+/* interface Formatter<ValueType, RowType, FormattedType> {
   (value: ValueType, row: RowType): FormattedType;
-}
+} */
 
 declare function SortStringToBooleanFn(arg1: string, arg2: string): boolean;
 declare function SortStringToNumberFn(arg1: string, arg2: string): number;
@@ -28,7 +28,7 @@ export interface TableRow {
     | typeof SortStringToNumberFn;
   field: string | FieldFn | unknown;
   required?: boolean; // Use of `required` is important to avoid breaking QTable
-  format?: Formatter<unknown, unknown, unknown> | null;
+  format?: unknown;
   filterable?: boolean;
   filterInputType?: InputTypes;
   filterOptions?: SelectOption[];

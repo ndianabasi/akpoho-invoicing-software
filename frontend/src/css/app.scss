@@ -231,6 +231,7 @@ input[type='file'] {
 .quotation-invoice-table {
   &.scroll {
     overflow-y: hidden;
+    overflow-x: auto;
   }
 
   .q-field--with-bottom {
@@ -279,6 +280,14 @@ input[type='file'] {
   }
 
   .desc-column {
+    min-width: 400px !important;
+    .q-field__native {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+  }
+
+  .product-id-column {
     min-width: 350px !important;
   }
 
@@ -289,15 +298,18 @@ input[type='file'] {
 
   .qty-column {
     :has(.composite-qty) {
-      width: 300px !important;
+      width: 350px !important;
+      min-width: 350px;
     }
-    /* :not(:has(.composite-qty)) {
-      width: 60px !important;
-    } */
+    :not(:has(.composite-qty)) {
+      width: 70px !important;
+      min-width: 70px;
+    }
     > label,
     .group-qty-input {
       > .q-field__inner {
         width: 60px !important;
+        min-width: 60px;
       }
     }
   }
@@ -305,21 +317,25 @@ input[type='file'] {
   .unit-discount-column {
     :has(.discount-type-select-input) {
       width: 180px !important;
+      min-width: 180px;
     }
     :not(:has(.discount-type-select-input)) {
       width: 60px !important;
+      min-width: 60px;
     }
 
     > label,
     .group-qty-input {
       > .q-field__inner {
         width: 60px !important;
+        min-width: 60px;
       }
     }
   }
 
   .group-qty-total {
     width: 80px !important;
+    min-width: 80px;
   }
 
   .price-column {
@@ -332,8 +348,10 @@ input[type='file'] {
   .total-column,
   .line-discount-column {
     width: 110px !important;
+    min-width: 110px;
     > label > .q-field__inner {
       width: 100px !important;
+      min-width: 100px;
     }
   }
 
@@ -346,7 +364,8 @@ input[type='file'] {
     background: rgba(0, 0, 0, 0.05);
     border-radius: 4px 4px 0 0;
     line-height: 18px;
-    height: 100%;
+    min-height: 36px;
+    height: 40px;
     padding-right: 0.75rem;
   }
 

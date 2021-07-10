@@ -4,7 +4,7 @@ import sharp from 'sharp'
 import { bytesToKbytes, nameToSlug } from 'App/Helpers/utils'
 import crypto from 'crypto'
 import fs from 'fs'
-import { BreakpointFormat, FileDimensions, FileInfo } from './types/file'
+import { BreakpointFormat, FileDimensions, FileInfo } from '../../types/file'
 
 // Todo: add this setting to .env or database
 export let uploadSettings = {

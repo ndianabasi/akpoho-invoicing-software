@@ -2,6 +2,7 @@ import { MutationTree } from 'vuex';
 import {
   CurrentlyViewedAddress,
   CurrentlyViewedCustomer,
+  CustomerAddressForSelectPayload,
   SelectOption,
 } from '../types';
 import { CustomersStateInterface } from './state';
@@ -30,7 +31,7 @@ const mutation: MutationTree<CustomersStateInterface> = {
 
   SET_CUSTOMER_ADDRESSES_FOR_SELECT(
     state: CustomersStateInterface,
-    payload: SelectOption[]
+    payload: CustomerAddressForSelectPayload
   ) {
     state.customerAddressesForSelect = payload;
   },

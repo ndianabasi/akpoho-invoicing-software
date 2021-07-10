@@ -1,6 +1,7 @@
 import Route from '@ioc:Adonis/Core/Route'
 import './inventories'
 import './customers'
+import './invoices_quotations'
 
 Route.get('/views/test', async ({ view }) => {
   return view.render('emails/new-account-verification')

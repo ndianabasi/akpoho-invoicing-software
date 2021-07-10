@@ -229,7 +229,10 @@ export interface CurrentlyViewedCustomer extends CurrentCustomerBaseInterface {
   };
 }
 
-export type CustomerAddressType = 'billing_address' | 'shipping_address';
+export type CustomerAddressType =
+  | 'billing_address'
+  | 'shipping_address'
+  | 'both';
 
 export interface CurrentlyViewedAddress {
   id: string;
@@ -335,6 +338,11 @@ export enum PERMISSION {
   CAN_VIEW_INVENTORIES = 'can_view_inventories',
   CAN_EDIT_INVENTORIES = 'can_edit_inventories',
   CAN_DELETE_INVENTORIES = 'can_delete_inventories',
+  CAN_LIST_QUOTATIONS = 'can_list_quotations',
+  CAN_CREATE_QUOTATIONS = 'can_create_quotations',
+  CAN_VIEW_QUOTATIONS = 'can_view_quotations',
+  CAN_EDIT_QUOTATIONS = 'can_edit_quotations',
+  CAN_DELETE_QUOTATIONS = 'can_delete_quotations',
 }
 
 export interface FileMultiFormats {
@@ -595,6 +603,15 @@ export type DiscountType = 'percentage' | 'number';
 export type RoundingType = 'none' | 'nearest' | 'down' | 'up';
 export type ThousandSeparator = 'comma' | 'period' | 'none' | 'space';
 
+export const discountTypes: DiscountType[] = ['number', 'percentage'];
+export const roundingTypes: RoundingType[] = ['none', 'nearest', 'down', 'up'];
+export const thousandSeparatorTypes: ThousandSeparator[] = [
+  'comma',
+  'period',
+  'none',
+  'space',
+];
+
 export const itemCollectionTypes: ItemCollectionType[] = [
   'set(s)',
   'piece(s)',
@@ -630,6 +647,11 @@ export const unitOfMeasurementTypes: Array<
 
 export type ProductNameType = 'custom_product' | 'real_product';
 
+export const ProductNameTypes: ProductNameType[] = [
+  'custom_product',
+  'real_product',
+];
+
 export const productNameTypeOptions: Array<{
   label: string;
   value: ProductNameType;
@@ -646,7 +668,7 @@ export interface QuotationInvoiceItemShape {
   qty: number | null;
   groupQty: number | null;
   UOM: UnitOfMeasurement;
-  collectionType: ItemCollectionType;
+  collectionTypeId: ItemCollectionType;
   unitPrice: number | null;
   unitDiscount: number | null;
   discountType: DiscountType;
@@ -658,7 +680,8 @@ export type QuotationInvoiceFormShape = {
   date: string | null;
   code: string | null | undefined;
   customerId: string | null | undefined;
-  customerAddressId: string | null | undefined;
+  customerBillingAddressId: string | null | undefined;
+  customerShippingAddressId: string | null | undefined;
   introduction: string | null | undefined;
   title: string | null | undefined;
   items: Array<QuotationInvoiceItemShape>;
@@ -690,3 +713,25 @@ export interface SelectNewValueCallback {
 }
 
 export type AdditionalFee = { name: string; amount: number };
+
+export type CustomerAddressForSelectPayload = {
+  shippingAddresses: SelectOption[];
+  billingAddresses: SelectOption[];
+};
+
+export interface QuotationResultRowInterface {
+  id: string;
+  title: string;
+  tax_percentage: number;
+  simple_quantities: number;
+  show_discounts: number;
+  created_at: string;
+  updated_at: string;
+  meta?: {
+    is_corporate: number;
+    first_name: string;
+    last_name: string;
+    corporate_has_rep: number;
+    company_name: string;
+  };
+}

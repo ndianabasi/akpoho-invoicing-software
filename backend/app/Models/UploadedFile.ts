@@ -9,10 +9,13 @@ import {
   beforeSave,
   afterFind,
   afterFetch,
+  manyToMany,
+  ManyToMany,
 } from '@ioc:Adonis/Lucid/Orm'
 import FileProvider from 'App/Models/FileProvider'
 import UserProfile from 'App/Models/UserProfile'
 import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import InvoiceQuotationItem from './InvoiceQuotationItem'
 
 type FormatAttributes = {
   name: string
@@ -108,8 +111,16 @@ export default class UploadedFile extends BaseModel {
   @belongsTo(() => FileProvider)
   public provider: BelongsTo<typeof FileProvider>
 
-  @hasOne(() => UserProfile, { foreignKey: 'profile_picture' })
+  @hasOne(() => UserProfile, { foreignKey: 'profilePicture' })
   public profilePicture: HasOne<typeof UserProfile>
+
+  @manyToMany(() => InvoiceQuotationItem, {
+    pivotTable: 'invoices_quotations_items_files',
+    pivotTimestamps: true,
+    pivotForeignKey: 'uploadedFileId',
+    pivotRelatedForeignKey: 'invoicesQuotationsItemId',
+  })
+  public invoiceQuotationItems: ManyToMany<typeof InvoiceQuotationItem>
 
   @beforeSave()
   public static async stringifyFormats(file: UploadedFile) {

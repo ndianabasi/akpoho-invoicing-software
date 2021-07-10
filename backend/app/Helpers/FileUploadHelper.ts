@@ -21,7 +21,7 @@ import {
   FileMetaInfo,
   OptimizedOutput,
   EnhancedFileInfo,
-} from './types/file'
+} from '../../types/file'
 
 import sharp from 'sharp'
 import HttpContext, { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'

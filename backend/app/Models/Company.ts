@@ -23,6 +23,7 @@ import Attribute from 'App/Models/Attribute'
 import AttributeSet from 'App/Models/AttributeSet'
 import Product from 'App/Models/Product'
 import ProductCategory from 'App/Models/ProductCategory'
+import InvoiceQuotation from './InvoiceQuotation'
 
 export type CompanyType = 'personal' | 'corporate'
 
@@ -147,4 +148,18 @@ export default class Company extends BaseModel {
     pivotTimestamps: true,
   })
   public productCategories: ManyToMany<typeof ProductCategory>
+
+  @hasMany(() => InvoiceQuotation, {
+    onQuery: (query) => {
+      query.where('type', 'quotation')
+    },
+  })
+  public quotations: HasMany<typeof InvoiceQuotation>
+
+  @hasMany(() => InvoiceQuotation, {
+    onQuery: (query) => {
+      query.where('type', 'invoice')
+    },
+  })
+  public invoices: HasMany<typeof InvoiceQuotation>
 }

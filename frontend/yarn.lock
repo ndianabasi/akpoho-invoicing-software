@@ -1558,19 +1558,19 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.0.11.tgz#20d22dd0da7d358bb21c17f9bde8628152642c77"
   integrity sha512-b+zB8A2so8eCE0JsxjL24J7vdGl8rzPQ09hZNhystm+KqSbKcAej1A+Hbva1rCMmTTqA+hFnUSDc5kouEo0JzA==
 
-"@vuelidate/core@^2.0.0-alpha.14":
-  version "2.0.0-alpha.14"
-  resolved "https://registry.yarnpkg.com/@vuelidate/core/-/core-2.0.0-alpha.14.tgz#b92f193693bc45eb51f1e84ac2893f8dfd123fc5"
-  integrity sha512-RFWA7785Bs995AbUig5D199xBUlDIAFXZIjAv78G9g1JwwRREDOZV8g41Umx2jQr9rGyUlgepgb+bZ4223NFNw==
+"@vuelidate/core@^2.0.0-alpha.21":
+  version "2.0.0-alpha.21"
+  resolved "https://registry.yarnpkg.com/@vuelidate/core/-/core-2.0.0-alpha.21.tgz#37077421007b8ff925840ee937e9e821fbc03f12"
+  integrity sha512-Qk8UzmadmVO1fg527lRKzI29kpQf4wW1XZICerIZuhDinm3VDsq+lG2LSI21NV1uGbNJLdmDTYWF+tKvk+zLoQ==
   dependencies:
-    vue-demi "^0.6.0"
+    vue-demi "^0.9.1"
 
-"@vuelidate/validators@^2.0.0-alpha.12":
-  version "2.0.0-alpha.12"
-  resolved "https://registry.yarnpkg.com/@vuelidate/validators/-/validators-2.0.0-alpha.12.tgz#7be5dede7d35b7f9bbe4190d5fe5aa94fedae749"
-  integrity sha512-z+SuLnpdcb/3YA1avBjySbc90rQ8dYlRnWBAmy6xtjlgf6vB2nCrYR1pNYnRp8bXaTBszC3Wojjgu/Ez8F603A==
+"@vuelidate/validators@^2.0.0-alpha.18":
+  version "2.0.0-alpha.18"
+  resolved "https://registry.yarnpkg.com/@vuelidate/validators/-/validators-2.0.0-alpha.18.tgz#4e6008ed6d098f9a1ffd20b4fc06730c1cbc24fb"
+  integrity sha512-JLH5uoynR6lLzmzGjb6sqxmDng1BB+FUpoKb38BNqUheM7ZMJeetZVZ9T/PUL5K8btLgoEqrPHL+SWHrOwIm7w==
   dependencies:
-    vue-demi "^0.6.0"
+    vue-demi "^0.9.1"
 
 "@webassemblyjs/ast@1.11.0":
   version "1.11.0"
@@ -6755,10 +6755,10 @@ vue-cropperjs@^5.0.0:
   dependencies:
     cropperjs "^1.5.6"
 
-vue-demi@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.6.0.tgz#e314282f704cb449119b9fd002cbbc0e39f591fe"
-  integrity sha512-8GEJa0mHJpYJeGeq5fD1pJct2kfdl30PHfmL1NaJ97mgKPyKojlIRt/3inGBK4Y0ylCI6T5vOo3chwpqDOq/Hw==
+vue-demi@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.9.1.tgz#25d6e1ebd4d4010757ff3571e2bf6a1d7bf3de82"
+  integrity sha512-7s1lufRD2l369eFWPjgLvhqCRk0XzGWJsQc7K4q+0mZtixyGIvsK1Cg88P4NcaRIEiBuuN4q1NN4SZKFKwQswA==
 
 vue-eslint-parser@^7.6.0:
   version "7.6.0"

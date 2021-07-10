@@ -13,6 +13,7 @@ import CustomerAddress from 'App/Models/CustomerAddress'
 import UUIDHook from './Hooks/UUIDHook'
 import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 import CustomerTitle from './CustomerTitle'
+import InvoiceQuotation from './InvoiceQuotation'
 
 export default class Customer extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -98,4 +99,23 @@ export default class Customer extends BaseModel {
 
   @belongsTo(() => CustomerTitle)
   public title: BelongsTo<typeof CustomerTitle>
+
+  @hasMany(() => InvoiceQuotation)
+  public invoiceQuotations: HasMany<typeof InvoiceQuotation>
+
+  @hasMany(() => InvoiceQuotation, {
+    foreignKey: 'customerId',
+    onQuery: (query) => {
+      query.where('type', 'invoice')
+    },
+  })
+  public invoices: HasMany<typeof InvoiceQuotation>
+
+  @hasMany(() => InvoiceQuotation, {
+    foreignKey: 'customerId',
+    onQuery: (query) => {
+      query.where('type', 'quotation')
+    },
+  })
+  public quotations: HasMany<typeof InvoiceQuotation>
 }

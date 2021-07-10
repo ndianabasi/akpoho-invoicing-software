@@ -13,38 +13,12 @@
               <q-input
                 v-model="form.date"
                 label="Quotation Date"
-                filled
-                fill-mask
-                mask="####-##-##"
+                stack-label
                 dense
-                class="q-mb-sm-sm q-mb-md-md"
-              >
-                <template #append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy
-                      ref="qDateProxy"
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date
-                        v-model="form.date"
-                        today-btn
-                        minimal
-                        mask="YYYY-MM-DD"
-                      >
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
+                filled
+                type="date"
+                for="date"
+              />
             </div>
             <div class="col col-md-2 col-lg-2 col-sm-6 col-xs-12">
               <q-input
@@ -59,6 +33,7 @@
                 autocomplete="off"
                 class="q-mb-sm-sm q-mb-md-md"
                 dense
+                :debounce="250"
               >
                 <!-- <template #error>
                   {{ formErrors[field.name] }}
@@ -76,7 +51,7 @@
                 filled
                 aria-autocomplete="list"
                 autocomplete="off"
-                :options="customersForSelect"
+                :options="[]"
                 label="Customer"
                 name="customerSelect"
                 for="customerSelect"
@@ -110,15 +85,15 @@
             </div>
             <div class="col col-md-4 col-lg-4 col-sm-12 col-xs-12">
               <quasar-select
-                ref="customerAddressSelect"
-                v-model="form.customerAddressId"
+                ref="customerBillingAddressSelect"
+                v-model="form.customerBillingAddressId"
                 filled
                 aria-autocomplete="list"
                 autocomplete="off"
-                :options="customerAddresses"
+                :options="customerBillingAddresses"
                 label="Billing Address"
-                name="customerAddressSelect"
-                for="customerAddressSelect"
+                name="customerBillingAddressSelect"
+                for="customerBillingAddressSelect"
                 clearable
                 bottom-slots
                 options-dense
@@ -142,11 +117,61 @@
                   <div v-if="!form.customerId">Select customer first</div>
                   <div v-else>
                     {{
-                      customerAddresses && customerAddresses.length
+                      customerBillingAddresses &&
+                      customerBillingAddresses.length
                         ? `${
-                            customerAddresses.length === 1
-                              ? '1 address'
-                              : customerAddresses.length + ' addresses'
+                            customerBillingAddresses.length === 1
+                              ? '1 billing address'
+                              : customerBillingAddresses.length +
+                                ' billing addresses'
+                          } available`
+                        : ''
+                    }}
+                  </div>
+                </template>
+              </quasar-select>
+            </div>
+            <div class="col col-md-4 col-lg-4 col-sm-12 col-xs-12">
+              <quasar-select
+                ref="customerShippingAddressSelect"
+                v-model="form.customerShippingAddressId"
+                filled
+                aria-autocomplete="list"
+                autocomplete="off"
+                :options="customerShippingAddresses"
+                label="Shipping Address"
+                name="customerShippingAddressSelect"
+                for="customerShippingAddressSelect"
+                clearable
+                bottom-slots
+                options-dense
+                use-input
+                :input-debounce="250"
+                class="q-mb-sm-sm q-mb-md-md"
+                transition-show="scale"
+                transition-hide="scale"
+                emit-value
+                map-options
+                dense
+                :disable="!form.customerId"
+              >
+                <!-- <template v-if="field?.icon" #before>
+                <q-icon :name="field?.icon ?? ''" />
+              </template>
+              <template #error>
+                {{ formErrors[field.name] }}
+              </template> -->
+                <template #hint>
+                  <div v-if="!form.customerId">Select customer first</div>
+                  <div v-else>
+                    {{
+                      customerShippingAddresses &&
+                      customerShippingAddresses.length
+                        ? `${
+                            customerShippingAddresses.length === 1
+                              ? '1 shipping address'
+                              : customerShippingAddresses.length +
+                                ' shipping addresses'
                           } available`
                         : ''
                     }}
@@ -170,6 +195,7 @@
                 autocomplete="off"
                 class="q-mb-sm-sm q-mb-md-sm"
                 dense
+                :debounce="250"
               >
                 <!-- <template #error>
                   {{ formErrors[field.name] }}
@@ -192,6 +218,7 @@
                 autocomplete="off"
                 class="q-mb-sm-sm q-mb-md-sm"
                 dense
+                :debounce="250"
               >
                 <!-- <template #error>
                   {{ formErrors[field.name] }}
@@ -294,6 +321,7 @@
                         dense
                         :aria-disabled="col.disabled"
                         :disable="col.disabled"
+                        :debounce="250"
                       >
                         <template #prepend>
                           <div
@@ -330,6 +358,7 @@
                             v-if="col.name === 'qty' && !form.simpleQuantities"
                             class="
                               row
+                              no-wrap
                               inline
                               justify-center
                               items-center
@@ -339,7 +368,7 @@
                           >
                             <q-select
                               v-model="
-                                form.items[props.rowIndex].collectionType
+                                form.items[props.rowIndex].collectionTypeId
                               "
                               filled
                               :options="collectionTypeOptions"
@@ -357,6 +386,7 @@
                               dense
                               class="group-qty-input"
                               autogrow
+                              :debounce="250"
                             />
                             <q-select
                               v-model="form.items[props.rowIndex].UOM"
@@ -464,8 +494,6 @@
                         :async-filter-mode="
                           form.items[props.rowIndex].productNameType ===
                           'real_product'
-                            ? col.asyncFilterMode
-                            : undefined
                         "
                       >
                         <template #append>
@@ -725,6 +753,7 @@
                           input-class=" text-right"
                           stack-label
                           autogrow
+                          :debounce="250"
                         />
                       </q-td>
                       <q-td class="text-right additional-fee-cell">
@@ -736,6 +765,7 @@
                           input-class=" text-right"
                           stack-label
                           autogrow
+                          :debounce="250"
                         />
                       </q-td>
                       <q-td auto-width>
@@ -841,6 +871,7 @@
                       class="tax-input"
                       input-class=" text-right"
                       stack-label
+                      :debounce="250"
                     >
                       <template #append>
                         <div class="text-body2">%</div>
@@ -1007,6 +1038,7 @@
                       autogrow
                       label="Discount amount"
                       stack-label
+                      :debounce="250"
                     >
                       <template
                         v-if="form.additionalDiscountType === 'percentage'"
@@ -1123,12 +1155,9 @@ import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import useResourcePermissions from '../../composables/useResourcePermissions';
 import {
-  CurrentlyViewedCompany,
   SelectionOption,
   PERMISSION,
   TitleInfo,
-  CompanyFormShape,
-  FormSchema,
   CustomerAddressType,
   SelectOption,
   QuotationInvoiceItemShape,
@@ -1140,17 +1169,13 @@ import {
   UnitOfMeasurement,
   productNameTypeOptions,
   ProductNameType,
-  SelectNewValueCallback,
   AdditionalFee,
+  CustomerAddressForSelectPayload,
 } from '../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../components/QuasarSelect';
-import { useForm, useField } from 'vee-validate';
-import * as yup from 'yup';
 import { useStore } from 'vuex';
 import { useQuasar, format } from 'quasar';
-import { phoneNumberRegex } from '../../helpers/utils';
-import { isEqual } from 'lodash';
 import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
 import ProductNameTypeSelect from '../../components/ProductNameTypeSelect.vue';
 //import Sortable from 'sortablejs';
@@ -1178,7 +1203,7 @@ export default defineComponent({
   },
 
   props: {
-    companyId: {
+    quotationId: {
       type: String,
       required: false,
       default: '',
@@ -1194,10 +1219,11 @@ export default defineComponent({
   },
 
   setup(props) {
-    const companyCreated = ref(false);
+    const quotationCreated = ref(false);
     const store = useStore();
     const router = useRouter();
     const $q = useQuasar();
+    const isSubmitting = ref(false);
     const fileObjectUrls: Ref<string[][]> = ref([]);
     const fileUploadProgress = ref(
       [] as Array<
@@ -1312,20 +1338,28 @@ export default defineComponent({
       { label: 'Period', value: 'period' },
     ]);
 
-    const customerAddresses = computed({
+    const customerBillingAddresses = computed({
       get: () =>
-        store.getters[
-          'customers/GET_CUSTOMER_ADDRESSES_FOR_SELECT'
-        ] as SelectOption[],
+        store.getters['customers/GET_CUSTOMER_ADDRESSES_FOR_SELECT']
+          .billingAddresses as SelectOption[],
+      set: (value) => value,
+    });
+
+    const customerShippingAddresses = computed({
+      get: () =>
+        store.getters['customers/GET_CUSTOMER_ADDRESSES_FOR_SELECT']
+          .shippingAddresses as SelectOption[],
       set: (value) => value,
     });
 
     const form: QuotationInvoiceFormShape = reactive({
       items: [] as QuotationInvoiceFormShape['items'],
+      additionalFees: [] as QuotationInvoiceFormShape['additionalFees'],
       date: null,
       code: '',
       customerId: null,
-      customerAddressId: null,
+      customerBillingAddressId: null,
+      customerShippingAddressId: null,
       introduction: '',
       title: '',
       simpleQuantities: true,
@@ -1347,7 +1381,6 @@ export default defineComponent({
       additionalDiscountType: 'percentage',
       additionalDiscountAmount: 0,
       showAdditionalFees: false,
-      additionalFees: [] as QuotationInvoiceFormShape['additionalFees'],
       showImages: true,
     });
 
@@ -1358,7 +1391,7 @@ export default defineComponent({
       description: '',
       qty: null,
       UOM: 'kg',
-      collectionType: 'set(s)',
+      collectionTypeId: 'set(s)',
       groupQty: null,
       unitPrice: null,
       unitDiscount: null,
@@ -1530,6 +1563,9 @@ export default defineComponent({
       (form) => {
         itemTotals.value = getTotalArray(form.items);
         itemLineDiscounts.value = getLineDiscountArray(form.items);
+
+        // Update vuex store
+        //store.commit('invoices_quotations/SET_QUOTATION_FORM', form);
       },
       { deep: true }
     );
@@ -1618,6 +1654,7 @@ export default defineComponent({
     );
 
     const taxAmount = computed(() => {
+      if (form.amountsAreTaxInclusive) return 0;
       const tax = (grandTotalBeforeTax.value * form?.taxPercentage ?? 0) / 100;
       return Number(
         getRoundedTotal(tax, form.roundAmountType, form.numberOfDecimals)
@@ -1634,77 +1671,35 @@ export default defineComponent({
       )
     );
 
-    // Valiation section starts
+    let currentQuotation: Ref<QuotationInvoiceFormShape | null>;
 
-    const formSchema = computed(() =>
-      yup.object({
-        isPersonalBrand: yup.boolean(),
-        name: yup.string().required('Name is required').nullable(),
-        email: yup
-          .string()
-          .email('Email is not valid')
-          .required('Email is required'),
-        phoneNumber: yup
-          .string()
-          .matches(phoneNumberRegex, 'Please provide a valid phone number')
-          .nullable(),
-        address: yup.string().optional().nullable(),
-        city: yup.string().required('City is required').nullable(),
-        size: yup.number().required('Company Size is required').nullable(),
-        stateId: yup.number().required('State is required').nullable(),
-        countryId: yup.number().required('Country is required').nullable(),
-        website: yup.string().optional().nullable(),
-      })
-    );
+    currentQuotation = !props.creationMode
+      ? computed(
+          () =>
+            store.getters[
+              'quotations/GET_CURRENTLY_VIEWED_QUOTATION'
+            ] as QuotationInvoiceFormShape
+        )
+      : ref(null);
 
-    const {
-      handleSubmit,
-      errors: formErrors,
-      isSubmitting,
-      values,
-    } = useForm<CompanyFormShape>({
-      /* validationSchema: formSchema.value,
-      initialValues, */
-    });
+    const onSubmit = () => {
+      console.log(form);
 
-    /* const { value: isPersonalBrand } = useField('isPersonalBrand'); */
-
-    // Form schema for form generation
-
-    // Valiation section ends
-
-    /* watch(
-      () => form.countryId.model,
-      (newCountry) => {
-        stateId.value = null;
-        if (newCountry) {
-          void store.dispatch(
-            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: newCountry }
-          );
-
-          countryStates.value = store.getters[
-            'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-          ] as SelectionOption[];
-        }
-      }
-    ); */
-
-    const onSubmit = handleSubmit((form) => {
       void nextTick(() => {
         const isCreationMode = props.creationMode;
         void store
           .dispatch(
-            `companies/${isCreationMode ? 'CREATE_COMPANY' : 'EDIT_COMPANY'}`,
-            isCreationMode ? form : { form, companyId: props.companyId }
+            `invoices_quotations/${
+              isCreationMode ? 'CREATE_QUOTATION' : 'EDIT_QUOTATION'
+            }`,
+            isCreationMode ? form : { form, quotationId: props.quotationId }
           )
           .then((id: string) => {
-            companyCreated.value = true;
-            void store.dispatch('auth/FETCH_AUTH_PROFILE');
+            quotationCreated.value = true;
             void nextTick(() => {
               void router.push({
-                name: 'view_company',
-                params: { companyId: id },
+                name: 'view_quotation',
+                params: { quotationId: id },
               });
             });
           })
@@ -1712,22 +1707,22 @@ export default defineComponent({
             console.error(error);
           });
       });
-    });
+    };
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
-    /* watch(
-      currentCompany,
+    watch(
+      currentQuotation,
       () => {
         const title =
-          currentCompany && currentCompany.value
+          currentQuotation && currentQuotation.value
             ? useTitleInfo({
-                title: currentCompany.value.name ?? '',
+                title: currentQuotation.value.title ?? '',
                 avatar: undefined,
               })
             : props.creationMode
             ? useTitleInfo({
-                title: 'New Company',
+                title: 'New Quotation',
                 avatar: '',
               })
             : ref(null);
@@ -1735,43 +1730,44 @@ export default defineComponent({
         titleInfo.value = title.value;
       },
       { deep: true }
-    ); */
+    );
 
     watch(
       () => form.customerId,
       async (customerId) => {
         if (!customerId) {
-          customerAddresses.value = [];
-          form.customerAddressId = null;
+          customerBillingAddresses.value = [];
+          customerShippingAddresses.value = [];
+          form.customerBillingAddressId = null;
+          form.customerShippingAddressId = null;
           return;
         }
 
         await store
           .dispatch('customers/FETCH_CUSTOMER_ADDRESSES_FOR_SELECT', {
-            type: 'billing_address' as CustomerAddressType,
+            type: 'both' as CustomerAddressType,
             customerId,
           })
           .then(() => {
-            customerAddresses.value = store.getters[
+            const customerAddresses = store.getters[
               'countries_states/GET_CUSTOMER_ADDRESSES_FOR_SELECT'
-            ] as SelectionOption[];
+            ] as CustomerAddressForSelectPayload;
+
+            customerBillingAddresses.value =
+              customerAddresses?.billingAddresses ?? [];
+            customerShippingAddresses.value =
+              customerAddresses?.shippingAddresses ?? [];
           });
       }
     );
 
     watch(
       [
-        () => form.calculateTotals,
         () => form.showDiscounts,
         () => form.changeProductPrices,
         () => form.simpleQuantities,
       ],
-      ([
-        calculateTotals,
-        showDiscounts,
-        changeProductPrices,
-        simpleQuantities,
-      ]) => {
+      ([showDiscounts, changeProductPrices, simpleQuantities]) => {
         const discountColumnHeader = itemsColumns.filter(
           (column) => column.name === 'unitDiscount'
         )[0];
@@ -1863,26 +1859,9 @@ export default defineComponent({
       }
     }); */
 
-    /* watch(
-      () => countryId.value,
-      (country) => {
-        if (country) {
-          stateId.value = null;
-          void store.dispatch(
-            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: country }
-          );
-
-          countryStates.value = store.getters[
-            'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-          ] as SelectionOption[];
-        }
-      }
-    ); */
-
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const CAN_EDIT_COMPANIES = computed(() =>
-      store.getters['permissions/GET_USER_PERMISSION']('can_edit_companies')
+    const CAN_EDIT_QUOTATIONS = computed(() =>
+      store.getters['permissions/GET_USER_PERMISSION']('can_edit_quotations')
     );
 
     onMounted(() => {
@@ -1937,49 +1916,40 @@ export default defineComponent({
 
     onBeforeMount(() => {
       //stopFetchCurrentlyViewedCompany();
-      /* stopFetchCountriesForSelect();
-      stopFetchCompanySizesForSelect(); */
     });
 
     onBeforeUnmount(() => {
       //void cleanUpFiles()
     });
 
-    /*onBeforeRouteLeave((to, from, next) => {
-      if (companyCreated.value) {
-        return next();
-      }
-
-      const didFormValuesChange = !isEqual(initialValues , values);
-       if (didFormValuesChange) {
-        $q.dialog({
-          message: 'Form has changed. Do you really want to leave this page?',
-          title: 'Data loss warning',
-          persistent: true,
-          cancel: true,
+    onBeforeRouteLeave((to, from, next) => {
+      $q.dialog({
+        message: 'Form has changed. Do you really want to leave this page?',
+        title: 'Data loss warning',
+        persistent: true,
+        cancel: true,
+      })
+        .onOk(() => {
+          return next();
         })
-          .onOk(() => {
-            return next();
-          })
-          .onCancel(() => {
-            return false;
-          });
-      } else return next();
-    });*/
+        .onCancel(() => {
+          return false;
+        });
+    });
 
     return {
-      //quotation: currentQuotation,
+      quotation: currentQuotation,
       form,
       titleInfo,
-      customerAddresses,
+      customerBillingAddresses,
+      customerShippingAddresses,
       resourcePermissions: useResourcePermissions({
         view: PERMISSION.CAN_VIEW_COMPANIES,
         list: PERMISSION.CAN_LIST_COMPANIES,
       }),
-      CAN_EDIT_COMPANIES,
+      CAN_EDIT_QUOTATIONS,
       isSubmitting,
       onSubmit,
-      formErrors,
       addItemLines,
       removeItem,
       isLastItem,

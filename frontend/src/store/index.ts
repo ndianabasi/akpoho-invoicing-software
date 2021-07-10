@@ -61,6 +61,10 @@ import attributes from './attributes';
 import { AttributeStateInterface } from './attributes/state';
 import { AttributesGettersInterface } from './attributes/getters';
 
+import invoices_quotations from './invoices_quotations';
+import { InvoiceQuotationStateInterface } from './invoices_quotations/state';
+import { InvoiceQuotationGetterInterface } from './invoices_quotations/getters';
+
 //import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
@@ -115,6 +119,7 @@ export interface StateInterface {
   companies?: CompanyStateInterface;
   products?: ProductStateInterface;
   attributes?: AttributeStateInterface;
+  invoices_quotations?: InvoiceQuotationStateInterface;
 }
 
 export interface StoreGettersInterface {
@@ -130,6 +135,7 @@ export interface StoreGettersInterface {
   companies?: CompanyGetterInterface;
   products?: ProductGetterInterface;
   attributes?: AttributesGettersInterface;
+  invoices_quotations?: InvoiceQuotationGetterInterface;
 }
 
 export type StoreGetters = RootGetterInterface & StoreGettersInterface;
@@ -231,6 +237,7 @@ export default function () {
       companies,
       products,
       attributes,
+      invoices_quotations,
     },
 
     plugins:

@@ -3,6 +3,19 @@
 import { Readable } from 'stream'
 import slugify from 'slugify'
 import Env from '@ioc:Adonis/Core/Env'
+import {
+  ItemCollectionType,
+  PRODUCT_OWNERSHIP_TYPE,
+  QUOTATION_PRODUCT_NAME_TYPE,
+  UnitOfMeasurement,
+} from 'types/inventory'
+import { ADDRESS_TYPE } from 'types/customer'
+import {
+  DiscountType,
+  InvoiceQuotationType,
+  RoundingType,
+  ThousandSeparator,
+} from 'App/Models/InvoiceQuotation'
 
 export const STANDARD_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss'
 export const TIMEZONE_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss ZZ'
@@ -53,10 +66,48 @@ export const commonEmailProperties = function () {
 
 export const IS_DEMO_MODE = Env.get('DEMO_MODE')
 
-export type ADDRESS_TYPE = 'billing_address' | 'shipping_address'
-
 export const ADDRESS_TYPES: ADDRESS_TYPE[] = ['billing_address', 'shipping_address']
 
-export type PRODUCT_OWNERSHIP_TYPE = 'owner' | 'consumer'
-
 export const PRODUCT_OWNERSHIP_TYPES: PRODUCT_OWNERSHIP_TYPE[] = ['owner', 'consumer']
+
+export const QUOTATION_PRODUCT_NAME_TYPES: QUOTATION_PRODUCT_NAME_TYPE[] = [
+  'custom_product',
+  'real_product',
+]
+
+export const discountTypes: DiscountType[] = ['number', 'percentage']
+export const roundingTypes: RoundingType[] = ['none', 'nearest', 'down', 'up']
+export const thousandSeparatorTypes: ThousandSeparator[] = ['comma', 'period', 'none', 'space']
+
+export const itemCollectionTypes: ItemCollectionType[] = [
+  'set(s)',
+  'piece(s)',
+  'pack(s)',
+  'carton(s)',
+  'box(es)',
+  'bottle(s)',
+  'truck(s)',
+  'container(s)',
+  'dozen(s)',
+  'wrap(s)',
+  'roll(s)',
+]
+
+export const unitOfMeasurementTypes: Array<ItemCollectionType | UnitOfMeasurement> = [
+  ...itemCollectionTypes,
+  'kg',
+  'lb',
+  'm',
+  'yd',
+  'ft',
+  'in',
+  'cm',
+  'sq.m',
+  'sq.ft',
+  'sq.in',
+  'cu.m',
+  'cu.ft',
+  'cu.in',
+]
+
+export const InvoiceQuotationTypes: InvoiceQuotationType[] = ['invoice', 'quotation']
