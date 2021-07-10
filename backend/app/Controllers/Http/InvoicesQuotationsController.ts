@@ -59,7 +59,11 @@ export default class QuotationsController {
       )
 
     if (sortBy) {
-      subquery = subquery?.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
+      if (sortBy === 'customer') {
+        subquery = subquery
+          ?.orderBy('customers.first_name', descending === 'true' ? 'desc' : 'asc')
+          .orderBy('customers.company_name ', descending === 'true' ? 'desc' : 'asc')
+      } else subquery = subquery?.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
     }
 
     if (searchQuery) {
@@ -88,7 +92,7 @@ export default class QuotationsController {
       })
     }
 
-    const quotations = await subquery?.paginate(page ? page : 1, perPage ? perPage : 20)
+    const quotations = await await subquery?.paginate(page ? page : 1, perPage ? perPage : 20)
 
     return response.ok({ data: quotations })
   }

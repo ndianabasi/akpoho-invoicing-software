@@ -17,6 +17,7 @@ import UploadedFile from './UploadedFile'
 export default class InvoiceQuotationItem extends BaseModel {
   public static selfAssignPrimaryKey = true
   public static table = 'invoice_quotation_items'
+  public serializeExtras = true
 
   @column({ isPrimary: true })
   public id: string

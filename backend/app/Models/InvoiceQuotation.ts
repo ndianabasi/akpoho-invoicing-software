@@ -25,6 +25,7 @@ export type InvoiceQuotationType = 'invoice' | 'quotation'
 export default class InvoiceQuotation extends BaseModel {
   public static selfAssignPrimaryKey = true
   public static table = 'invoices_quotations'
+  public serializeExtras = true
 
   @column({ isPrimary: true })
   public id: string

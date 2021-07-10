@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { QuotationResultRowInterface } from 'src/store/types';
 import { onBeforeUnmount } from 'vue';
 import { TableRow } from '../../../types/table';
 
 interface Headers extends TableRow {
   name: Columns;
-  field: Columns;
+  field: Columns | ((row: QuotationResultRowInterface) => unknown);
 }
 
 enum Columns {
@@ -43,7 +44,13 @@ const columns: Headers[] = [
     required: true,
     label: 'Customer Name',
     align: 'center',
-    field: Columns.customer,
+    field: (row) => row.meta, // This becomes value for `format` property
+    format: (val: QuotationResultRowInterface['meta']): string => {
+      if (val?.is_corporate) return val?.company_name + ' (Corporate)';
+      else {
+        return `${val?.first_name ?? ''} ${val?.last_name ?? ''}`.trim();
+      }
+    },
     sortable: true,
     filterable: true,
     filterInputType: 'text',

@@ -718,3 +718,20 @@ export type CustomerAddressForSelectPayload = {
   shippingAddresses: SelectOption[];
   billingAddresses: SelectOption[];
 };
+
+export interface QuotationResultRowInterface {
+  id: string;
+  title: string;
+  tax_percentage: number;
+  simple_quantities: number;
+  show_discounts: number;
+  created_at: string;
+  updated_at: string;
+  meta?: {
+    is_corporate: number;
+    first_name: string;
+    last_name: string;
+    corporate_has_rep: number;
+    company_name: string;
+  };
+}
