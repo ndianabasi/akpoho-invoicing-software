@@ -1,6 +1,9 @@
 import { MutationTree } from 'vuex';
 import { InvoiceQuotationStateInterface } from './state';
-import { QuotationInvoiceFormShape } from '../types';
+import {
+  CurrentlyViewedInvoiceQuotation,
+  QuotationInvoiceFormShape,
+} from '../types';
 
 const mutation: MutationTree<InvoiceQuotationStateInterface> = {
   SET_QUOTATION_FORM(
@@ -10,12 +13,12 @@ const mutation: MutationTree<InvoiceQuotationStateInterface> = {
     state.quotationForm = payload;
   },
 
-  /* SET_CURRENTLY_VIEWED_QUOTATION(
+  SET_CURRENTLY_VIEWED_INVOICE_QUOTATION(
     state: InvoiceQuotationStateInterface,
-    payload: ProductResultRowInterface
+    payload: CurrentlyViewedInvoiceQuotation
   ) {
-    state.currentlyViewedProduct = payload;
-  }, */
+    state.currentlyViewedInvoiceQuotation = payload;
+  },
 };
 
 export default mutation;

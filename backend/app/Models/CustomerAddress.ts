@@ -7,6 +7,7 @@ import {
   belongsTo,
   hasMany,
   HasMany,
+  computed,
 } from '@ioc:Adonis/Lucid/Orm'
 import UUIDHook from 'App/Models/Hooks/UUIDHook'
 import Customer from 'App/Models/Customer'
@@ -58,6 +59,13 @@ export default class CustomerAddress extends BaseModel {
     },
   })
   public updatedAt: DateTime
+
+  @computed({ serializeAs: 'full_address' })
+  public get fullAddress(): string {
+    return `${this.streetAddress ? this.streetAddress : ''}${this.city ? ' ' + this.city : ''}${
+      this.postalCode ? ' ' + this.postalCode : ''
+    }`
+  }
 
   @beforeCreate()
   public static generateUUID(model: CustomerAddress) {

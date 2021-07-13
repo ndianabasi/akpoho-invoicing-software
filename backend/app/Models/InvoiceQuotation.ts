@@ -15,7 +15,7 @@ import Customer from './Customer'
 import CustomerAddress from './CustomerAddress'
 import InvoiceQuotationItem from './InvoiceQuotationItem'
 import Company from './Company'
-import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
+import { DATE_FORMAT } from 'App/Helpers/utils'
 
 export type DiscountType = 'percentage' | 'number'
 export type RoundingType = 'none' | 'nearest' | 'down' | 'up'
@@ -48,7 +48,7 @@ export default class InvoiceQuotation extends BaseModel {
 
   @column.dateTime({
     serialize(value: DateTime) {
-      return value ? value.toFormat(TIMEZONE_DATE_TIME_FORMAT) : ''
+      return value ? value.toFormat(DATE_FORMAT) : ''
     },
   })
   public date: DateTime
@@ -68,46 +68,46 @@ export default class InvoiceQuotation extends BaseModel {
   @column()
   public additionalFees: AdditionalFee[] | string | null
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public simpleQuantities: boolean
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public amountsAreTaxInclusive: boolean
 
   @column()
   public taxPercentage: number
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public roundAmounts: boolean
 
   @column()
   public roundAmountType: RoundingType
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public showDiscounts: boolean
 
   @column()
   public discountType: DiscountType
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public setDiscountTypePerLine: boolean
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public calculateTotals: boolean
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public changeProductPrices: boolean
 
   @column()
   public numberOfDecimals: number
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public useThousandSeparator: boolean
 
   @column()
   public thousandSeparatorType: ThousandSeparator
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public showAdditionalSubtotalDiscount: boolean
 
   @column()
@@ -116,10 +116,10 @@ export default class InvoiceQuotation extends BaseModel {
   @column()
   public additionalDiscountAmount: number
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public showAdditionalFees: boolean
 
-  @column()
+  @column({ serialize: (value) => Boolean(value) })
   public showImages: boolean
 
   @column.dateTime({ autoCreate: true })
@@ -164,6 +164,7 @@ export default class InvoiceQuotation extends BaseModel {
   public company: BelongsTo<typeof Company>
 
   @belongsTo(() => CustomerAddress, {
+    serializeAs: 'shipping_address',
     foreignKey: 'customerShippingAddress',
     onQuery(query) {
       query.where('address_type', 'shipping_address')
@@ -172,6 +173,7 @@ export default class InvoiceQuotation extends BaseModel {
   public shippingAddress: BelongsTo<typeof CustomerAddress>
 
   @belongsTo(() => CustomerAddress, {
+    serializeAs: 'billing_address',
     foreignKey: 'customerBillingAddress',
     onQuery(query) {
       query.where('address_type', 'billing_address')

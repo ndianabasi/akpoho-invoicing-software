@@ -7,6 +7,7 @@ import {
   column,
   HasMany,
   hasMany,
+  computed,
 } from '@ioc:Adonis/Lucid/Orm'
 import Company from 'App/Models/Company'
 import CustomerAddress from 'App/Models/CustomerAddress'
@@ -17,6 +18,7 @@ import InvoiceQuotation from './InvoiceQuotation'
 
 export default class Customer extends BaseModel {
   public static selfAssignPrimaryKey = true
+  public serializeExtras = true
 
   @column({ isPrimary: true })
   public id: string
@@ -85,6 +87,16 @@ export default class Customer extends BaseModel {
     },
   })
   public updatedAt: DateTime
+
+  @computed({ serializeAs: 'customer_name' })
+  public get customerName(): string {
+    const isCorporate = Boolean(this.isCorporate)
+    return isCorporate
+      ? this.companyName + ' (corporate)'
+      : `${this.firstName}${this.middleName ? ' ' + this.middleName : ''}${
+          this.lastName ? ' ' + this.lastName : ''
+        }`
+  }
 
   @beforeCreate()
   public static generateUUID(model: Customer) {

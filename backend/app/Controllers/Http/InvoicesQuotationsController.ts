@@ -210,10 +210,23 @@ export default class QuotationsController {
     // Check authorisation
     await bouncer.with('InvoiceQuotationPolicy').authorize('view', requestedInvoiceQuotation!)
 
-    await requestedInvoiceQuotation?.load('company')
     await requestedInvoiceQuotation?.load('customer')
-    await requestedInvoiceQuotation?.load('shippingAddress')
-    await requestedInvoiceQuotation?.load('billingAddress')
+    await requestedInvoiceQuotation?.load('shippingAddress', (addressQuery) => {
+      addressQuery.preload('addressCountry', (subAddressQuery) =>
+        subAddressQuery.select('id', 'name')
+      )
+      addressQuery.preload('addressState', (subAddressQuery) =>
+        subAddressQuery.select('id', 'name')
+      )
+    })
+    await requestedInvoiceQuotation?.load('billingAddress', (addressQuery) => {
+      addressQuery.preload('addressCountry', (subAddressQuery) =>
+        subAddressQuery.select('id', 'name')
+      )
+      addressQuery.preload('addressState', (subAddressQuery) =>
+        subAddressQuery.select('id', 'name')
+      )
+    })
     await requestedInvoiceQuotation?.load('items', (itemsQuery) => {
       itemsQuery
         .preload('collectionType')
@@ -222,7 +235,57 @@ export default class QuotationsController {
         .preload('unitOfMeasurement')
     })
 
-    return response.ok({ data: requestedInvoiceQuotation })
+    const serialisedInvoiceQuotation = requestedInvoiceQuotation?.serialize({
+      fields: {
+        omit: [
+          'customer_id',
+          'company_id',
+          'customer_billing_address',
+          'customer_shipping_address',
+        ],
+      },
+      relations: {
+        customer: { fields: { pick: ['id', 'customer_name'] } },
+        shipping_address: {
+          fields: { pick: ['id', 'full_address'] },
+        },
+        billing_address: {
+          fields: { pick: ['id', 'full_address'] },
+        },
+        items: {
+          fields: {
+            omit: [
+              'invoices_quotations_id',
+              'product_id',
+              'collection_type_id',
+              'unit_of_measurement_id',
+              'updated_at',
+              'created_at',
+            ],
+          },
+          relations: {
+            collectionType: {
+              fields: {
+                omit: ['created_at', 'updated_at'],
+              },
+            },
+            product: {
+              fields: {
+                omit: ['created_at', 'updated_at', 'product_type_id', 'attribute_set_id'],
+                pick: ['id', 'name'],
+              },
+            },
+            unitOfMeasurement: {
+              fields: {
+                omit: ['created_at', 'updated_at'],
+              },
+            },
+          },
+        },
+      },
+    })
+
+    return response.ok({ data: serialisedInvoiceQuotation })
   }
 
   public async update({}: HttpContextContract) {}

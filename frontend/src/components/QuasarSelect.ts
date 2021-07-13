@@ -109,26 +109,26 @@ export default defineComponent({
         .trim();
     };
 
-    const selectFilterFn: SelectCallback = async function (val, update) {
+    const selectFilterFn: SelectCallback = function (val, update) {
       const needle = computed(() => normalize(val));
 
-      if (!needle.value && !props.asyncFilterMode) {
-        filteredOptions.value = props.options;
-      } else {
-        filteredOptions.value = props.options.filter(
-          (v) => normalize(v[props.optionLabel]).indexOf(needle.value) > -1
-        );
-      }
+      update(() => {
+        if (!needle.value && !props.asyncFilterMode) {
+          filteredOptions.value = props.options;
+        } else {
+          filteredOptions.value = props.options.filter(
+            (v) => normalize(v[props.optionLabel]).indexOf(needle.value) > -1
+          );
+        }
 
-      if (props.asyncFilterMode && needle.value) {
-        await store
-          .dispatch(props.asyncFilterAction, needle.value)
-          .then((options: Array<{ [index: string]: string }>) => {
-            filteredOptions.value = options;
-          });
-      }
-
-      update();
+        if (props.asyncFilterMode && needle.value) {
+          void store
+            .dispatch(props.asyncFilterAction, needle.value)
+            .then((options: Array<{ [index: string]: string }>) => {
+              filteredOptions.value = options;
+            });
+        }
+      });
     };
 
     return () => {

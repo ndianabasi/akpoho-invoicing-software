@@ -78,16 +78,25 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
     });
   },
 
-  async FETCH_CURRENTLY_VIEWED_PRODUCT(
-    { commit },
-    { productId }: { productId: string }
+  async FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION(
+    { commit, rootGetters },
+    { id, queryString }: { id: string; queryString: Record<string, string> }
   ) {
-    return new Promise(async (resolve) => {
-      await $http.get(`/products/${productId}`).then((res: HttpResponse) => {
-        commit('SET_CURRENTLY_VIEWED_PRODUCT', res.data.data);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const currentCompany = rootGetters[
+      'auth/GET_CURRENT_COMPANY'
+    ] as StringIDNameInterface;
 
-        resolve(res.data);
-      });
+    return new Promise(async (resolve) => {
+      await $http
+        .get(`${currentCompany.id}/invoices-quotations/${id}`, {
+          params: queryString,
+        })
+        .then((res: HttpResponse) => {
+          commit('SET_CURRENTLY_VIEWED_INVOICE_QUOTATION', res.data.data);
+
+          resolve(res.data);
+        });
     });
   },
 };

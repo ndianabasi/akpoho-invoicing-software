@@ -1,16 +1,17 @@
 import {
+  CurrentlyViewedInvoiceQuotation,
   /* ProductResultRowInterface, */ QuotationInvoiceFormShape,
 } from '../types';
 
 export interface InvoiceQuotationStateInterface {
   quotationForm: QuotationInvoiceFormShape | Record<string, unknown>;
-  //currentlyViewedQuotation: ProductResultRowInterface | null;
+  currentlyViewedInvoiceQuotation: CurrentlyViewedInvoiceQuotation | null;
 }
 
 function state(): InvoiceQuotationStateInterface {
   return {
     quotationForm: {},
-    //currentlyViewedQuotation: null,
+    currentlyViewedInvoiceQuotation: null,
   };
 }
 

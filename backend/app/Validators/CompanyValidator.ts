@@ -24,7 +24,7 @@ export default class CompanyValidator {
     size: schema.number([rules.unsigned()]),
     stateId: schema.number.optional([rules.unsigned()]),
     countryId: schema.number.optional([rules.unsigned()]),
-    website: schema.string.optional({ escape: true, trim: true }, [rules.regex(urlRegex)]),
+    website: schema.string.optional({ trim: true }, [rules.regex(urlRegex)]),
   })
 
   public messages = {

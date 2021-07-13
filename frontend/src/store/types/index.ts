@@ -672,8 +672,8 @@ export interface QuotationInvoiceItemShape {
   unitPrice: number | null;
   unitDiscount: number | null;
   discountType: DiscountType;
-  readonly total: number;
-  files: Array<File>;
+  readonly total?: number;
+  files?: Array<File>;
 }
 
 export type QuotationInvoiceFormShape = {
@@ -699,7 +699,7 @@ export type QuotationInvoiceFormShape = {
   useThousandSeparator: boolean;
   thousandSeparatorType: ThousandSeparator;
   notes: string;
-  theme: string | null;
+  theme?: string | null;
   showAdditionalSubtotalDiscount: boolean;
   additionalDiscountType: DiscountType;
   additionalDiscountAmount: number;
@@ -736,6 +736,90 @@ export interface QuotationResultRowInterface {
   };
 }
 
+export type UnitOfMeasurementTypes = 'collection' | 'discrete';
+
 export interface CurrentlyViewedInvoiceQuotation {
   id: string;
+  type: 'quotation' | 'invoice';
+  date: string;
+  code: string;
+  title: string;
+  introduction: string;
+  notes: string;
+  additional_fees: Array<AdditionalFee>;
+  simple_quantities: boolean;
+  amounts_are_tax_inclusive: boolean;
+  tax_percentage: number;
+  round_amounts: boolean;
+  round_amount_type: RoundingType;
+  show_discounts: boolean;
+  discount_type: DiscountType;
+  set_discount_type_per_line: boolean;
+  calculate_totals: boolean;
+  change_product_prices: boolean;
+  number_of_decimals: number;
+  use_thousand_separator: boolean;
+  thousand_separator_type: ThousandSeparator;
+  show_additional_subtotal_discount: boolean;
+  additional_discount_type: DiscountType;
+  additional_discount_amount: number;
+  show_additional_fees: boolean;
+  show_images: boolean;
+  created_at: string;
+  updated_at: string;
+  customer: {
+    id: string;
+    customer_name: string;
+  };
+  shipping_address: {
+    id: string;
+    addressCountry: {
+      id: number;
+      name: string;
+    };
+    addressState: {
+      id: number;
+      name: string;
+    };
+    full_address: string;
+  };
+  billing_address: {
+    id: string;
+    addressCountry: {
+      id: number;
+      name: string;
+    };
+    addressState: {
+      id: number;
+      name: string;
+    };
+    full_address: string;
+  };
+  items: Array<{
+    id: string;
+    product_name: string | null;
+    description: string;
+    sort_order: number;
+    qty: number;
+    group_qty: number | null;
+    unit_price: number;
+    unit_discount: number | null;
+    discount_type: DiscountType;
+    collectionType: {
+      id: number;
+      name: ItemCollectionType;
+      type: UnitOfMeasurementTypes;
+    };
+    files: Array<unknown>;
+    product: {
+      id: string;
+      name: string;
+      meta: { weight_unit: string };
+    } | null;
+    unitOfMeasurement: {
+      id: number;
+      name: UnitOfMeasurement;
+      type: UnitOfMeasurementTypes;
+    };
+  }>;
 }

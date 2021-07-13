@@ -1,10 +1,15 @@
 import { TableRow } from '../../../types/table';
 import { reactive } from 'vue';
-import { InputComponentType, InputComponentTypeVariant } from 'src/store/types';
+import {
+  InputComponentType,
+  InputComponentTypeVariant,
+  SelectOption,
+} from 'src/store/types';
 
 interface QuotationInvoiceHeaders extends TableRow {
   name: Columns;
   field: Columns;
+  options?: Array<SelectOption>;
   componentType?: InputComponentType | 'computed';
   componentTypeVariant?: InputComponentTypeVariant;
   inputClass?: string;
