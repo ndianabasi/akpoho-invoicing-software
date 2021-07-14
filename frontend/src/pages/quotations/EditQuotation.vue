@@ -10,8 +10,8 @@
     >
       <view-card
         v-if="!loading || creationMode"
-        :title-info="titleInfo"
-        show-avatar
+        :title-info="!creationMode ? titleInfo : null"
+        :show-avatar="false"
         show-title-panel-side
         card-container-classes="col-12"
       >
@@ -243,7 +243,7 @@
                   >
                   <q-editor
                     v-model="form.introduction"
-                    class="q-mb-md-lg q-mb-sm-md"
+                    class="q-mb-lg"
                     min-height="5rem"
                     placeholder="Introduction"
                   />
@@ -1073,29 +1073,29 @@
                 <div class="col col-12">
                   <div class="row q-gutter-lg">
                     <q-toggle
-                        v-model="form.amountsAreTaxInclusive"
-                        checked-icon="check"
-                        color="positive"
-                        label="Amounts include taxes"
-                        unchecked-icon="clear"
-                      />
-                      <q-input
-                        v-if="!form.amountsAreTaxInclusive"
-                        v-model="form.taxPercentage"
-                        filled
-                        dense
-                        class="tax-input"
-                        input-class=" text-right"
-                        stack-label
-                        :debounce="250"
-                      >
-                        <template #append>
-                          <div class="text-body2">%</div>
-                        </template>
-                        <template #prepend>
-                          <div class="text-body2">Tax</div>
-                        </template>
-                      </q-input>
+                      v-model="form.amountsAreTaxInclusive"
+                      checked-icon="check"
+                      color="positive"
+                      label="Amounts include taxes"
+                      unchecked-icon="clear"
+                    />
+                    <q-input
+                      v-if="!form.amountsAreTaxInclusive"
+                      v-model="form.taxPercentage"
+                      filled
+                      dense
+                      class="tax-input"
+                      input-class=" text-right"
+                      stack-label
+                      :debounce="250"
+                    >
+                      <template #append>
+                        <div class="text-body2">%</div>
+                      </template>
+                      <template #prepend>
+                        <div class="text-body2">Tax</div>
+                      </template>
+                    </q-input>
                   </div>
                 </div>
                 <div class="col col-12">
@@ -1338,6 +1338,18 @@
                 </q-item>
 
                 <q-item
+                  v-if="resourcePermissions?.canCreate ?? false"
+                  :to="{
+                    name: 'create_quotation',
+                  }"
+                >
+                  <q-item-section>
+                    <q-btn flat icon="post_add" />
+                  </q-item-section>
+                  <q-item-section>Create Quotation</q-item-section>
+                </q-item>
+
+                <q-item
                   v-if="resourcePermissions?.canList ?? false"
                   :to="{
                     name: 'quotations',
@@ -1458,6 +1470,7 @@ export default defineComponent({
     const loading = ref(true);
     const enableImageUploads = computed(() => false);
     const hasFormChanged = ref(false);
+    let titleInfo: Ref<TitleInfo | null> = ref(null);
 
     const customerSelect: Ref<QuasarSelectInterface | null> = ref(null);
     const customerBillingAddressSelect: Ref<QuasarSelectInterface | null> =
@@ -1998,29 +2011,6 @@ export default defineComponent({
       });
     };
 
-    let titleInfo: Ref<TitleInfo | null> = ref(null);
-
-    watch(
-      currentQuotation,
-      () => {
-        const title =
-          currentQuotation && currentQuotation.value
-            ? useTitleInfo({
-                title: currentQuotation.value.title ?? '',
-                avatar: undefined,
-              })
-            : props.creationMode
-            ? useTitleInfo({
-                title: 'New Quotation',
-                avatar: '',
-              })
-            : ref(null);
-
-        titleInfo.value = title.value;
-      },
-      { deep: true }
-    );
-
     watch(
       () => form.customerId,
       async (customerId) => {
@@ -2233,6 +2223,11 @@ export default defineComponent({
                 currentInvoiceQuotationData.use_custom_serial_numbers;
               form.useEditor = currentInvoiceQuotationData.use_editor;
 
+              titleInfo.value = useTitleInfo({
+                title: currentInvoiceQuotationData.title ?? '',
+                avatar: undefined,
+              }).value;
+
               loading.value = false;
             } catch (error) {
               console.log(error);
@@ -2332,6 +2327,7 @@ export default defineComponent({
       resourcePermissions: useResourcePermissions({
         view: PERMISSION.CAN_VIEW_QUOTATIONS,
         list: PERMISSION.CAN_LIST_QUOTATIONS,
+        new: PERMISSION.CAN_CREATE_QUOTATIONS,
       }),
       CAN_EDIT_QUOTATIONS,
       isSubmitting,
