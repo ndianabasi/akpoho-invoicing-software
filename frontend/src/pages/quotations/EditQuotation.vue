@@ -663,7 +663,6 @@
                       </q-td>
                       <q-td auto-width>
                         <q-btn
-                          v-if="!isLastItem(props.rowIndex)"
                           color="negative"
                           round
                           flat
@@ -672,7 +671,7 @@
                           @click="removeItem(props.rowIndex)"
                         />
                         <q-btn-dropdown
-                          v-else
+                          v-if="isLastItem(props.rowIndex)"
                           class="add-item-dropdown"
                           icon="playlist_add"
                           split
@@ -750,9 +749,17 @@
                     </q-tr>
                   </template>
                   <template #no-data="{ message }">
-                    <div>{{ message }}</div>
+                    <div class="col col-12 message text-center">
+                      {{ message }}
+                    </div>
+                    <div class="row justify-center q-mt-lg-lg q-mt-sm-md">
+                      <q-btn
+                        label="Add Item"
+                        @click.prevent="addItemLines(1)"
+                      />
+                    </div>
                   </template>
-                  <template #bottom-row>
+                  <template v-if="form.items && !!form.items.length" #bottom-row>
                     <q-tr v-if="form.calculateTotals" class="bottom-row">
                       <q-td auto-width />
                       <q-td
@@ -898,7 +905,6 @@
                         </q-td>
                         <q-td auto-width>
                           <q-btn
-                            v-if="!isAdditionalFeeLastItem(index)"
                             color="negative"
                             round
                             flat
@@ -907,7 +913,7 @@
                             @click="removeAdditionalFee(index)"
                           />
                           <q-btn
-                            v-else
+                            v-if="isAdditionalFeeLastItem(index)"                           
                             color="positive"
                             round
                             flat

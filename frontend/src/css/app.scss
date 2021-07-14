@@ -384,3 +384,13 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.q-table__bottom--nodata {
+  margin-bottom: 5rem;
+
+  .message {
+    padding: 1rem 0;
+    background-color: $warning;
+    color: white;
+  }
+}
