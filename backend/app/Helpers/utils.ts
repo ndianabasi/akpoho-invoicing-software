@@ -12,6 +12,7 @@ import {
   ThousandSeparator,
 } from 'App/Models/InvoiceQuotation'
 import { ItemCollectionType } from 'App/Models/UnitOfMeasurement'
+import sanitizeHtml from 'sanitize-html'
 
 export const STANDARD_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss'
 export const TIMEZONE_DATE_TIME_FORMAT = 'yyyy-LL-dd HH:mm:ss ZZ'
@@ -108,3 +109,14 @@ export const unitOfMeasurementTypes = [
 ]
 
 export const InvoiceQuotationTypes: InvoiceQuotationType[] = ['invoice', 'quotation']
+
+export const sanitiseHTML = function (
+  input?: string,
+  config?: {
+    allowedTags?: string[]
+    allowedAttributes?: Record<string, string[]>
+    allowedIframeHostnames?: string[]
+  }
+): string {
+  return sanitizeHtml(input, config)
+}

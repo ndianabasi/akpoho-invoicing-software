@@ -215,13 +215,13 @@
               </div>
               <div class="col col-md-6 col-lg-6 col-sm-12 col-xs-12">
                 <q-input
+                  v-if="!form.useEditor"
                   v-model="form.introduction"
                   type="textarea"
                   for="introduction"
                   filled
                   clearable
                   bottom-slots
-                  autogrow
                   label="Introduction"
                   aria-autocomplete="off"
                   autocomplete="off"
@@ -235,6 +235,13 @@
 
                   <template #hint></template>
                 </q-input>
+                <q-editor
+                  v-else
+                  v-model="form.introduction"
+                  class="q-mb-md-lg q-mb-sm-md"
+                  min-height="5rem"
+                  placeholder="Introduction"
+                />
               </div>
             </div>
             <div class="row q-gutter-sm">
@@ -992,6 +999,38 @@
                 </q-table>
               </div>
             </div>
+            <div class="row q-gutter-sm">
+              <div class="col col-md-9 col-lg-9 col-sm-12 col-xs-12">
+                <q-input
+                  v-if="!form.useEditor"
+                  v-model="form.notes"
+                  type="textarea"
+                  for="notes"
+                  filled
+                  clearable
+                  bottom-slots
+                  label="Notes"
+                  aria-autocomplete="off"
+                  autocomplete="off"
+                  class="q-mb-sm-sm q-mb-md-sm"
+                  dense
+                  :debounce="250"
+                >
+                  <!-- <template #error>
+                  {{ formErrors[field.name] }}
+                </template> -->
+
+                  <template #hint></template>
+                </q-input>
+                <q-editor
+                  v-else
+                  v-model="form.notes"
+                  class="q-mb-md-lg q-mb-sm-md"
+                  min-height="5rem"
+                  placeholder="Notes"
+                />
+              </div>
+            </div>
             <q-expansion-item
               expand-separator
               icon="settings"
@@ -1223,6 +1262,15 @@
                       checked-icon="check"
                       color="positive"
                       label="Set additional fees"
+                      unchecked-icon="clear"
+                    />
+                  </div>
+                  <div class="col">
+                    <q-toggle
+                      v-model="form.useEditor"
+                      checked-icon="check"
+                      color="positive"
+                      label="Use WYSIWYG Editor"
                       unchecked-icon="clear"
                     />
                   </div>
@@ -1577,6 +1625,7 @@ export default defineComponent({
       showAdditionalFees: false,
       showImages: true,
       useCustomSerialNumbers: false,
+      useEditor: false,
     });
 
     const quotationItemShape: QuotationInvoiceItemShape = {
@@ -2174,6 +2223,7 @@ export default defineComponent({
               form.showImages = currentInvoiceQuotationData.show_images;
               form.useCustomSerialNumbers =
                 currentInvoiceQuotationData.use_custom_serial_numbers;
+              form.useEditor = currentInvoiceQuotationData.use_editor;
 
               loading.value = false;
             } catch (error) {

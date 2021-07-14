@@ -105,6 +105,7 @@ export default class QuotationValidator {
     showAdditionalFees: schema.boolean(),
     showImages: schema.boolean(),
     useCustomSerialNumbers: schema.boolean(),
+    useEditor: schema.boolean(),
   })
 
   public messages = {

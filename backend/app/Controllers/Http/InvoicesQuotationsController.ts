@@ -1,4 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { sanitiseHTML } from 'App/Helpers/utils'
 import InvoiceQuotation from 'App/Models/InvoiceQuotation'
 import UnitOfMeasurement from 'App/Models/UnitOfMeasurement'
 import QuotationValidator from 'App/Validators/QuotationValidator'
@@ -134,6 +135,7 @@ export default class QuotationsController {
         showAdditionalFees,
         showImages,
         useCustomSerialNumbers,
+        useEditor,
       } = await request.validate(QuotationValidator)
 
       const { type: documentType } = request.qs()
@@ -145,7 +147,7 @@ export default class QuotationsController {
         customerId,
         customerBillingAddress: customerBillingAddressId,
         customerShippingAddress: customerShippingAddressId,
-        introduction,
+        introduction: sanitiseHTML(introduction),
         title,
         simpleQuantities,
         amountsAreTaxInclusive,
@@ -160,7 +162,7 @@ export default class QuotationsController {
         numberOfDecimals,
         useThousandSeparator,
         thousandSeparatorType,
-        notes,
+        notes: sanitiseHTML(notes),
         showAdditionalSubtotalDiscount,
         additionalDiscountType,
         additionalDiscountAmount,
@@ -168,6 +170,7 @@ export default class QuotationsController {
         showImages,
         type: documentType,
         useCustomSerialNumbers,
+        useEditor,
       })
 
       const preparedItems: Array<Record<string, unknown>> = []
@@ -329,6 +332,7 @@ export default class QuotationsController {
         showAdditionalFees,
         showImages,
         useCustomSerialNumbers,
+        useEditor,
       } = await request.validate(QuotationValidator)
 
       // 1. Update Quotation/Invoice details
@@ -341,7 +345,7 @@ export default class QuotationsController {
         customerId,
         customerBillingAddress: customerBillingAddressId,
         customerShippingAddress: customerShippingAddressId,
-        introduction,
+        introduction: sanitiseHTML(introduction),
         title,
         simpleQuantities,
         amountsAreTaxInclusive,
@@ -356,13 +360,14 @@ export default class QuotationsController {
         numberOfDecimals,
         useThousandSeparator,
         thousandSeparatorType,
-        notes,
+        notes: sanitiseHTML(notes),
         showAdditionalSubtotalDiscount,
         additionalDiscountType,
         additionalDiscountAmount,
         showAdditionalFees,
         showImages,
         useCustomSerialNumbers,
+        useEditor,
       })
 
       await requestedInvoiceQuotation.save()

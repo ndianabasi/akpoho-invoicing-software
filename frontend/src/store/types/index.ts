@@ -708,6 +708,7 @@ export type QuotationInvoiceFormShape = {
   additionalFees: Array<AdditionalFee>;
   showImages: boolean;
   useCustomSerialNumbers: boolean;
+  useEditor: boolean;
 };
 
 export interface SelectNewValueCallback {
@@ -768,6 +769,7 @@ export interface CurrentlyViewedInvoiceQuotation {
   show_additional_fees: boolean;
   show_images: boolean;
   use_custom_serial_numbers: boolean;
+  use_editor: boolean;
   created_at: string;
   updated_at: string;
   customer: {
