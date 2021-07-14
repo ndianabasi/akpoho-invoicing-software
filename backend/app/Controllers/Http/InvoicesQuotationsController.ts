@@ -133,6 +133,7 @@ export default class QuotationsController {
         additionalDiscountAmount,
         showAdditionalFees,
         showImages,
+        useCustomSerialNumbers,
       } = await request.validate(QuotationValidator)
 
       const { type: documentType } = request.qs()
@@ -166,6 +167,7 @@ export default class QuotationsController {
         showAdditionalFees,
         showImages,
         type: documentType,
+        useCustomSerialNumbers,
       })
 
       const preparedItems: Array<Record<string, unknown>> = []
@@ -186,6 +188,7 @@ export default class QuotationsController {
         itemCollector.unitPrice = item.unitPrice
         itemCollector.unitDiscount = item.unitDiscount
         itemCollector.discountType = item.discountType
+        itemCollector.customSerialNumber = item.customSerialNumber
 
         // 3. Get `unitOfMeasurementId`
         const uom = await UnitOfMeasurement.findBy('name', item.UOM)
@@ -325,6 +328,7 @@ export default class QuotationsController {
         additionalDiscountAmount,
         showAdditionalFees,
         showImages,
+        useCustomSerialNumbers,
       } = await request.validate(QuotationValidator)
 
       // 1. Update Quotation/Invoice details
@@ -358,6 +362,7 @@ export default class QuotationsController {
         additionalDiscountAmount,
         showAdditionalFees,
         showImages,
+        useCustomSerialNumbers,
       })
 
       await requestedInvoiceQuotation.save()
@@ -385,6 +390,7 @@ export default class QuotationsController {
         itemCollector.unitPrice = item.unitPrice
         itemCollector.unitDiscount = item.unitDiscount
         itemCollector.discountType = item.discountType
+        itemCollector.customSerialNumber = item.customSerialNumber
 
         // 3. Get `unitOfMeasurementId`
         const uom = await UnitOfMeasurement.findBy('name', item.UOM)

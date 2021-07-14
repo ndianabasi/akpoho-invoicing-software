@@ -123,6 +123,9 @@ export default class InvoiceQuotation extends BaseModel {
   @column({ serialize: (value) => Boolean(value) })
   public showImages: boolean
 
+  @column({ serialize: (value) => Boolean(value) })
+  public useCustomSerialNumbers: boolean
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

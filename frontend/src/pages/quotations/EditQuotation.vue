@@ -275,8 +275,20 @@
 
                   <template #body="props">
                     <q-tr :props="props" class="q-my-auto">
-                      <q-td auto-width>
-                        <div>{{ props.rowIndex + 1 }}</div>
+                      <q-td class="serial-number-column" auto-width>
+                        <q-input
+                          v-if="form.useCustomSerialNumbers"
+                          v-model="
+                            form.items[props.rowIndex].customSerialNumber
+                          "
+                          filled
+                          dense
+                          class="custom-serial-input"
+                          input-class=" text-center"
+                          stack-label
+                          :debounce="250"
+                        />
+                        <div v-else>{{ props.rowIndex + 1 }}</div>
                       </q-td>
                       <!-- <q-td auto-width>
                       <q-btn
@@ -992,6 +1004,15 @@
                 <div class="col column col-sm-12 col-md-6 col-lg-6">
                   <div class="col">
                     <q-toggle
+                      v-model="form.useCustomSerialNumbers"
+                      checked-icon="check"
+                      color="positive"
+                      label="Use custom serial numbers"
+                      unchecked-icon="clear"
+                    />
+                  </div>
+                  <div class="col">
+                    <q-toggle
                       v-model="form.simpleQuantities"
                       checked-icon="check"
                       color="positive"
@@ -1555,6 +1576,7 @@ export default defineComponent({
       additionalDiscountAmount: 0,
       showAdditionalFees: false,
       showImages: true,
+      useCustomSerialNumbers: false,
     });
 
     const quotationItemShape: QuotationInvoiceItemShape = {
@@ -1571,6 +1593,7 @@ export default defineComponent({
       discountType: 'number',
       total: 0,
       files: [],
+      customSerialNumber: null,
     };
 
     const additionalFeeShape: AdditionalFee = { name: '', amount: 0 };
@@ -2087,6 +2110,7 @@ export default defineComponent({
                     unitPrice: item.unit_price,
                     unitDiscount: item.unit_discount,
                     discountType: item.discount_type,
+                    customSerialNumber: item.custom_serial_number,
                   };
                 });
 
@@ -2148,6 +2172,8 @@ export default defineComponent({
               form.showAdditionalFees =
                 currentInvoiceQuotationData.show_additional_fees;
               form.showImages = currentInvoiceQuotationData.show_images;
+              form.useCustomSerialNumbers =
+                currentInvoiceQuotationData.use_custom_serial_numbers;
 
               loading.value = false;
             } catch (error) {

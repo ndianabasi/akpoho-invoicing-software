@@ -26,7 +26,10 @@ export default class InvoiceQuotationItem extends BaseModel {
   public invoicesQuotationsId: string
 
   @column()
-  public productId: string
+  public productId?: string
+
+  @column()
+  public customSerialNumber?: string
 
   @column()
   public productName?: string

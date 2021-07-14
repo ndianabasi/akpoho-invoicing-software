@@ -314,6 +314,13 @@ input[type='file'] {
     }
   }
 
+  .serial-number-column {
+    .custom-serial-input {
+      width: 50px !important;
+      min-width: 50px;
+    }
+  }
+
   .unit-discount-column {
     :has(.discount-type-select-input) {
       width: 180px !important;

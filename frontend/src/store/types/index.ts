@@ -674,6 +674,7 @@ export interface QuotationInvoiceItemShape {
   discountType: DiscountType;
   readonly total?: number;
   files?: Array<File>;
+  customSerialNumber: number | null;
 }
 
 export type QuotationInvoiceFormShape = {
@@ -706,6 +707,7 @@ export type QuotationInvoiceFormShape = {
   showAdditionalFees: boolean;
   additionalFees: Array<AdditionalFee>;
   showImages: boolean;
+  useCustomSerialNumbers: boolean;
 };
 
 export interface SelectNewValueCallback {
@@ -765,6 +767,7 @@ export interface CurrentlyViewedInvoiceQuotation {
   additional_discount_amount: number;
   show_additional_fees: boolean;
   show_images: boolean;
+  use_custom_serial_numbers: boolean;
   created_at: string;
   updated_at: string;
   customer: {
@@ -821,5 +824,6 @@ export interface CurrentlyViewedInvoiceQuotation {
       name: UnitOfMeasurement;
       type: UnitOfMeasurementTypes;
     };
+    custom_serial_number: number | null;
   }>;
 }

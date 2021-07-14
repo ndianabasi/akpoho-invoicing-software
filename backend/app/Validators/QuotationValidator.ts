@@ -24,6 +24,10 @@ export default class QuotationValidator {
           rules.minLength(6),
           rules.maxLength(50),
         ]),
+        customSerialNumber: schema.string.optional({ escape: true, trim: true }, [
+          rules.minLength(1),
+          rules.maxLength(3),
+        ]),
         /**
          * Description could contain HTML tags. We do not want those tags
          * to be sanitised. So we will skip `escape` here and sanitise it
@@ -100,13 +104,17 @@ export default class QuotationValidator {
     additionalDiscountAmount: schema.number.optional(),
     showAdditionalFees: schema.boolean(),
     showImages: schema.boolean(),
+    useCustomSerialNumbers: schema.boolean(),
   })
 
   public messages = {
     'items.required': 'Items are required. You cannot submit an empty list of items.',
-    'items.*.productId.required': 'Product name/id is required for an item.',
     'items.*.productId.minLength': 'Minimum length of product name/id is {{options.choices}}.',
     'items.*.productId.maxLength': 'Maximum length of product name/id is {{options.choices}}.',
+    'items.*.customSerialNumber.minLength':
+      'Minimum length of Custom Serial Number is {{options.choices}}.',
+    'items.*.customSerialNumber.maxLength':
+      'Maximum length of Custom Serial Number is {{options.choices}}.',
     'items.*.productNameType.enum': 'Invalid product type was provided for an item.',
     'items.*.productName.minLength': 'Minimum length of product name is {{options.choices}}.',
     'items.*.productName.maxLength': 'Maximum length of product name is {{options.choices}}.',
