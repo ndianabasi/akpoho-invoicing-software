@@ -2,8 +2,17 @@ import Route from '@ioc:Adonis/Core/Route'
 
 // Company-related routes
 Route.group(() => {
-  // Create a new product and relate with to the company_id
-  Route.post('/:company_id/quotations', 'InvoicesQuotationsController.store')
+  // Create a invoice/quotation for a company. Need a type to differentiate
+  // a quotation request from an invoice request
+  // The type should be defined in the query string: e.g type=quotation
+  Route.post('/:company_id/invoices-quotations', 'InvoicesQuotationsController.store')
+  // Update an invoice/quotation for a company. Need a type to differentiate
+  // a quotation request from an invoice request
+  // The type should be defined in the query string: e.g type=quotation
+  Route.patch(
+    '/:company_id/invoices-quotations/:invoice_quotation_id',
+    'InvoicesQuotationsController.update'
+  ).middleware('findRequestedInvoiceQuotation')
   // Get all quotations for a company. Need a type to differentiate
   // a quotation request from an invoice request
   // The type should be defined in the query string: e.g type=quotation

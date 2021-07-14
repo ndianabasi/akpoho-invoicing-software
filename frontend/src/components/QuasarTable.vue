@@ -450,7 +450,8 @@ export default defineComponent({
     },
     tableDataGetterType: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
     routeParam: {
       type: String,

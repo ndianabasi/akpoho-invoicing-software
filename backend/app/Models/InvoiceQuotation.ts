@@ -3,6 +3,7 @@ import {
   afterFetch,
   afterFind,
   BaseModel,
+  beforeCreate,
   beforeSave,
   belongsTo,
   BelongsTo,
@@ -128,14 +129,14 @@ export default class InvoiceQuotation extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @beforeSave()
+  @beforeCreate()
   public static generateUUID(model: InvoiceQuotation) {
     UUIDHook.generateUUID(model, 'id')
   }
 
   @beforeSave()
   public static async stringifyFormats(invoiceQuotation: InvoiceQuotation) {
-    if (invoiceQuotation.$dirty.additionalFees && invoiceQuotation.additionalFees !== undefined) {
+    if (invoiceQuotation.$dirty.additionalFees) {
       invoiceQuotation.additionalFees = JSON.stringify(invoiceQuotation.additionalFees)
     }
   }

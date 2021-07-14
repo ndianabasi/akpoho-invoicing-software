@@ -159,39 +159,26 @@ export default defineComponent({
     const selectFilterFn: FilterFnInterface = function (val, update) {
       const needle = computed(() => normalize(val));
 
-      update(
-        () => {
-          if (!needle.value) {
-            filteredOptions.value = props.options;
-            return;
-          }
-
-          if (!props.asyncFilterMode) {
-            filteredOptions.value = props.options.filter(
-              (v) => normalize(v[props.optionLabel]).indexOf(needle.value) > -1
-            );
-            return;
-          } else {
-            void store
-              .dispatch(props.asyncFilterAction, needle.value)
-              .then((options: Array<{ [index: string]: string }>) => {
-                filteredOptions.value = options;
-              });
-            return;
-          }
-        },
-        // "ref" is the Vue reference to the QSelect
-        (ref) => {
-          if (
-            needle.value !== '' &&
-            (ref?.options?.length ?? 0 > 0) &&
-            (ref?.optionIndex ?? -1 === -1)
-          ) {
-            ref.moveOptionSelection(1, true); // focus the first selectable option and do not update the input-value
-            ref.toggleOption(ref?.options?.[ref?.optionIndex], true); // toggle the focused option
-          }
+      update(() => {
+        if (!needle.value) {
+          filteredOptions.value = props.options;
+          return;
         }
-      );
+
+        if (!props.asyncFilterMode) {
+          filteredOptions.value = props.options.filter(
+            (v) => normalize(v[props.optionLabel]).indexOf(needle.value) > -1
+          );
+          return;
+        } else {
+          void store
+            .dispatch(props.asyncFilterAction, needle.value)
+            .then((options: Array<{ [index: string]: string }>) => {
+              filteredOptions.value = options;
+            });
+          return;
+        }
+      });
     };
 
     const vm = getCurrentInstance() as unknown as CustomVm;

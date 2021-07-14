@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
-  beforeSave,
+  beforeCreate,
   belongsTo,
   BelongsTo,
   column,
@@ -64,7 +64,7 @@ export default class InvoiceQuotationItem extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @beforeSave()
+  @beforeCreate()
   public static generateUUID(model: InvoiceQuotationItem) {
     UUIDHook.generateUUID(model, 'id')
   }

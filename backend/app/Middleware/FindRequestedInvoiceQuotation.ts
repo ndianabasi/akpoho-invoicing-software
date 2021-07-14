@@ -7,6 +7,8 @@ export default class FindRequestedInvoiceQuotation {
     const { invoice_quotation_id } = ctx.params
     const { type } = ctx.request.qs()
 
+    if (!type) throw new NoEntityDefinedException('Document type is required')
+
     if (!invoice_quotation_id)
       throw new NoEntityDefinedException('No invoice/quotation was provided!')
 

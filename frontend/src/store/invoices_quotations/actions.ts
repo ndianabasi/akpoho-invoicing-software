@@ -11,20 +11,27 @@ import { Notify } from 'quasar';
 const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
   async CREATE_QUOTATION(
     { rootGetters },
-    payload: Record<string, Record<string, unknown> | string | number | boolean>
+    payload: {
+      form: Record<string, Record<string, unknown> | string | number | boolean>;
+      type: 'quotation' | 'invoice';
+    }
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const currentCompany = rootGetters[
       'auth/GET_CURRENT_COMPANY'
     ] as StringIDNameInterface;
 
-    const { form } = payload;
+    const { form, type } = payload;
 
     return new Promise(async (resolve, reject) => {
       await $http
-        .post(`${currentCompany.id}/quotations`, {
-          ...(form as Record<string, unknown>),
-        })
+        .post(
+          `${currentCompany.id}/invoices-quotations`,
+          {
+            ...(form as Record<string, unknown>),
+          },
+          { params: { type } }
+        )
         .then((res: HttpResponse) => {
           Notify.create({
             message: 'Quotation was successfully created',
@@ -48,23 +55,33 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
     });
   },
 
-  async EDIT_PRODUCT(
-    ctx,
-    {
-      form,
-      productId,
-    }: {
-      form: { [index: string]: unknown };
-      attributeSetId: string;
-      productId: string;
+  async EDIT_QUOTATION(
+    { rootGetters },
+    payload: {
+      form: Record<string, Record<string, unknown> | string | boolean | number>;
+      id: string;
+      type: 'quotation' | 'invoice';
     }
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const currentCompany = rootGetters[
+      'auth/GET_CURRENT_COMPANY'
+    ] as StringIDNameInterface;
+
+    const { form, id, type } = payload;
+
     return new Promise(async (resolve, reject) => {
       await $http
-        .patch(`/products/${productId}`, { ...form })
+        .patch(
+          `${currentCompany.id}/invoices-quotations/${id}`,
+          {
+            ...(form as Record<string, unknown>),
+          },
+          { params: { type } }
+        )
         .then((res: HttpResponse) => {
           Notify.create({
-            message: 'Product was successfully edited',
+            message: 'Quotation was successfully edited',
             type: 'positive',
             position: 'top',
             progress: true,

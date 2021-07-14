@@ -2,7 +2,6 @@
   <quasar-table
     :table-columns="columns"
     :table-name="tableName"
-    :table-data-getter-type="tableDataGetterType"
     :default-sort="defaultSort"
     no-results-label="Sorry! No quotations were found. Please check your filters too."
     row-view-route-name="view_quotation"

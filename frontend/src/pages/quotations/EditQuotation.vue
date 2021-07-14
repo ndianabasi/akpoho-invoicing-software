@@ -759,7 +759,10 @@
                       />
                     </div>
                   </template>
-                  <template v-if="form.items && !!form.items.length" #bottom-row>
+                  <template
+                    v-if="form.items && !!form.items.length"
+                    #bottom-row
+                  >
                     <q-tr v-if="form.calculateTotals" class="bottom-row">
                       <q-td auto-width />
                       <q-td
@@ -913,7 +916,7 @@
                             @click="removeAdditionalFee(index)"
                           />
                           <q-btn
-                            v-if="isAdditionalFeeLastItem(index)"                           
+                            v-if="isAdditionalFeeLastItem(index)"
                             color="positive"
                             round
                             flat
@@ -1235,7 +1238,7 @@
           </div>
         </template>
 
-        <template v-if="!creationMode && !myAccountMode" #title-panel-side>
+        <template v-if="!creationMode" #title-panel-side>
           <q-btn flat icon="more_vert">
             <q-menu
               anchor="bottom right"
@@ -1295,6 +1298,7 @@ import {
   nextTick,
   onMounted,
   unref,
+  PropType,
 } from 'vue';
 
 import ViewCard from '../../components/ViewCard.vue';
@@ -1352,17 +1356,18 @@ export default defineComponent({
 
   props: {
     quotationId: {
-      type: String,
+      type: String as PropType<string>,
       required: false,
       default: '',
     },
     creationMode: {
-      type: Boolean,
+      type: Boolean as PropType<boolean>,
       default: false,
     },
-    myAccountMode: {
-      type: Boolean,
-      default: false,
+    documentType: {
+      type: String as PropType<'quotation' | 'invoice'>,
+      required: false,
+      default: 'quotation',
     },
   },
 
@@ -1509,14 +1514,14 @@ export default defineComponent({
     const customerBillingAddresses = computed({
       get: () =>
         store.getters['customers/GET_CUSTOMER_ADDRESSES_FOR_SELECT']
-          .billingAddresses as SelectOption[],
+          ?.billingAddresses ?? ([] as SelectOption[]),
       set: (value) => value,
     });
 
     const customerShippingAddresses = computed({
       get: () =>
         store.getters['customers/GET_CUSTOMER_ADDRESSES_FOR_SELECT']
-          .shippingAddresses as SelectOption[],
+          ?.shippingAddresses ?? ([] as SelectOption[]),
       set: (value) => value,
     });
 
@@ -1883,14 +1888,20 @@ export default defineComponent({
 
       void nextTick(() => {
         const isCreationMode = props.creationMode;
+        quotationCreated.value = false;
+
         void store
           .dispatch(
             `invoices_quotations/${
               isCreationMode ? 'CREATE_QUOTATION' : 'EDIT_QUOTATION'
             }`,
             isCreationMode
-              ? { form: normalisedForm.value }
-              : { form: normalisedForm.value, quotationId: props.quotationId }
+              ? { form: normalisedForm.value, type: props.documentType }
+              : {
+                  form: normalisedForm.value,
+                  id: props.quotationId,
+                  type: props.documentType,
+                }
           )
           .then((id: string) => {
             quotationCreated.value = true;
@@ -2037,104 +2048,111 @@ export default defineComponent({
                   ] as CurrentlyViewedInvoiceQuotation
               )
             );
+            const currentInvoiceQuotationData = JSON.parse(
+              JSON.stringify(currentInvoiceQuotation.value)
+            ) as CurrentlyViewedInvoiceQuotation;
 
-            form.items = (currentInvoiceQuotation.value?.items ?? [])
-              .sort((a, b) => a.sort_order - b.sort_order)
-              .map((item) => {
-                const isRealProduct = item?.product !== null;
-                const productIdColumnHeader = itemsColumns.filter(
-                  (column) => column.name === 'productId'
-                )[0];
+            try {
+              form.items = (currentInvoiceQuotationData?.items ?? [])
+                .sort((a, b) => a.sort_order - b.sort_order)
+                .map((item) => {
+                  const isRealProduct = item?.product !== null;
+                  const productIdColumnHeader = itemsColumns.filter(
+                    (column) => column.name === 'productId'
+                  )[0];
 
-                if (isRealProduct) {
-                  productIdColumnHeader.options?.push({
-                    label: item?.product?.name ?? '',
-                    value: item?.product?.id ?? '',
-                  });
-                }
+                  if (isRealProduct) {
+                    productIdColumnHeader.options?.push({
+                      label: item?.product?.name ?? '',
+                      value: item?.product?.id ?? '',
+                    });
+                  }
 
-                return {
-                  productId: isRealProduct
-                    ? {
-                        label: item?.product?.name ?? '',
-                        value: item?.product?.id ?? null,
-                      }
-                    : null,
-                  productName: !isRealProduct ? item.product_name : '',
-                  productNameType: isRealProduct
-                    ? ('real_product' as ProductNameType)
-                    : ('custom_product' as ProductNameType),
-                  description: item.description,
-                  qty: item.qty,
-                  UOM: item.unitOfMeasurement.name,
-                  collectionTypeId: item.collectionType.name,
-                  groupQty: item.group_qty,
-                  unitPrice: item.unit_price,
-                  unitDiscount: item.unit_discount,
-                  discountType: item.discount_type,
-                };
+                  return {
+                    productId: isRealProduct
+                      ? {
+                          label: item?.product?.name ?? '',
+                          value: item?.product?.id ?? null,
+                        }
+                      : null,
+                    productName: !isRealProduct ? item.product_name : '',
+                    productNameType: isRealProduct
+                      ? ('real_product' as ProductNameType)
+                      : ('custom_product' as ProductNameType),
+                    description: item.description,
+                    qty: item.qty,
+                    UOM: item.unitOfMeasurement.name,
+                    collectionTypeId: item.collectionType.name,
+                    groupQty: item.group_qty,
+                    unitPrice: item.unit_price,
+                    unitDiscount: item.unit_discount,
+                    discountType: item.discount_type,
+                  };
+                });
+
+              form.additionalFees = currentInvoiceQuotationData.additional_fees;
+              form.date = currentInvoiceQuotationData.date;
+              form.code = currentInvoiceQuotationData.code;
+
+              form.customerId = {
+                label: currentInvoiceQuotationData.customer.customer_name,
+                value: currentInvoiceQuotationData.customer.id,
+              };
+              customersForSelectOptions.value.push({
+                label: currentInvoiceQuotationData.customer.customer_name,
+                value: currentInvoiceQuotationData.customer.id,
               });
 
-            form.additionalFees = currentInvoiceQuotation.value.additional_fees;
-            form.date = currentInvoiceQuotation.value.date;
-            form.code = currentInvoiceQuotation.value.code;
+              form.customerBillingAddressId = {
+                label: currentInvoiceQuotationData.billing_address.full_address,
+                value: currentInvoiceQuotationData.billing_address.id,
+              };
 
-            form.customerId = {
-              label: currentInvoiceQuotation.value.customer.customer_name,
-              value: currentInvoiceQuotation.value.customer.id,
-            };
-            customersForSelectOptions.value.push({
-              label: currentInvoiceQuotation.value.customer.customer_name,
-              value: currentInvoiceQuotation.value.customer.id,
-            });
+              form.customerShippingAddressId = {
+                label:
+                  currentInvoiceQuotationData.shipping_address.full_address,
+                value: currentInvoiceQuotationData.shipping_address.id,
+              };
 
-            form.customerBillingAddressId = {
-              label: currentInvoiceQuotation.value.billing_address.full_address,
-              value: currentInvoiceQuotation.value.billing_address.id,
-            };
+              form.introduction = currentInvoiceQuotationData.introduction;
+              form.title = currentInvoiceQuotationData.title;
+              form.simpleQuantities =
+                currentInvoiceQuotationData.simple_quantities;
+              form.amountsAreTaxInclusive =
+                currentInvoiceQuotationData.amounts_are_tax_inclusive;
+              form.taxPercentage = currentInvoiceQuotationData.tax_percentage;
+              form.roundAmounts = currentInvoiceQuotationData.round_amounts;
+              form.roundAmountType =
+                currentInvoiceQuotationData.round_amount_type;
+              form.showDiscounts = currentInvoiceQuotationData.show_discounts;
+              form.discountType = currentInvoiceQuotationData.discount_type;
+              form.setDiscountTypePerLine =
+                currentInvoiceQuotationData.set_discount_type_per_line;
+              form.calculateTotals =
+                currentInvoiceQuotationData.calculate_totals;
+              form.changeProductPrices =
+                currentInvoiceQuotationData.change_product_prices;
+              form.numberOfDecimals =
+                currentInvoiceQuotationData.number_of_decimals;
+              form.useThousandSeparator =
+                currentInvoiceQuotationData.use_thousand_separator;
+              form.thousandSeparatorType =
+                currentInvoiceQuotationData.thousand_separator_type;
+              form.notes = currentInvoiceQuotationData.notes;
+              form.showAdditionalSubtotalDiscount =
+                currentInvoiceQuotationData.show_additional_subtotal_discount;
+              form.additionalDiscountType =
+                currentInvoiceQuotationData.additional_discount_type;
+              form.additionalDiscountAmount =
+                currentInvoiceQuotationData.additional_discount_amount;
+              form.showAdditionalFees =
+                currentInvoiceQuotationData.show_additional_fees;
+              form.showImages = currentInvoiceQuotationData.show_images;
 
-            form.customerShippingAddressId = {
-              label:
-                currentInvoiceQuotation.value.shipping_address.full_address,
-              value: currentInvoiceQuotation.value.shipping_address.id,
-            };
-
-            form.introduction = currentInvoiceQuotation.value.introduction;
-            form.title = currentInvoiceQuotation.value.title;
-            form.simpleQuantities =
-              currentInvoiceQuotation.value.simple_quantities;
-            form.amountsAreTaxInclusive =
-              currentInvoiceQuotation.value.amounts_are_tax_inclusive;
-            form.taxPercentage = currentInvoiceQuotation.value.tax_percentage;
-            form.roundAmounts = currentInvoiceQuotation.value.round_amounts;
-            form.roundAmountType =
-              currentInvoiceQuotation.value.round_amount_type;
-            form.showDiscounts = currentInvoiceQuotation.value.show_discounts;
-            form.discountType = currentInvoiceQuotation.value.discount_type;
-            form.setDiscountTypePerLine =
-              currentInvoiceQuotation.value.set_discount_type_per_line;
-            form.calculateTotals =
-              currentInvoiceQuotation.value.calculate_totals;
-            form.changeProductPrices =
-              currentInvoiceQuotation.value.change_product_prices;
-            form.numberOfDecimals =
-              currentInvoiceQuotation.value.number_of_decimals;
-            form.useThousandSeparator =
-              currentInvoiceQuotation.value.use_thousand_separator;
-            form.thousandSeparatorType =
-              currentInvoiceQuotation.value.thousand_separator_type;
-            form.notes = currentInvoiceQuotation.value.notes;
-            form.showAdditionalSubtotalDiscount =
-              currentInvoiceQuotation.value.show_additional_subtotal_discount;
-            form.additionalDiscountType =
-              currentInvoiceQuotation.value.additional_discount_type;
-            form.additionalDiscountAmount =
-              currentInvoiceQuotation.value.additional_discount_amount;
-            form.showAdditionalFees =
-              currentInvoiceQuotation.value.show_additional_fees;
-            form.showImages = currentInvoiceQuotation.value.show_images;
-
-            loading.value = false;
+              loading.value = false;
+            } catch (error) {
+              console.log(error);
+            }
           })
           .catch(() => {
             loading.value = false;
@@ -2149,11 +2167,6 @@ export default defineComponent({
 
     onMounted(() => {
       if (props.creationMode) void addItemLines(3);
-
-      console.log(customerSelect.value);
-      customerSelect.value?.focus();
-      customerBillingAddressSelect.value?.focus();
-      customerShippingAddressSelect.value?.focus();
 
       /* const sortableListElement = document.querySelector(
         '.quotation-invoice-table tbody'
