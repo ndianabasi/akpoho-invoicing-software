@@ -181,7 +181,7 @@ export default class QuotationsController {
         // 1. test if product id is a UUID
         const isId = isUUID(item?.productId ?? '', 5)
         itemCollector.productId = isId ? item.productId : null
-        itemCollector.productName = isId ? null : item?.productName
+        itemCollector.productName = isId ? null : sanitiseHTML(item?.productName)
 
         // 2. Get other fields
         itemCollector.description = item.description
@@ -385,7 +385,7 @@ export default class QuotationsController {
         // 1. test if product id is a UUID
         const isId = isUUID(item?.productId ?? '', 5)
         itemCollector.productId = isId ? item.productId : null
-        itemCollector.productName = isId ? null : item?.productName
+        itemCollector.productName = isId ? null : sanitiseHTML(item?.productName)
 
         // 2. Get other fields
         itemCollector.description = item.description

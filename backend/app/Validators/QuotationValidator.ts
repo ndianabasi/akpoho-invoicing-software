@@ -20,7 +20,12 @@ export default class QuotationValidator {
           rules.maxLength(50),
         ]),
         productNameType: schema.enum(QUOTATION_PRODUCT_NAME_TYPES),
-        productName: schema.string.optional({ escape: true, trim: true }, [
+        /**
+         * Product Name could contain special characters.
+         * So we will skip `escape` here and sanitise it
+         * in the controller
+         */
+        productName: schema.string.optional({ trim: true }, [
           rules.minLength(6),
           rules.maxLength(50),
         ]),
