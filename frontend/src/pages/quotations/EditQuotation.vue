@@ -235,13 +235,19 @@
 
                   <template #hint></template>
                 </q-input>
-                <q-editor
-                  v-else
-                  v-model="form.introduction"
-                  class="q-mb-md-lg q-mb-sm-md"
-                  min-height="5rem"
-                  placeholder="Introduction"
-                />
+                <template v-else>
+                  <label
+                    class="q-field__label no-pointer-events text-body2"
+                    for="introduction"
+                    >Introduction</label
+                  >
+                  <q-editor
+                    v-model="form.introduction"
+                    class="q-mb-md-lg q-mb-sm-md"
+                    min-height="5rem"
+                    placeholder="Introduction"
+                  />
+                </template>
               </div>
             </div>
             <div class="row q-gutter-sm">
@@ -1022,13 +1028,19 @@
 
                   <template #hint></template>
                 </q-input>
-                <q-editor
-                  v-else
-                  v-model="form.notes"
-                  class="q-mb-md-lg q-mb-sm-md"
-                  min-height="5rem"
-                  placeholder="Notes"
-                />
+                <template v-else>
+                  <label
+                    class="q-field__label no-pointer-events text-body2"
+                    for="notes"
+                    >Notes</label
+                  >
+                  <q-editor
+                    v-model="form.notes"
+                    class="q-mb-md-lg q-mb-sm-md"
+                    min-height="5rem"
+                    placeholder="Notes"
+                  />
+                </template>
               </div>
             </div>
             <q-expansion-item
@@ -1036,32 +1048,31 @@
               icon="settings"
               color="accent"
               label="Settings"
-              class="quotation-settings-accordion"
+              class="quotation-settings-accordion q-mt-md"
               dense
             >
               <div class="row">
-                <div class="col column col-sm-12 col-md-6 col-lg-6">
-                  <div class="col">
+                <div class="col col-12">
+                  <q-toggle
+                    v-model="form.useCustomSerialNumbers"
+                    checked-icon="check"
+                    color="positive"
+                    label="Use custom serial numbers"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col col-12">
+                  <q-toggle
+                    v-model="form.simpleQuantities"
+                    checked-icon="check"
+                    color="positive"
+                    label="Use simple quantities"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col col-12">
+                  <div class="row q-gutter-lg">
                     <q-toggle
-                      v-model="form.useCustomSerialNumbers"
-                      checked-icon="check"
-                      color="positive"
-                      label="Use custom serial numbers"
-                      unchecked-icon="clear"
-                    />
-                  </div>
-                  <div class="col">
-                    <q-toggle
-                      v-model="form.simpleQuantities"
-                      checked-icon="check"
-                      color="positive"
-                      label="Use simple quantities"
-                      unchecked-icon="clear"
-                    />
-                  </div>
-                  <div class="col">
-                    <div class="row q-gutter-lg">
-                      <q-toggle
                         v-model="form.amountsAreTaxInclusive"
                         checked-icon="check"
                         color="positive"
@@ -1085,113 +1096,111 @@
                           <div class="text-body2">Tax</div>
                         </template>
                       </q-input>
-                    </div>
                   </div>
-                  <div class="col">
+                </div>
+                <div class="col col-12">
+                  <q-toggle
+                    v-model="form.changeProductPrices"
+                    checked-icon="check"
+                    color="positive"
+                    label="Change product prices"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col col-12">
+                  <div class="row q-gutter-lg">
                     <q-toggle
-                      v-model="form.changeProductPrices"
+                      v-model="form.roundAmounts"
                       checked-icon="check"
                       color="positive"
-                      label="Change product prices"
+                      label="Round amounts"
                       unchecked-icon="clear"
                     />
+                    <q-select
+                      v-if="form.roundAmounts"
+                      v-model="form.roundAmountType"
+                      filled
+                      :options="roundTypeOptions"
+                      dense
+                      options-dense
+                      transition-show="scale"
+                      transition-hide="scale"
+                      emit-value
+                      map-options
+                    />
                   </div>
-                  <div class="col">
-                    <div class="row q-gutter-lg">
-                      <q-toggle
-                        v-model="form.roundAmounts"
-                        checked-icon="check"
-                        color="positive"
-                        label="Round amounts"
-                        unchecked-icon="clear"
-                      />
+                </div>
+                <div class="col col-12">
+                  <q-toggle
+                    v-model="form.calculateTotals"
+                    checked-icon="check"
+                    color="positive"
+                    label="Calculate totals"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col col-12">
+                  <div class="row q-gutter-lg">
+                    <q-toggle
+                      v-model="form.showDiscounts"
+                      checked-icon="check"
+                      color="positive"
+                      label="Show discounts"
+                      unchecked-icon="clear"
+                    />
+                    <q-select
+                      v-if="form.showDiscounts && !form.setDiscountTypePerLine"
+                      v-model="form.discountType"
+                      filled
+                      :options="discountTypeOptions"
+                      dense
+                      options-dense
+                      transition-show="scale"
+                      transition-hide="scale"
+                      emit-value
+                      map-options
+                    />
+                  </div>
+                </div>
+                <div v-if="form.showDiscounts" class="col col-12">
+                  <q-toggle
+                    v-model="form.setDiscountTypePerLine"
+                    checked-icon="check"
+                    color="positive"
+                    label="Set discount type per line"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col col-12">
+                  <div class="row">
+                    <div class="col col-sm-12 col-md-6">
                       <q-select
-                        v-if="form.roundAmounts"
-                        v-model="form.roundAmountType"
+                        v-model="form.numberOfDecimals"
                         filled
-                        :options="roundTypeOptions"
-                        dense
+                        :options="numberOfDecimalOptions"
                         options-dense
+                        dense
                         transition-show="scale"
                         transition-hide="scale"
                         emit-value
                         map-options
-                      />
+                      >
+                        <template #before>
+                          <div
+                            class="
+                              before-select-label
+                              q-pl-sm
+                              text-body1 text-weight-regular text-black
+                            "
+                          >
+                            Number of decimals
+                          </div>
+                        </template>
+                      </q-select>
                     </div>
                   </div>
-                  <div class="col">
-                    <q-toggle
-                      v-model="form.calculateTotals"
-                      checked-icon="check"
-                      color="positive"
-                      label="Calculate totals"
-                      unchecked-icon="clear"
-                    />
-                  </div>
-                  <div class="col">
-                    <div class="row q-gutter-lg">
-                      <q-toggle
-                        v-model="form.showDiscounts"
-                        checked-icon="check"
-                        color="positive"
-                        label="Show discounts"
-                        unchecked-icon="clear"
-                      />
-                      <q-select
-                        v-if="
-                          form.showDiscounts && !form.setDiscountTypePerLine
-                        "
-                        v-model="form.discountType"
-                        filled
-                        :options="discountTypeOptions"
-                        dense
-                        options-dense
-                        transition-show="scale"
-                        transition-hide="scale"
-                        emit-value
-                        map-options
-                      />
-                    </div>
-                  </div>
-                  <div v-if="form.showDiscounts" class="col">
-                    <q-toggle
-                      v-model="form.setDiscountTypePerLine"
-                      checked-icon="check"
-                      color="positive"
-                      label="Set discount type per line"
-                      unchecked-icon="clear"
-                    />
-                  </div>
-                  <div class="col">
-                    <div class="row">
-                      <div class="col col-sm-12 col-md-6">
-                        <q-select
-                          v-model="form.numberOfDecimals"
-                          filled
-                          :options="numberOfDecimalOptions"
-                          options-dense
-                          dense
-                          transition-show="scale"
-                          transition-hide="scale"
-                          emit-value
-                          map-options
-                        >
-                          <template #before>
-                            <div
-                              class="
-                                before-select-label
-                                q-pl-sm
-                                text-body1 text-weight-regular text-black
-                              "
-                            >
-                              Number of decimals
-                            </div>
-                          </template>
-                        </q-select>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- <div class="col q-mt-sm">
+                </div>
+                <!-- <div class="col q-mt-sm">
                   <div class="row q-gutter-lg">
                     <q-toggle
                       v-model="form.useThousandSeparator"
@@ -1214,75 +1223,74 @@
                     />
                   </div>
                 </div> -->
-                  <div class="col q-my-sm">
-                    <div class="row q-gutter-lg">
-                      <q-toggle
-                        v-model="form.showAdditionalSubtotalDiscount"
-                        checked-icon="check"
-                        color="positive"
-                        label="Show additional subtotal discount"
-                        unchecked-icon="clear"
-                      />
-                      <q-select
-                        v-if="form.showAdditionalSubtotalDiscount"
-                        v-model="form.additionalDiscountType"
-                        filled
-                        :options="discountTypeOptions"
-                        dense
-                        options-dense
-                        transition-show="scale"
-                        transition-hide="scale"
-                        emit-value
-                        map-options
-                        class="additional-discount-select"
-                      />
-                      <q-input
-                        v-if="form.showAdditionalSubtotalDiscount"
-                        v-model="form.additionalDiscountAmount"
-                        filled
-                        dense
-                        class="additional-discount-input"
-                        autogrow
-                        label="Discount amount"
-                        stack-label
-                        :debounce="250"
+                <div class="col col-12 q-my-sm">
+                  <div class="row q-gutter-lg">
+                    <q-toggle
+                      v-model="form.showAdditionalSubtotalDiscount"
+                      checked-icon="check"
+                      color="positive"
+                      label="Show additional subtotal discount"
+                      unchecked-icon="clear"
+                    />
+                    <q-select
+                      v-if="form.showAdditionalSubtotalDiscount"
+                      v-model="form.additionalDiscountType"
+                      filled
+                      :options="discountTypeOptions"
+                      dense
+                      options-dense
+                      transition-show="scale"
+                      transition-hide="scale"
+                      emit-value
+                      map-options
+                      class="additional-discount-select"
+                    />
+                    <q-input
+                      v-if="form.showAdditionalSubtotalDiscount"
+                      v-model="form.additionalDiscountAmount"
+                      filled
+                      dense
+                      class="additional-discount-input"
+                      autogrow
+                      label="Discount amount"
+                      stack-label
+                      :debounce="250"
+                    >
+                      <template
+                        v-if="form.additionalDiscountType === 'percentage'"
+                        #append
                       >
-                        <template
-                          v-if="form.additionalDiscountType === 'percentage'"
-                          #append
-                        >
-                          <div class="text-body2">%</div>
-                        </template>
-                      </q-input>
-                    </div>
+                        <div class="text-body2">%</div>
+                      </template>
+                    </q-input>
                   </div>
-                  <div class="col">
-                    <q-toggle
-                      v-model="form.showAdditionalFees"
-                      checked-icon="check"
-                      color="positive"
-                      label="Set additional fees"
-                      unchecked-icon="clear"
-                    />
-                  </div>
-                  <div class="col">
-                    <q-toggle
-                      v-model="form.useEditor"
-                      checked-icon="check"
-                      color="positive"
-                      label="Use WYSIWYG Editor"
-                      unchecked-icon="clear"
-                    />
-                  </div>
-                  <div v-if="enableImageUploads" class="col">
-                    <q-toggle
-                      v-model="form.showImages"
-                      checked-icon="check"
-                      color="positive"
-                      label="Show/Add images"
-                      unchecked-icon="clear"
-                    />
-                  </div>
+                </div>
+                <div class="col col-12">
+                  <q-toggle
+                    v-model="form.showAdditionalFees"
+                    checked-icon="check"
+                    color="positive"
+                    label="Set additional fees"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div class="col col-12">
+                  <q-toggle
+                    v-model="form.useEditor"
+                    checked-icon="check"
+                    color="positive"
+                    label="Use WYSIWYG Editor"
+                    unchecked-icon="clear"
+                  />
+                </div>
+                <div v-if="enableImageUploads" class="col col-12">
+                  <q-toggle
+                    v-model="form.showImages"
+                    checked-icon="check"
+                    color="positive"
+                    label="Show/Add images"
+                    unchecked-icon="clear"
+                  />
                 </div>
               </div>
             </q-expansion-item>
@@ -1317,28 +1325,28 @@
             >
               <q-list>
                 <q-item
-                  v-if="resourcePermissions.canView"
+                  v-if="resourcePermissions?.canView ?? false"
                   :to="{
-                    name: 'view_company',
-                    params: { companyId: companyId }, //companyId from route props
+                    name: 'view_quotation',
+                    params: { quotationId: quotationId }, //quotationId from route props
                   }"
                 >
                   <q-item-section>
                     <q-btn flat icon="visibility" />
                   </q-item-section>
-                  <q-item-section>View Company</q-item-section>
+                  <q-item-section>View Quotation</q-item-section>
                 </q-item>
 
                 <q-item
-                  v-if="resourcePermissions.canList"
+                  v-if="resourcePermissions?.canList ?? false"
                   :to="{
-                    name: 'all_companies',
+                    name: 'quotations',
                   }"
                 >
                   <q-item-section>
                     <q-btn flat icon="view_list" />
                   </q-item-section>
-                  <q-item-section>All Companies</q-item-section>
+                  <q-item-section>All Quotations</q-item-section>
                 </q-item>
               </q-list>
             </q-menu>
@@ -2322,8 +2330,8 @@ export default defineComponent({
       customerBillingAddresses,
       customerShippingAddresses,
       resourcePermissions: useResourcePermissions({
-        view: PERMISSION.CAN_VIEW_COMPANIES,
-        list: PERMISSION.CAN_LIST_COMPANIES,
+        view: PERMISSION.CAN_VIEW_QUOTATIONS,
+        list: PERMISSION.CAN_LIST_QUOTATIONS,
       }),
       CAN_EDIT_QUOTATIONS,
       isSubmitting,
