@@ -50,6 +50,7 @@
     "phc-argon2": "^1.1.1",
     "proxy-addr": "^2.0.6",
     "reflect-metadata": "^0.1.13",
+    "sanitize-html": "^2.4.0",
     "secure-random-password": "^0.2.2",
     "sharp": "^0.28.3",
     "source-map-support": "^0.5.19",

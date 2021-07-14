@@ -661,7 +661,7 @@ export const productNameTypeOptions: Array<{
 ];
 
 export interface QuotationInvoiceItemShape {
-  productId: string | null;
+  productId: SelectOption | null;
   productName: string | null;
   productNameType: ProductNameType;
   description: string | null;
@@ -679,9 +679,9 @@ export interface QuotationInvoiceItemShape {
 export type QuotationInvoiceFormShape = {
   date: string | null;
   code: string | null | undefined;
-  customerId: string | null | undefined;
-  customerBillingAddressId: string | null | undefined;
-  customerShippingAddressId: string | null | undefined;
+  customerId: SelectOption | null | undefined;
+  customerBillingAddressId: SelectOption | null | undefined;
+  customerShippingAddressId: SelectOption | null | undefined;
   introduction: string | null | undefined;
   title: string | null | undefined;
   items: Array<QuotationInvoiceItemShape>;

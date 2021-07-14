@@ -1,11 +1,58 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { defineComponent, ref, Ref, PropType, computed, h } from 'vue';
+import {
+  defineComponent,
+  ref,
+  Ref,
+  PropType,
+  computed,
+  h,
+  getCurrentInstance,
+} from 'vue';
 import { QSelect } from 'quasar';
 import { useStore } from 'vuex';
-import { SelectOption } from 'src/store/types';
 
-interface SelectCallback {
-  (val: string, update: (fn?: () => void) => void): void;
+interface QSelectExtra extends QSelect {
+  optionIndex: number;
+}
+
+export interface QuasarSelectInterface {
+  focus: () => void;
+}
+
+export interface CustomVm {
+  proxy: {
+    $refs: {
+      root: QSelectExtra;
+    };
+  };
+}
+
+/**
+ * A function which is called when user wants to filter a value
+ */
+interface FilterFnInterface {
+  (
+    /**
+     * What the user typed
+     */
+    inputValue: string,
+    /**
+     * Supply a function which makes the necessary updates
+     * @param {Function} callbackFn Callback to call to make the actual updates
+     * @param {Function} [afterFn] Callback to call at the end after
+     * the update has been fully processed by QSelect
+     * @param {QSelectExtra} afterFn.ref Reference to the QSelect which
+     * triggered the filtering
+     */
+    doneFn: (
+      callbackFn?: () => void,
+      afterFn?: (ref: QSelectExtra) => void
+    ) => void,
+    /**
+     * Call this function if something went wrong
+     */
+    abortFn?: () => void
+  ): void;
 }
 
 export default defineComponent({
@@ -69,7 +116,7 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
-    optionDense: {
+    optionsDense: {
       type: Boolean,
       default: true,
     },
@@ -109,27 +156,50 @@ export default defineComponent({
         .trim();
     };
 
-    const selectFilterFn: SelectCallback = function (val, update) {
+    const selectFilterFn: FilterFnInterface = function (val, update) {
       const needle = computed(() => normalize(val));
 
-      update(() => {
-        if (!needle.value && !props.asyncFilterMode) {
-          filteredOptions.value = props.options;
-        } else {
-          filteredOptions.value = props.options.filter(
-            (v) => normalize(v[props.optionLabel]).indexOf(needle.value) > -1
-          );
-        }
+      update(
+        () => {
+          if (!needle.value) {
+            filteredOptions.value = props.options;
+            return;
+          }
 
-        if (props.asyncFilterMode && needle.value) {
-          void store
-            .dispatch(props.asyncFilterAction, needle.value)
-            .then((options: Array<{ [index: string]: string }>) => {
-              filteredOptions.value = options;
-            });
+          if (!props.asyncFilterMode) {
+            filteredOptions.value = props.options.filter(
+              (v) => normalize(v[props.optionLabel]).indexOf(needle.value) > -1
+            );
+            return;
+          } else {
+            void store
+              .dispatch(props.asyncFilterAction, needle.value)
+              .then((options: Array<{ [index: string]: string }>) => {
+                filteredOptions.value = options;
+              });
+            return;
+          }
+        },
+        // "ref" is the Vue reference to the QSelect
+        (ref) => {
+          if (
+            needle.value !== '' &&
+            (ref?.options?.length ?? 0 > 0) &&
+            (ref?.optionIndex ?? -1 === -1)
+          ) {
+            ref.moveOptionSelection(1, true); // focus the first selectable option and do not update the input-value
+            ref.toggleOption(ref?.options?.[ref?.optionIndex], true); // toggle the focused option
+          }
         }
-      });
+      );
     };
+
+    const vm = getCurrentInstance() as unknown as CustomVm;
+    Object.assign(vm?.proxy, {
+      focus() {
+        vm?.proxy.$refs.root.focus();
+      },
+    });
 
     return () => {
       const options = {

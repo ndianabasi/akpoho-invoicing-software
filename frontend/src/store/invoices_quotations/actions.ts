@@ -9,15 +9,22 @@ import { HttpError, HttpResponse, StringIDNameInterface } from '../types';
 import { Notify } from 'quasar';
 
 const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
-  async CREATE_QUOTATION({ rootGetters }, form: { [index: string]: unknown }) {
+  async CREATE_QUOTATION(
+    { rootGetters },
+    payload: Record<string, Record<string, unknown> | string | number | boolean>
+  ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const currentCompany = rootGetters[
       'auth/GET_CURRENT_COMPANY'
     ] as StringIDNameInterface;
 
+    const { form } = payload;
+
     return new Promise(async (resolve, reject) => {
       await $http
-        .post(`${currentCompany.id}/quotations`, { ...form })
+        .post(`${currentCompany.id}/quotations`, {
+          ...(form as Record<string, unknown>),
+        })
         .then((res: HttpResponse) => {
           Notify.create({
             message: 'Quotation was successfully created',

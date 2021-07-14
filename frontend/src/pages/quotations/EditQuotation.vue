@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <q-inner-loading :showing="loading">
+    <q-inner-loading :showing="loading && !creationMode">
       <q-spinner-oval size="100px" color="accent" />
     </q-inner-loading>
     <transition
@@ -9,7 +9,7 @@
       leave-active-class="animated fadeOut"
     >
       <view-card
-        v-if="!loading"
+        v-if="!loading || creationMode"
         :title-info="titleInfo"
         show-avatar
         show-title-panel-side
@@ -68,12 +68,12 @@
                   bottom-slots
                   options-dense
                   use-input
+                  :emit-value="false"
+                  :map-options="false"
                   :input-debounce="250"
                   class="q-mb-sm-sm q-mb-md-md"
                   transition-show="scale"
                   transition-hide="scale"
-                  emit-value
-                  map-options
                   dense
                   async-filter-action="customers/FETCH_CUSTOMERS_FOR_SELECT"
                   async-filter-mode
@@ -106,13 +106,13 @@
                   clearable
                   bottom-slots
                   options-dense
-                  use-input
+                  :use-input="false"
                   :input-debounce="250"
                   class="q-mb-sm-sm q-mb-md-md"
                   transition-show="scale"
                   transition-hide="scale"
-                  emit-value
-                  map-options
+                  :emit-value="false"
+                  :map-options="false"
                   dense
                   :disable="!form.customerId"
                 >
@@ -154,13 +154,13 @@
                   clearable
                   bottom-slots
                   options-dense
-                  use-input
+                  :use-input="false"
                   :input-debounce="250"
                   class="q-mb-sm-sm q-mb-md-md"
                   transition-show="scale"
                   transition-hide="scale"
-                  emit-value
-                  map-options
+                  :emit-value="false"
+                  :map-options="false"
                   dense
                   :disable="!form.customerId"
                 >
@@ -258,7 +258,10 @@
                       <!-- Use for reordering handle -->
                       <!-- <q-th auto-width /> -->
                       <!-- Use for expanding row -->
-                      <q-th v-if="form.showImages" auto-width />
+                      <q-th
+                        v-if="enableImageUploads && form.showImages"
+                        auto-width
+                      />
                       <q-th
                         v-for="col in props.cols"
                         :key="col.name"
@@ -286,7 +289,10 @@
                         flat
                       />
                     </q-td> -->
-                      <q-td v-if="form.showImages" auto-width>
+                      <q-td
+                        v-if="enableImageUploads && form.showImages"
+                        auto-width
+                      >
                         <q-btn
                           size="sm"
                           color="accent"
@@ -303,270 +309,357 @@
                         :auto-width="col.autoWidth"
                         :class="col.columnClass"
                       >
-                        <q-input
+                        <template
                           v-if="
-                            col.componentType === 'input' &&
-                            form.items[props.rowIndex]
+                            form.items[props.rowIndex] &&
+                            col.name === 'productId'
                           "
-                          :key="`field_${col.name}_${col.componentType}__index_${props.rowIndex}`"
-                          v-model="form.items[props.rowIndex][col.name]"
-                          :type="col.componentTypeVariant"
-                          :autogrow="
-                            col.componentTypeVariant === 'textarea' ||
-                            col.componentTypeVariant === 'text'
-                          "
-                          :mask="col.mask"
-                          :fill-mask="col.fillMask"
-                          :reverse-fill-mask="col.reverseFillMask"
-                          :hint="col.hint"
-                          class="main-column-input"
-                          :input-class="col.inputClass"
-                          :input-style="col.inputStyle"
-                          :for="col.name + '__index_' + props.rowIndex"
-                          filled
-                          bottom-slots
-                          aria-autocomplete="off"
-                          autocomplete="off"
-                          dense
-                          :aria-disabled="col.disabled"
-                          :disable="col.disabled"
-                          :debounce="250"
                         >
-                          <template #prepend>
-                            <div
-                              v-if="col.name === 'unitDiscount'"
-                              class="text-body2"
-                            >
-                              {{
-                                form.items[props.rowIndex].unitDiscount &&
-                                form.items[props.rowIndex].unitDiscount > 0
-                                  ? '-'
-                                  : ''
-                              }}
-                            </div>
-                          </template>
-                          <template #append>
-                            <div
-                              v-if="
-                                col.name === 'unitDiscount' &&
-                                form.discountType === 'percentage' &&
-                                !form.setDiscountTypePerLine
-                              "
-                              class="text-body2"
-                            >
-                              %
-                            </div>
-                          </template>
-                          <template
+                          <q-input
                             v-if="
-                              col.name === 'qty' || col.name === 'unitDiscount'
+                              form.items[props.rowIndex] &&
+                              form.items[props.rowIndex].productNameType ===
+                                'custom_product'
                             "
-                            #after
+                            v-model="form.items[props.rowIndex].productName"
+                            type="text"
+                            autogrow
+                            :hint="col.hint"
+                            class="
+                              main-column-input
+                              product-id-custom-product-input
+                            "
+                            :input-class="col.inputClass"
+                            :input-style="col.inputStyle"
+                            :for="col.name + '__index_' + props.rowIndex"
+                            filled
+                            bottom-slots
+                            aria-autocomplete="off"
+                            autocomplete="off"
+                            dense
+                            :aria-disabled="col.disabled"
+                            :disable="col.disabled"
+                            :debounce="250"
                           >
-                            <div
-                              v-if="
-                                col.name === 'qty' && !form.simpleQuantities
-                              "
-                              class="
-                                row
-                                no-wrap
-                                inline
-                                justify-center
-                                items-center
-                                q-gutter-sm
-                                composite-qty
-                              "
-                            >
-                              <q-select
-                                v-model="
-                                  form.items[props.rowIndex].collectionTypeId
+                            <template #append>
+                              <ProductNameTypeSelect
+                                :label="getProductNameType(props.rowIndex)"
+                                :product-name-type-options="
+                                  productNameTypeOptions
                                 "
-                                filled
-                                :options="collectionTypeOptions"
-                                dense
-                                options-dense
-                                transition-show="scale"
-                                transition-hide="scale"
-                                emit-value
-                                map-options
+                                :row-index="props.rowIndex"
+                                @typeSelected="setProductNameType"
                               />
-                              <div>of</div>
-                              <q-input
-                                v-model="form.items[props.rowIndex].groupQty"
-                                filled
-                                dense
-                                class="group-qty-input"
-                                autogrow
-                                :debounce="250"
-                              />
-                              <q-select
-                                v-model="form.items[props.rowIndex].UOM"
-                                filled
-                                :options="UOMTypeOptions"
-                                dense
-                                options-dense
-                                transition-show="scale"
-                                transition-hide="scale"
-                                emit-value
-                                map-options
-                              />
-                            </div>
-                            <div
-                              v-if="col.name === 'qty' && form.simpleQuantities"
-                              class="
-                                row
-                                inline
-                                justify-center
-                                items-center
-                                q-gutter-sm
-                                composite-qty
-                              "
-                            >
-                              <q-select
-                                v-model="form.items[props.rowIndex].UOM"
-                                filled
-                                :options="UOMTypeOptions"
-                                dense
-                                options-dense
-                                transition-show="scale"
-                                transition-hide="scale"
-                                emit-value
-                                map-options
-                              />
-                            </div>
-                            <div
-                              v-if="
-                                col.name === 'unitDiscount' &&
-                                form.setDiscountTypePerLine
-                              "
-                            >
-                              <q-select
-                                v-model="
-                                  form.items[props.rowIndex].discountType
+                            </template>
+                          </q-input>
+                          <quasar-select
+                            v-else
+                            v-model="form.items[props.rowIndex].productId"
+                            :multiple="false"
+                            filled
+                            aria-autocomplete="list"
+                            autocomplete="off"
+                            :options="col.options"
+                            :name="col.name + '__index_' + props.rowIndex"
+                            :for="col.name + '__index_' + props.rowIndex"
+                            bottom-slots
+                            options-dense
+                            use-input
+                            hide-dropdown-icon
+                            :input-debounce="200"
+                            class=""
+                            transition-show="scale"
+                            transition-hide="scale"
+                            :emit-value="false"
+                            :map-options="false"
+                            dense
+                            :aria-disabled="col.disabled"
+                            :disable="col.disabled"
+                            clearable
+                            :async-filter-action="col.asyncFilterAction"
+                            async-filter-mode
+                            :placeholder="
+                              form.items[props.rowIndex].productId
+                                ? ''
+                                : 'Search for product'
+                            "
+                          >
+                            <template #no-option="{ inputValue }">
+                              <div
+                                v-if="inputValue && inputValue.length > 0"
+                                class="q-ml-sm"
+                              >
+                                No product found for query:
+                                <b>{{ inputValue }}</b>
+                              </div>
+                            </template>
+                            <template #append>
+                              <ProductNameTypeSelect
+                                :label="getProductNameType(props.rowIndex)"
+                                :product-name-type-options="
+                                  productNameTypeOptions
                                 "
-                                filled
-                                :options="discountTypeOptions"
-                                dense
-                                options-dense
-                                class="discount-type-select-input"
-                                transition-show="scale"
-                                transition-hide="scale"
-                                emit-value
-                                map-options
+                                :row-index="props.rowIndex"
+                                @typeSelected="setProductNameType"
                               />
-                            </div>
-                          </template>
+                            </template>
+                          </quasar-select>
+                        </template>
+                        <template v-else>
+                          <q-input
+                            v-if="
+                              col.componentType === 'input' &&
+                              form.items[props.rowIndex]
+                            "
+                            :key="`field_${col.name}_${col.componentType}__index_${props.rowIndex}`"
+                            v-model="form.items[props.rowIndex][col.name]"
+                            :type="col.componentTypeVariant"
+                            :autogrow="col.autogrow"
+                            :mask="col.mask"
+                            :fill-mask="col.fillMask"
+                            :reverse-fill-mask="col.reverseFillMask"
+                            :hint="col.hint"
+                            class="main-column-input"
+                            :input-class="col.inputClass"
+                            :input-style="col.inputStyle"
+                            :for="col.name + '__index_' + props.rowIndex"
+                            filled
+                            bottom-slots
+                            aria-autocomplete="off"
+                            autocomplete="off"
+                            dense
+                            :aria-disabled="col.disabled"
+                            :disable="col.disabled"
+                            :debounce="250"
+                          >
+                            <template #prepend>
+                              <div
+                                v-if="col.name === 'unitDiscount'"
+                                class="text-body2"
+                              >
+                                {{
+                                  form.items[props.rowIndex].unitDiscount &&
+                                  form.items[props.rowIndex].unitDiscount > 0
+                                    ? '-'
+                                    : ''
+                                }}
+                              </div>
+                            </template>
+                            <template #append>
+                              <div
+                                v-if="
+                                  col.name === 'unitDiscount' &&
+                                  form.discountType === 'percentage' &&
+                                  !form.setDiscountTypePerLine
+                                "
+                                class="text-body2"
+                              >
+                                %
+                              </div>
+                            </template>
+                            <template
+                              v-if="
+                                col.name === 'qty' ||
+                                col.name === 'unitDiscount'
+                              "
+                              #after
+                            >
+                              <div
+                                v-if="
+                                  col.name === 'qty' && !form.simpleQuantities
+                                "
+                                class="
+                                  row
+                                  no-wrap
+                                  inline
+                                  justify-center
+                                  items-center
+                                  q-gutter-sm
+                                  composite-qty
+                                "
+                              >
+                                <q-select
+                                  v-model="
+                                    form.items[props.rowIndex].collectionTypeId
+                                  "
+                                  filled
+                                  :options="collectionTypeOptions"
+                                  dense
+                                  options-dense
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                  emit-value
+                                  map-options
+                                />
+                                <div>of</div>
+                                <q-input
+                                  v-model="form.items[props.rowIndex].groupQty"
+                                  filled
+                                  dense
+                                  class="group-qty-input"
+                                  autogrow
+                                  :debounce="250"
+                                />
+                                <q-select
+                                  v-model="form.items[props.rowIndex].UOM"
+                                  filled
+                                  :options="UOMTypeOptions"
+                                  dense
+                                  options-dense
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                  emit-value
+                                  map-options
+                                />
+                              </div>
+                              <div
+                                v-if="
+                                  col.name === 'qty' && form.simpleQuantities
+                                "
+                                class="
+                                  row
+                                  inline
+                                  justify-center
+                                  items-center
+                                  q-gutter-sm
+                                  composite-qty
+                                "
+                              >
+                                <q-select
+                                  v-model="form.items[props.rowIndex].UOM"
+                                  filled
+                                  :options="UOMTypeOptions"
+                                  dense
+                                  options-dense
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                  emit-value
+                                  map-options
+                                />
+                              </div>
+                              <div
+                                v-if="
+                                  col.name === 'unitDiscount' &&
+                                  form.setDiscountTypePerLine
+                                "
+                              >
+                                <q-select
+                                  v-model="
+                                    form.items[props.rowIndex].discountType
+                                  "
+                                  filled
+                                  :options="discountTypeOptions"
+                                  dense
+                                  options-dense
+                                  class="discount-type-select-input"
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                  emit-value
+                                  map-options
+                                />
+                              </div>
+                            </template>
 
-                          <!-- <template #error>
+                            <!-- <template #error>
                           {{ formErrors[col.name] }}
                         </template>
 
                         <template #hint></template> -->
-                        </q-input>
+                          </q-input>
 
-                        <quasar-select
-                          v-if="
-                            col.componentType === 'select' &&
-                            form.items[props.rowIndex]
-                          "
-                          :key="`field_${col.name}_${col.componentType}__index_${props.rowIndex}`"
-                          v-model="form.items[props.rowIndex][col.name]"
-                          :multiple="
-                            col.componentTypeVariant === 'multi-select'
-                          "
-                          filled
-                          aria-autocomplete="list"
-                          autocomplete="off"
-                          :options="col.options"
-                          :name="col.name + '__index_' + props.rowIndex"
-                          :for="col.name + '__index_' + props.rowIndex"
-                          bottom-slots
-                          options-dense
-                          use-input
-                          hide-dropdown-icon
-                          :input-debounce="200"
-                          class=""
-                          transition-show="scale"
-                          transition-hide="scale"
-                          emit-value
-                          map-options
-                          dense
-                          :aria-disabled="col.disabled"
-                          :disable="col.disabled"
-                          clearable
-                          :new-value-mode="
-                            form.items[props.rowIndex].productNameType ===
-                            'custom_product'
-                              ? 'add-unique'
-                              : undefined
-                          "
-                          :async-filter-action="
-                            form.items[props.rowIndex].productNameType ===
-                            'real_product'
-                              ? col.asyncFilterAction
-                              : undefined
-                          "
-                          :async-filter-mode="
-                            form.items[props.rowIndex].productNameType ===
-                            'real_product'
-                          "
-                        >
-                          <template #append>
-                            <ProductNameTypeSelect
-                              v-if="col.name === 'productId'"
-                              :label="getProductNameType(props.rowIndex)"
-                              :product-name-type-options="
-                                productNameTypeOptions
-                              "
-                              :row-index="props.rowIndex"
-                              @typeSelected="setProductNameType"
-                            />
-                          </template>
-                          <template
-                            v-if="col.name === 'productId'"
-                            #no-option="{ inputValue }"
+                          <quasar-select
+                            v-if="
+                              col.componentType === 'select' &&
+                              form.items[props.rowIndex]
+                            "
+                            :key="`field_${col.name}_${col.componentType}__index_${props.rowIndex}`"
+                            v-model="form.items[props.rowIndex][col.name]"
+                            :multiple="
+                              col.componentTypeVariant === 'multi-select'
+                            "
+                            filled
+                            aria-autocomplete="list"
+                            autocomplete="off"
+                            :options="col.options"
+                            :name="col.name + '__index_' + props.rowIndex"
+                            :for="col.name + '__index_' + props.rowIndex"
+                            bottom-slots
+                            options-dense
+                            use-input
+                            hide-dropdown-icon
+                            :input-debounce="200"
+                            class=""
+                            transition-show="scale"
+                            transition-hide="scale"
+                            emit-value
+                            map-options
+                            dense
+                            :aria-disabled="col.disabled"
+                            :disable="col.disabled"
+                            clearable
+                            :new-value-mode="
+                              form.items[props.rowIndex].productNameType ===
+                              'custom_product'
+                                ? 'add-unique'
+                                : undefined
+                            "
+                            :async-filter-action="
+                              form.items[props.rowIndex].productNameType ===
+                              'real_product'
+                                ? col.asyncFilterAction
+                                : undefined
+                            "
+                            :async-filter-mode="
+                              form.items[props.rowIndex].productNameType ===
+                              'real_product'
+                            "
                           >
-                            <div
-                              v-if="
-                                inputValue &&
-                                inputValue.length > 0 &&
-                                !form.items[props.rowIndex].productNameType
-                              "
-                              class="q-ml-sm"
+                            <template
+                              v-if="col.name === 'productId'"
+                              #no-option="{ inputValue }"
                             >
-                              No product found for query:
-                              <b>{{ inputValue }}</b>
+                              <div
+                                v-if="
+                                  inputValue &&
+                                  inputValue.length > 0 &&
+                                  !form.items[props.rowIndex].productNameType
+                                "
+                                class="q-ml-sm"
+                              >
+                                No product found for query:
+                                <b>{{ inputValue }}</b>
+                              </div>
+                              <div
+                                v-if="
+                                  inputValue &&
+                                  inputValue.length > 0 &&
+                                  form.items[props.rowIndex].productNameType ===
+                                    'real_product'
+                                "
+                                class="q-ml-sm"
+                              >
+                                No product found for query:
+                                <b>{{ inputValue }}</b>
+                              </div>
+                            </template>
+                          </quasar-select>
+                          <div
+                            v-if="col.componentType === 'computed'"
+                            class="filled row items-center justify-end"
+                          >
+                            <div v-if="col.name === 'total'">
+                              {{ itemTotals?.[props.rowIndex] ?? 0 }}
                             </div>
-                            <div
-                              v-if="
-                                inputValue &&
-                                inputValue.length > 0 &&
-                                form.items[props.rowIndex].productNameType ===
-                                  'real_product'
-                              "
-                              class="q-ml-sm"
-                            >
-                              No product found for query:
-                              <b>{{ inputValue }}</b>
+                            <div v-if="col.name === 'lineDiscount'">
+                              {{
+                                (itemLineDiscounts?.[props.rowIndex] ?? 0) > 0
+                                  ? '- ' +
+                                      itemLineDiscounts?.[props.rowIndex] ?? 0
+                                  : 0
+                              }}
                             </div>
-                          </template>
-                        </quasar-select>
-                        <div
-                          v-if="col.componentType === 'computed'"
-                          class="filled row items-center justify-end"
-                        >
-                          <div v-if="col.name === 'total'">
-                            {{ itemTotals?.[props.rowIndex] ?? 0 }}
                           </div>
-                          <div v-if="col.name === 'lineDiscount'">
-                            {{
-                              (itemLineDiscounts?.[props.rowIndex] ?? 0) > 0
-                                ? '- ' + itemLineDiscounts?.[props.rowIndex] ??
-                                  0
-                                : 0
-                            }}
-                          </div>
-                        </div>
+                        </template>
                       </q-td>
                       <q-td auto-width>
                         <q-btn
@@ -656,10 +749,16 @@
                       <q-td :colspan="props.cols.length - 1" />
                     </q-tr>
                   </template>
+                  <template #no-data="{ message }">
+                    <div>{{ message }}</div>
+                  </template>
                   <template #bottom-row>
                     <q-tr v-if="form.calculateTotals" class="bottom-row">
                       <q-td auto-width />
-                      <q-td v-if="form.showImages" auto-width />
+                      <q-td
+                        v-if="enableImageUploads && form.showImages"
+                        auto-width
+                      />
                       <q-td class="text-right" :colspan="2">
                         <div class="">Sub-totals</div>
                       </q-td>
@@ -733,7 +832,10 @@
                       class="bottom-row"
                     >
                       <q-td auto-width />
-                      <q-td v-if="form.showImages" auto-width />
+                      <q-td
+                        v-if="enableImageUploads && form.showImages"
+                        auto-width
+                      />
                       <q-td
                         class="text-right"
                         :colspan="visibleColumns.length - 1"
@@ -760,7 +862,10 @@
                         class="bottom-row"
                       >
                         <q-td auto-width />
-                        <q-td v-if="form.showImages" auto-width />
+                        <q-td
+                          v-if="enableImageUploads && form.showImages"
+                          auto-width
+                        />
                         <q-td
                           class="text-right"
                           :colspan="visibleColumns.length - 3"
@@ -821,7 +926,10 @@
                       class="bottom-row"
                     >
                       <q-td auto-width />
-                      <q-td v-if="form.showImages" auto-width />
+                      <q-td
+                        v-if="enableImageUploads && form.showImages"
+                        auto-width
+                      />
                       <q-td
                         class="text-right"
                         :colspan="visibleColumns.length - 1"
@@ -837,7 +945,10 @@
                     </q-tr>
                     <q-tr v-if="form.calculateTotals" class="bottom-row">
                       <q-td auto-width />
-                      <q-td v-if="form.showImages" auto-width />
+                      <q-td
+                        v-if="enableImageUploads && form.showImages"
+                        auto-width
+                      />
                       <q-td
                         class="text-right"
                         :colspan="visibleColumns.length - 1"
@@ -1085,7 +1196,7 @@
                       unchecked-icon="clear"
                     />
                   </div>
-                  <div class="col">
+                  <div v-if="enableImageUploads" class="col">
                     <q-toggle
                       v-model="form.showImages"
                       checked-icon="check"
@@ -1202,7 +1313,9 @@ import {
   CurrentlyViewedInvoiceQuotation,
 } from '../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
-import QuasarSelect from '../../components/QuasarSelect';
+import QuasarSelect, {
+  QuasarSelectInterface,
+} from '../../components/QuasarSelect';
 import { useStore } from 'vuex';
 import { useQuasar, format, QSelect } from 'quasar';
 import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
@@ -1255,9 +1368,14 @@ export default defineComponent({
     const isSubmitting = ref(false);
     const fileObjectUrls: Ref<string[][]> = ref([]);
     const loading = ref(true);
-    const customerSelect: Ref<QSelect | null> = ref(null);
-    const customerBillingAddressSelect: Ref<QSelect | null> = ref(null);
-    const customerShippingAddressSelect: Ref<QSelect | null> = ref(null);
+    const enableImageUploads = computed(() => false);
+    const hasFormChanged = ref(false);
+
+    const customerSelect: Ref<QuasarSelectInterface | null> = ref(null);
+    const customerBillingAddressSelect: Ref<QuasarSelectInterface | null> =
+      ref(null);
+    const customerShippingAddressSelect: Ref<QuasarSelectInterface | null> =
+      ref(null);
 
     const fileUploadProgress = ref(
       [] as Array<
@@ -1605,6 +1723,9 @@ export default defineComponent({
     watch(
       () => form,
       (form) => {
+        // Indicate that form has changed
+        hasFormChanged.value = true;
+
         itemTotals.value = getTotalArray(form.items);
         itemLineDiscounts.value = getLineDiscountArray(form.items);
 
@@ -1622,7 +1743,7 @@ export default defineComponent({
       type: ProductNameType;
     }) {
       // clear the productId to cleanup the input area
-      form.items[index].productId = '';
+      form.items[index].productId = null;
       form.items[index].productNameType = type;
     };
 
@@ -1726,8 +1847,33 @@ export default defineComponent({
         )
       : ref(null);
 
+    const normalisedForm = computed(() => {
+      const {
+        customerId,
+        customerBillingAddressId,
+        customerShippingAddressId,
+        items,
+        ...restOfForm
+      } = form;
+
+      const newItems = items.map((item) => {
+        const { productId, ...restOfItem } = item;
+        return { productId: productId?.value, ...restOfItem };
+      });
+
+      const newForm = {
+        customerId: customerId?.value,
+        customerBillingAddressId: customerBillingAddressId?.value,
+        customerShippingAddressId: customerShippingAddressId?.value,
+        items: newItems,
+        ...restOfForm,
+      };
+
+      return newForm;
+    });
+
     const onSubmit = () => {
-      console.log(form);
+      console.log(normalisedForm.value);
 
       void nextTick(() => {
         const isCreationMode = props.creationMode;
@@ -1736,7 +1882,9 @@ export default defineComponent({
             `invoices_quotations/${
               isCreationMode ? 'CREATE_QUOTATION' : 'EDIT_QUOTATION'
             }`,
-            isCreationMode ? form : { form, quotationId: props.quotationId }
+            isCreationMode
+              ? { form: normalisedForm.value }
+              : { form: normalisedForm.value, quotationId: props.quotationId }
           )
           .then((id: string) => {
             quotationCreated.value = true;
@@ -1787,10 +1935,14 @@ export default defineComponent({
           return;
         }
 
+        // clear the billing/shipping addresses
+        customerBillingAddresses.value = [];
+        customerShippingAddresses.value = [];
+
         await store
           .dispatch('customers/FETCH_CUSTOMER_ADDRESSES_FOR_SELECT', {
             type: 'both' as CustomerAddressType,
-            customerId,
+            customerId: customerId.value,
           })
           .then(() => {
             const customerAddresses = store.getters[
@@ -1897,11 +2049,14 @@ export default defineComponent({
 
                 return {
                   productId: isRealProduct
-                    ? item?.product?.id ?? null
-                    : item.product_name,
-                  productName: item.product_name,
+                    ? {
+                        label: item?.product?.name ?? '',
+                        value: item?.product?.id ?? null,
+                      }
+                    : null,
+                  productName: !isRealProduct ? item.product_name : '',
                   productNameType: isRealProduct
-                    ? 'real_product'
+                    ? ('real_product' as ProductNameType)
                     : ('custom_product' as ProductNameType),
                   description: item.description,
                   qty: item.qty,
@@ -1918,16 +2073,26 @@ export default defineComponent({
             form.date = currentInvoiceQuotation.value.date;
             form.code = currentInvoiceQuotation.value.code;
 
-            form.customerId = currentInvoiceQuotation.value.customer.id;
+            form.customerId = {
+              label: currentInvoiceQuotation.value.customer.customer_name,
+              value: currentInvoiceQuotation.value.customer.id,
+            };
             customersForSelectOptions.value.push({
               label: currentInvoiceQuotation.value.customer.customer_name,
               value: currentInvoiceQuotation.value.customer.id,
             });
 
-            form.customerBillingAddressId =
-              currentInvoiceQuotation.value.billing_address.id;
-            form.customerShippingAddressId =
-              currentInvoiceQuotation.value.shipping_address.id;
+            form.customerBillingAddressId = {
+              label: currentInvoiceQuotation.value.billing_address.full_address,
+              value: currentInvoiceQuotation.value.billing_address.id,
+            };
+
+            form.customerShippingAddressId = {
+              label:
+                currentInvoiceQuotation.value.shipping_address.full_address,
+              value: currentInvoiceQuotation.value.shipping_address.id,
+            };
+
             form.introduction = currentInvoiceQuotation.value.introduction;
             form.title = currentInvoiceQuotation.value.title;
             form.simpleQuantities =
@@ -1964,16 +2129,6 @@ export default defineComponent({
             form.showImages = currentInvoiceQuotation.value.show_images;
 
             loading.value = false;
-
-            setTimeout(() => {
-              customerSelect.value?.showPopup();
-              customerSelect.value?.hidePopup();
-              customerBillingAddressSelect.value?.showPopup();
-              customerBillingAddressSelect.value?.hidePopup();
-              customerShippingAddressSelect.value?.showPopup();
-              customerShippingAddressSelect.value?.hidePopup();
-              
-            }, 1000);
           })
           .catch(() => {
             loading.value = false;
@@ -1987,8 +2142,12 @@ export default defineComponent({
     );
 
     onMounted(() => {
-      /* if (props.creationMode)  */
-      void addItemLines(3);
+      if (props.creationMode) void addItemLines(3);
+
+      console.log(customerSelect.value);
+      customerSelect.value?.focus();
+      customerBillingAddressSelect.value?.focus();
+      customerShippingAddressSelect.value?.focus();
 
       /* const sortableListElement = document.querySelector(
         '.quotation-invoice-table tbody'
@@ -2045,18 +2204,20 @@ export default defineComponent({
     });
 
     onBeforeRouteLeave((to, from, next) => {
-      $q.dialog({
-        message: 'Form has changed. Do you really want to leave this page?',
-        title: 'Data loss warning',
-        persistent: true,
-        cancel: true,
-      })
-        .onOk(() => {
-          return next();
+      if (hasFormChanged.value) {
+        $q.dialog({
+          message: 'Form has changed. Do you really want to leave this page?',
+          title: 'Data loss warning',
+          persistent: true,
+          cancel: true,
         })
-        .onCancel(() => {
-          return false;
-        });
+          .onOk(() => {
+            return next();
+          })
+          .onCancel(() => {
+            return false;
+          });
+      } else return next();
     });
 
     return {
@@ -2107,6 +2268,7 @@ export default defineComponent({
       fileObjectUrls,
       loading,
       customersForSelectOptions,
+      enableImageUploads,
     };
   },
 });

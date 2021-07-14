@@ -15,7 +15,7 @@ export default class QuotationValidator {
   public schema = schema.create({
     items: schema.array().members(
       schema.object().members({
-        productId: schema.string({ escape: true, trim: true }, [
+        productId: schema.string.optional({ escape: true, trim: true }, [
           rules.minLength(6),
           rules.maxLength(50),
         ]),
@@ -24,7 +24,12 @@ export default class QuotationValidator {
           rules.minLength(6),
           rules.maxLength(50),
         ]),
-        description: schema.string.optional({ escape: true, trim: true }),
+        /**
+         * Description could contain HTML tags. We do not want those tags
+         * to be sanitised. So we will skip `escape` here and sanitise it
+         * in the controller
+         */
+        description: schema.string.optional({ trim: true }),
         qty: schema.number(),
         UOM: schema.enum(unitOfMeasurementTypes),
         collectionTypeId: schema.enum(itemCollectionTypes),
@@ -63,7 +68,12 @@ export default class QuotationValidator {
     customerBillingAddressId: schema.string.optional({ escape: true, trim: true }, [
       rules.uuid({ version: 5 }),
     ]),
-    introduction: schema.string.optional({ escape: true, trim: true }),
+    /**
+     * Introduction could contain HTML tags. We do not want those tags
+     * to be sanitised. So we will skip `escape` here and sanitise it
+     * in the controller
+     */
+    introduction: schema.string.optional({ trim: true }),
     title: schema.string({ escape: true, trim: true }, [rules.minLength(6), rules.maxLength(100)]),
     simpleQuantities: schema.boolean(),
     amountsAreTaxInclusive: schema.boolean(),
@@ -78,8 +88,13 @@ export default class QuotationValidator {
     numberOfDecimals: schema.number.optional(),
     useThousandSeparator: schema.boolean(),
     thousandSeparatorType: schema.enum(thousandSeparatorTypes),
-    notes: schema.string.optional({ escape: true, trim: true }),
-    theme: schema.string.optional({ escape: true, trim: true }, [rules.uuid({ version: 5 })]),
+    /**
+     * Notes could contain HTML tags. We do not want those tags
+     * to be sanitised. So we will skip `escape` here and sanitise it
+     * in the controller
+     */
+    notes: schema.string.optional({ trim: true }),
+    theme: schema.string.optional({ trim: true }, [rules.uuid({ version: 5 })]),
     showAdditionalSubtotalDiscount: schema.boolean(),
     additionalDiscountType: schema.enum(discountTypes),
     additionalDiscountAmount: schema.number.optional(),

@@ -26,6 +26,7 @@ interface QuotationInvoiceHeaders extends TableRow {
   asyncFilterMode?: boolean;
   min?: number;
   max?: number;
+  autogrow?: boolean;
 }
 
 enum Columns {
@@ -77,6 +78,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     componentType: 'input',
     componentTypeVariant: 'textarea',
     columnClass: 'desc-column',
+    autogrow: true,
   },
   {
     name: Columns.qty,
@@ -87,7 +89,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     sortable: false,
     filterable: false,
     componentType: 'input',
-    componentTypeVariant: 'text',
+    componentTypeVariant: 'number',
     inputClass: 'text-right',
     //inputStyle: 'max-width: 35px',
     columnClass: 'qty-column',
@@ -102,7 +104,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     sortable: false,
     filterable: false,
     componentType: 'input',
-    componentTypeVariant: 'text',
+    componentTypeVariant: 'number',
     inputClass: 'text-right',
     //inputStyle: 'max-width: 100px',
     columnClass: 'price-column',
@@ -118,7 +120,7 @@ const columns: QuotationInvoiceHeaders[] = reactive([
     sortable: false,
     filterable: false,
     componentType: 'input',
-    componentTypeVariant: 'text',
+    componentTypeVariant: 'number',
     min: 0,
     inputClass: 'text-right',
     //inputStyle: 'max-width: 35px',

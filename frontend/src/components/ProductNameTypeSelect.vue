@@ -5,7 +5,9 @@
         v-for="(type, productNameTypeIndex) in productNameTypeOptions"
         :key="'product_name_type__' + productNameTypeIndex"
         clickable
-        @click="$emit('typeSelected', { index: rowIndex, type: type.value })"
+        @click.prevent.stop="
+          $emit('typeSelected', { index: rowIndex, type: type.value })
+        "
       >
         <q-item-section>
           <q-item-label>{{ type.label }}</q-item-label>

@@ -173,9 +173,9 @@ export default class QuotationsController {
         const itemCollector: Record<string, unknown> = {}
 
         // 1. test if product id is a UUID
-        const isId = isUUID(item.productId, 5)
-        if (isId) itemCollector.productId = item.productId
-        else itemCollector.productName = item.productId
+        const isId = isUUID(item?.productId ?? '', 5)
+        itemCollector.productId = isId ? item.productId : null
+        itemCollector.productName = isId ? null : item?.productName
 
         // 2. Get other fields
         itemCollector.description = item.description
