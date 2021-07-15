@@ -1,4 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
 import { sanitiseHTML } from 'App/Helpers/utils'
 import InvoiceQuotation from 'App/Models/InvoiceQuotation'
 import UnitOfMeasurement from 'App/Models/UnitOfMeasurement'
@@ -55,6 +56,11 @@ export default class QuotationsController {
         'customers.company_name',
         'customers.company_phone'
       )
+      .select(
+        Database.rawQuery(
+          "COALESCE(customers.company_name, CONCAT(customers.first_name, ' ', customers.last_name)) AS customer"
+        )
+      )
       .where('invoices_quotations.company_id', requestedCompany?.id ?? '')
       .where({ type })
       .leftJoin('customers', (query) =>
@@ -62,11 +68,7 @@ export default class QuotationsController {
       )
 
     if (sortBy) {
-      if (sortBy === 'customer') {
-        subquery = subquery
-          ?.orderBy('customers.first_name', descending === 'true' ? 'desc' : 'asc')
-          .orderBy('customers.company_name ', descending === 'true' ? 'desc' : 'asc')
-      } else subquery = subquery?.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
+      subquery = subquery?.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
     }
 
     if (searchQuery) {

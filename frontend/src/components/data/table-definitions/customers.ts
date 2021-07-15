@@ -1,13 +1,22 @@
 import { TableRow } from '../../../types/table';
 import { stringSortFn, dateSortFn } from '../../../helpers/utils';
+import { CustomersIndexResultInterface } from 'src/store/types';
 
 interface CustomerHeaders extends TableRow {
   name: CustomerColumns;
-  field: CustomerColumns;
+  field: CustomerColumns | ((row: CustomersIndexResultInterface) => unknown);
+  /**
+   * Make `visibleAsColumn` mandatory for all columns
+   * in this definition. See `TableRow` type for more explanations
+   */
+  visibleAsColumn: boolean;
 }
 
 enum CustomerColumns {
   id = 'id',
+  customer_name = 'customer_name',
+  customer_email = 'customer_email',
+  customer_phone = 'customer_phone',
   first_name = 'first_name',
   last_name = 'last_name',
   email = 'email',
@@ -31,6 +40,7 @@ const columns: Array<CustomerHeaders> = [
     field: CustomerColumns.id,
     filterable: true,
     filterInputType: 'text',
+    visibleAsColumn: true,
   },
   {
     name: CustomerColumns.title,
@@ -40,6 +50,45 @@ const columns: Array<CustomerHeaders> = [
     field: CustomerColumns.title,
     sortable: false,
     filterable: false,
+    visibleAsColumn: false,
+  },
+  {
+    name: CustomerColumns.customer_name,
+    required: true,
+    label: 'Customer Name',
+    align: 'center',
+    field: CustomerColumns.customer_name,
+    sortable: true,
+    filterable: false,
+    visibleAsColumn: true,
+  },
+  {
+    name: CustomerColumns.customer_email,
+    required: true,
+    label: 'Customer Email',
+    align: 'center',
+    field: (row: CustomersIndexResultInterface) => row, // This becomes value for `format` property
+    format: (val: CustomersIndexResultInterface): string | null => {
+      if (val?.is_corporate) return val?.company_email;
+      else return val?.email;
+    },
+    sortable: true,
+    filterable: false,
+    visibleAsColumn: true,
+  },
+  {
+    name: CustomerColumns.customer_phone,
+    required: true,
+    label: 'Customer Phone',
+    align: 'center',
+    field: (row: CustomersIndexResultInterface) => row, // This becomes value for `format` property
+    format: (val: CustomersIndexResultInterface): string | null => {
+      if (val?.is_corporate) return val?.company_phone;
+      else return val?.phone_number;
+    },
+    sortable: true,
+    filterable: false,
+    visibleAsColumn: true,
   },
   {
     name: CustomerColumns.first_name,
@@ -50,6 +99,7 @@ const columns: Array<CustomerHeaders> = [
     sortable: true,
     filterable: true,
     filterInputType: 'text',
+    visibleAsColumn: false,
   },
   {
     name: CustomerColumns.last_name,
@@ -61,6 +111,7 @@ const columns: Array<CustomerHeaders> = [
     sort: (a: string, b: string) => stringSortFn(a, b),
     filterable: true,
     filterInputType: 'text',
+    visibleAsColumn: false,
   },
   {
     name: CustomerColumns.email,
@@ -72,6 +123,7 @@ const columns: Array<CustomerHeaders> = [
     sort: (a: string, b: string) => stringSortFn(a, b),
     filterable: true,
     filterInputType: 'text',
+    visibleAsColumn: false,
   },
   {
     name: CustomerColumns.phone_number,
@@ -83,11 +135,12 @@ const columns: Array<CustomerHeaders> = [
     sort: (a: string, b: string) => stringSortFn(a, b),
     filterable: true,
     filterInputType: 'text',
+    visibleAsColumn: false,
   },
   {
     name: CustomerColumns.is_corporate,
     required: true,
-    label: 'Is Corporate Customer',
+    label: 'Is Company?',
     align: 'center',
     field: CustomerColumns.is_corporate,
     sortable: true,
@@ -98,11 +151,12 @@ const columns: Array<CustomerHeaders> = [
       { label: 'Yes', value: true },
       { label: 'No', value: false },
     ],
+    visibleAsColumn: false,
   },
   {
     name: CustomerColumns.corporate_has_rep,
     required: true,
-    label: 'Corporate Has Rep',
+    label: 'Company Has Rep?',
     align: 'center',
     field: CustomerColumns.corporate_has_rep,
     sortable: true,
@@ -113,43 +167,47 @@ const columns: Array<CustomerHeaders> = [
       { label: 'Yes', value: true },
       { label: 'No', value: false },
     ],
+    visibleAsColumn: false,
   },
   {
     name: CustomerColumns.company_phone,
     required: true,
-    label: 'Corporate Phone Number',
+    label: 'Company Phone Number',
     align: 'center',
     field: CustomerColumns.company_phone,
     sortable: true,
     sort: (a: string, b: string) => stringSortFn(a, b),
     filterable: true,
     filterInputType: 'text',
+    visibleAsColumn: false,
   },
   {
     name: CustomerColumns.company_name,
     required: true,
-    label: 'Corporate Name',
+    label: 'Company Name',
     align: 'center',
     field: CustomerColumns.company_name,
     sortable: true,
     sort: (a: string, b: string) => stringSortFn(a, b),
     filterable: true,
     filterInputType: 'text',
+    visibleAsColumn: false,
   },
   {
     name: CustomerColumns.company_email,
     required: true,
-    label: 'Corporate Email',
+    label: 'Company Email',
     align: 'center',
     field: CustomerColumns.company_email,
     sortable: true,
     sort: (a: string, b: string) => stringSortFn(a, b),
     filterable: true,
     filterInputType: 'text',
+    visibleAsColumn: false,
   },
   {
     name: CustomerColumns.created_at,
-    required: false,
+    required: true,
     label: 'Created At',
     align: 'center',
     field: CustomerColumns.created_at,
@@ -157,10 +215,11 @@ const columns: Array<CustomerHeaders> = [
     sort: (a: string, b: string) => dateSortFn(a, b),
     filterable: true,
     filterInputType: 'date',
+    visibleAsColumn: true,
   },
   {
     name: CustomerColumns.updated_at,
-    required: false,
+    required: true,
     label: 'Updated At',
     align: 'center',
     field: CustomerColumns.updated_at,
@@ -168,6 +227,7 @@ const columns: Array<CustomerHeaders> = [
     sort: (a: string, b: string) => dateSortFn(a, b),
     filterable: true,
     filterInputType: 'date',
+    visibleAsColumn: true,
   },
 ];
 

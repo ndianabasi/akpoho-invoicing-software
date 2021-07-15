@@ -278,6 +278,23 @@ export interface CustomerFormShape extends CurrentCustomerBaseInterface {
   billing_postal_code: string | null;
 }
 
+export interface CustomersIndexResultInterface {
+  company_email: string;
+  company_name: string;
+  company_phone: string;
+  corporate_has_rep: boolean;
+  created_at: string;
+  customer_name: string;
+  email: string | null;
+  first_name: string | null;
+  id: string;
+  is_corporate: boolean;
+  last_name: string | null;
+  meta: unknown;
+  phone_number: string | null;
+  updated_at: string;
+}
+
 export interface SelectionOption {
   label: string;
   value: string & number & boolean;

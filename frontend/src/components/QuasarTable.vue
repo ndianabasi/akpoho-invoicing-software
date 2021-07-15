@@ -164,10 +164,10 @@
                 multiple
                 dense
                 options-dense
-                :display-value="$q.lang.table.columns"
+                display-value="Extra columns"
                 emit-value
                 map-options
-                :options="visibleColumnsObjects"
+                :options="invisibleColumnsObjects"
                 option-value="name"
                 options-cover
                 style="min-width: 200px"
@@ -348,6 +348,7 @@ import {
   onMounted,
   watch,
   readonly,
+  PropType,
 } from 'vue';
 import { useStore } from 'vuex';
 import {
@@ -369,7 +370,7 @@ export default defineComponent({
 
   props: {
     tableColumns: {
-      type: Array,
+      type: Array as PropType<TableRow[]>,
       required: true,
     },
     showSelections: {
@@ -532,18 +533,16 @@ export default defineComponent({
 
     const filterSubmitting = ref(false);
 
-    const visibleColumnsObjects = function () {
-      const columns = props.tableColumns as TableRow[];
-      return ref(
-        [...columns]
-          .filter((column) => !column.required)
-          .map((column) => column)
-      );
-    };
+    const invisibleColumnsObjects = computed(() => {
+      // Use spread operation to avoid copying objects by reference
+      return [...props.tableColumns]
+        .filter((column) => !column.required && column.visibleAsColumn)
+        .map((column) => column);
+    });
 
-    const columns = props.tableColumns as TableRow[];
-    const filterableColumns = ref(
-      [...columns].filter(
+    // Use spread operation to avoid copying objects by reference
+    const filterableColumns = computed(() =>
+      [...props.tableColumns].filter(
         (column) => column.filterable && column.filterInputType
       )
     );
@@ -834,8 +833,14 @@ export default defineComponent({
       nameOfTable: ref(props.tableName),
       selectedRows,
       visibleColumns,
-      visibleColumnsObjects: visibleColumnsObjects(),
-      columns: ref(props.tableColumns),
+      invisibleColumnsObjects,
+      columns: computed(() =>
+        props.tableColumns.filter((col) => {
+          if (col.visibleAsColumn !== undefined) {
+            return col.visibleAsColumn && col.required;
+          } else return col.required;
+        })
+      ),
       paginationModel: props.usePagination ? pagination : null,
       pagesNumber: computed(() => {
         return Math.ceil(

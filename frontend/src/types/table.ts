@@ -32,6 +32,12 @@ export interface TableRow {
   filterable?: boolean;
   filterInputType?: InputTypes;
   filterOptions?: SelectOption[];
+  /**
+   * Used to indicate whether column is visible as a column or note
+   * irrespective of whether it is `required` or not.
+   * This could be used for columns meant to appear for filtering only
+   */
+  visibleAsColumn?: boolean;
 }
 
 export interface GenericTableData {

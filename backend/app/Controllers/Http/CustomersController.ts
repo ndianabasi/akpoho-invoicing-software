@@ -1,4 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
 import Customer from 'App/Models/Customer'
 import CustomerTitle from 'App/Models/CustomerTitle'
 import CustomerValidator from 'App/Validators/CustomerValidator'
@@ -55,6 +56,19 @@ export default class CustomersController {
         'customers.company_email',
         'customers.company_phone',
         'customer_titles.name as title'
+      )
+      .select(
+        Database.rawQuery('COALESCE(customers.company_email, customers.email) AS customer_email')
+      )
+      .select(
+        Database.rawQuery(
+          'COALESCE(customers.company_phone, customers.phone_number) AS customer_phone'
+        )
+      )
+      .select(
+        Database.rawQuery(
+          "COALESCE(customers.company_name, CONCAT(customers.first_name, ' ', customers.last_name)) AS customer_name"
+        )
       )
       .where({ company_id: requestedCompany?.id })
       .leftJoin('customer_titles', (query) =>
