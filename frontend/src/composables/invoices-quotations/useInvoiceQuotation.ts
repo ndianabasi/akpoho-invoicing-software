@@ -236,6 +236,7 @@ type GetLineDiscountArrayConfig = {
   showDiscounts: boolean;
   discountType: DiscountType;
   roundedTotal: typeof getRoundedTotal;
+  setDiscountTypePerLine: boolean;
 };
 
 export const getLineDiscountArray = function ({
@@ -246,6 +247,7 @@ export const getLineDiscountArray = function ({
   discountType,
   roundAmounts,
   roundedTotal,
+  setDiscountTypePerLine,
 }: GetLineDiscountArrayConfig): number[] {
   const discountArray: number[] = [];
   if (items && items.length) {
@@ -257,7 +259,12 @@ export const getLineDiscountArray = function ({
       if (showDiscounts) {
         const unitDiscount = Number(item?.unitDiscount ?? 0);
         let discount = 0;
-        if (discountType === 'percentage') {
+        if (setDiscountTypePerLine) {
+          const lineDiscountType = item.discountType;
+          if (lineDiscountType === 'percentage') {
+            discount = (unitDiscount / 100) * unitPrice;
+          } else discount = unitDiscount;
+        } else if (discountType === 'percentage') {
           discount = (unitDiscount / 100) * unitPrice;
         } else {
           discount = unitDiscount;

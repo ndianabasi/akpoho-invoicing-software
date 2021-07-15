@@ -1,27 +1,22 @@
 <template>
   <div class="q-pa-md">
     <view-card
-      v-if="!!companyProperties.length"
-      :title-info="titleInfo"
+      :title-info="null"
       show-avatar
       show-title-panel-side
       card-container-classes="col-12"
       :loading="loading"
     >
       <template #body-panel>
-        <div class="q-gutter-y-sm">
-          <q-list padding>
-            <q-item v-for="property in companyProperties" :key="property.name">
-              <q-item-section>
-                <q-item-label class="text-uppercase">{{
-                  property.name
-                }}</q-item-label>
-                <q-item-label caption lines="2">{{
-                  property.value
-                }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
+        <div class="row q-gutter-sm">
+          <div class="col col-12">
+            <InvoiceQuotationTable
+              class="invoice-quotation-view-table"
+              :form="form"
+              :creation-mode="false"
+              :view-mode="true"
+            />
+          </div>
         </div>
       </template>
 
@@ -44,7 +39,7 @@
                 <q-item-section>
                   <q-btn flat icon="edit" />
                 </q-item-section>
-                <q-item-section>Edit</q-item-section>
+                <q-item-section>Edit Quotation</q-item-section>
               </q-item>
 
               <q-item
@@ -77,10 +72,11 @@
   </div>
 </template>
 
-<!-- eslint-disable @typescript-eslint/no-unsafe-return -->
-<!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
-<!-- eslint-disable @typescript-eslint/restrict-template-expressions -->
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import {
   defineComponent,
   ref,
@@ -90,6 +86,7 @@ import {
   computed,
   Ref,
   PropType,
+  unref,
 } from 'vue';
 import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
@@ -98,17 +95,25 @@ import useDeleteResource from '../../composables/useDeleteResource';
 import {
   CurrentlyViewedInvoiceQuotation,
   PERMISSION,
+  QuotationInvoiceFormShape,
   TitleInfo,
 } from '../../store/types';
 import { store } from '../../store';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import InvoiceQuotationTable from '../../components/InvoiceQuotationTable.vue';
+import {
+  currentInvoiceQuotation,
+  getCurrentInvoiceQuotationData,
+} from '../../composables/invoices-quotations/useInvoiceQuotation';
+import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
 
 export default defineComponent({
   name: 'ViewQuotation',
 
   components: {
     ViewCard,
+    InvoiceQuotationTable,
   },
 
   props: {
@@ -128,30 +133,8 @@ export default defineComponent({
     const router = useRouter();
     const $q = useQuasar();
     const loading = ref(false);
-
-    const currentInvoiceQuotation = computed(
-      () =>
-        store.getters[
-          'invoices_quotations/GET_CURRENTLY_VIEWED_INVOICE_QUOTATION'
-        ] as CurrentlyViewedInvoiceQuotation
-    );
-
     let titleInfo: Ref<TitleInfo | null> = ref(null);
-
-    const stopFetchCurrentlyViewedInvoiceQuotation = watchEffect(() => {
-      loading.value = true;
-      void store
-        .dispatch(
-          'invoices_quotations/FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION',
-          {
-            id: props.quotationId,
-            queryString: { type: props.documentType },
-          }
-        )
-        .then(() => {
-          loading.value = false;
-        });
-    });
+    const form: QuotationInvoiceFormShape = {} as QuotationInvoiceFormShape;
 
     const handleDeletion = async function () {
       await useDeleteResource({
@@ -180,6 +163,51 @@ export default defineComponent({
         });
     };
 
+    const stopFetchCurrentlyViewedInvoiceQuotation = watchEffect(() => {
+      loading.value = true;
+
+      void store
+        .dispatch(
+          'invoices_quotations/FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION',
+          {
+            id: props.quotationId,
+            queryString: { type: 'quotation' },
+          }
+        )
+        .then(() => {
+          currentInvoiceQuotation.value = unref(
+            computed(
+              () =>
+                store.getters[
+                  'invoices_quotations/GET_CURRENTLY_VIEWED_INVOICE_QUOTATION'
+                ] as CurrentlyViewedInvoiceQuotation
+            )
+          );
+
+          const computedForm = getCurrentInvoiceQuotationData.value(
+            currentInvoiceQuotation.value,
+            itemsColumns
+          ) as Record<string, unknown>;
+
+          for (const key in computedForm) {
+            if (Object.prototype.hasOwnProperty.call(computedForm, key)) {
+              const item: unknown = computedForm[key];
+              form[key] = item;
+            }
+          }
+
+          titleInfo.value = useTitleInfo({
+            title: form.title ?? '',
+            avatar: undefined,
+          }).value;
+
+          loading.value = false;
+        })
+        .catch(() => {
+          loading.value = false;
+        });
+    });
+
     onBeforeMount(() => {
       stopFetchCurrentlyViewedInvoiceQuotation();
     });
@@ -195,6 +223,7 @@ export default defineComponent({
       }),
       handleDeletion,
       loading,
+      form,
     };
   },
 });

@@ -401,3 +401,34 @@ input[type='number']::-webkit-outer-spin-button {
     color: white;
   }
 }
+
+.invoice-quotation-view-table {
+  thead {
+    background-color: $deep-purple-8;
+    color: white;
+    tr {
+      th {
+        line-height: 1.5rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+      }
+    }
+  }
+
+  tbody {
+    tr:nth-of-type(even):not(.bottom-row) {
+      background-color: $deep-purple-2;
+      color: black;
+    }
+  }
+
+  .bottom-row {
+    height: unset !important;
+    &:nth-last-child(odd) {
+      td:last-child {
+        background-color: $deep-purple-2;
+        color: black;
+      }
+    }
+  }
+}

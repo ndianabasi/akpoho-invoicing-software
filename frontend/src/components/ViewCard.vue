@@ -11,15 +11,15 @@
       >
         <q-card v-if="!loading" flat bordered>
           <slot v-if="showTitlePanel" name="title-panel">
-            <q-item v-if="titleInfo">
-              <q-item-section v-if="showAvatar" avatar>
-                <q-avatar>
+            <q-item>
+              <q-item-section avatar>
+                <q-avatar v-if="showAvatar && titleInfo">
                   <img v-if="titleInfo.avatar" :src="titleInfo.avatar" />
                 </q-avatar>
               </q-item-section>
 
               <q-item-section>
-                <q-item-label class="text-h6">{{
+                <q-item-label v-if="titleInfo" class="text-h6">{{
                   titleInfo.title
                 }}</q-item-label>
               </q-item-section>
