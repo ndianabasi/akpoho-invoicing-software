@@ -678,6 +678,7 @@ export interface QuotationInvoiceItemShape {
 }
 
 export type QuotationInvoiceFormShape = {
+  [index: string]: unknown;
   date: string | null;
   code: string | null | undefined;
   customerId: SelectOption | null | undefined;

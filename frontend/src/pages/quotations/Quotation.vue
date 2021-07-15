@@ -5,6 +5,7 @@
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
+      card-container-classes="col-12"
     >
       <template #body-panel>
         <div class="q-gutter-y-sm">
@@ -35,8 +36,8 @@
               <q-item
                 v-if="resourcePermissions.canEdit"
                 :to="{
-                  name: 'edit_company',
-                  params: { companyId: companyId }, //companyId from route props
+                  name: 'edit_quotation',
+                  params: { quotationId: quotationId }, //quotationId from route props
                 }"
               >
                 <q-item-section>
@@ -53,19 +54,19 @@
                 <q-item-section>
                   <q-btn flat icon="delete" />
                 </q-item-section>
-                <q-item-section>Delete Company</q-item-section>
+                <q-item-section>Delete Quotation</q-item-section>
               </q-item>
 
               <q-item
                 v-if="resourcePermissions.canList"
                 :to="{
-                  name: 'all_companies',
+                  name: 'quotations',
                 }"
               >
                 <q-item-section>
                   <q-btn flat icon="view_list" />
                 </q-item-section>
-                <q-item-section>All Companies</q-item-section>
+                <q-item-section>All Quotations</q-item-section>
               </q-item>
             </q-list>
           </q-menu>
@@ -87,13 +88,14 @@ import {
   watch,
   computed,
   Ref,
+  PropType,
 } from 'vue';
 import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import useResourcePermissions from '../../composables/useResourcePermissions';
 import useDeleteResource from '../../composables/useDeleteResource';
 import {
-  CurrentlyViewedCompany,
+  CurrentlyViewedInvoiceQuotation,
   PERMISSION,
   TitleInfo,
 } from '../../store/types';
@@ -109,10 +111,15 @@ export default defineComponent({
   },
 
   props: {
-    companyId: {
+    quotationId: {
       type: String,
       required: false,
       default: '',
+    },
+    documentType: {
+      type: String as PropType<'quotation' | 'invoice'>,
+      required: false,
+      default: 'quotation',
     },
   },
 
@@ -120,68 +127,38 @@ export default defineComponent({
     const router = useRouter();
     const $q = useQuasar();
 
-    const currentCompany = computed(
+    const currentInvoiceQuotation = computed(
       () =>
         store.getters[
-          'companies/GET_CURRENTLY_VIEWED_COMPANY'
-        ] as CurrentlyViewedCompany
+          'invoices_quotations/GET_CURRENTLY_VIEWED_INVOICE_QUOTATION'
+        ] as CurrentlyViewedInvoiceQuotation
     );
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
-    watch(
-      currentCompany,
-      () => {
-        const title = useTitleInfo({
-          title: currentCompany?.value?.name ?? '',
-          avatar: undefined,
+    const stopFetchCurrentlyViewedInvoiceQuotation = watchEffect(() => {
+      void store
+        .dispatch(
+          'invoices_quotations/FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION',
+          {
+            quotationId: props.quotationId,
+            type: props.documentType,
+          }
+        )
+        .then(() => {
+          //
         });
-
-        titleInfo.value = title.value;
-      },
-      { deep: true }
-    );
-
-    const stopFetchCurrentlyViewedCompany = watchEffect(() => {
-      void store.dispatch('companies/FETCH_CURRENTLY_VIEWED_COMPANY', {
-        companyId: props.companyId,
-      });
-    });
-
-    const companyProperties = computed(() => {
-      const company = currentCompany.value;
-      return [
-        { name: 'ID', value: company?.id },
-        { name: 'Name', value: company?.name },
-        { name: 'Type', value: company?.type?.toUpperCase() ?? '' },
-        { name: 'Email', value: company?.email },
-        { name: 'Phone Number', value: company?.phone_number ?? '' },
-        { name: 'Address', value: company?.address },
-        { name: 'Website', value: company?.website ?? '' },
-        { name: 'Company Size', value: company?.companySize?.size ?? '' },
-        { name: 'City', value: company?.city ?? '' },
-        { name: 'Country', value: company?.country?.name ?? '' },
-        { name: 'State', value: company?.state?.name ?? '' },
-        { name: 'Slug', value: company?.slug },
-        {
-          name: 'Is Company Approved',
-          value: company?.is_approved ? true : false,
-        },
-        { name: 'Approved At', value: company?.approved_at },
-        { name: 'Created At', value: company?.created_at },
-        { name: 'Updated At', value: company?.updated_at },
-      ];
     });
 
     const handleDeletion = async function () {
       await useDeleteResource({
         resource: 'company',
         resourceName: 'Company',
-        payload: props.companyId,
+        payload: props.quotationId,
       })
         .then(() => {
           const postDeletionAction = {
-            routeName: 'all_companies',
+            routeName: 'all_invoices_quotations',
             routeParams: undefined,
           };
 
@@ -201,19 +178,19 @@ export default defineComponent({
     };
 
     onBeforeMount(() => {
-      stopFetchCurrentlyViewedCompany();
+      stopFetchCurrentlyViewedInvoiceQuotation();
     });
 
     return {
       tab: ref('user_account'),
       titleInfo,
       resourcePermissions: useResourcePermissions({
-        edit: PERMISSION.CAN_EDIT_COMPANIES,
-        list: PERMISSION.CAN_LIST_COMPANIES,
-        delete: PERMISSION.CAN_DELETE_COMPANIES,
+        edit: PERMISSION.CAN_EDIT_QUOTATIONS,
+        list: PERMISSION.CAN_LIST_QUOTATIONS,
+        delete: PERMISSION.CAN_DELETE_QUOTATIONS,
+        new: PERMISSION.CAN_DELETE_QUOTATIONS,
       }),
       handleDeletion,
-      companyProperties,
     };
   },
 });

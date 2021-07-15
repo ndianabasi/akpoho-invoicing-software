@@ -1421,6 +1421,13 @@ import itemsColumns from '../../components/data/table-definitions/quotation_invo
 import ProductNameTypeSelect from '../../components/ProductNameTypeSelect.vue';
 //import Sortable from 'sortablejs';
 //import thousandFormatter from 'format-thousands/index';
+import {
+  currentInvoiceQuotation,
+  getCurrentInvoiceQuotationData,
+  getLineDiscountArray,
+  getRoundedTotal,
+  getTotalArray,
+} from '../../composables/invoices-quotations/useInvoiceQuotation';
 
 const { capitalize } = format;
 
@@ -1471,12 +1478,6 @@ export default defineComponent({
     const enableImageUploads = computed(() => false);
     const hasFormChanged = ref(false);
     let titleInfo: Ref<TitleInfo | null> = ref(null);
-
-    const customerSelect: Ref<QuasarSelectInterface | null> = ref(null);
-    const customerBillingAddressSelect: Ref<QuasarSelectInterface | null> =
-      ref(null);
-    const customerShippingAddressSelect: Ref<QuasarSelectInterface | null> =
-      ref(null);
 
     const fileUploadProgress = ref(
       [] as Array<
@@ -1593,14 +1594,6 @@ export default defineComponent({
 
     const customersForSelectOptions: Ref<Array<SelectOption>> = ref([]);
 
-    const currentInvoiceQuotation = computed({
-      get: () =>
-        store.getters[
-          'invoices_quotations/GET_CURRENTLY_VIEWED_INVOICE_QUOTATION'
-        ] as CurrentlyViewedInvoiceQuotation,
-      set: (value) => value,
-    });
-
     const customerBillingAddresses = computed({
       get: () =>
         store.getters['customers/GET_CUSTOMER_ADDRESSES_FOR_SELECT']
@@ -1615,7 +1608,7 @@ export default defineComponent({
       set: (value) => value,
     });
 
-    const form: QuotationInvoiceFormShape = reactive({
+    let form: QuotationInvoiceFormShape = reactive({
       items: [] as QuotationInvoiceFormShape['items'],
       additionalFees: [] as QuotationInvoiceFormShape['additionalFees'],
       date: null,
@@ -1705,119 +1698,32 @@ export default defineComponent({
 
     const addItemsDropdownList = ref([2, 5, 10, 20]);
 
-    const getRoundedTotal = function (
-      amount: string | number,
-      roundingType: RoundingType,
-      numberOfDecimals: number
-    ) {
-      let total: string | number = '';
-      switch (roundingType) {
-        case 'none':
-          total = Number.parseFloat(amount as string).toFixed(numberOfDecimals);
-          break;
-        case 'nearest':
-          total = Math.round(amount as number);
-          break;
-        case 'down':
-          total = Math.floor(amount as number);
-          break;
-        case 'up':
-          total = Math.ceil(amount as number);
-          break;
-      }
-      return total;
-    };
-
-    const getTotalArray = function (
-      items: QuotationInvoiceItemShape[]
-    ): number[] {
-      const totalArray: number[] = [];
-      if (items && items.length) {
-        items.forEach((item, index) => {
-          const unitPrice = Number(item?.unitPrice ?? 0);
-          const qty = Number(item?.qty ?? 0);
-          const roundingType = form.roundAmountType;
-          const numberOfDecimals = form.numberOfDecimals;
-          //const thousandSeparator = form.thousandSeparatorType;
-
-          if (form.showDiscounts) {
-            const unitDiscount = Number(item?.unitDiscount ?? 0);
-            let discountedPrice = 0;
-            if (form.discountType === 'percentage') {
-              discountedPrice = (1 - unitDiscount / 100) * unitPrice;
-            } else {
-              discountedPrice = unitPrice - unitDiscount;
-            }
-
-            if (form.roundAmounts) {
-              totalArray[index] = Number(
-                getRoundedTotal(
-                  qty * discountedPrice,
-                  roundingType,
-                  numberOfDecimals
-                )
-              );
-            } else {
-              totalArray[index] = qty * discountedPrice;
-            }
-          } else {
-            // The effect is the same for when `form.roundAmounts`
-            // is true or false
-            totalArray[index] = Number(
-              getRoundedTotal(qty * unitPrice, roundingType, numberOfDecimals)
-            );
-          }
-        });
-      }
-      return totalArray;
-    };
-
-    const getLineDiscountArray = function (
-      items: QuotationInvoiceItemShape[]
-    ): number[] {
-      const discountArray: number[] = [];
-      if (items && items.length) {
-        items.forEach((item, index) => {
-          const unitPrice = Number(item?.unitPrice ?? 0);
-          const qty = Number(item?.qty ?? 0);
-          const roundingType = form.roundAmountType;
-          const numberOfDecimals = form.numberOfDecimals;
-          //const thousandSeparator = form.thousandSeparatorType;
-
-          if (form.showDiscounts) {
-            const unitDiscount = Number(item?.unitDiscount ?? 0);
-            let discount = 0;
-            if (form.discountType === 'percentage') {
-              discount = (unitDiscount / 100) * unitPrice;
-            } else {
-              discount = unitDiscount;
-            }
-
-            if (form.roundAmounts) {
-              discountArray[index] = Number(
-                getRoundedTotal(qty * discount, roundingType, numberOfDecimals)
-              );
-            } else {
-              discountArray[index] = qty * discount;
-            }
-          } else {
-            discountArray[index] = 0;
-          }
-        });
-      }
-      return discountArray;
-    };
-
     const itemTotals = computed({
       get: () => {
-        return getTotalArray(form.items);
+        return getTotalArray({
+          items: form.items,
+          roundAmountType: form.roundAmountType,
+          roundAmounts: form.roundAmounts,
+          numberOfDecimals: form.numberOfDecimals,
+          showDiscounts: form.showDiscounts,
+          discountType: form.discountType,
+          roundedTotal: getRoundedTotal,
+        });
       },
       set: (value) => value,
     });
 
     const itemLineDiscounts = computed({
       get: () => {
-        return getLineDiscountArray(form.items);
+        return getLineDiscountArray({
+          items: form.items,
+          roundingType: form.roundAmountType,
+          roundAmounts: form.roundAmounts,
+          numberOfDecimals: form.numberOfDecimals,
+          showDiscounts: form.showDiscounts,
+          discountType: form.discountType,
+          roundedTotal: getRoundedTotal,
+        });
       },
       set: (value) => value,
     });
@@ -1830,8 +1736,24 @@ export default defineComponent({
         // Indicate that form has changed
         hasFormChanged.value = true;
 
-        itemTotals.value = getTotalArray(form.items);
-        itemLineDiscounts.value = getLineDiscountArray(form.items);
+        itemTotals.value = getTotalArray({
+          items: form.items,
+          roundAmountType: form.roundAmountType,
+          roundAmounts: form.roundAmounts,
+          numberOfDecimals: form.numberOfDecimals,
+          showDiscounts: form.showDiscounts,
+          discountType: form.discountType,
+          roundedTotal: getRoundedTotal,
+        });
+        itemLineDiscounts.value = getLineDiscountArray({
+          items: form.items,
+          roundingType: form.roundAmountType,
+          roundAmounts: form.roundAmounts,
+          numberOfDecimals: form.numberOfDecimals,
+          showDiscounts: form.showDiscounts,
+          discountType: form.discountType,
+          roundedTotal: getRoundedTotal,
+        });
 
         // Update vuex store
         //store.commit('invoices_quotations/SET_QUOTATION_FORM', form);
@@ -1939,17 +1861,6 @@ export default defineComponent({
         )
       )
     );
-
-    let currentQuotation: Ref<QuotationInvoiceFormShape | null>;
-
-    currentQuotation = !props.creationMode
-      ? computed(
-          () =>
-            store.getters[
-              'quotations/GET_CURRENTLY_VIEWED_QUOTATION'
-            ] as QuotationInvoiceFormShape
-        )
-      : ref(null);
 
     const normalisedForm = computed(() => {
       const {
@@ -2118,120 +2029,25 @@ export default defineComponent({
                   ] as CurrentlyViewedInvoiceQuotation
               )
             );
-            const currentInvoiceQuotationData = JSON.parse(
-              JSON.stringify(currentInvoiceQuotation.value)
-            ) as CurrentlyViewedInvoiceQuotation;
 
-            try {
-              form.items = (currentInvoiceQuotationData?.items ?? [])
-                .sort((a, b) => a.sort_order - b.sort_order)
-                .map((item) => {
-                  const isRealProduct = item?.product !== null;
-                  const productIdColumnHeader = itemsColumns.filter(
-                    (column) => column.name === 'productId'
-                  )[0];
+            const computedForm = getCurrentInvoiceQuotationData.value(
+              currentInvoiceQuotation.value,
+              itemsColumns
+            ) as Record<string, unknown>;
 
-                  if (isRealProduct) {
-                    productIdColumnHeader.options?.push({
-                      label: item?.product?.name ?? '',
-                      value: item?.product?.id ?? '',
-                    });
-                  }
-
-                  return {
-                    productId: isRealProduct
-                      ? {
-                          label: item?.product?.name ?? '',
-                          value: item?.product?.id ?? null,
-                        }
-                      : null,
-                    productName: !isRealProduct ? item.product_name : '',
-                    productNameType: isRealProduct
-                      ? ('real_product' as ProductNameType)
-                      : ('custom_product' as ProductNameType),
-                    description: item.description,
-                    qty: item.qty,
-                    UOM: item.unitOfMeasurement.name,
-                    collectionTypeId: item.collectionType.name,
-                    groupQty: item.group_qty,
-                    unitPrice: item.unit_price,
-                    unitDiscount: item.unit_discount,
-                    discountType: item.discount_type,
-                    customSerialNumber: item.custom_serial_number,
-                  };
-                });
-
-              form.additionalFees = currentInvoiceQuotationData.additional_fees;
-              form.date = currentInvoiceQuotationData.date;
-              form.code = currentInvoiceQuotationData.code;
-
-              form.customerId = {
-                label: currentInvoiceQuotationData.customer.customer_name,
-                value: currentInvoiceQuotationData.customer.id,
-              };
-              customersForSelectOptions.value.push({
-                label: currentInvoiceQuotationData.customer.customer_name,
-                value: currentInvoiceQuotationData.customer.id,
-              });
-
-              form.customerBillingAddressId = {
-                label: currentInvoiceQuotationData.billing_address.full_address,
-                value: currentInvoiceQuotationData.billing_address.id,
-              };
-
-              form.customerShippingAddressId = {
-                label:
-                  currentInvoiceQuotationData.shipping_address.full_address,
-                value: currentInvoiceQuotationData.shipping_address.id,
-              };
-
-              form.introduction = currentInvoiceQuotationData.introduction;
-              form.title = currentInvoiceQuotationData.title;
-              form.simpleQuantities =
-                currentInvoiceQuotationData.simple_quantities;
-              form.amountsAreTaxInclusive =
-                currentInvoiceQuotationData.amounts_are_tax_inclusive;
-              form.taxPercentage = currentInvoiceQuotationData.tax_percentage;
-              form.roundAmounts = currentInvoiceQuotationData.round_amounts;
-              form.roundAmountType =
-                currentInvoiceQuotationData.round_amount_type;
-              form.showDiscounts = currentInvoiceQuotationData.show_discounts;
-              form.discountType = currentInvoiceQuotationData.discount_type;
-              form.setDiscountTypePerLine =
-                currentInvoiceQuotationData.set_discount_type_per_line;
-              form.calculateTotals =
-                currentInvoiceQuotationData.calculate_totals;
-              form.changeProductPrices =
-                currentInvoiceQuotationData.change_product_prices;
-              form.numberOfDecimals =
-                currentInvoiceQuotationData.number_of_decimals;
-              form.useThousandSeparator =
-                currentInvoiceQuotationData.use_thousand_separator;
-              form.thousandSeparatorType =
-                currentInvoiceQuotationData.thousand_separator_type;
-              form.notes = currentInvoiceQuotationData.notes;
-              form.showAdditionalSubtotalDiscount =
-                currentInvoiceQuotationData.show_additional_subtotal_discount;
-              form.additionalDiscountType =
-                currentInvoiceQuotationData.additional_discount_type;
-              form.additionalDiscountAmount =
-                currentInvoiceQuotationData.additional_discount_amount;
-              form.showAdditionalFees =
-                currentInvoiceQuotationData.show_additional_fees;
-              form.showImages = currentInvoiceQuotationData.show_images;
-              form.useCustomSerialNumbers =
-                currentInvoiceQuotationData.use_custom_serial_numbers;
-              form.useEditor = currentInvoiceQuotationData.use_editor;
-
-              titleInfo.value = useTitleInfo({
-                title: currentInvoiceQuotationData.title ?? '',
-                avatar: undefined,
-              }).value;
-
-              loading.value = false;
-            } catch (error) {
-              console.log(error);
+            for (const key in computedForm) {
+              if (Object.prototype.hasOwnProperty.call(computedForm, key)) {
+                const item: unknown = computedForm[key];
+                form[key] = item;
+              }
             }
+
+            titleInfo.value = useTitleInfo({
+              title: form.title ?? '',
+              avatar: undefined,
+            }).value;
+
+            loading.value = false;
           })
           .catch(() => {
             loading.value = false;
@@ -2319,7 +2135,6 @@ export default defineComponent({
     });
 
     return {
-      quotation: currentQuotation,
       form,
       titleInfo,
       customerBillingAddresses,

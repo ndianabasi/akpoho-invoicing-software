@@ -6,7 +6,7 @@ import {
   SelectOption,
 } from 'src/store/types';
 
-interface QuotationInvoiceHeaders extends TableRow {
+export interface QuotationInvoiceHeaders extends TableRow {
   name: Columns;
   field: Columns;
   options?: Array<SelectOption>;
