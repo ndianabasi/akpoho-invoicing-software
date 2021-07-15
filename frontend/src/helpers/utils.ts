@@ -56,3 +56,13 @@ export const yesNoOptionsForSelect = computed(() =>
     value: option ? option : null,
   }))
 );
+
+export const typeSortFn = function <T>(a: T, b: T): number {
+  {
+    if (new String(a).toLocaleLowerCase() > new String(b).toLocaleLowerCase())
+      return 1;
+    if (new String(a).toLocaleLowerCase() < new String(b).toLocaleLowerCase())
+      return -1;
+    return 0;
+  }
+};

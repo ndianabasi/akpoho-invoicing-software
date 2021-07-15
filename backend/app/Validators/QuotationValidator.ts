@@ -16,8 +16,7 @@ export default class QuotationValidator {
     items: schema.array().members(
       schema.object().members({
         productId: schema.string.optional({ escape: true, trim: true }, [
-          rules.minLength(6),
-          rules.maxLength(50),
+          rules.uuid({ version: 5 }),
         ]),
         productNameType: schema.enum(QUOTATION_PRODUCT_NAME_TYPES),
         /**
@@ -115,8 +114,7 @@ export default class QuotationValidator {
 
   public messages = {
     'items.required': 'Items are required. You cannot submit an empty list of items.',
-    'items.*.productId.minLength': 'Minimum length of product name/id is {{options.choices}}.',
-    'items.*.productId.maxLength': 'Maximum length of product name/id is {{options.choices}}.',
+    'items.*.productId.uuid': 'Product ID is invalid.',
     'items.*.customSerialNumber.minLength':
       'Minimum length of Custom Serial Number is {{options.choices}}.',
     'items.*.customSerialNumber.maxLength':

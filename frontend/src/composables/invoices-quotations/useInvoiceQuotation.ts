@@ -7,7 +7,7 @@ import {
   QuotationInvoiceItemShape,
   RoundingType,
 } from 'src/store/types';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { store } from '../../store';
 
 export const currentInvoiceQuotation = computed({
@@ -303,3 +303,15 @@ export const getSubTotal = function (
     return Number(roundedTotal(total, roundAmountType, numberOfDecimals));
   });
 };
+
+export const discountTypeOptions = ref([
+  { label: 'Num', value: 'number' },
+  { label: '%', value: 'percentage' },
+]);
+export const roundTypeOptions = ref([
+  { label: 'None', value: 'none' },
+  { label: 'Nearest', value: 'nearest' },
+  { label: 'Down', value: 'down' },
+  { label: 'Up', value: 'up' },
+]);
+export const numberOfDecimalOptionValues = [0, 1, 2, 3, 4, 5, 6];
