@@ -32,15 +32,15 @@
               <q-list padding>
                 <template
                   v-if="
-                    !customer.is_corporate ||
-                    (customer.is_corporate && customer.corporate_has_rep)
+                    !customer?.is_corporate ||
+                    (customer?.is_corporate && customer?.corporate_has_rep)
                   "
                 >
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-uppercase">ID</q-item-label>
                       <q-item-label caption lines="2">{{
-                        customer.id
+                        customer?.id
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
@@ -53,7 +53,7 @@
                         }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
-                        customer.title?.name ?? ''
+                        customer?.title?.name ?? ''
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
@@ -64,7 +64,7 @@
                         >First Name</q-item-label
                       >
                       <q-item-label caption lines="2">{{
-                        customer.first_name
+                        customer?.first_name
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
@@ -77,7 +77,7 @@
                         }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
-                        customer.middle_name
+                        customer?.middle_name
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
@@ -90,7 +90,7 @@
                         }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
-                        customer.last_name
+                        customer?.last_name
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
@@ -103,7 +103,7 @@
                         }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
-                        customer.email
+                        customer?.email
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
@@ -116,20 +116,20 @@
                         }}</q-item-label
                       >
                       <q-item-label caption lines="2">{{
-                        customer.phone_number
+                        customer?.phone_number
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </template>
 
-                <template v-if="customer.is_corporate">
+                <template v-if="customer?.is_corporate">
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-uppercase"
                         >Company Name</q-item-label
                       >
                       <q-item-label caption lines="2">{{
-                        customer.company_name
+                        customer?.company_name
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
@@ -139,7 +139,7 @@
                         >Company Phone Number</q-item-label
                       >
                       <q-item-label caption lines="2">{{
-                        customer.company_phone
+                        customer?.company_phone
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
@@ -149,7 +149,7 @@
                         >Company Email Address</q-item-label
                       >
                       <q-item-label caption lines="2">{{
-                        customer.company_email
+                        customer?.company_email
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>
@@ -161,7 +161,7 @@
                       >Customer Creation Date</q-item-label
                     >
                     <q-item-label caption lines="2">{{
-                      customer.created_at
+                      customer?.created_at
                     }}</q-item-label>
                   </q-item-section>
                 </q-item>
@@ -172,7 +172,7 @@
                       >Customer Last Update Date</q-item-label
                     >
                     <q-item-label caption lines="2">{{
-                      customer.updated_at
+                      customer?.updated_at
                     }}</q-item-label>
                   </q-item-section>
                 </q-item>
@@ -276,18 +276,18 @@ export default defineComponent({
 
     const corporateHasRep = computed(() => {
       const customer = currentCustomer.value;
-      return customer && customer.is_corporate && customer.corporate_has_rep;
+      return customer && customer?.is_corporate && customer?.corporate_has_rep;
     });
 
     let titleInfo = ref({});
 
     onMounted(() => {
       titleInfo.value = useTitleInfo({
-        title: !currentCustomer.value.is_corporate
+        title: !currentCustomer.value?.is_corporate
           ? `${currentCustomer?.value?.title?.name ?? ''} ${
-              currentCustomer.value.first_name ?? ''
-            } ${currentCustomer.value.last_name ?? ''}`
-          : `${currentCustomer.value.company_name} (Corporate)`,
+              currentCustomer.value?.first_name ?? ''
+            } ${currentCustomer.value?.last_name ?? ''}`
+          : `${currentCustomer.value?.company_name} (Corporate)`,
       }).value;
     });
 
@@ -295,11 +295,11 @@ export default defineComponent({
       currentCustomer,
       () => {
         titleInfo.value = useTitleInfo({
-          title: !currentCustomer.value.is_corporate
+          title: !currentCustomer.value?.is_corporate
             ? `${currentCustomer?.value?.title?.name ?? ''} ${
-                currentCustomer.value.first_name ?? ''
-              } ${currentCustomer.value.last_name ?? ''}`
-            : `${currentCustomer.value.company_name} (Corporate)`,
+                currentCustomer.value?.first_name ?? ''
+              } ${currentCustomer.value?.last_name ?? ''}`
+            : `${currentCustomer.value?.company_name} (Corporate)`,
         }).value;
       },
       { deep: true }

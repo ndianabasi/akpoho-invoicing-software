@@ -141,8 +141,8 @@ export default defineComponent({
         .dispatch(
           'invoices_quotations/FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION',
           {
-            quotationId: props.quotationId,
-            type: props.documentType,
+            id: props.quotationId,
+            queryString: { type: props.documentType },
           }
         )
         .then(() => {

@@ -11,10 +11,6 @@ import {
 import { QSelect } from 'quasar';
 import { useStore } from 'vuex';
 
-interface QSelectExtra extends QSelect {
-  optionIndex: number;
-}
-
 export interface QuasarSelectInterface {
   focus: () => void;
 }
@@ -22,7 +18,7 @@ export interface QuasarSelectInterface {
 export interface CustomVm {
   proxy: {
     $refs: {
-      root: QSelectExtra;
+      root: QSelect;
     };
   };
 }
@@ -41,13 +37,10 @@ interface FilterFnInterface {
      * @param {Function} callbackFn Callback to call to make the actual updates
      * @param {Function} [afterFn] Callback to call at the end after
      * the update has been fully processed by QSelect
-     * @param {QSelectExtra} afterFn.ref Reference to the QSelect which
+     * @param {QSelect} afterFn.ref Reference to the QSelect which
      * triggered the filtering
      */
-    doneFn: (
-      callbackFn?: () => void,
-      afterFn?: (ref: QSelectExtra) => void
-    ) => void,
+    doneFn: (callbackFn?: () => void, afterFn?: (ref: QSelect) => void) => void,
     /**
      * Call this function if something went wrong
      */
@@ -159,26 +152,23 @@ export default defineComponent({
     const selectFilterFn: FilterFnInterface = function (val, update) {
       const needle = computed(() => normalize(val));
 
-      update(() => {
-        if (!needle.value) {
-          filteredOptions.value = props.options;
-          return;
-        }
+      if (!needle.value) {
+        filteredOptions.value = props.options;
+      }
 
-        if (!props.asyncFilterMode) {
-          filteredOptions.value = props.options.filter(
-            (v) => normalize(v[props.optionLabel]).indexOf(needle.value) > -1
-          );
-          return;
-        } else {
-          void store
-            .dispatch(props.asyncFilterAction, needle.value)
-            .then((options: Array<{ [index: string]: string }>) => {
-              filteredOptions.value = options;
-            });
-          return;
-        }
-      });
+      if (!props.asyncFilterMode) {
+        filteredOptions.value = props.options.filter(
+          (v) => normalize(v[props.optionLabel]).indexOf(needle.value) > -1
+        );
+      } else {
+        void store
+          .dispatch(props.asyncFilterAction, needle.value)
+          .then((options: Array<{ [index: string]: string }>) => {
+            filteredOptions.value = options;
+          });
+      }
+
+      update();
     };
 
     const vm = getCurrentInstance() as unknown as CustomVm;
