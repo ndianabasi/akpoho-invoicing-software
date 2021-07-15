@@ -1,8 +1,17 @@
 <template>
   <div class="q-pa-md">
-    <view-card :title-info="titleInfo" show-avatar show-title-panel-side>
+    <view-card
+      :title-info="titleInfo"
+      show-avatar
+      show-title-panel-side
+      :loading="loading"
+    >
       <template #body-panel>
-        <form class="q-pa-md" @submit.prevent="submitForm">
+        <form
+          class="q-pa-md"
+          style="width: 100%; min-height: 50vh"
+          @submit.prevent="submitForm"
+        >
           <div class="row q-mx-auto">
             <div class="column col-6">
               <q-toggle
@@ -171,7 +180,9 @@ import { email, helpers, required } from '@vuelidate/validators';
 import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import { store } from '../../store';
-import useResourcePermissions, { ResourcePermissions } from '../../composables/useResourcePermissions';
+import useResourcePermissions, {
+  ResourcePermissions,
+} from '../../composables/useResourcePermissions';
 import {
   CurrentlyViewedCustomer,
   SelectionOption,
@@ -209,6 +220,7 @@ export default defineComponent({
 
   setup(props) {
     const submitting = ref(false);
+    const loading = ref(false);
     const router = useRouter();
 
     let currentCustomer: Ref<CurrentlyViewedCustomer | null>;
@@ -473,7 +485,7 @@ export default defineComponent({
     const form$ = useVuelidate(rules, form);
 
     function submitForm() {
-      if (!form$.value.$invalid) {
+      if (!form$?.value?.$invalid ?? false) {
         submitting.value = true;
         // Try to by-pass issue with object being emitted in QuasarSelect
 
@@ -567,6 +579,7 @@ export default defineComponent({
 
     const stopFetchCurrentlyViewedCustomer = watchEffect(() => {
       if (!props.creationMode) {
+        loading.value = true;
         void store
           .dispatch('customers/FETCH_CURRENTLY_VIEWED_CUSTOMER', {
             customerId: props.customerId,
@@ -593,6 +606,8 @@ export default defineComponent({
             form.corporate_has_rep = Boolean(
               currentCustomer?.value?.corporate_has_rep ?? false
             );
+
+            loading.value = false;
           });
       }
     });
@@ -634,10 +649,11 @@ export default defineComponent({
       stopFetchCustomerTitlesForSelect();
     });
 
-    const resourcePermissions: ResourcePermissions | null = useResourcePermissions({
+    const resourcePermissions: ResourcePermissions | null =
+      useResourcePermissions({
         view: PERMISSION.CAN_VIEW_CUSTOMERS,
         list: PERMISSION.CAN_LIST_CUSTOMERS,
-      })
+      });
 
     return {
       customer: currentCustomer,
@@ -652,7 +668,8 @@ export default defineComponent({
       customerFormSchema,
       titleInfo,
       customerTitles,
-      resourcePermissions
+      resourcePermissions,
+      loading,
     };
   },
 });

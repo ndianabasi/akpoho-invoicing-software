@@ -5,9 +5,14 @@
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
+      :loading="loading"
     >
       <template #body-panel="{ isSmallScreen }">
-        <form class="q-pa-md" @submit="onSubmit">
+        <form
+          class="q-pa-md"
+          style="min-height: 50vh; width: 100%"
+          @submit="onSubmit"
+        >
           <template v-for="field in form">
             <q-toggle
               v-if="field.componentType === 'toggle' && field.isVisible"
@@ -215,6 +220,7 @@ export default defineComponent({
     const store = useStore();
     const $q = useQuasar();
     const router = useRouter();
+    const loading = ref(false);
 
     const initialForm: ProductFormShape = reactive({
       productTypeId: '',
@@ -493,6 +499,7 @@ export default defineComponent({
 
     const stopFetchProductResultRowInterface = watchEffect(() => {
       if (!props.creationMode) {
+        loading.value = true;
         void store
           .dispatch('products/FETCH_CURRENTLY_VIEWED_PRODUCT', {
             productId: props.productId,
@@ -520,6 +527,8 @@ export default defineComponent({
             shortDescription.value = currentProduct?.value?.short_description;
             weight.value = currentProduct?.value?.weight;
             countryOfManufacture.value = currentProduct?.value?.country?.id;
+
+            loading.value = false;
           });
       }
     });
@@ -578,6 +587,7 @@ export default defineComponent({
       isSubmitting,
       formErrors,
       form,
+      loading,
     };
   },
 });

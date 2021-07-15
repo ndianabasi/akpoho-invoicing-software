@@ -5,6 +5,7 @@
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
+      :loading="loading"
     >
       <template #body-panel>
         <q-tabs v-model="tab" align="justify" narrow-indicator class="q-mb-lg">
@@ -207,7 +208,7 @@
                 <q-item-section>
                   <q-btn flat icon="edit" />
                 </q-item-section>
-                <q-item-section>Edit</q-item-section>
+                <q-item-section>Edit Customer</q-item-section>
               </q-item>
 
               <q-item
@@ -267,6 +268,8 @@ export default defineComponent({
   },
 
   setup(props) {
+    const loading = ref(false);
+
     const currentCustomer = computed(
       () =>
         store.getters[
@@ -306,9 +309,14 @@ export default defineComponent({
     );
 
     const stopFetchCurrentlyViewedCustomer = watchEffect(() => {
-      void store.dispatch('customers/FETCH_CURRENTLY_VIEWED_CUSTOMER', {
-        customerId: props.customerId,
-      });
+      loading.value = true;
+      void store
+        .dispatch('customers/FETCH_CURRENTLY_VIEWED_CUSTOMER', {
+          customerId: props.customerId,
+        })
+        .then(() => {
+          loading.value = false;
+        });
     });
 
     onBeforeMount(() => {
@@ -316,6 +324,7 @@ export default defineComponent({
     });
 
     return {
+      loading,
       customer: currentCustomer,
       tab: ref('customer_details'),
       titleInfo,

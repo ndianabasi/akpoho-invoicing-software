@@ -5,6 +5,7 @@
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
+      :loading="loading"
     >
       <template #body-panel>
         <form class="q-pa-md" @submit.prevent="submitForm">
@@ -300,6 +301,7 @@ export default defineComponent({
   setup(props) {
     const submitting = ref(false);
     const router = useRouter();
+    const loading = ref(false);
 
     let currentUser: Ref<CurrentlyViewedUser | null>;
 
@@ -506,6 +508,7 @@ export default defineComponent({
 
     const stopFetchCurrentlyViewedUser = watchEffect(() => {
       if (!props.creationMode) {
+        loading.value = true;
         void store
           .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
             userId: props.userId,
@@ -546,6 +549,8 @@ export default defineComponent({
               form.state_id = currentUser?.value?.profile.userState?.id ?? null;
             }
             form.login_status = Boolean(currentUser?.value.login_status);
+
+            loading.value = false;
           });
       }
     });
@@ -608,6 +613,7 @@ export default defineComponent({
       CAN_EDIT_USERS,
       handleCropperFinish,
       getFormData,
+      loading,
     };
   },
 });

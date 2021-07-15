@@ -1,33 +1,46 @@
 <template>
-  <div class="row justify-center">
+  <div class="row justify-center" style="min-height: 50vh">
     <div :class="cardContainerClasses">
-      <q-card flat bordered>
-        <slot v-if="showTitlePanel" name="title-panel">
-          <q-item v-if="titleInfo">
-            <q-item-section v-if="showAvatar" avatar>
-              <q-avatar>
-                <img v-if="titleInfo.avatar" :src="titleInfo.avatar" />
-              </q-avatar>
-            </q-item-section>
+      <q-inner-loading :showing="loading">
+        <q-spinner-oval size="100px" color="accent" />
+      </q-inner-loading>
+      <transition
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut"
+      >
+        <q-card v-if="!loading" flat bordered>
+          <slot v-if="showTitlePanel" name="title-panel">
+            <q-item v-if="titleInfo">
+              <q-item-section v-if="showAvatar" avatar>
+                <q-avatar>
+                  <img v-if="titleInfo.avatar" :src="titleInfo.avatar" />
+                </q-avatar>
+              </q-item-section>
 
-            <q-item-section>
-              <q-item-label class="text-h6">{{ titleInfo.title }}</q-item-label>
-            </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-h6">{{
+                  titleInfo.title
+                }}</q-item-label>
+              </q-item-section>
 
-            <q-item-section v-if="showTitlePanelSide" side>
-              <slot name="title-panel-side"></slot>
-            </q-item-section>
-          </q-item>
-        </slot>
+              <q-item-section v-if="showTitlePanelSide" side>
+                <slot name="title-panel-side"></slot>
+              </q-item-section>
+            </q-item>
+          </slot>
 
-        <q-separator v-if="showSeparator" />
+          <q-separator v-if="showSeparator" />
 
-        <q-card-section>
-          <slot name="body-panel"></slot>
+          <q-card-section>
+            <div style="min-height: 50vh">
+              <slot name="body-panel"></slot>
+            </div>
 
-          <slot name="footer-panel"></slot>
-        </q-card-section>
-      </q-card>
+            <slot name="footer-panel"></slot>
+          </q-card-section>
+        </q-card>
+      </transition>
     </div>
   </div>
 </template>
@@ -48,6 +61,12 @@ export default defineComponent({
     showAvatar: {
       type: Boolean,
       default: false,
+    },
+
+    loading: {
+      type: Boolean,
+      default: false,
+      required: true,
     },
 
     showTitlePanelSide: {
@@ -75,10 +94,6 @@ export default defineComponent({
         );
       },
     },
-  },
-
-  setup(/* props */) {
-    return {};
   },
 });
 </script>

@@ -1,70 +1,84 @@
 <template>
   <q-card class="my-card">
     <q-card-section>
-      <form style="width: 500px; max-width: 90vw" @submit.prevent="submitForm">
-        <div class="text-h6 q-mb-md">Edit Address</div>
-        <template v-for="field in customerFormSchema">
-          <q-input
-            v-if="field.componentType === 'input' && field.isVisible"
-            :key="`field_${field.name}_${field.componentType}`"
-            v-model="form[field.name]"
-            :error="form$?.[field.name]?.$invalid ?? false"
-            :type="field.inputType"
-            :autogrow="field.inputType === 'textarea'"
-            filled
-            :aria-autocomplete="field.autocomplete"
-            :autocomplete="field.autocomplete"
-            clearable
-            bottom-slots
-            :label="field.label"
-            :dense="dense"
-            class="q-mb-md"
-          >
-            <template #error>
-              {{
-                form$ && form$[field.name]
-                  ? form$[field.name].$silentErrors
-                      .map((error) => error.$message)
-                      .join(', ')
-                  : ''
-              }}
-            </template>
-          </q-input>
+      <div class="text-h6 q-mb-md">Edit Address</div>
+      <form
+        style="width: 500px; max-width: 90vw; min-height: 500px"
+        @submit.prevent="submitForm"
+      >
+        <q-inner-loading :showing="loading">
+          <q-spinner-oval size="100px" color="accent" />
+        </q-inner-loading>
+        <transition
+          appear
+          enter-active-class="animated fadeIn"
+          leave-active-class="animated fadeOut"
+        >
+          <div v-if="!loading">
+            <template v-for="field in customerFormSchema">
+              <q-input
+                v-if="field.componentType === 'input' && field.isVisible"
+                :key="`field_${field.name}_${field.componentType}`"
+                v-model="form[field.name]"
+                :error="form$?.[field.name]?.$invalid ?? false"
+                :type="field.inputType"
+                :autogrow="field.inputType === 'textarea'"
+                filled
+                :aria-autocomplete="field.autocomplete"
+                :autocomplete="field.autocomplete"
+                clearable
+                bottom-slots
+                :label="field.label"
+                :dense="dense"
+                class="q-mb-md"
+              >
+                <template #error>
+                  {{
+                    form$ && form$[field.name]
+                      ? form$[field.name].$silentErrors
+                          .map((error) => error.$message)
+                          .join(', ')
+                      : ''
+                  }}
+                </template>
+              </q-input>
 
-          <quasar-select
-            v-if="field.componentType === 'select' && field.isVisible"
-            :key="`field_${field.name}_${field.componentType}`"
-            :ref="field.name"
-            v-model="form[field.name]"
-            :error="form$?.[field.name]?.$invalid ?? false"
-            filled
-            :options="field.options"
-            :label="field.label"
-            :name="field.name"
-            aria-autocomplete="off"
-            autocomplete="off"
-            clearable
-            bottom-slots
-            options-dense
-            use-input
-            :input-debounce="200"
-            class="q-mb-md"
-            transition-show="scale"
-            transition-hide="scale"
-            emit-value
-            map-options
-          >
-            <template #error>
-              {{
-                form$ && form$[field.name]
-                  ? form$[field.name].$silentErrors
-                      .map((error) => error.$message)
-                      .join(', ')
-                  : ''
-              }}
+              <quasar-select
+                v-if="field.componentType === 'select' && field.isVisible"
+                :key="`field_${field.name}_${field.componentType}`"
+                :ref="field.name"
+                v-model="form[field.name]"
+                :error="form$?.[field.name]?.$invalid ?? false"
+                filled
+                :options="field.options"
+                :label="field.label"
+                :name="field.name"
+                aria-autocomplete="off"
+                autocomplete="off"
+                clearable
+                bottom-slots
+                options-dense
+                use-input
+                :input-debounce="200"
+                class="q-mb-md"
+                transition-show="scale"
+                transition-hide="scale"
+                emit-value
+                map-options
+              >
+                <template #error>
+                  {{
+                    form$ && form$[field.name]
+                      ? form$[field.name].$silentErrors
+                          .map((error) => error.$message)
+                          .join(', ')
+                      : ''
+                  }}
+                </template>
+              </quasar-select>
             </template>
-          </quasar-select>
-        </template>
+          </div>
+        </transition>
       </form>
     </q-card-section>
 
@@ -143,6 +157,7 @@ export default defineComponent({
 
   setup(props) {
     const submitting = ref(false);
+    const loading = ref(false);
 
     let currentAddress: Ref<CurrentlyViewedAddress | null>;
 
@@ -344,6 +359,7 @@ export default defineComponent({
 
     const stopFetchCurrentlyViewedAddress = watchEffect(() => {
       if (!props.creationMode && props.customerId && props.customerAddressId) {
+        loading.value = true;
         void store
           .dispatch('customers/FETCH_CURRENTLY_VIEWED_ADDRESS', {
             customerId: props.customerId,
@@ -376,6 +392,8 @@ export default defineComponent({
               // Attempt to update the state, irrespective
               form.state = currentAddress?.value?.addressState?.id ?? null;
             }
+
+            loading.value = false;
           });
       }
     });
@@ -408,6 +426,7 @@ export default defineComponent({
     });
 
     return {
+      loading,
       customer: currentAddress,
       text: ref(''),
       ph: ref(''),

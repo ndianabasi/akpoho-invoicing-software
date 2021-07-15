@@ -5,6 +5,7 @@
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
+      :loading="loading"
     >
       <template #body-panel>
         <div class="q-gutter-y-sm">
@@ -42,7 +43,7 @@
                 <q-item-section>
                   <q-btn flat icon="edit" />
                 </q-item-section>
-                <q-item-section>Edit</q-item-section>
+                <q-item-section>Edit Product</q-item-section>
               </q-item>
 
               <q-item
@@ -119,6 +120,7 @@ export default defineComponent({
   setup(props) {
     const router = useRouter();
     const $q = useQuasar();
+    const loading = ref(false);
 
     const currentProduct = computed(
       () =>
@@ -143,9 +145,14 @@ export default defineComponent({
     );
 
     const stopFetchCurrentlyViewedProduct = watchEffect(() => {
-      void store.dispatch('products/FETCH_CURRENTLY_VIEWED_PRODUCT', {
-        productId: props.productId,
-      });
+      loading.value = true;
+      void store
+        .dispatch('products/FETCH_CURRENTLY_VIEWED_PRODUCT', {
+          productId: props.productId,
+        })
+        .then(() => {
+          loading.value = false;
+        });
     });
 
     const productProperties = computed(() => {
@@ -206,6 +213,7 @@ export default defineComponent({
     });
 
     return {
+      loading,
       tab: ref('user_account'),
       titleInfo,
       resourcePermissions: useResourcePermissions({

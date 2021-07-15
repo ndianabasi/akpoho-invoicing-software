@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <view-card :show-title-panel="false">
+    <view-card :show-title-panel="false" :loading="false">
       <template #body-panel>
         <form>
           <q-input
@@ -274,6 +274,7 @@ export default defineComponent({
   },
 
   setup() {
+    const loading = ref(false);
     const submitting = ref(false);
     const step = ref(1);
     const stepper: Ref<QStepper | null> = ref(null);

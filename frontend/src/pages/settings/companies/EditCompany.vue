@@ -5,6 +5,7 @@
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
+      :loading="loading"
     >
       <template #body-panel="{ isSmallScreen }">
         <form class="q-pa-md" @submit="onSubmit">
@@ -212,6 +213,7 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
     const $q = useQuasar();
+    const loading = ref(false);
 
     const stopFetchCountriesForSelect = watchEffect(() => {
       void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
@@ -479,6 +481,7 @@ export default defineComponent({
 
     const stopFetchCurrentlyViewedCompany = watchEffect(() => {
       if (!props.creationMode) {
+        loading.value = true;
         void store
           .dispatch('companies/FETCH_CURRENTLY_VIEWED_COMPANY', {
             companyId: props.companyId,
@@ -516,6 +519,8 @@ export default defineComponent({
               // Then update the current state
               countryId.value = currentCompany?.value?.state?.id ?? null;
             }
+
+            loading.value = false;
           });
       }
     });
@@ -588,6 +593,7 @@ export default defineComponent({
       isSubmitting,
       onSubmit,
       formErrors,
+      loading,
     };
   },
 });

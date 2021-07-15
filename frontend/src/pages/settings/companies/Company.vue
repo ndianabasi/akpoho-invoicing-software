@@ -5,6 +5,7 @@
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
+      :loading="loading"
     >
       <template #body-panel>
         <div class="q-gutter-y-sm">
@@ -119,6 +120,7 @@ export default defineComponent({
   setup(props) {
     const router = useRouter();
     const $q = useQuasar();
+    const loading = ref(false);
 
     const currentCompany = computed(
       () =>
@@ -143,9 +145,14 @@ export default defineComponent({
     );
 
     const stopFetchCurrentlyViewedCompany = watchEffect(() => {
-      void store.dispatch('companies/FETCH_CURRENTLY_VIEWED_COMPANY', {
-        companyId: props.companyId,
-      });
+      loading.value = true;
+      void store
+        .dispatch('companies/FETCH_CURRENTLY_VIEWED_COMPANY', {
+          companyId: props.companyId,
+        })
+        .then(() => {
+          loading.value = false;
+        });
     });
 
     const companyProperties = computed(() => {
@@ -214,6 +221,7 @@ export default defineComponent({
       }),
       handleDeletion,
       companyProperties,
+      loading,
     };
   },
 });

@@ -5,6 +5,7 @@
       :title-info="titleInfo"
       show-avatar
       show-title-panel-side
+      :loading="loading"
     >
       <template #body-panel>
         <q-tabs v-model="tab" align="justify" narrow-indicator class="q-mb-lg">
@@ -417,6 +418,7 @@ export default defineComponent({
   setup(props) {
     const router = useRouter();
     const $q = useQuasar();
+    const loading = ref(false);
 
     const currentUser = computed(
       () =>
@@ -448,9 +450,14 @@ export default defineComponent({
     );
 
     const stopFetchCurrentlyViewedUser = watchEffect(() => {
-      void store.dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
-        userId: props.userId,
-      });
+      loading.value = true;
+      void store
+        .dispatch('users/FETCH_CURRENTLY_VIEW_USER', {
+          userId: props.userId,
+        })
+        .then(() => {
+          loading.value = false;
+        });
     });
 
     const handleDeletion = async function () {
@@ -494,6 +501,7 @@ export default defineComponent({
         delete: PERMISSION.CAN_DELETE_USERS,
       }),
       handleDeletion,
+      loading,
     };
   },
 });

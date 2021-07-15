@@ -6,6 +6,7 @@
       show-avatar
       show-title-panel-side
       card-container-classes="col-12"
+      :loading="loading"
     >
       <template #body-panel>
         <div class="q-gutter-y-sm">
@@ -126,6 +127,7 @@ export default defineComponent({
   setup(props) {
     const router = useRouter();
     const $q = useQuasar();
+    const loading = ref(false);
 
     const currentInvoiceQuotation = computed(
       () =>
@@ -137,6 +139,7 @@ export default defineComponent({
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
     const stopFetchCurrentlyViewedInvoiceQuotation = watchEffect(() => {
+      loading.value = true;
       void store
         .dispatch(
           'invoices_quotations/FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION',
@@ -146,7 +149,7 @@ export default defineComponent({
           }
         )
         .then(() => {
-          //
+          loading.value = false;
         });
     });
 
@@ -191,6 +194,7 @@ export default defineComponent({
         new: PERMISSION.CAN_DELETE_QUOTATIONS,
       }),
       handleDeletion,
+      loading,
     };
   },
 });
