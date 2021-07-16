@@ -4,14 +4,14 @@
       :title-info="null"
       show-avatar
       show-title-panel-side
-      card-container-classes="col-12"
+      card-container-classes="col-md-12 col-lg-9 col-xl-9"
       :loading="loading"
     >
       <template #body-panel>
         <div class="row q-gutter-sm">
           <div class="col col-12">
             <InvoiceQuotationTable
-              class="invoice-quotation-view-table"
+              class="invoice-quotation-view-table q-mx-auto"
               :form="form"
               :creation-mode="false"
               :view-mode="true"

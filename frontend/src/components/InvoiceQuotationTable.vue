@@ -404,12 +404,15 @@
                 class="filled row items-center justify-end"
               >
                 <div v-if="col.name === 'total'">
-                  {{ itemTotals?.[props.rowIndex] ?? 0 }}
+                  {{ useThousandSeparator(itemTotals?.[props.rowIndex] ?? 0) }}
                 </div>
                 <div v-if="col.name === 'lineDiscount'">
                   {{
-                    (itemLineDiscounts?.[props.rowIndex] ?? 0) > 0
-                      ? '- ' + itemLineDiscounts?.[props.rowIndex] ?? 0
+                    itemLineDiscounts?.[props.rowIndex] ?? -1 > 0
+                      ? '- ' +
+                        useThousandSeparator(
+                          Number(itemLineDiscounts?.[props.rowIndex] ?? 0)
+                        )
                       : 0
                   }}
                 </div>
@@ -432,6 +435,7 @@
                   internalForm.items[props.rowIndex].productNameType ===
                     'custom_product'
                 "
+                style="max-width: 300px; margin: auto auto"
               >
                 {{ internalForm.items[props.rowIndex].productName }}
               </div>
@@ -441,6 +445,7 @@
                   internalForm.items[props.rowIndex].productNameType ===
                     'real_product'
                 "
+                style="max-width: 300px; margin: auto auto"
               >
                 {{ internalForm.items[props.rowIndex].productId.label }}
               </div>
@@ -450,11 +455,13 @@
                 v-if="internalForm.simpleQuantities"
                 :class="[col.inputClass]"
               >
-                {{ internalForm.items[props.rowIndex].qty }}
+                {{
+                  useThousandSeparator(internalForm.items[props.rowIndex].qty)
+                }}
               </div>
               <div v-else>
                 <span class="text-bold">{{
-                  internalForm.items[props.rowIndex].qty
+                  useThousandSeparator(internalForm.items[props.rowIndex].qty)
                 }}</span
                 >&nbsp;
                 <span>{{
@@ -462,27 +469,72 @@
                 }}</span>
                 of
                 <span class="text-bold">{{
-                  internalForm.items[props.rowIndex].groupQty
+                  useThousandSeparator(
+                    internalForm.items[props.rowIndex].groupQty
+                  )
                 }}</span
                 >&nbsp;
                 <span>{{ internalForm.items[props.rowIndex].UOM }}</span>
               </div>
             </template>
+            <template v-else-if="col.name === 'unitPrice'">
+              <div :class="[col.inputClass]">
+                {{
+                  internalForm.items[props.rowIndex].unitPrice > 0
+                    ? useThousandSeparator(
+                        internalForm.items[props.rowIndex].unitPrice
+                      )
+                    : 0
+                }}
+              </div>
+            </template>
             <template v-else>
               <div
                 v-if="col.componentType !== 'computed'"
-                :class="[col.inputClass]"
+                :class="[
+                  col.inputClass,
+                  col.name === 'description' && 'text-left',
+                ]"
               >
-                {{ internalForm.items[props.rowIndex][col.name] }}
+                <span v-if="col.name === 'unitDiscount'">
+                  {{
+                    internalForm.items[props.rowIndex].unitDiscount > 0
+                      ? useThousandSeparator(
+                          internalForm.items[props.rowIndex].unitDiscount
+                        )
+                      : 0
+                  }}
+                  {{
+                    (internalForm.items[props.rowIndex].discountType ===
+                      'number' &&
+                      internalForm.setDiscountTypePerLine) ||
+                    (internalForm.discountType === 'number' &&
+                      !internalForm.setDiscountTypePerLine)
+                      ? ''
+                      : ' %'
+                  }}
+                </span>
+                <span v-else>
+                  {{ internalForm.items[props.rowIndex][col.name] }}
+                </span>
               </div>
-              <div v-else :class="[col.inputClass]">
-                {{
-                  col.name === 'total'
-                    ? itemTotals?.[props.rowIndex] ?? 0
-                    : (itemLineDiscounts?.[props.rowIndex] ?? 0) > 0
-                    ? '- ' + itemLineDiscounts?.[props.rowIndex] ?? 0
-                    : 0
-                }}
+              <div
+                v-else
+                :class="[col.inputClass, col.name === 'total' && 'text-bold']"
+              >
+                <span v-if="col.name === 'total'"
+                  >{{ useThousandSeparator(itemTotals?.[props.rowIndex] ?? 0) }}
+                </span>
+                <span v-if="col.name === 'lineDiscount'">
+                  {{
+                    (itemLineDiscounts?.[props.rowIndex] ?? 0) > 0
+                      ? '- ' +
+                        useThousandSeparator(
+                          itemLineDiscounts?.[props.rowIndex] ?? 0
+                        )
+                      : 0
+                  }}
+                </span>
               </div>
             </template>
           </q-td>
@@ -582,7 +634,7 @@
           auto-width
         />
         <q-td class="text-right" :colspan="2">
-          <div class="">Sub-totals</div>
+          <div class="bottom-rows-text">Sub-totals</div>
         </q-td>
         <q-td class="text-right total-qty-cell">
           <div
@@ -591,7 +643,7 @@
               filled: !viewMode,
             }"
           >
-            <div>{{ totalQuantities }}</div>
+            <div>{{ useThousandSeparator(totalQuantities) }}</div>
           </div>
         </q-td>
         <q-td class="text-right" :colspan="internalForm.showDiscounts ? 2 : 1">
@@ -608,7 +660,11 @@
             }"
           >
             <div>
-              {{ totalDiscounts > 0 ? '- ' + totalDiscounts : 0 }}
+              {{
+                totalDiscounts > 0
+                  ? '- ' + useThousandSeparator(totalDiscounts)
+                  : 0
+              }}
             </div>
           </div>
         </q-td>
@@ -636,7 +692,7 @@
               filled: !viewMode,
             }"
           >
-            <div>{{ subTotal }}</div>
+            <div>{{ useThousandSeparator(subTotal) }}</div>
           </div>
         </q-td>
         <q-td v-if="!viewMode" auto-width> &nbsp; </q-td>
@@ -651,7 +707,7 @@
         <q-td auto-width />
         <q-td v-if="enableImageUploads && internalForm.showImages" auto-width />
         <q-td class="text-right" :colspan="visibleColumns.length - 1">
-          <div class="">Additional discount</div>
+          <div class="bottom-rows-text">Additional discount</div>
         </q-td>
         <q-td class="text-right additional-discount-cell">
           <div
@@ -663,7 +719,7 @@
             <div>
               {{
                 additionalSubtotalDiscount > 0
-                  ? '- ' + additionalSubtotalDiscount
+                  ? '- ' + useThousandSeparator(additionalSubtotalDiscount)
                   : 0
               }}
             </div>
@@ -697,7 +753,9 @@
               autogrow
               :debounce="250"
             />
-            <div v-else>{{ internalForm.additionalFees[index].name }}</div>
+            <div v-else class="bottom-rows-text">
+              {{ internalForm.additionalFees[index].name }}
+            </div>
           </q-td>
           <q-td class="text-right additional-fee-cell">
             <q-input
@@ -711,7 +769,15 @@
               autogrow
               :debounce="250"
             />
-            <div v-else>{{ internalForm.additionalFees[index].amount }}</div>
+            <div v-else>
+              {{
+                internalForm.additionalFees[index].amount > 0
+                  ? useThousandSeparator(
+                      internalForm.additionalFees[index].amount
+                    )
+                  : 0
+              }}
+            </div>
           </q-td>
           <q-td v-if="!viewMode" auto-width>
             <q-btn
@@ -744,16 +810,16 @@
         <q-td auto-width />
         <q-td v-if="enableImageUploads && internalForm.showImages" auto-width />
         <q-td class="text-right" :colspan="visibleColumns.length - 1">
-          <div class="">Tax</div>
+          <div class="bottom-rows-text">Tax</div>
         </q-td>
-        <q-td class="text-right grand-total-cell">
+        <q-td class="text-right tax-cell">
           <div
             :class="{
               'row items-center justify-end': true,
               filled: !viewMode,
             }"
           >
-            <div>{{ taxAmount }}</div>
+            <div>{{ useThousandSeparator(taxAmount) }}</div>
           </div>
         </q-td>
         <q-td v-if="!viewMode" auto-width> &nbsp; </q-td>
@@ -762,7 +828,7 @@
         <q-td auto-width />
         <q-td v-if="enableImageUploads && internalForm.showImages" auto-width />
         <q-td class="text-right" :colspan="visibleColumns.length - 1">
-          <div class="">
+          <div class="bottom-rows-text">
             Grand total
             {{ internalForm.amountsAreTaxInclusive ? '(tax inclusive)' : '' }}
           </div>
@@ -774,7 +840,7 @@
               filled: !viewMode,
             }"
           >
-            <div>{{ grandTotal }}</div>
+            <div>{{ useThousandSeparator(grandTotal) }}</div>
           </div>
         </q-td>
         <q-td v-if="!viewMode" auto-width> &nbsp; </q-td>
@@ -817,6 +883,7 @@ import {
   getRoundedTotal,
 } from '../composables/invoices-quotations/useInvoiceQuotation';
 import { useQuasar, format } from 'quasar';
+import useThousandSeparator from '../composables/useThousandSeparators';
 
 export default defineComponent({
   name: 'InvoiceQuotationTable',
@@ -1203,6 +1270,7 @@ export default defineComponent({
       removeAdditionalFee,
       isLastItem,
       collectionTypeOptions,
+      useThousandSeparator,
     };
   },
 });

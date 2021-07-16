@@ -403,6 +403,7 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 .invoice-quotation-view-table {
+  width: 95%;
   thead {
     background-color: $deep-purple-8;
     color: white;
@@ -420,15 +421,52 @@ input[type='number']::-webkit-outer-spin-button {
       background-color: $deep-purple-2;
       color: black;
     }
+
+    tr,
+    td {
+      height: auto !important;
+      white-space: normal;
+
+      div {
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+      }
+    }
   }
 
   .bottom-row {
-    height: unset !important;
+    height: auto !important;
     &:nth-last-child(odd) {
       td:last-child {
-        background-color: $deep-purple-2;
+        background-color: $deep-purple-1;
         color: black;
       }
+    }
+
+    .total-qty-cell,
+    .total-discount-cell,
+    .subtotal-cell {
+      background-color: $deep-purple-5 !important;
+      color: white !important;
+    }
+
+    .bottom-rows-text,
+    .grand-total-cell {
+      font-weight: 500;
+    }
+
+    .grand-total-cell,
+    .subtotal-cell {
+      font-weight: 600;
+    }
+  }
+
+  .desc-column,
+  .product-id-column {
+    width: 350px;
+
+    div.row {
+      word-wrap: normal;
     }
   }
 }
