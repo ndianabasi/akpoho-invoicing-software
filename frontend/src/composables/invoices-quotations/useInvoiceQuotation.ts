@@ -335,7 +335,7 @@ const getAddressObject = function (address: CustomerAddressShape) {
     streetAddress: address?.street_address,
     addressLine2: `${address?.city ?? ''} ${address?.postal_code ?? ''}`.trim(),
     addressLine3: `${address?.addressState?.name ?? ''}${
-      address?.addressCountry?.name
+      address?.addressCountry?.name && address?.addressState?.name
         ? ', ' + address?.addressCountry?.name
         : address?.addressCountry?.name ?? ''
     }`.trim(),
