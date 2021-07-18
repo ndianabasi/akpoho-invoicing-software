@@ -63,8 +63,8 @@
                 class="q-mb-md"
                 transition-show="scale"
                 transition-hide="scale"
-                emit-value
-                map-options
+                :emit-value="false"
+                :map-options="false"
               >
                 <template #error>
                   {{
@@ -114,6 +114,7 @@ import {
   PERMISSION,
   CustomerAddressInterface,
   FormSchemaProperties,
+  CustomerAddressInterfaceRaw,
 } from '../../store/types';
 import { Notify } from 'quasar';
 import { FetchTableDataInterface } from '../../types/table';
@@ -191,13 +192,26 @@ export default defineComponent({
         ] as SelectionOption[]
     );
 
-    const form: CustomerAddressInterface = reactive({
+    const form: CustomerAddressInterfaceRaw = reactive({
       address: '',
       lga: '',
       postal_code: '',
       state: null,
       country: null,
       type: null,
+    });
+
+    const addressTypeOptions = computed(() => {
+      return props.creationMode
+        ? [
+            { label: 'Billing', value: 'billing_address' },
+            { label: 'Shipping', value: 'shipping_address' },
+            { label: 'Both', value: 'both' },
+          ]
+        : [
+            { label: 'Billing', value: 'billing_address' },
+            { label: 'Shipping', value: 'shipping_address' },
+          ];
     });
 
     const customerFormSchema: ComputedRef<FormSchemaProperties[]> = computed(
@@ -207,16 +221,7 @@ export default defineComponent({
           label: 'Address Type',
           default: null,
           componentType: 'select',
-          options: props.creationMode
-            ? [
-                { label: 'Billing', value: 'billing_address' },
-                { label: 'Shipping', value: 'shipping_address' },
-                { label: 'Both', value: 'both' },
-              ]
-            : [
-                { label: 'Billing', value: 'billing_address' },
-                { label: 'Shipping', value: 'shipping_address' },
-              ],
+          options: addressTypeOptions.value,
           isVisible: true,
           autocomplete: 'off',
         },
@@ -285,6 +290,16 @@ export default defineComponent({
 
     const form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
 
+    const processedForm = computed(() => {
+      const { type, country, state, ...restOfForm } = form;
+      return {
+        type: type?.value,
+        country: country?.value,
+        state: state?.value,
+        ...restOfForm,
+      };
+    });
+
     function submitForm() {
       if (!form$.value.$invalid) {
         submitting.value = true;
@@ -295,7 +310,7 @@ export default defineComponent({
               .dispatch('customers/EDIT_CUSTOMER_ADDRESS', {
                 customerId: props.customerId,
                 customerAddressId: props.customerAddressId,
-                form: form,
+                form: processedForm.value,
               })
               .then(async () => {
                 submitting.value = false;
@@ -310,7 +325,7 @@ export default defineComponent({
             store
               .dispatch('customers/CREATE_CUSTOMER_ADDRESS', {
                 customerId: props.customerId,
-                form: form,
+                form: processedForm.value,
               })
               .then(async () => {
                 submitting.value = false;
@@ -374,23 +389,40 @@ export default defineComponent({
             );
 
             form.address = currentAddress?.value?.street_address ?? '';
-            form.type = currentAddress?.value?.address_type ?? '';
+            form.type = addressTypeOptions.value.filter(
+              (type) => type.value === currentAddress?.value?.address_type
+            )[0];
             form.lga = currentAddress?.value?.city ?? '';
             form.postal_code = currentAddress?.value?.postal_code ?? '';
-            form.country = currentAddress?.value?.addressCountry?.id ?? null;
+            form.country = currentAddress?.value?.addressCountry
+              ? {
+                  label: currentAddress?.value?.addressCountry?.name ?? '',
+                  value: currentAddress?.value?.addressCountry?.id ?? null,
+                }
+              : null;
             // Fetch the states for the current country
             if (form.country) {
               await store
                 .dispatch('countries_states/FETCH_COUNTRY_STATES_FOR_SELECT', {
-                  countryId: form.country,
+                  countryId: form.country?.value,
                 })
                 .then(() => {
                   // Then update the current state
-                  form.state = currentAddress?.value?.addressState?.id ?? null;
+                  form.state = currentAddress?.value?.addressState
+                    ? {
+                        label: currentAddress?.value?.addressState?.name ?? '',
+                        value: currentAddress?.value?.addressState?.id ?? null,
+                      }
+                    : null;
                 });
             } else {
               // Attempt to update the state, irrespective
-              form.state = currentAddress?.value?.addressState?.id ?? null;
+              form.state = currentAddress?.value?.addressState
+                ? {
+                    label: currentAddress?.value?.addressState?.name ?? '',
+                    value: currentAddress?.value?.addressState?.id ?? null,
+                  }
+                : null;
             }
 
             loading.value = false;
@@ -408,12 +440,12 @@ export default defineComponent({
 
     watch(
       () => form.country,
-      (newValue) => {
+      (country) => {
         form.state = null;
-        if (newValue) {
+        if (country?.value) {
           void store.dispatch(
             'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: newValue }
+            { countryId: country?.value }
           );
         }
       }

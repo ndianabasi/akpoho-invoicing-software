@@ -252,14 +252,25 @@ export interface CurrentlyViewedAddress {
   };
 }
 
-export interface CustomerAddressInterface {
+export interface CustomerAddressInterfaceContract {
   [key: string]: boolean | number | SelectOption | string | null | undefined;
-  country: number | null;
-  type: string | null;
-  state: number | null;
-  address: string | null;
+  address: string;
   lga: string | null;
   postal_code: string | null;
+}
+
+export interface CustomerAddressInterfaceRaw
+  extends CustomerAddressInterfaceContract {
+  type: SelectOption | null;
+  country: SelectOption | null;
+  state: SelectOption | null;
+}
+
+export interface CustomerAddressInterface
+  extends CustomerAddressInterfaceContract {
+  type: string;
+  country: string | null;
+  state: string | null;
 }
 
 export interface CustomerFormShape extends CurrentCustomerBaseInterface {

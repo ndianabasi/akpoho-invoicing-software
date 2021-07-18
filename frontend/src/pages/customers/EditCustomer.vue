@@ -176,7 +176,7 @@ import {
   reactive,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
-import { email, helpers, required } from '@vuelidate/validators';
+import { email, helpers } from '@vuelidate/validators';
 import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import { store } from '../../store';
@@ -468,12 +468,6 @@ export default defineComponent({
     ]);
 
     const rules = computed(() => ({
-      first_name: {
-        requird: helpers.withMessage('First Name is required..', required),
-      },
-      last_name: {
-        requird: helpers.withMessage('Last Name is required..', required),
-      },
       email: {
         email: helpers.withMessage('Email is not valid.', email),
       },
