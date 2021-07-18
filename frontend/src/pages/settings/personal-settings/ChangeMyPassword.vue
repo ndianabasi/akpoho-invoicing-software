@@ -274,7 +274,6 @@ export default defineComponent({
   },
 
   setup() {
-    const loading = ref(false);
     const submitting = ref(false);
     const step = ref(1);
     const stepper: Ref<QStepper | null> = ref(null);

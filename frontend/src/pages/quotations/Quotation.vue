@@ -29,7 +29,7 @@
         </div>
         <div
           class="
-            q-ml-xl-xl q-ml-lg-xl q-ml-md-lg q-ml-sm-md
+            q-mx-xl-xl q-mx-lg-xl q-mx-md-lg q-mx-sm-md
             row
             items-center
             justify-start
@@ -131,7 +131,7 @@
             <div class="row justify-center items-center">
               <div
                 v-if="customerInformation.documentTitle"
-                class="text-h4 q-mt-lg self-center"
+                class="text-h5 text-uppercase q-mt-lg self-center"
               >
                 {{ customerInformation.documentTitle }}
               </div>
@@ -155,7 +155,7 @@
         </div>
         <div
           class="
-            q-ml-xl-xl q-ml-lg-xl q-ml-md-lg q-ml-sm-md
+            q-mx-xl-xl q-mx-lg-xl q-mx-md-lg q-mx-sm-md
             column
             q-gutter-sm q-my-lg-md q-my-sm-sm
           "

@@ -720,7 +720,7 @@
               {{
                 additionalSubtotalDiscount > 0
                   ? '- ' + useThousandSeparator(additionalSubtotalDiscount)
-                  : 0
+                  : useThousandSeparator(additionalSubtotalDiscount)
               }}
             </div>
           </div>
@@ -771,11 +771,7 @@
             />
             <div v-else>
               {{
-                internalForm.additionalFees[index].amount > 0
-                  ? useThousandSeparator(
-                      internalForm.additionalFees[index].amount
-                    )
-                  : 0
+                useThousandSeparator(internalForm.additionalFees[index].amount)
               }}
             </div>
           </q-td>

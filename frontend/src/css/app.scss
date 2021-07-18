@@ -280,7 +280,7 @@ input[type='file'] {
   }
 
   .desc-column {
-    min-width: 300px !important;
+    max-width: 350px;
     .q-field__native {
       max-height: 250px;
       overflow-y: auto;
@@ -288,7 +288,7 @@ input[type='file'] {
   }
 
   .product-id-column {
-    min-width: 300px !important;
+    max-width: 400px;
   }
 
   .ghost-item {
@@ -299,17 +299,17 @@ input[type='file'] {
   .qty-column {
     :has(.composite-qty) {
       width: 350px !important;
-      min-width: 350px;
+      max-width: 350px;
     }
     :not(:has(.composite-qty)) {
       width: 70px !important;
-      min-width: 70px;
+      max-width: 70px;
     }
     > label,
     .group-qty-input {
       > .q-field__inner {
         width: 60px !important;
-        min-width: 60px;
+        max-width: 60px;
       }
     }
   }
@@ -317,32 +317,32 @@ input[type='file'] {
   .serial-number-column {
     .custom-serial-input {
       width: 50px !important;
-      min-width: 50px;
+      max-width: 50px;
     }
   }
 
   .unit-discount-column {
     :has(.discount-type-select-input) {
       width: 250px !important;
-      min-width: 180px;
+      max-width: 180px;
     }
     :not(:has(.discount-type-select-input)) {
       width: 60px !important;
-      min-width: 60px;
+      max-width: 60px;
     }
 
     > label,
     .group-qty-input {
       > .q-field__inner {
         width: 60px !important;
-        min-width: 60px;
+        max-width: 60px;
       }
     }
   }
 
   .group-qty-total {
     width: 80px !important;
-    min-width: 80px;
+    max-width: 80px;
   }
 
   .price-column {
@@ -355,10 +355,10 @@ input[type='file'] {
   .total-column,
   .line-discount-column {
     width: 110px !important;
-    min-width: 110px;
+    max-width: 110px;
     > label > .q-field__inner {
       width: 100px !important;
-      min-width: 100px;
+      max-width: 100px;
     }
   }
 
@@ -371,7 +371,7 @@ input[type='file'] {
     background: rgba(0, 0, 0, 0.05);
     border-radius: 4px 4px 0 0;
     line-height: 18px;
-    min-height: 36px;
+    mmaximaxn-height: 36px;
     height: 40px;
     padding-right: 0.75rem;
   }
@@ -461,9 +461,12 @@ input[type='number']::-webkit-outer-spin-button {
     }
   }
 
-  .desc-column,
   .product-id-column {
-    width: 250px;
+    width: 300px !important;
+  }
+
+  .desc-column {
+    width: 300px !important;
   }
 
   .qty-column {
@@ -490,5 +493,14 @@ input[type='number']::-webkit-outer-spin-button {
     margin-top: 2rem;
     padding-top: 1rem;
     border-top: solid 2px $deep-purple-8;
+  }
+}
+
+.invoice-quotation-view-table {
+  .quotation-invoice-table {
+    max-width: 100%;
+    table {
+      max-width: 100%;
+    }
   }
 }
