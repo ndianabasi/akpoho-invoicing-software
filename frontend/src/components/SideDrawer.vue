@@ -40,8 +40,8 @@
       </q-select>
 
       <q-list padding>
-        <template v-if="links1 && !!links1.length">
-          <template v-for="link in links1">
+        <template v-if="mainSideDrawerMenu && !!mainSideDrawerMenu.length">
+          <template v-for="link in mainSideDrawerMenu">
             <q-item
               v-if="!link.subMenu"
               :key="link.title"
@@ -87,10 +87,10 @@
           </template>
         </template>
 
-        <template v-if="links2 && !!links2.length">
+        <template v-if="sideDrawerFooterMenu && !!sideDrawerFooterMenu.length">
           <q-separator inset class="q-my-md" />
           <q-item
-            v-for="link in links2"
+            v-for="link in sideDrawerFooterMenu"
             :key="link.title"
             clickable
             class="AIS__drawer-item"
@@ -106,10 +106,10 @@
           </q-item>
         </template>
 
-        <template v-if="links3 && !!links3.length">
+        <template v-if="sideDrawerBottomMenu && !!sideDrawerBottomMenu.length">
           <q-separator class="q-my-md" />
           <q-item
-            v-for="link in links3"
+            v-for="link in sideDrawerBottomMenu"
             :key="link.title"
             clickable
             class="AIS__drawer-item"
@@ -135,7 +135,11 @@
 import { defineComponent, computed, ref, watch, Ref, watchEffect } from 'vue';
 import { useStore } from 'vuex';
 import { SelectOption, StringIDNameInterface } from '../store/types';
-import { Menu } from '../store/menus/state';
+import {
+  mainSideDrawerMenu,
+  sideDrawerFooterMenu,
+  sideDrawerBottomMenu,
+} from '../composables/menus/useMenu';
 
 export default defineComponent({
   name: 'SideDrawer',
@@ -217,14 +221,10 @@ export default defineComponent({
       store.commit('auth/SET_CURRENT_COMPANY', event);
     };
 
-    const links1 = computed(() => store.getters['menus/GET_LINKS1'] as Menu[]);
-    const links2 = computed(() => store.getters['menus/GET_LINKS2'] as Menu[]);
-    const links3 = computed(() => store.getters['menus/GET_LINKS3'] as Menu[]);
-
     return {
-      links1,
-      links2,
-      links3,
+      mainSideDrawerMenu,
+      sideDrawerFooterMenu,
+      sideDrawerBottomMenu,
       TOGGLE_LEFT_DRAWER,
       leftDrawerOpen,
       selectedCompany,

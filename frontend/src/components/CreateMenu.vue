@@ -31,8 +31,8 @@
 <!-- eslint-disable @typescript-eslint/no-unsafe-return -->
 <!-- eslint-disable @typescript-eslint/no-unsafe-member-access -->
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-import { useStore } from 'vuex';
+import { defineComponent } from 'vue';
+import { createMenu } from '../composables/menus/useMenu';
 
 export default defineComponent({
   name: 'CreateMenu',
@@ -43,9 +43,8 @@ export default defineComponent({
     }, */
   },
   setup(/* props */) {
-    const store = useStore();
     return {
-      createMenu: computed(() => store.getters['menus/GET_CREATE_MENU']),
+      createMenu,
     };
   },
 });

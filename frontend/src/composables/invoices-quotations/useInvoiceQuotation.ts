@@ -155,7 +155,7 @@ export const getRoundedTotal = function (
   let total: string | number = '';
   switch (roundingType) {
     case 'none':
-      total = Number.parseFloat(amount as string).toFixed(numberOfDecimals);
+      total = Number(amount).toFixed(numberOfDecimals);
       break;
     case 'nearest':
       total = Math.round(amount as number);
