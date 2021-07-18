@@ -336,8 +336,8 @@ const getAddressObject = function (address: CustomerAddressShape) {
     addressLine2: `${address?.city ?? ''} ${address?.postal_code ?? ''}`.trim(),
     addressLine3: `${address?.addressState?.name ?? ''}${
       address?.addressCountry?.name
-        ? ', '
-        : '' + address?.addressCountry?.name ?? ''
+        ? ', ' + address?.addressCountry?.name
+        : address?.addressCountry?.name ?? ''
     }`.trim(),
   };
 };

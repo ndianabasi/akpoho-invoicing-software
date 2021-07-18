@@ -98,7 +98,7 @@
                   {{ customerInformation.billingAddress.addressLine2 }},
                 </div>
                 <div class="text-body2">
-                  {{ customerInformation.billingAddress.addressLine3 }}.
+                  {{ customerInformation.billingAddress.addressLine3 }}
                 </div>
               </div>
               <div
@@ -115,7 +115,7 @@
                   {{ customerInformation.shippingAddress.addressLine2 }},
                 </div>
                 <div class="text-body2">
-                  {{ customerInformation.shippingAddress.addressLine3 }}.
+                  {{ customerInformation.shippingAddress.addressLine3 }}
                 </div>
               </div>
             </div>
