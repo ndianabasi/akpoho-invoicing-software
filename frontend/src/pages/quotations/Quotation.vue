@@ -5,26 +5,20 @@
       :title-info="null"
       show-avatar
       show-title-panel-side
-      card-container-classes="col-md-12 col-lg-10 col-xl-10 invoice-quotation-body"
+      card-container-classes="col-md-12 col-lg-10 col-xl-10 col-sm-12 col-xs-12 invoice-quotation-body"
       :loading="loading"
     >
       <template #body-panel>
-        <div
-          class="
-            column
-            items-center
-            justify-center
-            q-gutter-sm q-my-lg-md q-my-sm-sm
-            company-logo
-          "
-        >
-          <q-img
-            :src="companyImageUrl"
-            spinner-color="white"
-            style="height: 140px; max-width: 150px"
-          />
-          <div class="text-h5 text-deep-purple-8">
-            {{ customerInformation.documentCompany.name }}
+        <div class="row q-gutter-sm q-my-lg-md q-my-sm-sm company-logo">
+          <div class="col items-center justify-center col-12 column">
+            <q-img
+              :src="companyImageUrl"
+              spinner-color="white"
+              style="height: 140px; max-width: 150px"
+            />
+            <div class="text-h5 text-deep-purple-8 q-mt-sm">
+              {{ customerInformation.documentCompany.name }}
+            </div>
           </div>
         </div>
         <div
@@ -37,7 +31,7 @@
           "
         >
           <div class="col col-12">
-            <div class="text-body2 text-bold text-deep-purple-8">
+            <div class="text-body2 text-bold text-deep-purple-8 q-mt-sm">
               {{ documentDate }}
             </div>
             <div class="text-body2 text-deep-purple-8 q-mt-md text-bold">
@@ -75,7 +69,7 @@
                 }}</span
               >
             </div>
-            <div class="text-body2">
+            <div class="text-body2 q-mb-sm">
               <span class="text-bold">PHONE NUMBER:</span>&nbsp;
               <span v-if="customerInformation.isCorporateCustomer"
                 >{{
@@ -89,10 +83,10 @@
                 }}</span
               >
             </div>
-            <div class="row q-mt-md">
+            <div class="row q-gutter-xs-none q-mt-md">
               <div
                 v-if="customerInformation.isBillingAddressAvailable"
-                class="col col-sm-12 col-md-6 col-lg-4 col-xl-3"
+                class="col col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-3"
               >
                 <div class="text-body2 text-deep-purple-8 text-bold">
                   BILLING ADDRESS:
@@ -109,9 +103,9 @@
               </div>
               <div
                 v-if="customerInformation.isShippingAddressAvailable"
-                class="col col-sm-12 col-md-6 col-lg-4 col-xl-3"
+                class="col col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-3"
               >
-                <div class="text-body2 text-deep-purple-8 text-bold">
+                <div class="text-body2 text-deep-purple-8 text-bold q-mt-xs-sm">
                   SHIPPING ADDRESS:
                 </div>
                 <div class="text-body2">
@@ -176,13 +170,13 @@
             footer
           "
         >
-          <div class="text-body2 text-bold text-deep-purple-8">
+          <div class="text-body2 text-center text-bold text-deep-purple-8">
             {{ customerInformation.documentCompany.name }}
           </div>
-          <div class="text-body2">
+          <div class="text-body2 text-center">
             {{ customerInformation.documentCompany.fullAddress }}
           </div>
-          <div class="text-body2">
+          <div class="text-body2 text-center">
             <span v-if="customerInformation.documentCompany.email"
               ><span class="text-bold">EMAIL:</span>&nbsp;
               {{ customerInformation.documentCompany.email }} | </span

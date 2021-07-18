@@ -211,9 +211,16 @@ export default class QuotationsController {
     } else return response.abort({ message: 'Company not found' })
   }
 
-  public async show({ response, requestedInvoiceQuotation, bouncer }: HttpContextContract) {
+  public async show({
+    response,
+    requestedInvoiceQuotation,
+    requestedCompany,
+    bouncer,
+  }: HttpContextContract) {
     // Check authorisation
-    await bouncer.with('InvoiceQuotationPolicy').authorize('view', requestedInvoiceQuotation!)
+    await bouncer
+      .with('InvoiceQuotationPolicy')
+      .authorize('view', requestedInvoiceQuotation!, requestedCompany!)
 
     await requestedInvoiceQuotation?.load('customer', (customerQuery) => {
       customerQuery.preload('title', (titleQuery) => titleQuery.select('name'))
@@ -340,7 +347,9 @@ export default class QuotationsController {
     requestedInvoiceQuotation,
   }: HttpContextContract) {
     if (requestedCompany) {
-      await bouncer.with('InvoiceQuotationPolicy').authorize('edit', requestedInvoiceQuotation)
+      await bouncer
+        .with('InvoiceQuotationPolicy')
+        .authorize('edit', requestedInvoiceQuotation, requestedCompany!)
 
       const {
         items,

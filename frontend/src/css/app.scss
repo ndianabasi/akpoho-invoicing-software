@@ -371,7 +371,7 @@ input[type='file'] {
     background: rgba(0, 0, 0, 0.05);
     border-radius: 4px 4px 0 0;
     line-height: 18px;
-    mmaximaxn-height: 36px;
+    min-height: 36px;
     height: 40px;
     padding-right: 0.75rem;
   }
@@ -493,14 +493,5 @@ input[type='number']::-webkit-outer-spin-button {
     margin-top: 2rem;
     padding-top: 1rem;
     border-top: solid 2px $deep-purple-8;
-  }
-}
-
-.invoice-quotation-view-table {
-  .quotation-invoice-table {
-    max-width: 100%;
-    table {
-      max-width: 100%;
-    }
   }
 }

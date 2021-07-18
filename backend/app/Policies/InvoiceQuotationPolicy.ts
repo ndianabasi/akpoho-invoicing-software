@@ -4,6 +4,7 @@ import PermissionHelper from 'App/Helpers/PermissionHelper'
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
 import { accessInvoicesQuotations } from 'App/Helpers/PolicyHelper'
 import InvoiceQuotation from 'App/Models/InvoiceQuotation'
+import Company from 'App/Models/Company'
 
 export default class ProductPolicy extends BasePolicy {
   public async create(user: User) {
@@ -36,13 +37,31 @@ export default class ProductPolicy extends BasePolicy {
     return Bouncer.deny('You are not permitted to perform this action!')
   }
 
-  public async view(user: User, requestedInvoiceQuotation: InvoiceQuotation) {
+  public async view(
+    user: User,
+    requestedInvoiceQuotation: InvoiceQuotation,
+    requestedCompany: Company
+  ) {
     const resourcePermission = 'can_view_quotations'
-    return await accessInvoicesQuotations(resourcePermission, user, requestedInvoiceQuotation)
+    return await accessInvoicesQuotations(
+      resourcePermission,
+      user,
+      requestedInvoiceQuotation,
+      requestedCompany
+    )
   }
 
-  public async edit(user: User, requestedInvoiceQuotation: InvoiceQuotation) {
+  public async edit(
+    user: User,
+    requestedInvoiceQuotation: InvoiceQuotation,
+    requestedCompany: Company
+  ) {
     const resourcePermission = 'can_edit_quotations'
-    return await accessInvoicesQuotations(resourcePermission, user, requestedInvoiceQuotation)
+    return await accessInvoicesQuotations(
+      resourcePermission,
+      user,
+      requestedInvoiceQuotation,
+      requestedCompany
+    )
   }
 }

@@ -286,7 +286,8 @@ export const accessProducts = async (
 export const accessInvoicesQuotations = async (
   resourcePermission: string,
   authUser: User,
-  invoices_quotations: InvoiceQuotation | string[]
+  invoices_quotations: InvoiceQuotation | string[],
+  ownerCompany: Company
 ) => {
   const resourcePermitted = await PermissionHelper.hasResourcePermission({
     resourcePermission,
@@ -311,6 +312,11 @@ export const accessInvoicesQuotations = async (
       await invoiceQuotation.load('company')
       const invoiceQuotationCompany = invoiceQuotation.company
 
+      if (invoiceQuotationCompany.id !== ownerCompany.id) {
+        permitted.push(false)
+        continue
+      }
+
       if (
         authUserCompanies.some(
           (authUserCompany) => authUserCompany.id === invoiceQuotationCompany.id
@@ -327,6 +333,12 @@ export const accessInvoicesQuotations = async (
     // Load invoice_quotation company
     await invoiceQuotation.load('company')
     const invoiceQuotationCompany = invoiceQuotation.company
+
+    if (invoiceQuotationCompany.id !== ownerCompany.id) {
+      return Bouncer.deny(
+        'You are not permitted to perform this action! Make sure you have selected the right company.'
+      )
+    }
 
     if (
       authUserCompanies.some(
