@@ -1,6 +1,7 @@
 import { QuotationInvoiceHeaders } from 'src/components/data/table-definitions/quotation_invoice_items';
 import {
   CurrentlyViewedInvoiceQuotation,
+  CustomerAddressShape,
   DiscountType,
   ProductNameType,
   QuotationInvoiceFormShape,
@@ -9,6 +10,7 @@ import {
 } from 'src/store/types';
 import { computed, ref } from 'vue';
 import { store } from '../../store';
+import { DateTime } from 'luxon';
 
 export const currentInvoiceQuotation = computed({
   get: () =>
@@ -322,3 +324,91 @@ export const roundTypeOptions = ref([
   { label: 'Up', value: 'up' },
 ]);
 export const numberOfDecimalOptionValues = [0, 1, 2, 3, 4, 5, 6];
+
+export const fullDate = function (date: string): string {
+  // Date is in iso format
+  return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
+};
+
+const getAddressObject = function (address: CustomerAddressShape) {
+  return {
+    streetAddress: address.street_address,
+    addressLine2: `${address.city} ${address.postal_code}`,
+    addressLine3: `${address.addressState.name}, ${address.addressCountry.name}`,
+  };
+};
+
+export const getCustomerInformation = function (
+  data: CurrentlyViewedInvoiceQuotation
+) {
+  const isCorporateCustomer = data.customer.is_corporate;
+  const customerName = isCorporateCustomer
+    ? data.customer.company_name
+    : data.customer.customer_name;
+  const corporateCustomerHasRep = data.customer.corporate_has_rep;
+  const shippingAddress = getAddressObject(data.shipping_address);
+  const billingAddress = getAddressObject(data.billing_address);
+  const individualCustomerOrRepDetails = {
+    name: !isCorporateCustomer
+      ? customerName
+      : `${data.customer?.first_name ?? ''} ${data.customer?.last_name ?? ''}`,
+    email: data.customer?.email ?? '',
+    phoneNumber: data.customer?.phone_number ?? '',
+    customerHasTitle: !!data.customer?.title?.name,
+    title: data.customer?.title?.name ?? '',
+  };
+  const corporateCustomerDetails = {
+    name: data.customer?.company_name ?? '',
+    email: data.customer?.company_email ?? '',
+    phoneNumber: data.customer?.company_phone ?? '',
+  };
+  const isIndividualCustomerOrRepAvailable =
+    (isCorporateCustomer && corporateCustomerHasRep) || !isCorporateCustomer;
+  const isBillingAddressAvailable = !!data.billing_address;
+  const isShippingAddressAvailable = !!data.shipping_address;
+  const customerTitle = data.customer?.title?.name ?? 'Sir/Madam';
+  const documentTitle =
+    data.title && data.title !== 'undefined' ? data.title : '';
+  const documentIntroduction =
+    data.introduction && data.introduction !== 'undefined'
+      ? data.introduction
+      : '';
+  const documentNotes =
+    data.notes && data.notes !== 'undefined' ? data.notes : '';
+  const documentCompany = {
+    name: data.company.name,
+    fullAddress: `${data.company?.address ?? ''}${
+      data.company?.city
+        ? ' ' + data.company?.city + `${data.company.state?.name ? ',' : ''}`
+        : ''
+    }${
+      data.company.state?.name
+        ? ' ' +
+          data.company.state?.name +
+          `${data.company.country?.name ? ',' : ''}`
+        : ''
+    }${
+      data.company.country?.name ? ' ' + data.company.country?.name : ''
+    }`.trim(),
+    phoneNumber: data.company?.phone_number,
+    email: data.company.email,
+  };
+
+  return {
+    isCorporateCustomer,
+    customerName,
+    corporateCustomerHasRep,
+    shippingAddress,
+    billingAddress,
+    individualCustomerOrRepDetails,
+    isIndividualCustomerOrRepAvailable,
+    corporateCustomerDetails,
+    isBillingAddressAvailable,
+    isShippingAddressAvailable,
+    customerTitle,
+    documentTitle,
+    documentIntroduction,
+    documentNotes,
+    documentCompany,
+  };
+};

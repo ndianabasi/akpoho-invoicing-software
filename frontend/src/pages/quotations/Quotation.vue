@@ -1,13 +1,148 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <div class="q-pa-md">
     <view-card
       :title-info="null"
       show-avatar
       show-title-panel-side
-      card-container-classes="col-md-12 col-lg-9 col-xl-9"
+      card-container-classes="col-md-12 col-lg-10 col-xl-10 invoice-quotation-body"
       :loading="loading"
     >
       <template #body-panel>
+        <div
+          class="
+            column
+            items-center
+            justify-center
+            q-gutter-sm q-my-lg-md q-my-sm-sm
+            company-logo
+          "
+        >
+          <q-img
+            :src="companyImageUrl"
+            spinner-color="white"
+            style="height: 140px; max-width: 150px"
+          />
+          <div class="text-h5 text-deep-purple-8">
+            {{ customerInformation.documentCompany.name }}
+          </div>
+        </div>
+        <div
+          class="
+            q-ml-xl-xl q-ml-lg-xl q-ml-md-lg q-ml-sm-md
+            row
+            items-center
+            justify-start
+            q-gutter-sm q-my-lg-md q-my-sm-sm
+          "
+        >
+          <div class="col col-12">
+            <div class="text-body2 text-bold text-deep-purple-8">
+              {{ documentDate }}
+            </div>
+            <div class="text-body2 text-deep-purple-8 q-mt-md text-bold">
+              ATTENTION:
+            </div>
+            <div
+              v-if="customerInformation.isIndividualCustomerOrRepAvailable"
+              class="text-bold text-deep-purple-8"
+            >
+              <span
+                v-if="
+                  customerInformation.individualCustomerOrRepDetails
+                    .customerHasTitle
+                "
+                >{{
+                  customerInformation.individualCustomerOrRepDetails.title
+                }}&nbsp;</span
+              >{{ customerInformation.individualCustomerOrRepDetails.name }},
+            </div>
+            <div
+              v-if="customerInformation.isCorporateCustomer"
+              class="text-bold text-deep-purple-8"
+            >
+              {{ customerInformation.corporateCustomerDetails.name }}.
+            </div>
+            <div class="text-body2">
+              <span class="text-bold">EMAIL ADDRESS:</span>&nbsp;
+              <span v-if="customerInformation.isCorporateCustomer"
+                >{{ customerInformation.corporateCustomerDetails.email }} </span
+              ><span
+                v-if="customerInformation.isIndividualCustomerOrRepAvailable"
+                >;
+                {{
+                  customerInformation.individualCustomerOrRepDetails.email
+                }}</span
+              >
+            </div>
+            <div class="text-body2">
+              <span class="text-bold">PHONE NUMBER:</span>&nbsp;
+              <span v-if="customerInformation.isCorporateCustomer"
+                >{{
+                  customerInformation.corporateCustomerDetails.phoneNumber
+                }} </span
+              ><span
+                v-if="customerInformation.isIndividualCustomerOrRepAvailable"
+                >;
+                {{
+                  customerInformation.individualCustomerOrRepDetails.phoneNumber
+                }}</span
+              >
+            </div>
+            <div class="row q-mt-md">
+              <div
+                v-if="customerInformation.isBillingAddressAvailable"
+                class="col col-sm-12 col-md-6 col-lg-4 col-xl-3"
+              >
+                <div class="text-body2 text-deep-purple-8 text-bold">
+                  BILLING ADDRESS:
+                </div>
+                <div class="text-body2">
+                  {{ customerInformation.billingAddress.streetAddress }},
+                </div>
+                <div class="text-body2">
+                  {{ customerInformation.billingAddress.addressLine2 }},
+                </div>
+                <div class="text-body2">
+                  {{ customerInformation.billingAddress.addressLine3 }}.
+                </div>
+              </div>
+              <div
+                v-if="customerInformation.isShippingAddressAvailable"
+                class="col col-sm-12 col-md-6 col-lg-4 col-xl-3"
+              >
+                <div class="text-body2 text-deep-purple-8 text-bold">
+                  SHIPPING ADDRESS:
+                </div>
+                <div class="text-body2">
+                  {{ customerInformation.shippingAddress.streetAddress }},
+                </div>
+                <div class="text-body2">
+                  {{ customerInformation.shippingAddress.addressLine2 }},
+                </div>
+                <div class="text-body2">
+                  {{ customerInformation.shippingAddress.addressLine3 }}.
+                </div>
+              </div>
+            </div>
+            <div class="text-body2 q-mt-lg">
+              Dear {{ customerInformation.customerTitle }},
+            </div>
+            <div class="row justify-center items-center">
+              <div
+                v-if="customerInformation.documentTitle"
+                class="text-h4 q-mt-lg self-center"
+              >
+                {{ customerInformation.documentTitle }}
+              </div>
+            </div>
+            <div
+              v-if="customerInformation.documentIntroduction"
+              class="q-my-md"
+              v-html="customerInformation.documentIntroduction"
+            ></div>
+          </div>
+        </div>
         <div class="row q-gutter-sm">
           <div class="col col-12">
             <InvoiceQuotationTable
@@ -16,6 +151,45 @@
               :creation-mode="false"
               :view-mode="true"
             />
+          </div>
+        </div>
+        <div
+          class="
+            q-ml-xl-xl q-ml-lg-xl q-ml-md-lg q-ml-sm-md
+            column
+            q-gutter-sm q-my-lg-md q-my-sm-sm
+          "
+        >
+          <div class="col text-body2 text-deep-purple-8 text-bold">NOTES:</div>
+          <div
+            v-if="customerInformation.documentNotes"
+            class="col"
+            v-html="customerInformation.documentNotes"
+          ></div>
+        </div>
+        <div
+          class="
+            column
+            items-center
+            justify-center
+            q-gutter-sm q-my-lg-md q-my-sm-sm
+            footer
+          "
+        >
+          <div class="text-body2 text-bold text-deep-purple-8">
+            {{ customerInformation.documentCompany.name }}
+          </div>
+          <div class="text-body2">
+            {{ customerInformation.documentCompany.fullAddress }}
+          </div>
+          <div class="text-body2">
+            <span v-if="customerInformation.documentCompany.email"
+              ><span class="text-bold">EMAIL:</span>&nbsp;
+              {{ customerInformation.documentCompany.email }} | </span
+            ><span v-if="customerInformation.documentCompany.phoneNumber"
+              ><span class="text-bold">PHONE NUMBER:</span>&nbsp;
+              {{ customerInformation.documentCompany.phoneNumber }}</span
+            >
           </div>
         </div>
       </template>
@@ -82,7 +256,6 @@ import {
   ref,
   onBeforeMount,
   watchEffect,
-  watch,
   computed,
   Ref,
   PropType,
@@ -105,6 +278,8 @@ import InvoiceQuotationTable from '../../components/InvoiceQuotationTable.vue';
 import {
   currentInvoiceQuotation,
   getCurrentInvoiceQuotationData,
+  fullDate,
+  getCustomerInformation,
 } from '../../composables/invoices-quotations/useInvoiceQuotation';
 import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
 
@@ -208,6 +383,10 @@ export default defineComponent({
         });
     });
 
+    const customerInformation = computed(() =>
+      getCustomerInformation(currentInvoiceQuotation.value)
+    );
+
     onBeforeMount(() => {
       stopFetchCurrentlyViewedInvoiceQuotation();
     });
@@ -224,6 +403,11 @@ export default defineComponent({
       handleDeletion,
       loading,
       form,
+      companyImageUrl: ref(
+        `https://placeimg.com/500/300/nature?t=${Math.random()}`
+      ),
+      documentDate: computed(() => fullDate(form.date)),
+      customerInformation,
     };
   },
 });

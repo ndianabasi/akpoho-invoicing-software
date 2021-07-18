@@ -16,7 +16,6 @@ import Customer from './Customer'
 import CustomerAddress from './CustomerAddress'
 import InvoiceQuotationItem from './InvoiceQuotationItem'
 import Company from './Company'
-import { DATE_FORMAT } from 'App/Helpers/utils'
 
 export type DiscountType = 'percentage' | 'number'
 export type RoundingType = 'none' | 'nearest' | 'down' | 'up'
@@ -47,11 +46,7 @@ export default class InvoiceQuotation extends BaseModel {
   @column()
   public customerBillingAddress: string
 
-  @column.dateTime({
-    serialize(value: DateTime) {
-      return value ? value.toFormat(DATE_FORMAT) : ''
-    },
-  })
+  @column.dateTime()
   public date: DateTime
 
   @column()

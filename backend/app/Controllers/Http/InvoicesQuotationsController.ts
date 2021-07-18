@@ -215,7 +215,13 @@ export default class QuotationsController {
     // Check authorisation
     await bouncer.with('InvoiceQuotationPolicy').authorize('view', requestedInvoiceQuotation!)
 
-    await requestedInvoiceQuotation?.load('customer')
+    await requestedInvoiceQuotation?.load('customer', (customerQuery) => {
+      customerQuery.preload('title', (titleQuery) => titleQuery.select('name'))
+    })
+    await requestedInvoiceQuotation?.load('company', (companyQuery) => {
+      companyQuery.preload('country')
+      companyQuery.preload('state')
+    })
     await requestedInvoiceQuotation?.load('shippingAddress', (addressQuery) => {
       addressQuery.preload('addressCountry', (subAddressQuery) =>
         subAddressQuery.select('id', 'name')
@@ -250,12 +256,28 @@ export default class QuotationsController {
         ],
       },
       relations: {
-        customer: { fields: { pick: ['id', 'customer_name'] } },
+        customer: {
+          fields: {
+            pick: [
+              'id',
+              'customer_name',
+              'is_corporate',
+              'corporate_has_rep',
+              'first_name',
+              'last_name',
+              'email',
+              'phone_number',
+              'company_name',
+              'company_phone',
+              'company_email',
+            ],
+          },
+        },
         shipping_address: {
-          fields: { pick: ['id', 'full_address'] },
+          fields: { pick: ['id', 'full_address', 'street_address', 'city', 'postal_code'] },
         },
         billing_address: {
-          fields: { pick: ['id', 'full_address'] },
+          fields: { pick: ['id', 'full_address', 'street_address', 'city', 'postal_code'] },
         },
         items: {
           fields: {
@@ -283,6 +305,23 @@ export default class QuotationsController {
             unitOfMeasurement: {
               fields: {
                 omit: ['created_at', 'updated_at'],
+              },
+            },
+          },
+        },
+        company: {
+          fields: {
+            pick: ['name', 'email', 'phone_number', 'address', 'city'],
+          },
+          relations: {
+            country: {
+              fields: {
+                pick: ['name'],
+              },
+            },
+            state: {
+              fields: {
+                pick: ['name'],
               },
             },
           },

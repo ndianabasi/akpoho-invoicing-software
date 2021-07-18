@@ -696,7 +696,7 @@ export interface QuotationInvoiceItemShape {
 
 export type QuotationInvoiceFormShape = {
   [index: string]: unknown;
-  date: string | null;
+  date: string;
   code: string | null | undefined;
   customerId: SelectOption | null | undefined;
   customerBillingAddressId: SelectOption | null | undefined;
@@ -759,6 +759,22 @@ export interface QuotationResultRowInterface {
 
 export type UnitOfMeasurementTypes = 'collection' | 'discrete';
 
+export type CustomerAddressShape = {
+  id: string;
+  addressCountry: {
+    id: number;
+    name: string;
+  };
+  addressState: {
+    id: number;
+    name: string;
+  };
+  full_address: string;
+  street_address: string;
+  city: string;
+  postal_code: string;
+};
+
 export interface CurrentlyViewedInvoiceQuotation {
   id: string;
   type: 'quotation' | 'invoice';
@@ -793,31 +809,19 @@ export interface CurrentlyViewedInvoiceQuotation {
   customer: {
     id: string;
     customer_name: string;
+    is_corporate: boolean;
+    corporate_has_rep: boolean;
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    phone_number?: string;
+    company_name?: string;
+    company_phone?: string;
+    company_email?: string;
+    title?: { name: string };
   };
-  shipping_address: {
-    id: string;
-    addressCountry: {
-      id: number;
-      name: string;
-    };
-    addressState: {
-      id: number;
-      name: string;
-    };
-    full_address: string;
-  };
-  billing_address: {
-    id: string;
-    addressCountry: {
-      id: number;
-      name: string;
-    };
-    addressState: {
-      id: number;
-      name: string;
-    };
-    full_address: string;
-  };
+  shipping_address: CustomerAddressShape;
+  billing_address: CustomerAddressShape;
   items: Array<{
     id: string;
     product_name: string | null;
@@ -846,4 +850,13 @@ export interface CurrentlyViewedInvoiceQuotation {
     };
     custom_serial_number: number | null;
   }>;
+  company: {
+    address: string;
+    city?: string;
+    country?: { name: string };
+    email: string;
+    name: string;
+    phone_number?: string;
+    state?: { name: string };
+  };
 }

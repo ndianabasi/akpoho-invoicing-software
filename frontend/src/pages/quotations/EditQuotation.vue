@@ -693,6 +693,7 @@ export default defineComponent({
 
   setup(props) {
     const quotationCreated = ref(false);
+    const hasFormChanged = ref(false);
     const store = useStore();
     const router = useRouter();
     const $q = useQuasar();
@@ -700,7 +701,6 @@ export default defineComponent({
     const fileObjectUrls: Ref<string[][]> = ref([]);
     const loading = ref(true);
     const enableImageUploads = computed(() => false);
-    const hasFormChanged = ref(false);
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
     const fileUploadProgress = ref(
@@ -808,7 +808,7 @@ export default defineComponent({
     let form: QuotationInvoiceFormShape = reactive({
       items: [] as QuotationInvoiceFormShape['items'],
       additionalFees: [] as QuotationInvoiceFormShape['additionalFees'],
-      date: null,
+      date: '',
       code: '',
       customerId: null,
       customerBillingAddressId: null,
@@ -845,7 +845,7 @@ export default defineComponent({
       () => form,
       () => {
         // Indicate that form has changed
-        hasFormChanged.value = true;
+        hasFormChanged.value = false;
 
         // Update vuex store
         //store.commit('invoices_quotations/SET_QUOTATION_FORM', form);
@@ -879,8 +879,6 @@ export default defineComponent({
     });
 
     const onSubmit = () => {
-      console.log(normalisedForm.value);
-
       void nextTick(() => {
         const isCreationMode = props.creationMode;
         quotationCreated.value = false;
@@ -1061,7 +1059,7 @@ export default defineComponent({
     });
 
     onBeforeRouteLeave((to, from, next) => {
-      if (hasFormChanged.value) {
+      if (!quotationCreated.value && hasFormChanged.value) {
         $q.dialog({
           message: 'Form has changed. Do you really want to leave this page?',
           title: 'Data loss warning',
