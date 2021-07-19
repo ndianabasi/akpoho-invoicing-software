@@ -53,8 +53,8 @@
             bottom-slots
             options-dense
             use-input
-            emit-value
-            map-options
+            :emit-value="false"
+            :map-options="false"
             class="q-mb-md"
             transition-show="scale"
             transition-hide="scale"
@@ -128,8 +128,8 @@
             class="q-mb-md"
             transition-show="scale"
             transition-hide="scale"
-            emit-value
-            map-options
+            :emit-value="false"
+            :map-options="false"
             ><template #before>
               <q-icon name="business" />
             </template>
@@ -152,8 +152,8 @@
             class="q-mb-md"
             transition-show="scale"
             transition-hide="scale"
-            emit-value
-            map-options
+            :emit-value="false"
+            :map-options="false"
             ><template #before>
               <q-icon name="business" />
             </template>
@@ -265,6 +265,7 @@ import {
   UserFormShape,
   PERMISSION,
   TitleInfo,
+  UserFormShapeProcessed,
 } from '../../../store/types';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
@@ -322,25 +323,36 @@ export default defineComponent({
       address: '',
       city: '',
       email: '',
-      role_id: '',
+      role_id: null,
       state_id: null,
       country_id: null,
       login_status: false,
       profile_picture: null,
     });
 
+    const processedForm = computed((): Record<string, unknown> => {
+      const { role_id, state_id, country_id, ...restOfForm } = form;
+      return {
+        role_id: role_id?.value ?? '',
+        state_id: state_id?.value ?? null,
+        country_id: country_id?.value ?? null,
+        ...restOfForm,
+      };
+    });
+
     const getFormData: ComputedRef<FormData> = computed(() => {
       const formData = new FormData();
 
-      for (const key in form) {
-        if (Object.prototype.hasOwnProperty.call(form, key)) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const value = form[key];
-          if (key === 'profile_picture' && value !== null) {
-            formData.append('profile_picture', form.profile_picture as Blob);
-          } else {
-            formData.append(key, value as string);
-          }
+      for (const key in processedForm.value) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const value = processedForm.value[key];
+        if (key === 'profile_picture' && value !== null) {
+          formData.append(
+            'profile_picture',
+            processedForm.value.profile_picture as Blob
+          );
+        } else {
+          formData.append(key, value as string);
         }
       }
 
@@ -362,8 +374,6 @@ export default defineComponent({
     };
 
     let form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
-
-    //const profilePictureSchema = computed(() => yup.mixed().test('fileSize', ))
 
     function submitForm() {
       if (!form$.value.$invalid) {
@@ -530,23 +540,41 @@ export default defineComponent({
             form.address = currentUser?.value?.profile.address;
             form.city = currentUser?.value?.profile.city;
             form.email = currentUser?.value?.email;
-            form.role_id = currentUser?.value.role.id;
-            form.country_id =
-              currentUser?.value?.profile.userCountry?.id ?? null;
+            form.role_id = currentUser?.value.role
+              ? {
+                  label: currentUser?.value.role.name,
+                  value: currentUser?.value.role.id,
+                }
+              : null;
+            form.country_id = currentUser?.value?.profile.userCountry
+              ? {
+                  label: currentUser?.value?.profile.userCountry?.name,
+                  value: currentUser?.value?.profile.userCountry?.id,
+                }
+              : null;
             // Fetch the states for the current country
             if (form.country_id) {
               await store
                 .dispatch('countries_states/FETCH_COUNTRY_STATES_FOR_SELECT', {
-                  countryId: form.country_id,
+                  countryId: form.country_id?.value,
                 })
                 .then(() => {
                   // Then update the current state
-                  form.state_id =
-                    currentUser?.value?.profile.userState?.id ?? null;
+                  form.state_id = currentUser?.value?.profile.userState
+                    ? {
+                        label: currentUser?.value?.profile.userState?.name,
+                        value: currentUser?.value?.profile.userState?.id,
+                      }
+                    : null;
                 });
             } else {
               // Then update the current state
-              form.state_id = currentUser?.value?.profile.userState?.id ?? null;
+              form.state_id = currentUser?.value?.profile.userState
+                ? {
+                    label: currentUser?.value?.profile.userState?.name,
+                    value: currentUser?.value?.profile.userState?.id,
+                  }
+                : null;
             }
             form.login_status = Boolean(currentUser?.value.login_status);
 
@@ -566,11 +594,11 @@ export default defineComponent({
     watch(
       () => form.country_id,
       (country) => {
-        if (country) {
+        if (country?.value) {
           form.state_id = null;
           void store.dispatch(
             'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: country }
+            { countryId: country?.value }
           );
         }
       }

@@ -316,8 +316,15 @@ export interface TitleInfo extends Object {
   avatar?: string;
 }
 
-export interface UserFormShape {
-  [index: string]: string | undefined | null | number | boolean | File | Blob;
+export interface UserFormShapeContract {
+  [index: string]:
+    | string
+    | undefined
+    | null
+    | number
+    | boolean
+    | File
+    | SelectOption;
   first_name: string;
   last_name: string;
   middle_name: string | undefined | null;
@@ -325,11 +332,20 @@ export interface UserFormShape {
   address: string | undefined | null;
   city: string | undefined | null;
   email: string;
-  role_id: string | undefined;
-  state_id: number | string | null;
-  country_id: number | string | null;
   login_status: boolean;
   profile_picture: File | null;
+}
+
+export interface UserFormShape extends UserFormShapeContract {
+  role_id: SelectOption | null;
+  state_id: SelectOption | null;
+  country_id: SelectOption | null;
+}
+
+export interface UserFormShapeProcessed extends UserFormShapeContract {
+  role_id: string | undefined;
+  state_id: number | null;
+  country_id: number | null;
 }
 
 export interface CompanyFormShape {

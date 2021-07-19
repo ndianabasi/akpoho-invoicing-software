@@ -112,7 +112,6 @@ import {
   CurrentlyViewedAddress,
   SelectionOption,
   PERMISSION,
-  CustomerAddressInterface,
   FormSchemaProperties,
   CustomerAddressInterfaceRaw,
 } from '../../store/types';
