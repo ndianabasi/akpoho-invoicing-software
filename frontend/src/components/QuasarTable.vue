@@ -159,7 +159,7 @@
           <div class="col col-sm-12 col-xs-12 col-md-4 col-lg-4">
             <div class="row justify-end">
               <q-select
-                v-if="useVisibleColumns"
+                v-if="useVisibleColumns && !!invisibleColumnsObjects.length"
                 v-model="visibleColumns"
                 multiple
                 dense
@@ -207,7 +207,7 @@
 
       <template #header="props">
         <q-tr :props="props">
-          <q-th auto-width />
+          <q-th v-if="showExpandedRow" auto-width />
           <q-th v-if="showSelections" auto-width>
             <q-checkbox v-model="props.selected" />
           </q-th>
@@ -224,6 +224,7 @@
           v-bind="{
             props,
             showSelections,
+            showExpandedRow,
             showActions: showActions_,
             resourcePermissions,
             routeParam,
@@ -233,7 +234,7 @@
           }"
         >
           <q-tr :props="props">
-            <q-td auto-width>
+            <q-td v-if="showExpandedRow" auto-width>
               <q-btn
                 size="sm"
                 color="accent"
@@ -374,6 +375,10 @@ export default defineComponent({
       required: true,
     },
     showSelections: {
+      type: Boolean,
+      default: false,
+    },
+    showExpandedRow: {
       type: Boolean,
       default: false,
     },

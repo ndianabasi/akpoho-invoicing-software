@@ -18,6 +18,7 @@
       title: 'New User',
     }"
     :resource-action-permissions="resourceActionPermissions"
+    :show-expanded-row="false"
   ></quasar-table>
 </template>
 

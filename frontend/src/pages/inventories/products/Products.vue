@@ -19,6 +19,7 @@
     }"
     :resource-action-permissions="resourceActionPermissions"
     is-company-specific
+    show-selections
   >
     <template #topAddNew>
       <q-btn-dropdown

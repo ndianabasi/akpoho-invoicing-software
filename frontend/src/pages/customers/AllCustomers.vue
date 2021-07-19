@@ -20,6 +20,7 @@
     show-selections
     route-param="customerId"
     :selection-actions="selectionActions"
+    :show-expanded-row="false"
   >
   </quasar-table>
 </template>
