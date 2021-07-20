@@ -22,11 +22,7 @@
       <router-view />
     </q-page-container>
 
-    <q-footer
-      v-if="$q.screen.lt.md && links1 && !!links1.length"
-      elevated
-      class="footer"
-    >
+    <q-footer v-if="$q.screen.lt.md" elevated class="footer">
       <q-tabs :dense="$q.screen.lt.sm" mobile-arrows align="justify">
         <q-route-tab
           v-for="link in firstTwoLinks"
@@ -66,7 +62,6 @@ import {
   defineComponent,
   ref,
   onMounted,
-  computed,
   watchEffect,
   onBeforeUnmount,
   Ref,
@@ -78,7 +73,7 @@ import SideDrawer from '../components/SideDrawer.vue';
 import PrimaryToolbar from '../components/PrimaryToolbar.vue';
 import AkpohoBanners from '../components/AkpohoBanners.vue';
 import { useMeta, useQuasar } from 'quasar';
-import { Menu } from '../store/menus/state';
+import { mobileFooterMenu, createMenu } from '../composables/menus/useMenu';
 
 const metaData = {
   // sets document title
@@ -180,20 +175,6 @@ export default defineComponent({
 
     const hideLeftDrawer = () => (leftDrawerOpen.value = false);
 
-    const links1 = computed(
-      () => store.getters['menus/GET_LINKS1'] as Array<Menu>
-    );
-    const links2 = computed(
-      () => store.getters['menus/GET_LINKS2'] as Array<Menu>
-    );
-    const links3 = computed(
-      () => store.getters['menus/GET_LINKS3'] as Array<Menu>
-    );
-
-    const createMenu = computed(
-      () => store.getters['menus/GET_CREATE_MENU'] as Array<Menu>
-    );
-
     const bottomSheetActions = createMenu.value.map((link) => ({
       label: link.title,
       icon: link.icon,
@@ -235,11 +216,8 @@ export default defineComponent({
     });
 
     return {
-      links1,
-      links2,
-      links3,
-      firstTwoLinks: links1.value.filter((_, index) => index < 2),
-      lastTwoLinks: links1.value.filter(
+      firstTwoLinks: mobileFooterMenu.value.filter((_, index) => index < 2),
+      lastTwoLinks: mobileFooterMenu.value.filter(
         (_, index, array) => index >= array.length - 2
       ),
       TOGGLE_LEFT_DRAWER,

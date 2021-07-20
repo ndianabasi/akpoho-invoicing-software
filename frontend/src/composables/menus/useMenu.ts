@@ -57,3 +57,20 @@ export const createMenu = computed((): Menu[] => {
     { icon: 'receipt', title: 'Receipt', link: 'create_receipt' },
   ];
 });
+
+export const mobileFooterMenu = computed((): Menu[] => {
+  const customerMenu = mainSideDrawerMenu.value.filter(
+    (menu) => menu.title === 'Customers'
+  );
+  const quotationMenu = mainSideDrawerMenu.value.filter(
+    (menu) => menu.title === 'Quotations'
+  );
+  const receiptMenu = mainSideDrawerMenu.value.filter(
+    (menu) => menu.title === 'Receipts'
+  );
+  const inventoryMenu = mainSideDrawerMenu.value.filter(
+    (menu) => menu.title === 'Inventories'
+  );
+
+  return [...customerMenu, ...quotationMenu, ...receiptMenu, ...inventoryMenu];
+});
