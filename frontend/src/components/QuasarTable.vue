@@ -10,7 +10,7 @@
       :hide-pagination="!usePagination"
       :rows="tableDataRows"
       :columns="columns"
-      row-key="id"
+      :row-key="rowKey"
       :selection="showSelections ? 'multiple' : 'none'"
       :class="{
         'my-sticky-header-column-table': stickyTable,
@@ -449,6 +449,10 @@ export default defineComponent({
       type: String,
       required: true,
       default: 'Resource',
+    },
+    rowKey: {
+      type: String,
+      default: 'id',
     },
     noResultsLabel: {
       type: String,

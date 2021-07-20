@@ -501,3 +501,8 @@ input[type='number']::-webkit-outer-spin-button {
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
+
+.q-table__top .q-btn-group > .q-btn {
+  padding-left: 0px;
+  padding-right: 0px;
+}

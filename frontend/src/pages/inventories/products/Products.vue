@@ -23,20 +23,20 @@
   >
     <template #topAddNew>
       <q-btn-dropdown
+        icon="playlist_add"
         split
+        flat
+        auto-close
         unelevated
         ripple
-        class="q-ml-md-md q-ml-sm-sm"
+        class="q-ml-md"
         color="accent"
-        label="New Product"
         @click="onNewProductDropdownMainClick"
       >
-        <q-list
-          v-for="type in productTypesForSelect"
-          :key="'product_type_' + type.value"
-        >
+        <q-list>
           <q-item
-            v-close-popup
+            v-for="type in productTypesForSelect"
+            :key="'product_type_' + type.value"
             clickable
             @click="onNewProductDropdownItemClick(type.label)"
           >
