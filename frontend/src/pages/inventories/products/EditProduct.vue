@@ -75,8 +75,8 @@
               class="q-mb-md"
               transition-show="scale"
               transition-hide="scale"
-              emit-value
-              map-options
+              :emit-value="false"
+              :map-options="false"
               :dense="isSmallScreen"
               :error="!!formErrors?.[field.name]?.length ?? false"
             >
@@ -181,6 +181,7 @@ import {
   FormSchema,
   SelectOption,
   ProductResultRowInterface,
+  ProductFormShapeRaw,
 } from '../../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../../components/QuasarSelect';
@@ -222,7 +223,7 @@ export default defineComponent({
     const router = useRouter();
     const loading = ref(false);
 
-    const initialForm: ProductFormShape = reactive({
+    const initialForm: ProductFormShapeRaw = reactive({
       productTypeId: '',
       productName: '',
       sku: '',
@@ -245,7 +246,7 @@ export default defineComponent({
       () =>
         store.getters[
           'countries_states/GET_COUNTRIES_FOR_SELECT'
-        ] as SelectionOption[]
+        ] as SelectOption[]
     );
 
     const attributeSetData = computed({
@@ -299,7 +300,12 @@ export default defineComponent({
         description: yup.string().optional().nullable(),
         shortDescription: yup.string().optional().nullable(),
         weight: yup.number().optional().nullable(),
-        countryOfManufacture: yup.number().optional().nullable(),
+        countryOfManufacture: yup
+          .object({
+            label: yup.string().nullable(),
+            value: yup.number().nullable(),
+          })
+          .nullable(),
       })
     );
 
@@ -313,7 +319,9 @@ export default defineComponent({
       initialValues: initialForm,
     });
 
-    const { value: productTypeId } = useField('productTypeId');
+    const { value: productTypeId } = useField<string | undefined>(
+      'productTypeId'
+    );
     const { value: productName } = useField('productName');
     const { value: sku } = useField('sku');
     const { value: price } = useField('price');
@@ -434,7 +442,7 @@ export default defineComponent({
         default: initialForm['countryOfManufacture'],
         autocomplete: 'off',
         isVisible: true,
-        options: countries,
+        options: countries.value,
       },
     });
 
@@ -442,6 +450,12 @@ export default defineComponent({
 
     const onSubmit = handleSubmit((form) => {
       isSubmitting.value = true;
+      const { countryOfManufacture, ...restOfForm } = form;
+      const processedForm = {
+        ...restOfForm,
+        countryOfManufacture: countryOfManufacture?.value,
+      };
+
       void nextTick(() => {
         const isCreationMode = props.creationMode;
         void store
@@ -449,10 +463,10 @@ export default defineComponent({
             `products/${isCreationMode ? 'CREATE_PRODUCT' : 'EDIT_PRODUCT'}`,
             isCreationMode
               ? {
-                  form,
+                  form: processedForm,
                 }
               : {
-                  form,
+                  form: processedForm,
                   productId: props.productId,
                 }
           )
@@ -526,7 +540,12 @@ export default defineComponent({
             description.value = currentProduct?.value?.description;
             shortDescription.value = currentProduct?.value?.short_description;
             weight.value = currentProduct?.value?.weight;
-            countryOfManufacture.value = currentProduct?.value?.country?.id;
+            countryOfManufacture.value = currentProduct?.value?.country
+              ? {
+                  label: currentProduct?.value?.country?.name,
+                  value: currentProduct?.value?.country?.id,
+                }
+              : null;
 
             loading.value = false;
           });

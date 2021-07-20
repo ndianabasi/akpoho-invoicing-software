@@ -160,8 +160,8 @@ export interface HttpError extends AxiosError {
 }
 
 export interface SelectOption {
-  label: string;
-  value: string | boolean | number | null;
+  label: string | null | undefined;
+  value: string | boolean | number | null | undefined;
   icon?: string;
   description?: string;
 }
@@ -438,7 +438,13 @@ export interface FormSchemaProperties {
   model?: unknown;
   inputType?: string;
   options?: SelectOption[] | null;
-  default?: string | number | boolean | null | Array<string | number>;
+  default?:
+    | string
+    | number
+    | boolean
+    | null
+    | Array<string | number>
+    | SelectOption;
   required?: boolean;
   autocomplete?: string;
   isVisible?: boolean | unknown;
@@ -486,7 +492,7 @@ export type CurrentlyViewedProduct = {
   attributeSetId: string;
 };
 
-export interface ProductFormShape {
+export interface ProductFormShapeContract {
   productTypeId: string;
   attributeSetId?: string;
   productName: string;
@@ -500,6 +506,16 @@ export interface ProductFormShape {
   shortDescription: string;
   productImages: '';
   weight: number | null;
+}
+
+export interface ProductFormShapeRaw extends ProductFormShapeContract {
+  countryOfManufacture: {
+    label: string | null | undefined;
+    value: number | null | undefined;
+  } | null;
+}
+
+export interface ProductFormShape extends ProductFormShapeContract {
   countryOfManufacture: number | null;
 }
 
@@ -602,7 +618,7 @@ export interface ProductResultRowInterface {
   created_at: string;
   updated_at: string;
   slug: string;
-  weight: string;
+  weight: number;
   country_of_manufacture: string;
   meta?: {
     weight_unit?: 'kg' | 'lb';
