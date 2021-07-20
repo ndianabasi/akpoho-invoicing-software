@@ -19,6 +19,7 @@
     }"
     :resource-action-permissions="resourceActionPermissions"
     :extra-query-strings="{ type: 'quotation' }"
+    show-selections
   ></quasar-table>
 </template>
 

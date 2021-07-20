@@ -40,20 +40,23 @@
     v-model="launchCropperDialog"
   >
     <q-card class="cropper-wrapper">
-      <img
-        ref="sourceRef"
-        :src="objectUrl"
-        alt="Source image preview"
-        class="image-source cropper-preview"
-      />
+      <q-card-section class="image-source q-pa-none">
+        <img
+          ref="sourceRef"
+          :src="objectUrl"
+          alt="Source image preview"
+          class="cropper-preview"
+        />
+      </q-card-section>
 
-      <q-card-section class="text-subitle2">
+      <q-card-section class="q-pb-none q-px-none">
         <q-card-actions align="center">
           <q-btn
             flat
             color="primary"
             icon="refresh"
             label="Reset"
+            size="sm"
             @click.prevent="resetCropper"
           />
           <q-btn
@@ -61,6 +64,7 @@
             color="primary"
             icon="rotate_left"
             label="Rotate Left"
+            size="sm"
             @click.prevent="rotateLeft"
           />
           <q-btn
@@ -68,6 +72,7 @@
             color="primary"
             icon="rotate_right"
             label="Rotate Right"
+            size="sm"
             @click.prevent="rotateRight"
           />
           <q-btn
@@ -75,6 +80,7 @@
             color="primary"
             icon="zoom_in"
             label="Zoom In"
+            size="sm"
             @click.prevent="zoomIn"
           />
           <q-btn
@@ -82,12 +88,13 @@
             color="primary"
             icon="zoom_out"
             label="Zoom Out"
+            size="sm"
             @click.prevent="zoomOut"
           />
         </q-card-actions>
       </q-card-section>
 
-      <q-card-section class="text-subitle2">
+      <q-card-section class="q-mt-sm q-pt-none">
         <q-card-actions align="right">
           <q-btn
             flat
@@ -116,7 +123,7 @@
       <q-slide-transition>
         <div v-show="cardExpanded">
           <q-separator />
-          <q-card-section class="text-subitle2">
+          <q-card-section class="text-subitle2 row items-center justify-center">
             <img
               v-if="previewCropped"
               ref="previewRef"
