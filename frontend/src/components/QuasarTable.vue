@@ -25,6 +25,7 @@
       :no-data-label="noResultsLabel_"
       :no-results-label="noResultsLabel_"
       :rows-per-page-options="rosPerPageOptions"
+      :dense="$q.screen.lt.md"
       @request="processTableRequest"
     >
       <template #top="props">
@@ -252,8 +253,10 @@
             </q-td>
             <q-td v-if="showActions_">
               <q-btn-dropdown
-                split
-                class="glossy"
+                flat
+                ripple
+                auto-close
+                unelevated
                 color="accent"
                 label="Actions"
               >
