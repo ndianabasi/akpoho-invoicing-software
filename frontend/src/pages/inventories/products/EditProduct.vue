@@ -30,13 +30,7 @@
               v-if="field.componentType === 'input' && field.isVisible"
               :key="`field_${field.name}_${field.componentType}`"
               v-model="field.model"
-              :type="
-                field.inputType !== 'password'
-                  ? field.inputType
-                  : revealPasswords[field.name]
-                  ? 'text'
-                  : 'password'
-              "
+              :type="field.inputType"
               :for="field.name"
               filled
               clearable

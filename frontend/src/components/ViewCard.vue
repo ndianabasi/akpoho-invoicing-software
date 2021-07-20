@@ -36,7 +36,8 @@
             <div style="min-height: 50vh">
               <slot name="body-panel"></slot>
             </div>
-
+          </q-card-section>
+          <q-card-section>
             <slot name="footer-panel"></slot>
           </q-card-section>
         </q-card>
@@ -81,7 +82,7 @@ export default defineComponent({
 
     cardContainerClasses: {
       type: [String, Array, Object],
-      default: () => 'col-md-6 col-sm-12 col-xs-12',
+      default: () => 'col-md-9 col-sm-12 col-xs-12 col-lg-8 col-xl-8',
     },
 
     titleInfo: {

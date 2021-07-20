@@ -495,3 +495,9 @@ input[type='number']::-webkit-outer-spin-button {
     border-top: solid 2px $deep-purple-8;
   }
 }
+
+.half-width {
+  width: 50% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}

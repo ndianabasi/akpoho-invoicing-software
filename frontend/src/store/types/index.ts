@@ -159,11 +159,22 @@ export interface HttpError extends AxiosError {
   response?: HttpResponse;
 }
 
-export interface SelectOption {
-  label: string | null | undefined;
-  value: string | boolean | number | null | undefined;
+interface SelectOptionBase {
+  label: string | undefined;
   icon?: string;
   description?: string;
+}
+
+export interface SelectOption extends SelectOptionBase {
+  value: string | boolean | number | null | undefined;
+}
+
+export interface SelectOptionNumber extends SelectOptionBase {
+  value: number | undefined;
+}
+
+export interface SelectOptionString extends SelectOptionBase {
+  value: string | undefined;
 }
 
 export interface StringSelectOption extends SelectOption {
@@ -210,22 +221,22 @@ export type CurrentlyViewedCompany = {
 };
 
 interface CurrentCustomerBaseInterface {
-  first_name: string;
-  last_name: string;
-  middle_name: string | null;
-  email: string;
-  phone_number: string;
+  first_name: string | undefined;
+  last_name: string | undefined;
+  middle_name: string | undefined;
+  email: string | undefined;
+  phone_number: string | undefined;
   is_corporate: boolean;
   corporate_has_rep: boolean;
-  company_name: string | null;
-  company_phone: string | null;
-  company_email: string | null;
+  company_name: string | undefined;
+  company_phone: string | undefined;
+  company_email: string | undefined;
 }
 
 export interface CurrentlyViewedCustomer extends CurrentCustomerBaseInterface {
   title?: {
-    id: number | null | undefined;
-    name: string | null | undefined;
+    id: number | undefined;
+    name: string | undefined;
   };
 }
 
@@ -253,7 +264,14 @@ export interface CurrentlyViewedAddress {
 }
 
 export interface CustomerAddressInterfaceContract {
-  [key: string]: boolean | number | SelectOption | string | null | undefined;
+  [key: string]:
+    | boolean
+    | number
+    | SelectOption
+    | SelectOptionNumber
+    | string
+    | null
+    | undefined;
   address: string;
   lga: string | null;
   postal_code: string | null;
@@ -273,20 +291,31 @@ export interface CustomerAddressInterface
   state: string | null;
 }
 
-export interface CustomerFormShape extends CurrentCustomerBaseInterface {
+export interface CustomerFormShapeBase extends CurrentCustomerBaseInterface {
   [key: string]: boolean | number | SelectOption | string | null | undefined;
-  title: number | null;
   is_billing_shipping_addresses_same: boolean;
-  shipping_country: number | null;
-  shipping_state: number | null;
-  billing_country: number | null;
-  billing_state: number | null;
   shipping_address: string | null;
   shipping_lga: string | null;
   shipping_postal_code: string | null;
   billing_address: string | null;
   billing_lga: string | null;
   billing_postal_code: string | null;
+}
+
+export interface CustomerFormShape extends CustomerFormShapeBase {
+  title: number | null;
+  shipping_country: number | null;
+  shipping_state: number | null;
+  billing_country: number | null;
+  billing_state: number | null;
+}
+
+export interface CustomerFormShapeRaw extends CustomerFormShapeBase {
+  title: SelectOptionNumber | null;
+  shipping_country: SelectOptionNumber | null;
+  shipping_state: SelectOptionNumber | null;
+  billing_country: SelectOptionNumber | null;
+  billing_state: SelectOptionNumber | null;
 }
 
 export interface CustomersIndexResultInterface {
@@ -449,7 +478,7 @@ export interface FormSchemaProperties {
   autocomplete?: string;
   isVisible?: boolean | unknown;
   regex?: RegExp | undefined | null;
-  name: string;
+  name?: string;
   label: string;
   componentType: InputComponentType;
 }
@@ -509,10 +538,7 @@ export interface ProductFormShapeContract {
 }
 
 export interface ProductFormShapeRaw extends ProductFormShapeContract {
-  countryOfManufacture: {
-    label: string | null | undefined;
-    value: number | null | undefined;
-  } | null;
+  countryOfManufacture: SelectOptionNumber | null;
 }
 
 export interface ProductFormShape extends ProductFormShapeContract {

@@ -198,7 +198,24 @@ export default class CustomersController {
       companyEmail: company_email,
     })
 
-    if (is_billing_shipping_addresses_same) {
+    const areAddressFieldsSet = (
+      streetAddress: string | undefined,
+      city: string | undefined,
+      countryId: number | undefined,
+      stateId: number | undefined,
+      postalCode: string | undefined
+    ) => !!city || !!countryId || !!stateId || !!postalCode || !!streetAddress
+
+    if (
+      is_billing_shipping_addresses_same &&
+      areAddressFieldsSet(
+        shipping_address,
+        shipping_lga,
+        shipping_country,
+        shipping_state,
+        shipping_postal_code
+      )
+    ) {
       const addressTypes: Array<ADDRESS_TYPE> = ['shipping_address', 'billing_address']
       for (let i = 0; i < addressTypes.length; i++) {
         const addressType = addressTypes[i]
@@ -213,23 +230,43 @@ export default class CustomersController {
         })
       }
     } else {
-      await newCustomer?.related('addresses').create({
-        addressType: 'shipping_address',
-        streetAddress: shipping_address,
-        city: shipping_lga,
-        countryId: shipping_country,
-        stateId: shipping_state,
-        postalCode: shipping_postal_code,
-      })
+      if (
+        areAddressFieldsSet(
+          shipping_address,
+          shipping_lga,
+          shipping_country,
+          shipping_state,
+          shipping_postal_code
+        )
+      ) {
+        await newCustomer?.related('addresses').create({
+          addressType: 'shipping_address',
+          streetAddress: shipping_address,
+          city: shipping_lga,
+          countryId: shipping_country,
+          stateId: shipping_state,
+          postalCode: shipping_postal_code,
+        })
+      }
 
-      await newCustomer?.related('addresses').create({
-        addressType: 'billing_address',
-        streetAddress: billing_address,
-        city: billing_lga,
-        countryId: billing_country,
-        stateId: billing_state,
-        postalCode: billing_postal_code,
-      })
+      if (
+        areAddressFieldsSet(
+          billing_address,
+          billing_lga,
+          billing_country,
+          billing_state,
+          billing_postal_code
+        )
+      ) {
+        await newCustomer?.related('addresses').create({
+          addressType: 'billing_address',
+          streetAddress: billing_address,
+          city: billing_lga,
+          countryId: billing_country,
+          stateId: billing_state,
+          postalCode: billing_postal_code,
+        })
+      }
     }
 
     return response.created({ data: newCustomer?.id })
