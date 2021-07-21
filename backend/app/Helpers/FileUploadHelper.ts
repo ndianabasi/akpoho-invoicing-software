@@ -277,7 +277,7 @@ class FileUploadHelper {
     // Get provider
     const provider: FileProvider = await FileProvider.findByOrFail('name', this.provider)
 
-    if (provider) {
+    if (provider.name === 'local') {
       // Persist to database
       const uploadedFile = await this.requestedCompany?.related('uploadFiles').create({
         alternativeText: fileInfo.alternativeText,

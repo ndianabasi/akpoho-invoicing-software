@@ -11,6 +11,7 @@ import Application from '@ioc:Adonis/Core/Application'
 import { DateTime } from 'luxon'
 import FileUploadHelper from 'App/Helpers/FileUploadHelper'
 import { AttachedFile, FileData } from 'types/file'
+import FileDeletionHelper from 'App/Helpers/FileDeletionHelper'
 
 export default class UsersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -206,6 +207,12 @@ export default class UsersController {
     })
     await requestedUserProfile?.save()
 
+    await requestedUserProfile?.refresh()
+
+    // Check if user profile already has a profile picture
+    const oldProfilePicture = requestedUserProfile?.profilePicture
+    const hasOldProfilePicture = !!oldProfilePicture
+
     // Process uploaded file (if any)
     if (profile_picture) {
       fileStatus.fileExists = true
@@ -257,6 +264,11 @@ export default class UsersController {
         requestedUserProfile?.merge({ profilePicture: uploadedFileModel?.id })
         await requestedUserProfile?.save()
       })
+
+      if (hasOldProfilePicture) {
+        // Delete old profile picture
+        await new FileDeletionHelper(oldProfilePicture!).delete()
+      }
     }
 
     // Clear the user's entire cache

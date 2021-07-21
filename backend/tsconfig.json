@@ -1,29 +1,16 @@
 {
   "extends": "./node_modules/adonis-preset-ts/tsconfig",
-  "include": [
-    "**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "build"
-  ],
+  "include": ["**/*"],
+  "exclude": ["node_modules", "build"],
   "compilerOptions": {
     "outDir": "build",
     "rootDir": "./",
     "sourceMap": true,
     "paths": {
-      "App/*": [
-        "./app/*"
-      ],
-      "Config/*": [
-        "./config/*"
-      ],
-      "Contracts/*": [
-        "./contracts/*"
-      ],
-      "Database/*": [
-        "./database/*"
-      ]
+      "App/*": ["./app/*"],
+      "Config/*": ["./config/*"],
+      "Contracts/*": ["./contracts/*"],
+      "Database/*": ["./database/*"]
     },
     "types": [
       "@adonisjs/core",
@@ -37,6 +24,7 @@
       "@adonisjs/bouncer",
       "@adonisjs/mail",
       "@adonisjs/lucid-slugify"
-    ]
+    ],
+    "lib": ["es5", "es6", "dom", "dom.iterable", "es2015"]
   }
 }

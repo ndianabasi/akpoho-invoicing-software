@@ -17,7 +17,7 @@ import UserProfile from 'App/Models/UserProfile'
 import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 import InvoiceQuotationItem from './InvoiceQuotationItem'
 
-type FormatAttributes = {
+export type FormatAttributes = {
   name: string
   hash: string
   ext: string

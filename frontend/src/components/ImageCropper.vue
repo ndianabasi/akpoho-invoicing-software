@@ -39,90 +39,100 @@
     ref="launchDialogRef"
     v-model="launchCropperDialog"
   >
-    <q-card class="cropper-wrapper">
-      <q-card-section class="image-source q-pa-none">
-        <img
-          ref="sourceRef"
-          :src="objectUrl"
-          alt="Source image preview"
-          class="cropper-preview"
-        />
-      </q-card-section>
+    <q-card
+      class="cropper-wrapper"
+      :style="{
+        width: $q.screen.lt.md ? '90vw' : '900px',
+        maxWidth: $q.screen.lt.md ? '95vw' : '80vw',
+      }"
+    >
+      <div class="row">
+        <div class="col col-xs-12 col-sm-12 col-md-8 col-lg-8">
+          <q-card-section class="image-source q-pa-none">
+            <img
+              ref="sourceRef"
+              :src="objectUrl"
+              alt="Source image preview"
+              class="cropper-preview"
+            />
+          </q-card-section>
 
-      <q-card-section class="q-pb-none q-px-none">
-        <q-card-actions align="center">
-          <q-btn
-            flat
-            color="primary"
-            icon="refresh"
-            label="Reset"
-            size="sm"
-            @click.prevent="resetCropper"
-          />
-          <q-btn
-            flat
-            color="primary"
-            icon="rotate_left"
-            label="Rotate Left"
-            size="sm"
-            @click.prevent="rotateLeft"
-          />
-          <q-btn
-            flat
-            color="primary"
-            icon="rotate_right"
-            label="Rotate Right"
-            size="sm"
-            @click.prevent="rotateRight"
-          />
-          <q-btn
-            flat
-            color="primary"
-            icon="zoom_in"
-            label="Zoom In"
-            size="sm"
-            @click.prevent="zoomIn"
-          />
-          <q-btn
-            flat
-            color="primary"
-            icon="zoom_out"
-            label="Zoom Out"
-            size="sm"
-            @click.prevent="zoomOut"
-          />
-        </q-card-actions>
-      </q-card-section>
+          <q-card-section class="q-pb-none q-px-none">
+            <q-card-actions align="center">
+              <q-btn
+                flat
+                color="primary"
+                icon="refresh"
+                label="Reset"
+                size="sm"
+                @click.prevent="resetCropper"
+              />
+              <q-btn
+                flat
+                color="primary"
+                icon="rotate_left"
+                label="Rotate Left"
+                size="sm"
+                @click.prevent="rotateLeft"
+              />
+              <q-btn
+                flat
+                color="primary"
+                icon="rotate_right"
+                label="Rotate Right"
+                size="sm"
+                @click.prevent="rotateRight"
+              />
+              <q-btn
+                flat
+                color="primary"
+                icon="zoom_in"
+                label="Zoom In"
+                size="sm"
+                @click.prevent="zoomIn"
+              />
+              <q-btn
+                flat
+                color="primary"
+                icon="zoom_out"
+                label="Zoom Out"
+                size="sm"
+                @click.prevent="zoomOut"
+              />
+            </q-card-actions>
+          </q-card-section>
 
-      <q-card-section class="q-mt-sm q-pt-none">
-        <q-card-actions align="right">
-          <q-btn
-            flat
-            color="primary"
-            icon="save"
-            label="Finish"
-            @click.prevent="finishCrop"
-          />
-          <q-btn
-            v-close-popup
-            flat
-            color="warning"
-            icon="cancel"
-            label="Cancel"
-          />
-          <q-btn
-            color="grey"
-            flat
-            dense
-            :icon="cardExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-            @click="cardExpanded = !cardExpanded"
-          />
-        </q-card-actions>
-      </q-card-section>
-
-      <q-slide-transition>
-        <div v-show="cardExpanded">
-          <q-separator />
+          <q-card-section class="q-mt-sm q-pt-none">
+            <q-card-actions align="center">
+              <q-btn
+                flat
+                color="primary"
+                icon="save"
+                label="Finish"
+                @click.prevent="finishCrop"
+              />
+              <q-btn
+                v-close-popup
+                flat
+                color="warning"
+                icon="cancel"
+                label="Cancel"
+              />
+              <q-btn
+                color="grey"
+                :label="cardExpanded ? 'Hide Preview' : 'Show Preview'"
+                flat
+                dense
+                :icon-right="cardExpanded ? 'chevron_left' : 'chevron_right'"
+                @click="cardExpanded = !cardExpanded"
+              />
+            </q-card-actions>
+          </q-card-section>
+        </div>
+        <div
+          v-if="cardExpanded"
+          class="col col-xs-12 col-sm-12 col-md-4 col-lg-4"
+        >
           <q-card-section class="text-subitle2 row items-center justify-center">
             <img
               v-if="previewCropped"
@@ -133,7 +143,7 @@
             />
           </q-card-section>
         </div>
-      </q-slide-transition>
+      </div>
     </q-card>
   </q-dialog>
 
@@ -287,6 +297,7 @@ export default defineComponent({
       if (sourceRef.value) {
         cropper.value = new Cropper(sourceRef.value, {
           aspectRatio: 1,
+          autoCropArea: 1,
           crop: debouncedUpdatePreview,
         });
       }
@@ -418,8 +429,13 @@ export default defineComponent({
   }
 
   .image-source {
-    max-height: 50% !important;
+    max-height: 50vh;
   }
+
+  /* .image-source .cropper-preview,
+  .cropper-container.cropper-bg {
+    max-height: 50% !important;
+  } */
 
   .cropper-container {
     max-height: 50% !important;
