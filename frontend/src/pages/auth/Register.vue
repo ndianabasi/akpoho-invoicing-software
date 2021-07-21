@@ -113,13 +113,10 @@
       </form>
     </template>
 
-    <template #submitSection="{ isSmallScreen }">
+    <template #submitSection>
       <q-btn
         :loading="isSubmitting"
-        :class="{
-          'full-width': isSmallScreen,
-          'text-center flex align-center q-mt-lg q-mx-auto q-px-xl half-width': true,
-        }"
+        class="full-width q-mt-lg q-mx-auto q-px-xl"
         color="accent"
         icon-right="send"
         label="Submit"

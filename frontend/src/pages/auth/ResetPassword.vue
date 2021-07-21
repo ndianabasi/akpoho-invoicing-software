@@ -115,14 +115,11 @@
 
     <template
       v-if="!showResetValidationError && !validationInProgresss"
-      #submitSection="{ isSmallScreen }"
+      #submitSection
     >
       <q-btn
         :loading="submitting"
-        :class="{
-          'full-width': isSmallScreen,
-          'text-center flex align-center q-mt-lg q-mx-auto q-px-xl half-width': true,
-        }"
+        class="full-width q-mt-lg q-mx-auto q-px-xl"
         color="accent"
         icon-right="send"
         label="Submit"
