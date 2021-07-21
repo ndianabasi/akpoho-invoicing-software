@@ -8,8 +8,8 @@
     @update:model-value="startCropper"
     @rejected="showRejectionDialog"
   >
-    <template #before>
-      <q-icon name="attach_file" />
+    <template v-if="useBeforeSlot" #before>
+      <slot name="before"><q-icon name="attach_file" /></slot>
     </template>
 
     <template #after>
@@ -202,6 +202,10 @@ export default defineComponent({
       default: true,
     },
     inputUseChips: {
+      type: Boolean,
+      default: true,
+    },
+    useBeforeSlot: {
       type: Boolean,
       default: true,
     },

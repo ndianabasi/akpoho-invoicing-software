@@ -15,6 +15,7 @@
           <image-cropper
             :input-max-file-size="5 * 1048576"
             input-class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
+            :use-before-slot="false"
             @finish-cropper="handleCropperFinish"
           />
           <!-- 5 MB max file size -->
@@ -32,10 +33,6 @@
             aria-autocomplete="email"
             autocomplete="email"
           >
-            <template #before>
-              <q-icon name="email" />
-            </template>
-
             <template #error>
               {{
                 form$.email.$silentErrors
@@ -64,10 +61,6 @@
             transition-hide="scale"
             :error="form$.role_id.$invalid"
           >
-            <template #before>
-              <q-icon name="person" />
-            </template>
-
             <template #hint>
               <div
                 v-if="CAN_EDIT_USERS && myAccountMode"
@@ -101,10 +94,6 @@
             :aria-autocomplete="form?.[field.name]?.autocomplete ?? 'off'"
             :autocomplete="form?.[field.name]?.autocomplete ?? 'off'"
           >
-            <template #before>
-              <q-icon name="person" />
-            </template>
-
             <template #error>
               {{
                 form$ && form$[field.name]
@@ -134,10 +123,7 @@
             transition-hide="scale"
             :emit-value="false"
             :map-options="false"
-            ><template #before>
-              <q-icon name="business" />
-            </template>
-          </quasar-select>
+          />
 
           <quasar-select
             v-model="form.state_id"
@@ -158,10 +144,7 @@
             transition-hide="scale"
             :emit-value="false"
             :map-options="false"
-            ><template #before>
-              <q-icon name="business" />
-            </template>
-          </quasar-select>
+          />
 
           <q-toggle
             v-if="CAN_EDIT_USERS"
@@ -169,7 +152,7 @@
             checked-icon="check"
             unchecked-icon="clear"
             :label="form.login_status ? 'Can login' : 'Cannot login'"
-            class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
+            class="col col-12"
           />
           <div
             v-if="CAN_EDIT_USERS && myAccountMode"
@@ -253,7 +236,6 @@ import {
   watchEffect,
   watch,
   computed,
-  unref,
   Ref,
   reactive,
   ComputedRef,
@@ -270,7 +252,6 @@ import {
   UserFormShape,
   PERMISSION,
   TitleInfo,
-  UserFormShapeProcessed,
 } from '../../../store/types';
 import { Notify } from 'quasar';
 import { useRouter } from 'vue-router';
@@ -312,12 +293,13 @@ export default defineComponent({
     let currentUser: Ref<CurrentlyViewedUser | null>;
 
     currentUser = !props.creationMode
-      ? computed(
-          () =>
+      ? computed({
+          get: () =>
             store.getters[
               'users/GET_CURRENTLY_VIEWED_USER'
-            ] as CurrentlyViewedUser
-        )
+            ] as CurrentlyViewedUser,
+          set: (value) => value,
+        })
       : ref(null);
 
     let form: UserFormShape = reactive({
@@ -529,22 +511,20 @@ export default defineComponent({
             userId: props.userId,
           })
           .then(async () => {
-            currentUser.value = unref(
-              computed(
-                () =>
-                  store.getters[
-                    'users/GET_CURRENTLY_VIEWED_USER'
-                  ] as CurrentlyViewedUser
-              )
-            );
+            currentUser.value = computed(
+              () =>
+                store.getters[
+                  'users/GET_CURRENTLY_VIEWED_USER'
+                ] as CurrentlyViewedUser
+            ).value;
 
-            form.first_name = currentUser?.value?.profile.first_name;
-            form.last_name = currentUser?.value?.profile.last_name;
-            form.middle_name = currentUser?.value?.profile.middle_name;
-            form.phone_number = currentUser?.value?.profile.phone_number;
-            form.address = currentUser?.value?.profile.address;
-            form.city = currentUser?.value?.profile.city;
-            form.email = currentUser?.value?.email;
+            form.first_name = currentUser?.value?.profile?.first_name ?? '';
+            form.last_name = currentUser?.value?.profile?.last_name ?? '';
+            form.middle_name = currentUser?.value?.profile?.middle_name ?? '';
+            form.phone_number = currentUser?.value?.profile?.phone_number ?? '';
+            form.address = currentUser?.value?.profile?.address ?? '';
+            form.city = currentUser?.value?.profile?.city ?? '';
+            form.email = currentUser?.value?.email ?? '';
             form.role_id = currentUser?.value.role
               ? {
                   label: currentUser?.value.role.name,

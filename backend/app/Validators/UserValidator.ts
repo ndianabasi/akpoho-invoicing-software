@@ -1,6 +1,5 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { UUID_REGEX } from 'App/Helpers/utils'
 
 export default class UserValidator {
   constructor(protected ctx: HttpContextContract) {}
@@ -8,25 +7,13 @@ export default class UserValidator {
   public refs = schema.refs({ userId: this.ctx.params?.user_id ?? null })
 
   public schema = schema.create({
-    first_name: schema.string({ escape: true, trim: true }, [
-      rules.alpha({ allow: ['dash', 'space'] }),
-      rules.maxLength(20),
-    ]),
-
-    middle_name: schema.string.optional({ escape: true, trim: true }, [
-      rules.alpha({ allow: ['dash', 'space'] }),
-      rules.maxLength(20),
-    ]),
-
-    last_name: schema.string({ escape: true, trim: true }, [
-      rules.alpha({ allow: ['dash', 'space'] }),
-      rules.maxLength(20),
-    ]),
+    first_name: schema.string({ escape: true, trim: true }, [rules.maxLength(20)]),
+    middle_name: schema.string.optional({ escape: true, trim: true }, [rules.maxLength(20)]),
+    last_name: schema.string({ escape: true, trim: true }, [rules.maxLength(20)]),
 
     phone_number: schema.string.optional({ escape: true, trim: true }, [rules.mobile()]),
 
     address: schema.string.optional({ escape: true, trim: true }),
-
     city: schema.string.optional({ escape: true, trim: true }, [rules.maxLength(20)]),
 
     email: schema.string({ escape: true, trim: true }, [
@@ -38,14 +25,10 @@ export default class UserValidator {
       }),
     ]),
 
-    role_id: schema.string({ escape: true, trim: true }, [rules.regex(UUID_REGEX)]),
-
+    role_id: schema.string({ escape: true, trim: true }, [rules.uuid({ version: 5 })]),
     state_id: schema.number.optional([rules.unsigned()]),
-
     country_id: schema.number.optional([rules.unsigned()]),
-
     login_status: schema.boolean(),
-
     profile_picture: schema.file.optional({ extnames: ['jpg', 'gif', 'png'], size: '5mb' }),
   })
 

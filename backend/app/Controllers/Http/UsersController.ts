@@ -196,7 +196,7 @@ export default class UsersController {
 
       requestedUserProfile = await userModel?.related('profile').create({
         firstName: first_name,
-        middleName: middle_name,
+        middleName: middle_name && middle_name !== 'null' ? middle_name : '',
         lastName: last_name,
         phoneNumber: phone_number,
         address,
@@ -224,7 +224,7 @@ export default class UsersController {
       requestedUserProfile = userModel?.profile
       requestedUserProfile?.merge({
         firstName: first_name,
-        middleName: middle_name,
+        middleName: middle_name && middle_name !== 'null' ? middle_name : '',
         lastName: last_name,
         phoneNumber: phone_number,
         address,
