@@ -36,6 +36,14 @@ export type FileFormats = {
   small: FormatAttributes
 }
 
+export type FileUsageType =
+  | 'user_profile_picture'
+  | 'company_logo'
+  | 'customer_logo'
+  | 'product_gallery_image'
+  | 'category_header_image'
+  | 'invoice_quotation_image'
+
 export default class UploadedFile extends BaseModel {
   @column({ isPrimary: true })
   public id: number
@@ -45,6 +53,9 @@ export default class UploadedFile extends BaseModel {
 
   @column()
   public name: string
+
+  @column()
+  public usageType: FileUsageType
 
   @column()
   public alternativeText: string

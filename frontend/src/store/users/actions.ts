@@ -39,7 +39,9 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
     });
   },
 
-  async CREATE_USER({ rootGetters }, formData: FormData) {
+  async CREATE_USER({ rootGetters }, { formData }: { formData: FormData }) {
+    console.log(formData);
+
     return new Promise(async (resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const currentCompany = rootGetters[

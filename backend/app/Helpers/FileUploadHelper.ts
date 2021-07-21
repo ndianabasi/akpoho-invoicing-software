@@ -27,7 +27,7 @@ import sharp from 'sharp'
 import HttpContext, { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import createDirectory from './CreateDirectory'
 import FileProvider from 'App/Models/FileProvider'
-import UploadedFile from 'App/Models/UploadedFile'
+import UploadedFile, { FileUsageType } from 'App/Models/UploadedFile'
 
 class FileUploadHelper {
   protected requestedUser: HttpContextContract['requestedUser']
@@ -35,6 +35,7 @@ class FileUploadHelper {
   protected fileData: FileData
   protected uploadDir: string
   protected provider: string
+  protected fileUsageType: FileUsageType
   protected uploadedFileModel: UploadedFile | undefined | null
   protected UPLOAD_DIR_PREFIX = 'public'
 
@@ -43,7 +44,12 @@ class FileUploadHelper {
    * @param fileData {FileData} The data of the attached file(s)
    * @param uploadDir {string} The upload directory
    */
-  constructor(fileData: FileData, uploadDir: string, provider: string) {
+  constructor(
+    fileData: FileData,
+    uploadDir: string,
+    provider: string,
+    fileUsageType: FileUsageType
+  ) {
     const { requestedUser, requestedCompany } = this.getContext
     this.requestedUser = requestedUser
     this.requestedCompany = requestedCompany
@@ -51,6 +57,7 @@ class FileUploadHelper {
     this.fileData = fileData
     this.uploadDir = uploadDir
     this.provider = provider
+    this.fileUsageType = fileUsageType
   }
 
   private get getContext() {
@@ -294,6 +301,7 @@ class FileUploadHelper {
         updatedBy: this.requestedUser?.id,
         fileProviderId: provider.id,
         formats: fileInfo.formats || null,
+        usageType: this.fileUsageType,
       })
 
       this.uploadedFileModel = uploadedFile

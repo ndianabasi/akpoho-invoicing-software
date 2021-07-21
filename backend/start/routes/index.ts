@@ -92,7 +92,7 @@ Route.group(() => {
 
   Route.get('/:company_id/users/:user_id', 'UsersController.show').middleware('findRequestedUser')
 
-  Route.patch('/:company_id/users/:user_id', 'UsersController.update').middleware(
+  Route.patch('/:company_id/users/:user_id', 'UsersController.store').middleware(
     'findRequestedUser'
   )
 

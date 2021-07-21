@@ -12,6 +12,8 @@ import { DateTime } from 'luxon'
 import FileUploadHelper from 'App/Helpers/FileUploadHelper'
 import { AttachedFile, FileData } from 'types/file'
 import FileDeletionHelper from 'App/Helpers/FileDeletionHelper'
+import User from 'App/Models/User'
+import UserProfile from 'App/Models/UserProfile'
 
 export default class UsersController {
   public async index({ response, requestedCompany, request, bouncer }: HttpContextContract) {
@@ -157,7 +159,7 @@ export default class UsersController {
     return response.ok({ data: cachedUserDetails })
   }
 
-  public async update({
+  public async store({
     response,
     requestedCompany,
     requestedUser,
@@ -179,35 +181,63 @@ export default class UsersController {
       profile_picture,
     } = await request.validate(UserValidator)
 
+    const requestMethod = request.method()
+
+    let creationMode = true
+    let userModel: User | undefined
+    let requestedUserProfile: UserProfile | undefined
+
+    if (requestMethod === 'POST') {
+      await bouncer.with('UserPolicy').authorize('create', requestedCompany!)
+
+      userModel = await requestedCompany
+        ?.related('users')
+        .create({ email, loginStatus: login_status, roleId: role_id })
+
+      requestedUserProfile = await userModel?.related('profile').create({
+        firstName: first_name,
+        middleName: middle_name,
+        lastName: last_name,
+        phoneNumber: phone_number,
+        address,
+        city,
+        stateId: state_id || null,
+        countryId: country_id || null,
+      })
+    } else if (requestMethod === 'PATCH') {
+      creationMode = false
+      await bouncer.with('UserPolicy').authorize('edit', requestedCompany!, requestedUser!)
+
+      userModel = requestedUser
+
+      userModel?.merge({ email, loginStatus: login_status })
+      await userModel?.save()
+
+      // Ensure that a SuperAdmin does not lose login access
+      await userModel?.load('role')
+      if (userModel?.role?.name !== ROLES.SUPERADMIN) {
+        userModel?.merge({ roleId: role_id })
+        await userModel?.save()
+      }
+
+      await userModel?.load('profile')
+      requestedUserProfile = userModel?.profile
+      requestedUserProfile?.merge({
+        firstName: first_name,
+        middleName: middle_name,
+        lastName: last_name,
+        phoneNumber: phone_number,
+        address,
+        city,
+        stateId: state_id || null,
+        countryId: country_id || null,
+      })
+      await requestedUserProfile?.save()
+
+      await requestedUserProfile?.refresh()
+    } else return response.badRequest({ message: 'This request is not recognised' })
+
     const fileStatus = { fileExists: false, uploaded: false }
-
-    await bouncer.with('UserPolicy').authorize('edit', requestedCompany!, requestedUser!)
-
-    requestedUser?.merge({ email, loginStatus: login_status })
-    await requestedUser?.save()
-
-    // Ensure that a SuperAdmin does not lose login access
-    await requestedUser?.load('role')
-    if (requestedUser?.role?.name !== ROLES.SUPERADMIN) {
-      requestedUser?.merge({ roleId: role_id })
-      await requestedUser?.save()
-    }
-
-    await requestedUser?.load('profile')
-    const requestedUserProfile = requestedUser?.profile
-    requestedUserProfile?.merge({
-      firstName: first_name,
-      middleName: middle_name,
-      lastName: last_name,
-      phoneNumber: phone_number,
-      address,
-      city,
-      stateId: state_id || null,
-      countryId: country_id || null,
-    })
-    await requestedUserProfile?.save()
-
-    await requestedUserProfile?.refresh()
 
     // Check if user profile already has a profile picture
     const oldProfilePicture = requestedUserProfile?.profilePicture
@@ -255,11 +285,14 @@ export default class UsersController {
         files: profile_picture,
       }
 
-      const fileUploadHelper = new FileUploadHelper(fileData, finalUploadDir, 'local')
+      const fileUploadHelper = new FileUploadHelper(
+        fileData,
+        finalUploadDir,
+        'local',
+        'user_profile_picture'
+      )
       await fileUploadHelper.upload().then(async (uploadedFileModel) => {
         fileStatus.uploaded = true
-        console.log(uploadedFileModel?.id)
-
         // Associate profile picture with the uploaded file
         requestedUserProfile?.merge({ profilePicture: uploadedFileModel?.id })
         await requestedUserProfile?.save()
@@ -279,49 +312,11 @@ export default class UsersController {
     ]
     await CacheHelper.flushTags(sets)
 
-    return response.created({ message: 'User was successfully edited.', fileStatus })
-  }
-
-  public async store({ response, requestedCompany, request, bouncer }: HttpContextContract) {
-    const {
-      first_name,
-      last_name,
-      middle_name,
-      phone_number,
-      address,
-      city,
-      email,
-      role_id,
-      state_id,
-      country_id,
-      login_status,
-    } = await request.validate(UserValidator)
-
-    await bouncer.with('UserPolicy').authorize('create', requestedCompany!)
-
-    const newUser = await requestedCompany
-      ?.related('users')
-      .create({ email, loginStatus: login_status, roleId: role_id })
-
-    await newUser?.related('profile').create({
-      firstName: first_name,
-      middleName: middle_name,
-      lastName: last_name,
-      phoneNumber: phone_number,
-      address,
-      city,
-      stateId: state_id || null,
-      countryId: country_id || null,
+    return response.created({
+      message: `User was successfully ${creationMode ? 'created' : 'edited'}.`,
+      fileStatus,
+      data: userModel?.id,
     })
-
-    // Clear relevant caches
-    const sets = [
-      `${CACHE_TAGS.COMPANY_USERS_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
-      `${CACHE_TAGS.COMPANY_USERS_INDEX_CACHE_TAG_PREFIX}:${requestedCompany?.id}`,
-    ]
-    await CacheHelper.flushTags(sets)
-
-    return response.created({ data: newUser?.id })
   }
 
   public async destroy({
