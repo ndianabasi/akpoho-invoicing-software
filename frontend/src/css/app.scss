@@ -281,6 +281,7 @@ input[type='file'] {
 
   .desc-column {
     max-width: 350px;
+    min-width: 300px;
     .q-field__native {
       max-height: 250px;
       overflow-y: auto;
@@ -356,6 +357,7 @@ input[type='file'] {
   .line-discount-column {
     width: 110px !important;
     max-width: 110px;
+    min-width: 100px;
     > label > .q-field__inner {
       width: 100px !important;
       max-width: 100px;
@@ -462,11 +464,11 @@ input[type='number']::-webkit-outer-spin-button {
   }
 
   .product-id-column {
-    width: 300px !important;
+    min-width: 300px !important;
   }
 
   .desc-column {
-    width: 300px !important;
+    min-width: 300px !important;
   }
 
   .qty-column {
