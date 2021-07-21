@@ -7,20 +7,15 @@
       :loading="loading"
     >
       <template #body-panel>
-        <form
-          class="q-pa-md"
-          style="width: 100%; min-height: 50vh"
-          @submit.prevent="submitForm"
-        >
-          <div class="row">
-            <div class="col col-xs-12 col-sm-6 col-lg-6 col-xl-4">
+        <form class="q-pa-md" @submit.prevent="submitForm">
+          <div class="q-mb-md row q-col-gutter-sm items-center justify-start">
+            <div class="col col-xs-12 col-sm-6 col-lg-6 col-xl-6">
               <q-toggle
                 v-model="is_corporate"
                 checked-icon="check"
                 color="green"
                 unchecked-icon="clear"
                 label="This is a corporate customer"
-                class="q-mb-md"
               />
             </div>
             <div
@@ -33,7 +28,6 @@
                 color="green"
                 unchecked-icon="clear"
                 label="Corporate customer has a representative"
-                class="q-mb-md"
               />
             </div>
             <div
@@ -51,7 +45,7 @@
             </div>
           </div>
 
-          <div class="row q-gutter-sm items-center justify-center">
+          <div class="row q-col-gutter-sm items-center justify-start">
             <template v-for="field in customerFormSchema">
               <q-input
                 v-if="field.componentType === 'input' && field.isVisible"
@@ -66,7 +60,7 @@
                 :autocomplete="field?.autocomplete ?? 'off'"
                 :dense="$q.screen.lt.sm"
                 :error="!!formErrors?.[field.name]?.length ?? false"
-                class="col col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6"
+                class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
               >
                 <template #error>
                   {{ formErrors[field.name] }}
@@ -90,7 +84,7 @@
                 :dense="$q.screen.lt.sm"
                 use-input
                 :input-debounce="200"
-                class="col col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6"
+                class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
                 transition-show="scale"
                 transition-hide="scale"
                 :emit-value="false"
@@ -114,7 +108,7 @@
             type="submit"
             :loading="isSubmitting"
             label="Submit"
-            :class="['q-mt-md', $q.screen.lt.md ? 'full-width' : 'half-width']"
+            :class="['q-mt-sm', $q.screen.lt.sm ? 'full-width' : 'half-width']"
             icon-right="send"
             @click.prevent="submitForm"
           >

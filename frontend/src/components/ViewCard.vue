@@ -33,7 +33,7 @@
           <q-separator v-if="showSeparator" />
 
           <q-card-section>
-            <div style="min-height: 50vh">
+            <div style="min-height: 30vh">
               <slot name="body-panel"></slot>
             </div>
           </q-card-section>

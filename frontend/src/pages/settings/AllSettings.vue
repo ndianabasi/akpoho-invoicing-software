@@ -1,10 +1,10 @@
 <template>
   <q-page>
-    <div class="q-pa-md row items-start q-gutter-md">
+    <div class="q-ma-md row q-col-gutter-md items-center justify-start">
       <div
         v-for="setting in settings"
         :key="setting.link"
-        class="col-sm-6 col-xs-12 col-lg-3 col-md-4"
+        class="col col-sm-6 col-xs-12 col-lg-3 col-md-4"
       >
         <q-card flat bordered>
           <q-card-section>

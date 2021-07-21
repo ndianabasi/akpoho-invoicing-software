@@ -8,9 +8,13 @@
       :loading="loading"
     >
       <template #body-panel>
-        <form class="q-pa-md" @submit.prevent="submitForm">
+        <form
+          class="q-pa-md row q-col-gutter-sm items-start justify-start"
+          @submit.prevent="submitForm"
+        >
           <image-cropper
             :input-max-file-size="5 * 1048576"
+            input-class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
             @finish-cropper="handleCropperFinish"
           />
           <!-- 5 MB max file size -->
@@ -22,7 +26,7 @@
             bottom-slots
             label="Email Address"
             :dense="dense"
-            class="q-mb-md"
+            class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
             type="email"
             :error="form$.email.$invalid"
             aria-autocomplete="email"
@@ -55,7 +59,7 @@
             use-input
             :emit-value="false"
             :map-options="false"
-            class="q-mb-md"
+            class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
             transition-show="scale"
             transition-hide="scale"
             :error="form$.role_id.$invalid"
@@ -93,7 +97,7 @@
             :label="field.label"
             :dense="dense"
             :error="form$?.[field.name]?.$invalid ?? false"
-            class="q-mb-md"
+            class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
             :aria-autocomplete="form?.[field.name]?.autocomplete ?? 'off'"
             :autocomplete="form?.[field.name]?.autocomplete ?? 'off'"
           >
@@ -125,7 +129,7 @@
             options-dense
             use-input
             :input-debounce="0"
-            class="q-mb-md"
+            class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
             transition-show="scale"
             transition-hide="scale"
             :emit-value="false"
@@ -149,7 +153,7 @@
             options-dense
             use-input
             :input-debounce="0"
-            class="q-mb-md"
+            class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
             transition-show="scale"
             transition-hide="scale"
             :emit-value="false"
@@ -165,6 +169,7 @@
             checked-icon="check"
             unchecked-icon="clear"
             :label="form.login_status ? 'Can login' : 'Cannot login'"
+            class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
           />
           <div
             v-if="CAN_EDIT_USERS && myAccountMode"
@@ -183,7 +188,7 @@
             type="submit"
             :loading="submitting"
             label="Submit"
-            class="q-mt-md"
+            :class="['q-mt-sm', $q.screen.lt.sm ? 'full-width' : 'half-width']"
             icon-right="send"
             @click.prevent="submitForm"
           >

@@ -9,8 +9,7 @@
     >
       <template #body-panel="{ isSmallScreen }">
         <form
-          class="q-pa-md"
-          style="min-height: 50vh; width: 100%"
+          class="row q-col-gutter-sm items-start justify-start q-pa-md"
           @submit="onSubmit"
         >
           <template v-for="field in form">
@@ -22,7 +21,14 @@
               color="green"
               unchecked-icon="clear"
               :label="field.label"
-              class="q-mb-md"
+              :class="
+                field.overrideClasses
+                  ? field.classes
+                  : [
+                      'col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6',
+                      field.classes,
+                    ]
+              "
               :dense="isSmallScreen"
             />
 
@@ -39,7 +45,14 @@
               :aria-autocomplete="field?.autocomplete ?? 'off'"
               :autocomplete="field?.autocomplete ?? 'off'"
               :error="!!formErrors?.[field.name]?.length ?? false"
-              class="q-mb-sm-sm q-mb-md-md"
+              :class="
+                field.overrideClasses
+                  ? field.classes
+                  : [
+                      'col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6',
+                      field.classes,
+                    ]
+              "
               :dense="isSmallScreen"
             >
               <template #error>
@@ -66,7 +79,14 @@
               :options-dense="isSmallScreen"
               use-input
               :input-debounce="200"
-              class="q-mb-md"
+              :class="
+                field.overrideClasses
+                  ? field.classes
+                  : [
+                      'col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6',
+                      field.classes,
+                    ]
+              "
               transition-show="scale"
               transition-hide="scale"
               :emit-value="false"
@@ -91,7 +111,7 @@
             type="submit"
             :loading="isSubmitting"
             label="Submit"
-            class="q-mt-md"
+            :class="['q-mt-sm', $q.screen.lt.sm ? 'full-width' : 'half-width']"
             icon-right="send"
             @click="onSubmit"
           >
@@ -329,6 +349,18 @@ export default defineComponent({
 
     // Form schema for form generation
     const form: FormSchema = reactive({
+      isEnabled: {
+        model: isEnabled,
+        name: 'isEnabled',
+        componentType: 'toggle',
+        inputType: 'toggle',
+        label: 'Is Enabled',
+        autocomplete: 'off',
+        default: initialForm['isEnabled'],
+        isVisible: true,
+        overrideClasses: true,
+        classes: 'col col-12',
+      },
       productTypeId: {
         model: productTypeId,
         name: 'productTypeId',
@@ -348,6 +380,7 @@ export default defineComponent({
         default: initialForm['productName'],
         autocomplete: 'off',
         isVisible: true,
+        //classes: 'offset-sm-6 offset-md-6 offset-lg-6 offset-xl-6',
       },
       sku: {
         model: sku,
@@ -369,16 +402,6 @@ export default defineComponent({
         autocomplete: 'off',
         isVisible: true,
       },
-      isEnabled: {
-        model: isEnabled,
-        name: 'isEnabled',
-        componentType: 'toggle',
-        inputType: 'toggle',
-        label: 'Is Enabled',
-        autocomplete: 'off',
-        default: initialForm['isEnabled'],
-        isVisible: true,
-      },
       stockStatus: {
         model: stockStatus,
         name: 'stockStatus',
@@ -397,6 +420,8 @@ export default defineComponent({
         default: initialForm['productHasWeight'],
         autocomplete: 'off',
         isVisible: true,
+        overrideClasses: true,
+        classes: 'col col-12',
       },
       weight: {
         model: weight,

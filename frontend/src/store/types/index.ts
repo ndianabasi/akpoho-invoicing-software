@@ -490,6 +490,8 @@ export interface FormSchemaProperties {
   name?: string;
   label: string;
   componentType: InputComponentType;
+  classes?: string | string[] | Record<string, number | string>;
+  overrideClasses?: boolean;
 }
 
 export type FormSchema = Record<string, FormSchemaProperties>;
