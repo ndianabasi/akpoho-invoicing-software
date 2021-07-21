@@ -437,6 +437,12 @@ export interface FileMultiFormats {
   url: string;
 }
 
+export interface ResolvedProfilePictureUrls {
+  thumbnail: string | undefined;
+  small: string | undefined;
+  original: string | undefined;
+}
+
 export type FileFormatAttributes = {
   name: string;
   hash: string;

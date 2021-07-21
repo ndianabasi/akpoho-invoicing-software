@@ -5,6 +5,7 @@ import { GetterTree } from 'vuex';
 import { StateInterface } from '../index';
 import { AuthStateInterface } from './state';
 import { DateTime } from 'luxon';
+import { ResolvedProfilePictureUrls } from '../types';
 
 export interface AuthGettersInterface {
   getToken: (state: AuthStateInterface) => string;
@@ -36,31 +37,40 @@ const getters: GetterTree<AuthStateInterface, StateInterface> = {
       ? globalRoles.some((role: string) => role === authRole)
       : false;
   },
-  GET_AUTH_USER_PROFILE_PICTURE: (state, getters, rootState, rootGetters) => {
+  GET_AUTH_USER_PROFILE_PICTURE: (
+    state,
+    getters,
+    rootState,
+    rootGetters
+  ): ResolvedProfilePictureUrls => {
     const rootUrl = rootGetters['getRootURL'] as string;
     const profilePictureBase = state.userProfile?.profile_picture;
-    const profilePictureFormat = { thumbnail: '', small: '' };
+    const profilePictureFormat: {
+      thumbnail?: string | undefined;
+      small?: string | undefined;
+      original?: string | undefined;
+    } = { thumbnail: undefined, small: undefined, original: undefined };
 
     if (profilePictureBase) {
       profilePictureFormat.thumbnail =
-        profilePictureBase?.formats?.thumbnail?.url ??
-        profilePictureBase?.formats?.thumbnail?.url ??
-        '';
+        profilePictureBase?.formats?.thumbnail?.url;
 
-      profilePictureFormat.small =
-        profilePictureBase?.formats?.small?.url ??
-        profilePictureFormat?.thumbnail ??
-        profilePictureBase?.url ??
-        '';
+      profilePictureFormat.small = profilePictureBase?.formats?.small?.url;
+      ('');
+
+      profilePictureFormat.original = profilePictureBase?.url;
     }
 
     return {
-      thumbnail: profilePictureFormat.thumbnail
+      thumbnail: profilePictureFormat?.thumbnail
         ? `${rootUrl}/${profilePictureFormat.thumbnail}`
-        : '',
+        : undefined,
       small: profilePictureFormat.small
         ? `${rootUrl}/${profilePictureFormat.small}`
-        : '',
+        : undefined,
+      original: profilePictureFormat.original
+        ? `${rootUrl}/${profilePictureFormat.original}`
+        : undefined,
     };
   },
   GET_LAST_PASSWORD_HISTORY: (state) => {

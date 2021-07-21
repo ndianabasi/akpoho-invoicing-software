@@ -105,16 +105,13 @@
       <q-btn round flat>
         <q-avatar
           v-bind="
-            authUserProfilePicture?.thumbnail ?? false
+            userHasProfilePicture
               ? {}
               : { color: 'accent', textColor: 'grey-3' }
           "
           size="26px"
         >
-          <img
-            v-if="authUserProfilePicture?.thumbnail ?? false"
-            :src="authUserProfilePicture?.thumbnail"
-          />
+          <img v-if="userHasProfilePicture" :src="resolvedProfilePictureUrl" />
           <template v-else>
             {{ getUserInitials }}
           </template>
@@ -209,6 +206,7 @@ import { useRouter } from 'vue-router';
 import {
   UserProfileSummary,
   StringIDNameInterface,
+  ResolvedProfilePictureUrls,
 } from '../store/types/index';
 import { $dark } from '../composables/useDarkMode';
 
@@ -263,7 +261,22 @@ export default defineComponent({
       () =>
         store.getters[
           'auth/GET_AUTH_USER_PROFILE_PICTURE'
-        ] as UserProfileSummary
+        ] as ResolvedProfilePictureUrls
+    );
+
+    const userHasProfilePicture = computed(() => {
+      return (
+        !!authUserProfilePicture.value?.thumbnail ||
+        !!authUserProfilePicture.value?.small ||
+        !!authUserProfilePicture.value?.original
+      );
+    });
+
+    const resolvedProfilePictureUrl = computed(
+      () =>
+        authUserProfilePicture.value?.thumbnail ??
+        authUserProfilePicture.value?.small ??
+        authUserProfilePicture.value?.original
     );
 
     const authRole = store.getters[
@@ -290,6 +303,8 @@ export default defineComponent({
         const [firstName, lastName] = userFullName.split(' ');
         return firstName[0] + lastName?.[0] ?? firstName[1];
       }),
+      userHasProfilePicture,
+      resolvedProfilePictureUrl,
     };
   },
 });
