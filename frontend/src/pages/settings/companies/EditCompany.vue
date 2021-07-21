@@ -71,8 +71,8 @@
               class="q-mb-md"
               transition-show="scale"
               transition-hide="scale"
-              emit-value
-              map-options
+              :emit-value="false"
+              :map-options="false"
               :dense="isSmallScreen"
               :error="!!formErrors?.[field.name]?.length ?? false"
             >
@@ -151,6 +151,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   defineComponent,
   ref,
@@ -169,11 +170,12 @@ import useTitleInfo from '../../../composables/useTitleInfo';
 import useResourcePermissions from '../../../composables/useResourcePermissions';
 import {
   CurrentlyViewedCompany,
-  SelectionOption,
   PERMISSION,
   TitleInfo,
   CompanyFormShape,
   FormSchema,
+  CompanyFormShapeRaw,
+  SelectOption,
 } from '../../../store/types';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import QuasarSelect from '../../../components/QuasarSelect';
@@ -227,14 +229,14 @@ export default defineComponent({
       () =>
         store.getters[
           'countries_states/GET_COUNTRIES_FOR_SELECT'
-        ] as SelectionOption[]
+        ] as SelectOption[]
     );
 
     const countryStates = computed({
       get: () =>
         store.getters[
           'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-        ] as SelectionOption[],
+        ] as SelectOption[],
       set: (value) => value,
     });
 
@@ -242,7 +244,7 @@ export default defineComponent({
       () =>
         store.getters[
           'companies/GET_COMPANY_SIZES_FOR_SELECT'
-        ] as SelectionOption[]
+        ] as SelectOption[]
     );
     let currentCompany: Ref<CurrentlyViewedCompany | null>;
 
@@ -271,14 +273,23 @@ export default defineComponent({
           .nullable(),
         address: yup.string().optional().nullable(),
         city: yup.string().required('City is required').nullable(),
-        size: yup.number().required('Company Size is required').nullable(),
-        stateId: yup.number().required('State is required').nullable(),
-        countryId: yup.number().required('Country is required').nullable(),
+        size: yup
+          .object({ label: yup.string(), value: yup.number() })
+          .default(null)
+          .nullable(),
+        stateId: yup
+          .object({ label: yup.string(), value: yup.number() })
+          .default(null)
+          .nullable(),
+        countryId: yup
+          .object({ label: yup.string(), value: yup.number() })
+          .default(null)
+          .nullable(),
         website: yup.string().optional().nullable(),
       })
     );
 
-    const initialValues: Readonly<CompanyFormShape> = {
+    const initialValues: Readonly<CompanyFormShapeRaw> = {
       isPersonalBrand: false,
       name: '',
       email: '',
@@ -296,21 +307,27 @@ export default defineComponent({
       errors: formErrors,
       isSubmitting,
       values,
-    } = useForm<CompanyFormShape>({
+    } = useForm<CompanyFormShapeRaw>({
       validationSchema: formSchema.value,
       initialValues,
     });
 
-    const { value: isPersonalBrand } = useField('isPersonalBrand');
-    const { value: name } = useField('name');
-    const { value: email } = useField('email');
-    const { value: phoneNumber } = useField('phoneNumber');
-    const { value: address } = useField('address');
-    const { value: city } = useField('city');
-    const { value: size } = useField('size');
-    const { value: stateId } = useField('stateId');
-    const { value: countryId } = useField('countryId');
-    const { value: website } = useField('website');
+    const { value: isPersonalBrand } =
+      useField<CompanyFormShapeRaw['isPersonalBrand']>('isPersonalBrand');
+    const { value: name } = useField<CompanyFormShapeRaw['name']>('name');
+    const { value: email } = useField<CompanyFormShapeRaw['email']>('email');
+    const { value: phoneNumber } =
+      useField<CompanyFormShapeRaw['phoneNumber']>('phoneNumber');
+    const { value: address } =
+      useField<CompanyFormShapeRaw['address']>('address');
+    const { value: city } = useField<CompanyFormShapeRaw['city']>('city');
+    const { value: size } = useField<CompanyFormShapeRaw['size']>('size');
+    const { value: stateId } =
+      useField<CompanyFormShapeRaw['stateId']>('stateId');
+    const { value: countryId } =
+      useField<CompanyFormShapeRaw['countryId']>('countryId');
+    const { value: website } =
+      useField<CompanyFormShapeRaw['website']>('website');
 
     // Form schema for form generation
     const form: FormSchema = reactive({
@@ -379,7 +396,7 @@ export default defineComponent({
         label: 'Company Size',
         default: null,
         isVisible: true,
-        options: computed(() => companySizes.value),
+        options: companySizes,
       },
       countryId: {
         model: countryId,
@@ -389,7 +406,7 @@ export default defineComponent({
         default: null,
         autocomplete: 'work country-name',
         isVisible: true,
-        options: unref(countries),
+        options: countries,
       },
       stateId: {
         model: stateId,
@@ -399,7 +416,7 @@ export default defineComponent({
         default: null,
         autocomplete: 'work address-level1',
         isVisible: true,
-        options: computed(() => countryStates.value),
+        options: countryStates,
       },
       website: {
         model: website,
@@ -415,30 +432,39 @@ export default defineComponent({
 
     // Valiation section ends
 
-    watch(
-      () => form.countryId.model,
-      (newCountry) => {
-        stateId.value = null;
-        if (newCountry) {
-          void store.dispatch(
-            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: newCountry }
-          );
+    watch(countryId, (newCountry) => {
+      stateId.value = null;
+      if (newCountry) {
+        void store.dispatch(
+          'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
+          { countryId: newCountry.value }
+        );
 
-          countryStates.value = store.getters[
-            'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-          ] as SelectionOption[];
-        }
+        countryStates.value = store.getters[
+          'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
+        ] as SelectOption[];
       }
-    );
+    });
 
-    const onSubmit = handleSubmit((form) => {
+    const onSubmit = handleSubmit((validatedForm) => {
+      const processedForm = computed(() => {
+        const { size, stateId, countryId, ...restOfForm } = validatedForm;
+        return {
+          size: size?.value,
+          stateId: stateId?.value,
+          countryId: countryId?.value,
+          ...restOfForm,
+        };
+      });
+
       void nextTick(() => {
         const isCreationMode = props.creationMode;
         void store
           .dispatch(
             `companies/${isCreationMode ? 'CREATE_COMPANY' : 'EDIT_COMPANY'}`,
-            isCreationMode ? form : { form, companyId: props.companyId }
+            isCreationMode
+              ? processedForm.value
+              : { form: processedForm.value, companyId: props.companyId }
           )
           .then((id: string) => {
             companyCreated.value = true;
@@ -502,22 +528,42 @@ export default defineComponent({
             phoneNumber.value = currentCompany?.value?.phone_number ?? '';
             address.value = currentCompany?.value?.address ?? '';
             city.value = currentCompany?.value?.city ?? '';
-            size.value = currentCompany?.value?.companySize?.id ?? null;
+            size.value = currentCompany?.value?.companySize
+              ? {
+                  label: currentCompany?.value?.companySize?.size,
+                  value: currentCompany?.value?.companySize?.id,
+                }
+              : null;
             website.value = currentCompany?.value?.website ?? '';
-            countryId.value = currentCompany?.value?.country?.id ?? null;
+            countryId.value = currentCompany?.value?.country
+              ? {
+                  label: currentCompany?.value?.country?.name,
+                  value: currentCompany?.value?.country?.id,
+                }
+              : null;
             // Fetch the states for the current country
             if (countryId.value) {
               await store
                 .dispatch('countries_states/FETCH_COUNTRY_STATES_FOR_SELECT', {
-                  countryId: countryId.value,
+                  countryId: countryId.value.value,
                 })
                 .then(() => {
                   // Then update the current state
-                  stateId.value = currentCompany?.value?.state?.id ?? null;
+                  stateId.value = currentCompany?.value?.state?.id
+                    ? {
+                        label: currentCompany?.value?.state?.name,
+                        value: currentCompany?.value?.state?.id,
+                      }
+                    : null;
                 });
             } else {
               // Then update the current state
-              countryId.value = currentCompany?.value?.state?.id ?? null;
+              countryId.value = currentCompany?.value?.state?.id
+                ? {
+                    label: currentCompany?.value?.state?.name,
+                    value: currentCompany?.value?.state?.id,
+                  }
+                : null;
             }
 
             loading.value = false;
@@ -525,22 +571,19 @@ export default defineComponent({
       }
     });
 
-    watch(
-      () => countryId.value,
-      (country) => {
-        if (country) {
-          stateId.value = null;
-          void store.dispatch(
-            'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
-            { countryId: country }
-          );
+    watch(countryId, (country) => {
+      if (country?.value) {
+        stateId.value = null;
+        void store.dispatch(
+          'countries_states/FETCH_COUNTRY_STATES_FOR_SELECT',
+          { countryId: country?.value }
+        );
 
-          countryStates.value = store.getters[
-            'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
-          ] as SelectionOption[];
-        }
+        countryStates.value = store.getters[
+          'countries_states/GET_COUNTRY_STATES_FOR_SELECT'
+        ] as SelectOption[];
       }
-    );
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const CAN_EDIT_COMPANIES = computed(() =>

@@ -377,17 +377,26 @@ export interface UserFormShapeProcessed extends UserFormShapeContract {
   country_id: number | null;
 }
 
-export interface CompanyFormShape {
+export interface CompanyFormShapeContract {
   name: string;
   phoneNumber: string | undefined | null;
   address: string | undefined | null;
   city: string | undefined | null;
   email: string;
+  website: string | undefined | null;
+  isPersonalBrand: boolean | undefined;
+}
+
+export interface CompanyFormShape extends CompanyFormShapeContract {
   size: number | undefined | null;
   stateId: number | null;
   countryId: number | null;
-  website: string | undefined | null;
-  isPersonalBrand: boolean | undefined;
+}
+
+export interface CompanyFormShapeRaw extends CompanyFormShapeContract {
+  size: SelectOption | null;
+  stateId: SelectOption | null;
+  countryId: SelectOption | null;
 }
 
 export enum PERMISSION {
