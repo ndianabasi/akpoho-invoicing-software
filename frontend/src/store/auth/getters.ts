@@ -54,10 +54,7 @@ const getters: GetterTree<AuthStateInterface, StateInterface> = {
     if (profilePictureBase) {
       profilePictureFormat.thumbnail =
         profilePictureBase?.formats?.thumbnail?.url;
-
       profilePictureFormat.small = profilePictureBase?.formats?.small?.url;
-      ('');
-
       profilePictureFormat.original = profilePictureBase?.url;
     }
 

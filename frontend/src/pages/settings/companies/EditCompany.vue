@@ -8,7 +8,10 @@
       :loading="loading"
     >
       <template #body-panel="{ isSmallScreen }">
-        <form class="q-pa-md" @submit="onSubmit">
+        <form
+          class="row q-col-gutter-sm items-start justify-start q-pa-md"
+          @submit="onSubmit"
+        >
           <template v-for="field in form">
             <q-toggle
               v-if="field.componentType === 'toggle' && field.isVisible"
@@ -18,7 +21,14 @@
               color="green"
               unchecked-icon="clear"
               :label="field.label"
-              class="q-ml-lg q-mb-md"
+              :class="
+                field.overrideClasses
+                  ? field.classes
+                  : [
+                      'col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6',
+                      field.classes,
+                    ]
+              "
               :dense="isSmallScreen"
             />
 
@@ -41,7 +51,14 @@
               :aria-autocomplete="field?.autocomplete ?? 'off'"
               :autocomplete="field?.autocomplete ?? 'off'"
               :error="!!formErrors?.[field.name]?.length ?? false"
-              class="q-mb-sm-sm q-mb-md-md"
+              :class="
+                field.overrideClasses
+                  ? field.classes
+                  : [
+                      'col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6',
+                      field.classes,
+                    ]
+              "
               :dense="isSmallScreen"
             >
               <template #error>
@@ -68,7 +85,14 @@
               :options-dense="isSmallScreen"
               use-input
               :input-debounce="200"
-              class="q-mb-md"
+              :class="
+                field.overrideClasses
+                  ? field.classes
+                  : [
+                      'col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6',
+                      field.classes,
+                    ]
+              "
               transition-show="scale"
               transition-hide="scale"
               :emit-value="false"
@@ -338,6 +362,8 @@ export default defineComponent({
         label: 'Create as Personal Brand',
         default: false,
         isVisible: true,
+        overrideClasses: true,
+        classes: 'col col-12',
       },
       name: {
         model: name,
