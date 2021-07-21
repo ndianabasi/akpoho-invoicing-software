@@ -29,10 +29,14 @@
             v-bind="{ isSmallScreen: isSmallScreen }"
           ></slot>
 
-          <slot
-            name="submitSection"
-            v-bind="{ isSmallScreen: isSmallScreen }"
-          ></slot>
+          <div class="row items-center justify-center">
+            <div class="col col-12">
+              <slot
+                name="submitSection"
+                v-bind="{ isSmallScreen: isSmallScreen }"
+              ></slot>
+            </div>
+          </div>
 
           <div class="text-center q-py-lg text-white form-footer">
             <slot name="formFooterLink"></slot>
