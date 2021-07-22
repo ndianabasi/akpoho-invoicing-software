@@ -632,7 +632,6 @@ import {
   Ref,
   reactive,
   nextTick,
-  onMounted,
   unref,
   PropType,
 } from 'vue';
@@ -654,7 +653,6 @@ import QuasarSelect from '../../components/QuasarSelect';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
-//import Sortable from 'sortablejs';
 //import thousandFormatter from 'format-thousands/index';
 import {
   currentInvoiceQuotation,
@@ -1002,53 +1000,6 @@ export default defineComponent({
     const CAN_EDIT_QUOTATIONS = computed(() =>
       store.getters['permissions/GET_USER_PERMISSION']('can_edit_quotations')
     );
-
-    onMounted(() => {
-      /* const sortableListElement = document.querySelector(
-        '.quotation-invoice-table tbody'
-      );
-      const sortable = Sortable.create(sortableListElement as HTMLElement, {
-        draggable: 'tr',
-        animation: 150,
-        sort: true,
-        easing: 'cubic-bezier(1, 0, 0, 1)',
-        handle: '.drag-handle',
-        ghostClass: '.ghost-item',
-        onStart: function (evt) {
-          dragging.value = true;
-        },
-        onEnd: function (evt) {
-          dragging.value = false;
-        },
-        onSort: function (evt) {
-          const { oldIndex, newIndex } = evt;
-          console.log({ oldIndex, newIndex });
-
-          const swapItems = function (
-            items: QuotationInvoiceItemShape[],
-            oldElementIndex: number | undefined,
-            newElementIndex: number | undefined
-          ) {
-            const unRefItems = [...items];
-            if (unRefItems.length === 1) return unRefItems;
-            if (oldElementIndex && newElementIndex) {
-              unRefItems.splice(
-                newElementIndex,
-                1,
-                unRefItems.splice(
-                  oldElementIndex,
-                  1,
-                  unRefItems[newElementIndex]
-                )[0]
-              );
-              return unRefItems;
-            } else return unRefItems;
-          };
-
-          form.items = swapItems(form.items, oldIndex, newIndex);
-        },
-      }); */
-    });
 
     onBeforeMount(() => {
       stopFetchCurrentlyViewedInvoiceQuotation();

@@ -1,5 +1,6 @@
 <template>
   <q-table
+    id="invoice-quotation-table"
     :rows="internalForm.items"
     :columns="itemsColumns"
     :visible-columns="visibleColumns"
@@ -13,10 +14,10 @@
   >
     <template #header="props">
       <q-tr :props="props">
+        <!-- Use for reordering handle -->
+        <q-th v-if="!viewMode && useSortable" auto-width />
         <!-- Use for auto-numbering -->
         <q-th auto-width><span>#</span></q-th>
-        <!-- Use for reordering handle -->
-        <!-- <q-th auto-width /> -->
         <!-- Use for expanding row -->
         <q-th
           v-if="enableImageUploads && internalForm.showImages && !viewMode"
@@ -31,6 +32,18 @@
 
     <template #body="props">
       <q-tr :props="props" class="q-my-auto">
+        <!-- For reordering the rows -->
+        <q-td v-if="!viewMode && useSortable" auto-width>
+          <q-btn
+            class="drag-handle"
+            size="sm"
+            color="accent"
+            round
+            dense
+            icon="unfold_more"
+            flat
+          />
+        </q-td>
         <q-td class="serial-number-column" auto-width>
           <template v-if="!viewMode">
             <q-input
@@ -55,17 +68,6 @@
             </div>
           </template>
         </q-td>
-        <!-- <q-td auto-width>
-                      <q-btn
-                        class="drag-handle"
-                        size="sm"
-                        color="accent"
-                        round
-                        dense
-                        icon="unfold_more"
-                        flat
-                      />
-                    </q-td> -->
         <q-td
           v-if="enableImageUploads && internalForm.showImages && !viewMode"
           auto-width
@@ -577,7 +579,11 @@
         </q-td>
       </q-tr>
       <q-tr v-if="props.expand && !viewMode" :props="props">
+        <!-- For reordering the rows -->
+        <q-td v-if="!viewMode && useSortable" auto-width />
+        <!-- For showing serials -->
         <q-td auto-width />
+        <!-- For showing image uploads -->
         <q-td v-if="internalForm.showImages" auto-width />
         <q-td :colspan="2">
           <div class="row q-pb-lg">
@@ -628,7 +634,11 @@
       #bottom-row
     >
       <q-tr v-if="internalForm.calculateTotals" class="bottom-row">
+        <!-- For reordering the rows -->
+        <q-td v-if="!viewMode && useSortable" auto-width />
+        <!-- For showing serials -->
         <q-td auto-width />
+        <!-- For showing image uploads -->
         <q-td
           v-if="enableImageUploads && internalForm.showImages && !viewMode"
           auto-width
@@ -704,7 +714,11 @@
         "
         class="bottom-row"
       >
+        <!-- For reordering the rows -->
+        <q-td v-if="!viewMode && useSortable" auto-width />
+        <!-- For showing serials -->
         <q-td auto-width />
+        <!-- For showing image uploads -->
         <q-td v-if="enableImageUploads && internalForm.showImages" auto-width />
         <q-td class="text-right" :colspan="visibleColumns.length - 1">
           <div class="bottom-rows-text">Additional discount</div>
@@ -733,7 +747,11 @@
           :key="'additional_fees__' + index"
           class="bottom-row"
         >
+          <!-- For reordering the rows -->
+          <q-td v-if="!viewMode && useSortable" auto-width />
+          <!-- For showing serials -->
           <q-td auto-width />
+          <!-- For showing image uploads -->
           <q-td
             v-if="enableImageUploads && internalForm.showImages && !viewMode"
             auto-width
@@ -803,7 +821,11 @@
         "
         class="bottom-row"
       >
+        <!-- For reordering the rows -->
+        <q-td v-if="!viewMode && useSortable" auto-width />
+        <!-- For showing serials -->
         <q-td auto-width />
+        <!-- For showing image uploads -->
         <q-td v-if="enableImageUploads && internalForm.showImages" auto-width />
         <q-td class="text-right" :colspan="visibleColumns.length - 1">
           <div class="bottom-rows-text">Tax</div>
@@ -821,7 +843,11 @@
         <q-td v-if="!viewMode" auto-width> &nbsp; </q-td>
       </q-tr>
       <q-tr v-if="internalForm.calculateTotals" class="bottom-row">
+        <!-- For reordering the rows -->
+        <q-td v-if="!viewMode && useSortable" auto-width />
+        <!-- For showing serials -->
         <q-td auto-width />
+        <!-- For showing image uploads -->
         <q-td v-if="enableImageUploads && internalForm.showImages" auto-width />
         <q-td class="text-right" :colspan="visibleColumns.length - 1">
           <div class="bottom-rows-text">
@@ -846,14 +872,17 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   defineComponent,
   PropType,
   computed,
   ref,
+  Ref,
   watch,
   watchEffect,
   onMounted,
+  onBeforeUnmount,
 } from 'vue';
 import { typeSortFn } from '../helpers/utils';
 import {
@@ -880,6 +909,7 @@ import {
 } from '../composables/invoices-quotations/useInvoiceQuotation';
 import { useQuasar, format } from 'quasar';
 import useThousandSeparator from '../composables/useThousandSeparators';
+import Sortable from 'sortablejs';
 
 export default defineComponent({
   name: 'InvoiceQuotationTable',
@@ -910,6 +940,9 @@ export default defineComponent({
   setup(props, ctx) {
     const $q = useQuasar();
     const { capitalize } = format;
+    const useSortable = ref(false);
+    //const dragging = ref(false);
+    const sortable: Ref<Sortable | null> = ref(null);
 
     const visibleColumns = computed(() => {
       return itemsColumns.filter((column) => column.required);
@@ -1236,6 +1269,38 @@ export default defineComponent({
 
     onMounted(() => {
       if (props.creationMode) void addItemLines(3);
+
+      /* const tableDom = document.getElementById('invoice-quotation-table');
+      const sortableListElement = tableDom?.querySelector('tbody'); */
+
+      /* sortable.value = Sortable.create(sortableListElement as HTMLElement, {
+        draggable: 'tr',
+        animation: 150,
+        sort: true,
+        easing: 'cubic-bezier(1, 0, 0, 1)',
+        handle: '.drag-handle',
+        ghostClass: '.ghost-item',
+        onStart: function (evt) {
+          dragging.value = true;
+        },
+        onEnd: function (evt) {
+          const { oldIndex, newIndex } = evt;
+          const items = internalForm.value.items;
+          const temp: QuotationInvoiceItemShape = JSON.parse(
+            JSON.stringify(items[oldIndex ?? -1])
+          );
+          items[oldIndex ?? -1] = JSON.parse(
+            JSON.stringify(items[newIndex ?? -1])
+          );
+          items[newIndex ?? -1] = temp;
+
+          dragging.value = false;
+        },
+      }); */
+    });
+
+    onBeforeUnmount(() => {
+      sortable.value = null;
     });
 
     return {
@@ -1267,6 +1332,7 @@ export default defineComponent({
       isLastItem,
       collectionTypeOptions,
       useThousandSeparator,
+      useSortable,
     };
   },
 });
