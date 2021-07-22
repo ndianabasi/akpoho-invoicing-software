@@ -10,9 +10,6 @@ import {
   createWebHistory,
 } from 'vue-router';
 import routes /* CustomRouteRecord */ from './routes';
-//import qs from 'qs';
-import { store } from '../store/index';
-import { Notify } from 'quasar';
 
 /*
  * If not building with SSR mode, you can
@@ -23,7 +20,7 @@ import { Notify } from 'quasar';
  * with the Router instance.
  */
 
-export default function () {
+export default function Router() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const createHistory =
     process.env.MODE === 'ssr'
@@ -55,34 +52,6 @@ export default function () {
     history: createHistory(
       process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE
     ),
-  });
-
-  Router.beforeEach((to, _from, next) => {
-    const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
-    if (to.matched.some((record) => record.meta.requiresAuth)) {
-      if (isLoggedIn) {
-        return next();
-      } else {
-        Notify.create({
-          type: 'negative',
-          message: 'You are not logged in.',
-          position: 'top',
-        });
-        return next({ name: 'Login' });
-      }
-    } else return next();
-  });
-
-  Router.beforeEach((to, from, next) => {
-    const GET_USER_PERMISSION =
-      store.getters['permissions/GET_USER_PERMISSION'];
-    if (to.meta && !!to.meta.permission) {
-      if (GET_USER_PERMISSION(to.meta.permission)) {
-        return next();
-      } else return next(from);
-    } else {
-      return next();
-    }
   });
 
   return Router;

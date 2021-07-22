@@ -82,10 +82,10 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
 
           commit('LOGOUT_USER');
 
-          resolve(res.data);
+          return resolve(res.data);
         })
         .catch((error: HttpError) => {
-          reject(error);
+          return reject(error);
         });
     });
   },

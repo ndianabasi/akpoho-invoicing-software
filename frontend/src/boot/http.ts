@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
 import { Store } from 'vuex';
 import { StoreElements } from '../store';
-import { App } from 'vue';
 import { Notify } from 'quasar';
 import { HttpError } from 'src/store/types';
+import { BootFileParams } from '@quasar/app';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -16,7 +18,7 @@ declare module '@vue/runtime-core' {
 const api: AxiosInstance = axios.create();
 
 export default boot(
-  ({ app, store }: { app: App; store: Store<StoreElements> }) => {
+  ({ app, store, router }: BootFileParams<Store<StoreElements>>) => {
     api.defaults.baseURL = store.getters.getBaseURL as string;
     api.defaults.timeout = store.getters.getHttpOptions.timeout as number;
     api.defaults.headers = store.getters.getHttpOptions.headers as string;
@@ -56,6 +58,7 @@ export default boot(
         console.log(error.response);
         if (error?.response?.status === 401) {
           store.commit('auth/LOGOUT_USER');
+          void router.push({ name: 'Login' });
 
           Notify.create({
             message:
@@ -175,6 +178,34 @@ export default boot(
         return Promise.reject(error);
       }
     );
+
+    router.beforeEach((to, _from, next) => {
+      const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
+      if (to.matched.some((record) => record.meta.requiresAuth)) {
+        if (isLoggedIn) {
+          return next();
+        } else {
+          Notify.create({
+            type: 'negative',
+            message: 'You are not logged in.',
+            position: 'top',
+          });
+          return next({ name: 'Login' });
+        }
+      } else return next();
+    });
+
+    router.beforeEach((to, from, next) => {
+      const GET_USER_PERMISSION =
+        store.getters['permissions/GET_USER_PERMISSION'];
+      if (to.meta && !!to.meta.permission) {
+        if (GET_USER_PERMISSION(to.meta.permission)) {
+          return next();
+        } else return next(from);
+      } else {
+        return next();
+      }
+    });
   }
 );
 
