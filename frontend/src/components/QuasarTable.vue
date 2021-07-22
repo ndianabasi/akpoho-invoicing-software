@@ -548,7 +548,11 @@ export default defineComponent({
     const invisibleColumnsObjects = computed(() => {
       // Use spread operation to avoid copying objects by reference
       return [...props.tableColumns]
-        .filter((column) => !column.required && column.visibleAsColumn)
+        .filter(
+          (column) =>
+            (!column.required && column.visibleAsColumn) ||
+            (!column.required && column.visibleAsColumn === undefined)
+        )
         .map((column) => column);
     });
 
@@ -849,8 +853,8 @@ export default defineComponent({
       columns: computed(() =>
         props.tableColumns.filter((col) => {
           if (col.visibleAsColumn !== undefined) {
-            return col.visibleAsColumn && col.required;
-          } else return col.required;
+            return col.visibleAsColumn;
+          } else return true;
         })
       ),
       paginationModel: props.usePagination ? pagination : null,

@@ -33,7 +33,7 @@ export interface TableRow {
   filterInputType?: InputTypes;
   filterOptions?: SelectOption[];
   /**
-   * Used to indicate whether column is visible as a column or note
+   * Used to indicate whether column is visible as a column or not
    * irrespective of whether it is `required` or not.
    * This could be used for columns meant to appear for filtering only
    */
