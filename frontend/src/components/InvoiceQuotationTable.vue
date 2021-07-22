@@ -406,13 +406,13 @@
                 class="filled row items-center justify-end"
               >
                 <div v-if="col.name === 'total'">
-                  {{ useThousandSeparator(itemTotals?.[props.rowIndex] ?? 0) }}
+                  {{ finalNumberToString(itemTotals?.[props.rowIndex] ?? 0) }}
                 </div>
                 <div v-if="col.name === 'lineDiscount'">
                   {{
                     itemLineDiscounts?.[props.rowIndex] ?? -1 > 0
                       ? '- ' +
-                        useThousandSeparator(
+                        finalNumberToString(
                           Number(itemLineDiscounts?.[props.rowIndex] ?? 0)
                         )
                       : 0
@@ -458,12 +458,12 @@
                 :class="[col.inputClass]"
               >
                 {{
-                  useThousandSeparator(internalForm.items[props.rowIndex].qty)
+                  finalNumberToString(internalForm.items[props.rowIndex].qty)
                 }}
               </div>
               <div v-else>
                 <span class="text-bold">{{
-                  useThousandSeparator(internalForm.items[props.rowIndex].qty)
+                  finalNumberToString(internalForm.items[props.rowIndex].qty)
                 }}</span
                 >&nbsp;
                 <span>{{
@@ -471,7 +471,7 @@
                 }}</span>
                 of
                 <span class="text-bold">{{
-                  useThousandSeparator(
+                  finalNumberToString(
                     internalForm.items[props.rowIndex].groupQty
                   )
                 }}</span
@@ -483,7 +483,7 @@
               <div :class="[col.inputClass]">
                 {{
                   internalForm.items[props.rowIndex].unitPrice > 0
-                    ? useThousandSeparator(
+                    ? finalNumberToString(
                         internalForm.items[props.rowIndex].unitPrice
                       )
                     : 0
@@ -501,7 +501,7 @@
                 <span v-if="col.name === 'unitDiscount'">
                   {{
                     internalForm.items[props.rowIndex].unitDiscount > 0
-                      ? useThousandSeparator(
+                      ? finalNumberToString(
                           internalForm.items[props.rowIndex].unitDiscount
                         )
                       : 0
@@ -525,13 +525,13 @@
                 :class="[col.inputClass, col.name === 'total' && 'text-bold']"
               >
                 <span v-if="col.name === 'total'"
-                  >{{ useThousandSeparator(itemTotals?.[props.rowIndex] ?? 0) }}
+                  >{{ finalNumberToString(itemTotals?.[props.rowIndex] ?? 0) }}
                 </span>
                 <span v-if="col.name === 'lineDiscount'">
                   {{
                     (itemLineDiscounts?.[props.rowIndex] ?? 0) > 0
                       ? '- ' +
-                        useThousandSeparator(
+                        finalNumberToString(
                           itemLineDiscounts?.[props.rowIndex] ?? 0
                         )
                       : 0
@@ -653,7 +653,7 @@
               filled: !viewMode,
             }"
           >
-            <div>{{ useThousandSeparator(totalQuantities) }}</div>
+            <div>{{ finalNumberToString(totalQuantities) }}</div>
           </div>
         </q-td>
         <q-td class="text-right" :colspan="internalForm.showDiscounts ? 2 : 1">
@@ -672,7 +672,7 @@
             <div>
               {{
                 totalDiscounts > 0
-                  ? '- ' + useThousandSeparator(totalDiscounts)
+                  ? '- ' + finalNumberToString(totalDiscounts)
                   : 0
               }}
             </div>
@@ -702,7 +702,7 @@
               filled: !viewMode,
             }"
           >
-            <div>{{ useThousandSeparator(subTotal) }}</div>
+            <div>{{ finalNumberToString(subTotal) }}</div>
           </div>
         </q-td>
         <q-td v-if="!viewMode" auto-width> &nbsp; </q-td>
@@ -733,8 +733,8 @@
             <div>
               {{
                 additionalSubtotalDiscount > 0
-                  ? '- ' + useThousandSeparator(additionalSubtotalDiscount)
-                  : useThousandSeparator(additionalSubtotalDiscount)
+                  ? '- ' + finalNumberToString(additionalSubtotalDiscount)
+                  : finalNumberToString(additionalSubtotalDiscount)
               }}
             </div>
           </div>
@@ -789,7 +789,7 @@
             />
             <div v-else>
               {{
-                useThousandSeparator(internalForm.additionalFees[index].amount)
+                finalNumberToString(internalForm.additionalFees[index].amount)
               }}
             </div>
           </q-td>
@@ -837,7 +837,7 @@
               filled: !viewMode,
             }"
           >
-            <div>{{ useThousandSeparator(taxAmount) }}</div>
+            <div>{{ finalNumberToString(taxAmount) }}</div>
           </div>
         </q-td>
         <q-td v-if="!viewMode" auto-width> &nbsp; </q-td>
@@ -862,7 +862,7 @@
               filled: !viewMode,
             }"
           >
-            <div>{{ useThousandSeparator(grandTotal) }}</div>
+            <div>{{ finalNumberToString(grandTotal) }}</div>
           </div>
         </q-td>
         <q-td v-if="!viewMode" auto-width> &nbsp; </q-td>
@@ -1014,6 +1014,9 @@ export default defineComponent({
       },
       set: (value) => value,
     });
+
+    const finalNumberToString = (input: number) =>
+      useThousandSeparator(input, internalForm.value.numberOfDecimals);
 
     watch(
       internalForm,
@@ -1331,7 +1334,7 @@ export default defineComponent({
       removeAdditionalFee,
       isLastItem,
       collectionTypeOptions,
-      useThousandSeparator,
+      finalNumberToString,
       useSortable,
     };
   },
