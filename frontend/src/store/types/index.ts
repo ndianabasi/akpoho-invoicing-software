@@ -218,6 +218,7 @@ export type CurrentlyViewedCompany = {
   updated_at: string;
   slug: string;
   is_approved: string;
+  company_logo: FileMultiFormats;
 };
 
 interface CurrentCustomerBaseInterface {
@@ -462,6 +463,7 @@ export type InputComponentType =
   | 'time'
   | 'toggle'
   | 'editor'
+  | 'image_cropper'
   | 'none';
 
 export type InputComponentTypeVariant =

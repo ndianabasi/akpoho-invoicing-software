@@ -13,6 +13,16 @@
           @submit="onSubmit"
         >
           <template v-for="field in form">
+            <image-cropper
+              v-if="field.componentType === 'image_cropper'"
+              :key="`field_${field.name}_${field.componentType}`"
+              v-model="field.model"
+              :input-max-file-size="5 * 1048576"
+              input-class="col col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6"
+              :use-before-slot="false"
+              :input-label="field.label"
+            />
+            <!-- 5 MB max file size -->
             <q-toggle
               v-if="field.componentType === 'toggle' && field.isVisible"
               :key="`field_${field.name}_${field.componentType}`"
@@ -196,7 +206,6 @@ import {
   CurrentlyViewedCompany,
   PERMISSION,
   TitleInfo,
-  CompanyFormShape,
   FormSchema,
   CompanyFormShapeRaw,
   SelectOption,
@@ -209,6 +218,9 @@ import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import { phoneNumberRegex } from '../../../helpers/utils';
 import { isEqual } from 'lodash';
+import ImageCropper from '../../../components/ImageCropper.vue';
+import useFormData, { RawObject } from '../../../composables/useFormData';
+import MultiFormatPicture from '../../../helpers/MultiFormatPicture';
 
 export default defineComponent({
   name: 'EditCompany',
@@ -216,6 +228,7 @@ export default defineComponent({
   components: {
     ViewCard,
     QuasarSelect,
+    ImageCropper,
   },
 
   props: {
@@ -240,6 +253,7 @@ export default defineComponent({
     const router = useRouter();
     const $q = useQuasar();
     const loading = ref(false);
+    const logo: Ref<File | null> = ref(null);
 
     const stopFetchCountriesForSelect = watchEffect(() => {
       void store.dispatch('countries_states/FETCH_COUNTRIES_FOR_SELECT');
@@ -361,9 +375,16 @@ export default defineComponent({
         componentType: 'toggle',
         label: 'Create as Personal Brand',
         default: false,
-        isVisible: true,
+        isVisible: computed(() => props.creationMode),
         overrideClasses: true,
         classes: 'col col-12',
+      },
+      logo: {
+        model: logo,
+        name: 'logo',
+        componentType: 'image_cropper',
+        label: 'Company Logo',
+        isVisible: true,
       },
       name: {
         model: name,
@@ -405,6 +426,17 @@ export default defineComponent({
         autocomplete: 'work street-address',
         isVisible: true,
       },
+      size: {
+        model: size,
+        name: 'size',
+        componentType: 'select',
+        label: 'Company Size',
+        default: null,
+        isVisible: true,
+        options: companySizes,
+        overrideClasses: true,
+        classes: 'col col-xs-12 col-sm-4 col-md-3 col-lg-3 col-xl-3',
+      },
       city: {
         model: city,
         name: 'city',
@@ -414,15 +446,8 @@ export default defineComponent({
         default: '',
         autocomplete: 'work address-level2',
         isVisible: true,
-      },
-      size: {
-        model: size,
-        name: 'size',
-        componentType: 'select',
-        label: 'Company Size',
-        default: null,
-        isVisible: true,
-        options: companySizes,
+        overrideClasses: true,
+        classes: 'col col-3',
       },
       countryId: {
         model: countryId,
@@ -433,6 +458,8 @@ export default defineComponent({
         autocomplete: 'work country-name',
         isVisible: true,
         options: countries,
+        overrideClasses: true,
+        classes: 'col col-xs-12 col-sm-4 col-md-3 col-lg-3 col-xl-3',
       },
       stateId: {
         model: stateId,
@@ -443,6 +470,8 @@ export default defineComponent({
         autocomplete: 'work address-level1',
         isVisible: true,
         options: countryStates,
+        overrideClasses: true,
+        classes: 'col col-xs-12 col-sm-4 col-md-3 col-lg-3 col-xl-3',
       },
       website: {
         model: website,
@@ -480,8 +509,14 @@ export default defineComponent({
           stateId: stateId?.value,
           countryId: countryId?.value,
           ...restOfForm,
+          logo: logo.value,
         };
       });
+
+      const getFormData = computed(() =>
+        useFormData(processedForm.value as RawObject)
+      );
+      console.log(getFormData.value);
 
       void nextTick(() => {
         const isCreationMode = props.creationMode;
@@ -489,8 +524,8 @@ export default defineComponent({
           .dispatch(
             `companies/${isCreationMode ? 'CREATE_COMPANY' : 'EDIT_COMPANY'}`,
             isCreationMode
-              ? processedForm.value
-              : { form: processedForm.value, companyId: props.companyId }
+              ? getFormData.value
+              : { form: getFormData.value, companyId: props.companyId }
           )
           .then((id: string) => {
             companyCreated.value = true;
@@ -517,7 +552,10 @@ export default defineComponent({
           currentCompany && currentCompany.value
             ? useTitleInfo({
                 title: currentCompany.value.name ?? '',
-                avatar: undefined,
+                avatar: currentCompany.value?.company_logo
+                  ? new MultiFormatPicture(currentCompany.value?.company_logo)
+                      .avatarImageUrl
+                  : undefined,
               })
             : props.creationMode
             ? useTitleInfo({

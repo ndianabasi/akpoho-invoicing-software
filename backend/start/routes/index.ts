@@ -83,7 +83,7 @@ Route.group(() => {
   // Get a specific company
   Route.get('/companies/:company_id', 'CompaniesController.show')
   // Edit a specific company
-  Route.patch('/companies/:company_id', 'CompaniesController.update')
+  Route.patch('/companies/:company_id', 'CompaniesController.store')
   // Delete a specific company
   Route.delete('/companies/:company_id', 'CompaniesController.destroy')
 

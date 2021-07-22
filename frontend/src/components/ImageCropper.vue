@@ -169,10 +169,15 @@ import 'cropperjs/dist/cropper.css';
 import { debounce } from 'lodash';
 import { DateTime } from 'luxon';
 import fileSize from 'filesize';
+import { snakeCase } from 'lodash';
 
 export default defineComponent({
   components: {},
   props: {
+    modelValue: {
+      type: File,
+      default: () => null,
+    },
     show: {
       type: Boolean,
       default: false,
@@ -188,10 +193,6 @@ export default defineComponent({
     inputLabel: {
       type: String,
       default: 'Profile Picture',
-    },
-    inputFor: {
-      type: String,
-      default: 'profile_picture',
     },
     inputCounter: {
       type: Boolean,
@@ -223,7 +224,7 @@ export default defineComponent({
       required: false,
     },
   },
-  emits: ['finish-cropper'],
+  emits: ['finish-cropper', 'update:modelValue'],
   setup(props, ctx) {
     const launchDialogRef: Ref<QDialog | null> = ref(null);
     const previewDialogRef: Ref<QDialog | null> = ref(null);
@@ -340,7 +341,7 @@ export default defineComponent({
         if (blob) {
           const file = new File(
             [blob],
-            `${props.inputFor}_${DateTime.now().toMillis()}`,
+            `${snakeCase(props.inputLabel)}_${DateTime.now().toMillis()}`,
             {
               lastModified: DateTime.now().toMillis(),
               type: blob.type,
@@ -351,6 +352,8 @@ export default defineComponent({
             ctx.emit('finish-cropper', {
               file: file,
             });
+
+            ctx.emit('update:modelValue', file);
           });
         }
       }, 'image/png');
@@ -389,7 +392,7 @@ export default defineComponent({
         stackLabel: previewCropped.value ? true : false,
         bottomSlots: props.inputBottomSlots,
         label: props.inputLabel,
-        for: props.inputFor,
+        for: snakeCase(props.inputLabel),
         counter: props.inputCounter,
         clearable: props.inputClearable,
         useChips: props.inputUseChips,

@@ -4,18 +4,19 @@ import {
   belongsTo,
   column,
   BelongsTo,
-  hasOne,
-  HasOne,
   beforeSave,
   afterFind,
   afterFetch,
   manyToMany,
   ManyToMany,
+  hasMany,
+  HasMany,
 } from '@ioc:Adonis/Lucid/Orm'
 import FileProvider from 'App/Models/FileProvider'
 import UserProfile from 'App/Models/UserProfile'
 import { TIMEZONE_DATE_TIME_FORMAT } from 'App/Helpers/utils'
 import InvoiceQuotationItem from './InvoiceQuotationItem'
+import Company from './Company'
 
 export type FormatAttributes = {
   name: string
@@ -122,8 +123,17 @@ export default class UploadedFile extends BaseModel {
   @belongsTo(() => FileProvider)
   public provider: BelongsTo<typeof FileProvider>
 
-  @hasOne(() => UserProfile, { foreignKey: 'profilePicture' })
-  public profilePicture: HasOne<typeof UserProfile>
+  @hasMany(() => UserProfile, {
+    foreignKey: 'profilePicture',
+    onQuery: (query) => query.where('usage_type', 'user_profile_picture'),
+  })
+  public userProfilePictures: HasMany<typeof UserProfile>
+
+  @hasMany(() => Company, {
+    foreignKey: 'logo',
+    onQuery: (query) => query.where('usage_type', 'company_logo'),
+  })
+  public companyLogos: HasMany<typeof Company>
 
   @manyToMany(() => InvoiceQuotationItem, {
     pivotTable: 'invoices_quotations_items_files',

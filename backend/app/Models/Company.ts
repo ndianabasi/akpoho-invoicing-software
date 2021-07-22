@@ -67,7 +67,7 @@ export default class Company extends BaseModel {
   public companySizeId: number
 
   @column()
-  public profilePicture: string
+  public logo: number
 
   @column()
   public website: string
@@ -116,6 +116,10 @@ export default class Company extends BaseModel {
   @hasMany(() => Customer)
   public customers: HasMany<typeof Customer>
 
+  /**
+   * Very important. Used for relating uploaded files
+   * to a company
+   */
   @hasMany(() => UploadedFile)
   public uploadFiles: HasMany<typeof UploadedFile>
 
@@ -162,4 +166,7 @@ export default class Company extends BaseModel {
     },
   })
   public invoices: HasMany<typeof InvoiceQuotation>
+
+  @belongsTo(() => UploadedFile, { foreignKey: 'logo', serializeAs: 'company_logo' })
+  public companyLogo: BelongsTo<typeof UploadedFile>
 }

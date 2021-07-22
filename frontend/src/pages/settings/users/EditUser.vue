@@ -238,12 +238,12 @@ import {
   computed,
   Ref,
   reactive,
-  ComputedRef,
 } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, email, helpers } from '@vuelidate/validators';
 import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
+import useFormData, { RawObject } from '../../../composables/useFormData';
 import { store } from '../../../store';
 import useResourcePermissions from '../../../composables/useResourcePermissions';
 import {
@@ -259,6 +259,7 @@ import QuasarSelect from '../../../components/QuasarSelect';
 /* import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup'; */
 import ImageCropper from '../../../components/ImageCropper.vue';
+import MultiFormatPicture from '../../../helpers/MultiFormatPicture';
 
 export default defineComponent({
   name: 'EditUser',
@@ -327,24 +328,9 @@ export default defineComponent({
       };
     });
 
-    const getFormData: ComputedRef<FormData> = computed(() => {
-      const formData = new FormData();
-
-      for (const key in processedForm.value) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const value = processedForm.value[key];
-        if (key === 'profile_picture' && value !== null) {
-          formData.append(
-            'profile_picture',
-            processedForm.value.profile_picture as Blob
-          );
-        } else {
-          formData.append(key, value as string);
-        }
-      }
-
-      return formData;
-    });
+    const getFormData = computed(() =>
+      useFormData(processedForm.value as RawObject)
+    );
 
     const rules = {
       first_name: {
@@ -365,6 +351,7 @@ export default defineComponent({
     function submitForm() {
       if (!form$.value.$invalid) {
         submitting.value = true;
+        console.log(getFormData.value);
 
         if (!props.creationMode) {
           void store
@@ -485,11 +472,10 @@ export default defineComponent({
                 title: `${currentUser.value.profile?.first_name ?? ''} ${
                   currentUser.value.profile?.last_name ?? ''
                 }`,
-                avatar:
-                  profilePictureFileBase?.formats?.thumbnail?.url ??
-                  profilePictureFileBase?.formats?.small?.url ??
-                  profilePictureFileBase?.url ??
-                  '',
+                avatar: profilePictureFileBase
+                  ? new MultiFormatPicture(profilePictureFileBase)
+                      .avatarImageUrl
+                  : undefined,
               })
             : props.creationMode
             ? useTitleInfo({

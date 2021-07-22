@@ -5,7 +5,7 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { CompanyStateInterface } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpResponse, HttpError, CompanyFormShape } from '../types';
+import { HttpResponse, HttpError } from '../types';
 import { PaginationParams } from '../../types/table';
 import { Notify } from 'quasar';
 
@@ -68,10 +68,14 @@ const actions: ActionTree<CompanyStateInterface, StateInterface> = {
     });
   },
 
-  async CREATE_COMPANY(ctx, form: CompanyFormShape) {
+  async CREATE_COMPANY(ctx, form: FormData) {
     return new Promise(async (resolve, reject) => {
       await $http
-        .post('/companies', { ...form })
+        .post('/companies', form, {
+          headers: {
+            'Content-type': 'multipart/form-data',
+          },
+        })
         .then((res: HttpResponse) => {
           Notify.create({
             message: 'Company was successfully created',
@@ -97,11 +101,15 @@ const actions: ActionTree<CompanyStateInterface, StateInterface> = {
 
   async EDIT_COMPANY(
     ctx,
-    { companyId, form }: { companyId: string; form: CompanyFormShape }
+    { companyId, form }: { companyId: string; form: FormData }
   ) {
     return new Promise(async (resolve, reject) => {
       await $http
-        .patch(`/companies/${companyId}`, { ...form })
+        .patch(`/companies/${companyId}`, form, {
+          headers: {
+            'Content-type': 'multipart/form-data',
+          },
+        })
         .then((res: HttpResponse) => {
           Notify.create({
             message: 'Company was successfully edited',

@@ -96,11 +96,13 @@ import useDeleteResource from '../../../composables/useDeleteResource';
 import {
   CurrentlyViewedCompany,
   PERMISSION,
+  ResolvedProfilePictureUrls,
   TitleInfo,
 } from '../../../store/types';
 import { store } from '../../../store';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import MultiFormatPicture from '../../../helpers/MultiFormatPicture';
 
 export default defineComponent({
   name: 'ViewCompany',
@@ -131,12 +133,22 @@ export default defineComponent({
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
 
+    const companyLogo = computed(
+      () =>
+        store.getters[
+          'companies/GET_COMPANY_LOGO'
+        ] as ResolvedProfilePictureUrls
+    );
+
     watch(
       currentCompany,
       () => {
         const title = useTitleInfo({
           title: currentCompany?.value?.name ?? '',
-          avatar: undefined,
+          avatar: currentCompany.value?.company_logo
+            ? new MultiFormatPicture(currentCompany.value?.company_logo)
+                .avatarImageUrl
+            : undefined,
         });
 
         titleInfo.value = title.value;

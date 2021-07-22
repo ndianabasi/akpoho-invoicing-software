@@ -53,10 +53,13 @@ class FileDeletionHelper {
         await fs.unlink(originalFilePath)
 
         // 2. Delete each file format
-        for (let i = 0; i < Object.keys(fileFormats).length; i++) {
-          const format = Object.values(fileFormats)[i]
-          const formatPath = this.getFilePath(`${this.UPLOAD_DIR_PREFIX}/${format.url}`)
-          await fs.unlink(formatPath)
+        const fileFormatKeys = fileFormats ? Object.keys(fileFormats) : []
+        if (fileFormatKeys.length) {
+          for (let i = 0; i < fileFormatKeys.length; i++) {
+            const format = Object.values(fileFormats)[i]
+            const formatPath = this.getFilePath(`${this.UPLOAD_DIR_PREFIX}/${format.url}`)
+            await fs.unlink(formatPath)
+          }
         }
       }
 

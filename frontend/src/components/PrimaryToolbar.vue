@@ -111,7 +111,7 @@
           "
           size="26px"
         >
-          <img v-if="userHasProfilePicture" :src="resolvedProfilePictureUrl" />
+          <img v-if="userHasProfilePicture" :src="userHasProfilePicture" />
           <template v-else>
             {{ getUserInitials }}
           </template>
@@ -122,15 +122,15 @@
             <div class="col-12 column items-center q-px-md">
               <q-avatar
                 v-bind="
-                  authUserProfilePicture?.small ?? false
+                  userHasProfilePicture
                     ? {}
                     : { color: 'accent', textColor: 'grey-3' }
                 "
                 size="72px"
               >
                 <img
-                  v-if="authUserProfilePicture?.small ?? false"
-                  :src="authUserProfilePicture?.small"
+                  v-if="userHasProfilePicture"
+                  :src="userHasProfilePicture"
                 />
                 <template v-else>
                   {{ getUserInitials }}
@@ -257,26 +257,8 @@ export default defineComponent({
       'auth/GET_USER_SUMMARY'
     ] as UserProfileSummary;
 
-    const authUserProfilePicture = computed(
-      () =>
-        store.getters[
-          'auth/GET_AUTH_USER_PROFILE_PICTURE'
-        ] as ResolvedProfilePictureUrls
-    );
-
-    const userHasProfilePicture = computed(() => {
-      return (
-        !!authUserProfilePicture.value?.thumbnail ||
-        !!authUserProfilePicture.value?.small ||
-        !!authUserProfilePicture.value?.original
-      );
-    });
-
-    const resolvedProfilePictureUrl = computed(
-      () =>
-        authUserProfilePicture.value?.thumbnail ??
-        authUserProfilePicture.value?.small ??
-        authUserProfilePicture.value?.original
+    const userHasProfilePicture = computed(
+      () => store.getters['auth/GET_AUTH_USER_PROFILE_PICTURE'] as string
     );
 
     const authRole = store.getters[
@@ -298,13 +280,11 @@ export default defineComponent({
       authRole: ref(authRole),
       toggleDarkMode,
       isDarkModeActive,
-      authUserProfilePicture,
       getUserInitials: computed(() => {
         const [firstName, lastName] = userFullName.split(' ');
         return firstName[0] + lastName?.[0] ?? firstName[1];
       }),
       userHasProfilePicture,
-      resolvedProfilePictureUrl,
     };
   },
 });

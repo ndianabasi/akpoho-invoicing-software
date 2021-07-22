@@ -6,6 +6,12 @@ import { CACHE_TAGS } from 'Contracts/cache'
 import Logger from '@ioc:Adonis/Core/Logger'
 import Company from 'App/Models/Company'
 import Database from '@ioc:Adonis/Lucid/Database'
+import Application from '@ioc:Adonis/Core/Application'
+import { DateTime } from 'luxon'
+import { snakeCase } from 'lodash'
+import { AttachedFile, FileData } from 'types/file'
+import FileUploadHelper from 'App/Helpers/FileUploadHelper'
+import FileDeletionHelper from 'App/Helpers/FileDeletionHelper'
 
 export default class CompaniesController {
   public async index({ response, auth, request, bouncer }: HttpContextContract) {
@@ -113,7 +119,7 @@ export default class CompaniesController {
     }
   }
 
-  public async store({ response, request, bouncer, auth }: HttpContextContract) {
+  public async store({ response, request, bouncer, auth, requestedCompany }: HttpContextContract) {
     const {
       isPersonalBrand,
       name,
@@ -125,25 +131,109 @@ export default class CompaniesController {
       stateId,
       countryId,
       website,
+      logo,
     } = await request.validate(CompanyValidator)
 
+    const requestMethod = request.method()
     const user = auth.user
+    let companyModel: Company | undefined
 
     if (user) {
-      await bouncer.with('CompanyPolicy').authorize('create')
+      if (requestMethod === 'POST') {
+        await bouncer.with('CompanyPolicy').authorize('create')
 
-      const newCompany = await user?.related('companies').create({
-        name,
-        email,
-        phoneNumber,
-        address,
-        city,
-        companySizeId: size,
-        stateId,
-        countryId,
-        website,
-        type: isPersonalBrand ? 'personal' : 'corporate',
-      })
+        companyModel = await user?.related('companies').create({
+          name,
+          email,
+          phoneNumber,
+          address,
+          city,
+          companySizeId: size,
+          stateId,
+          countryId,
+          website,
+          type: isPersonalBrand ? 'personal' : 'corporate',
+        })
+      } else if (requestMethod === 'PATCH') {
+        companyModel = requestedCompany
+        await bouncer.with('CompanyPolicy').authorize('edit', companyModel!)
+
+        companyModel?.merge({
+          name,
+          email,
+          phoneNumber,
+          address,
+          city,
+          companySizeId: size,
+          stateId,
+          countryId,
+          website,
+          type: isPersonalBrand ? 'personal' : 'corporate',
+        })
+        await companyModel?.save()
+      }
+
+      await companyModel?.refresh()
+      // Check if company already has a logo
+      const oldLogo = companyModel?.logo
+      const hasOldLogo = !!oldLogo
+
+      // Process uploaded file (if any)
+      if (logo) {
+        const companyName = companyModel?.name!
+        const firstLetter = companyName.charAt(0)
+        const secondLetter = companyName.charAt(1)
+        const finalUploadDir = `uploads/company_logos/${firstLetter}/${secondLetter}`.toLowerCase()
+
+        const fileName = `${snakeCase(companyName)}_${DateTime.now().toMillis()}`.toLowerCase()
+        await logo.move(Application.tmpPath('uploads/company_logos/'), {
+          name: `${fileName}.${logo.extname}`,
+          overwrite: true,
+        })
+
+        // Generate file formats using sharp and persist them
+        const fileObject: AttachedFile = {
+          filePath: logo.filePath,
+          name: fileName,
+          type: logo.type!,
+          size: logo.size!,
+        }
+
+        const mime = logo.type + '/' + logo.subtype
+
+        const fileData: FileData = {
+          data: {
+            fileInfo: {
+              ext: '',
+              hash: '',
+              mime,
+              size: fileObject.size,
+              alternativeText: '',
+              caption: '',
+              name: fileObject.name,
+              path: fileObject.filePath,
+            },
+          },
+          files: logo,
+        }
+
+        const fileUploadHelper = new FileUploadHelper(
+          fileData,
+          finalUploadDir,
+          'local',
+          'company_logo'
+        )
+        await fileUploadHelper.upload().then(async (uploadedFileModel) => {
+          // Associate company with the uploaded file
+          companyModel?.merge({ logo: uploadedFileModel?.id })
+          await companyModel?.save()
+        })
+
+        if (hasOldLogo) {
+          // Delete old profile picture
+          await new FileDeletionHelper(oldLogo!).delete()
+        }
+      }
 
       // Clear the user's entire cache
       const userCompaniesTags = await new UserServices({ id: user.id }).getCompaniesCacheTags()
@@ -155,7 +245,7 @@ export default class CompaniesController {
       ]
       await CacheHelper.flushTags(sets)
 
-      return response.created({ data: newCompany?.id })
+      return response.created({ data: companyModel?.id })
     } else return response.abort({ message: 'User not found' })
   }
 
@@ -165,72 +255,37 @@ export default class CompaniesController {
       await bouncer.with('CompanyPolicy').authorize('view', requestedCompany)
 
       const company = await Company.query()
-        .select(
-          'id',
-          'name',
-          'phone_number',
-          'address',
-          'is_approved',
-          'approved_at',
-          'city',
-          'created_at',
-          'email',
-          'updated_at',
-          'slug',
-          'type',
-          'website',
-          'company_size_id',
-          'country_id',
-          'state_id'
-        )
         .where('id', requestedCompany.id)
         .preload('companySize', (query) => query.select('id', 'size'))
         .preload('country', (query) => query.select('id', 'name'))
         .preload('state', (query) => query.select('id', 'name'))
+        .preload('companyLogo', (fileQuery) => fileQuery.select('formats', 'url'))
         .first()
 
-      return response.ok({ data: company })
+      const serialisedCompany = company?.serialize({
+        fields: {
+          pick: [
+            'id',
+            'name',
+            'phone_number',
+            'address',
+            'is_approved',
+            'approved_at',
+            'city',
+            'created_at',
+            'email',
+            'updated_at',
+            'slug',
+            'type',
+            'website',
+          ],
+        },
+      })
+
+      return response.ok({ data: serialisedCompany })
     } else {
       Logger.warn('Requested company not found at CompaniesController.show')
     }
-  }
-
-  public async update({ response, request, requestedCompany, bouncer, auth }: HttpContextContract) {
-    const {
-      isPersonalBrand,
-      name,
-      email,
-      phoneNumber,
-      address,
-      city,
-      size,
-      stateId,
-      countryId,
-      website,
-    } = await request.validate(CompanyValidator)
-
-    await bouncer.with('CompanyPolicy').authorize('create')
-
-    requestedCompany?.merge({
-      name,
-      email,
-      phoneNumber,
-      address,
-      city,
-      companySizeId: size,
-      stateId,
-      countryId,
-      website,
-      type: isPersonalBrand ? 'personal' : 'corporate',
-    })
-    await requestedCompany?.save()
-
-    // Clear the company's entire cache
-    const userCompaniesTags = await new UserServices({ id: auth?.user?.id }).getCompaniesCacheTags()
-    const sets = [...userCompaniesTags]
-    await CacheHelper.flushTags(sets)
-
-    return response.created({ data: requestedCompany?.id })
   }
 
   public async destroy({
