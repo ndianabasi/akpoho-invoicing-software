@@ -19,9 +19,11 @@ export default class MultiFormatPicture {
     } = { thumbnail: undefined, small: undefined, original: undefined };
 
     if (this.imageBase) {
-      profilePictureFormat.thumbnail = this.imageBase?.formats?.thumbnail?.url;
-      profilePictureFormat.small = this.imageBase?.formats?.small?.url;
-      profilePictureFormat.original = this.imageBase?.url;
+      profilePictureFormat.thumbnail =
+        this.imageBase?.formats?.thumbnail?.url ?? undefined;
+      profilePictureFormat.small =
+        this.imageBase?.formats?.small?.url ?? undefined;
+      profilePictureFormat.original = this.imageBase?.url ?? undefined;
     }
 
     return {

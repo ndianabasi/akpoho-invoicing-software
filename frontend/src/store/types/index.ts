@@ -400,6 +400,28 @@ export interface CompanyFormShapeRaw extends CompanyFormShapeContract {
   countryId: SelectOption | null;
 }
 
+export type CompanyType = 'personal' | 'corporate';
+
+export interface CompaniesIndexResultInterface {
+  address: string | null;
+  approved_at: string | null;
+  city: string | null;
+  company_size: string;
+  country: string;
+  created_at: string;
+  email: string | null;
+  id: string;
+  is_approved: number;
+  logo_formats: string | null;
+  logo_url: string | null;
+  name: string;
+  phone_number: string | null;
+  state: string;
+  type: CompanyType;
+  updated_at: string;
+  website: string | null;
+}
+
 export enum PERMISSION {
   CAN_LIST_USERS = 'can_list_users',
   CAN_CREATE_USERS = 'can_create_users',
@@ -434,8 +456,8 @@ export interface FileMultiFormats {
     large?: FileFormatAttributes;
     medium?: FileFormatAttributes;
     small?: FileFormatAttributes;
-  };
-  url: string;
+  } | null;
+  url: string | null;
 }
 
 export interface ResolvedProfilePictureUrls {

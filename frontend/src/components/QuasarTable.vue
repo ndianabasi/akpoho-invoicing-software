@@ -235,6 +235,7 @@
           }"
         >
           <q-tr :props="props">
+            <!-- Show expanded row toggle starts -->
             <q-td v-if="showExpandedRow" auto-width>
               <q-btn
                 size="sm"
@@ -245,11 +246,24 @@
                 @click="props.expand = !props.expand"
               />
             </q-td>
+            <!-- Show expanded row toggle ends-->
+            <!-- Show selection checkbox starts -->
             <q-td v-if="showSelections" auto-width>
               <q-checkbox v-model="props.selected" />
             </q-td>
+            <!-- Show selection checkbox ends -->
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              {{ col.value }}
+              <template v-if="col.name === 'display_image'">
+                <q-avatar v-if="col.value">
+                  <img :src="col.value" />
+                </q-avatar>
+                <q-avatar v-else color="accent" text-color="white"
+                  >AIS</q-avatar
+                >
+              </template>
+              <template v-else>
+                {{ col.value }}
+              </template>
             </q-td>
             <q-td v-if="showActions_">
               <q-btn-dropdown

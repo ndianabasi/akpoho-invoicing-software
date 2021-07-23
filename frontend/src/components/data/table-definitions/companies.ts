@@ -1,17 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { computed, watchEffect, onBeforeUnmount } from 'vue';
 import { store } from 'src/store';
-import { SelectOption } from 'src/store/types';
+import {
+  CompaniesIndexResultInterface,
+  FileMultiFormats,
+  SelectOption,
+} from 'src/store/types';
 import { TableRow } from '../../../types/table';
+import MultiFormatPicture from 'src/helpers/MultiFormatPicture';
 
 interface CompanyHeaders extends TableRow {
   name: CompanyColumns;
-  field: CompanyColumns;
+  field: CompanyColumns | ((row: CompaniesIndexResultInterface) => unknown);
 }
 
 enum CompanyColumns {
   id = 'id',
   email = 'email',
+  display_image = 'display_image', // a generic column name for profile pictures, logos, etc
   name = 'name',
   phone_number = 'phone_number',
   address = 'address',
@@ -44,6 +50,27 @@ const columns: CompanyHeaders[] = [
     field: CompanyColumns.id,
     filterable: true,
     filterInputType: 'text',
+  },
+  {
+    name: CompanyColumns.display_image,
+    required: true,
+    label: 'Logo',
+    align: 'center',
+    sortable: false,
+    filterable: false,
+    field: (row: CompaniesIndexResultInterface) => row, // This becomes value for `format` property
+    format: (val: CompaniesIndexResultInterface): string | null => {
+      const imageBase: FileMultiFormats = {
+        url: val.logo_url,
+        formats:
+          typeof val?.logo_formats && val?.logo_formats === 'string'
+            ? (JSON.parse(
+                val?.logo_formats ?? ''
+              ) as FileMultiFormats['formats'])
+            : null,
+      };
+      return new MultiFormatPicture(imageBase).avatarImageUrl;
+    },
   },
   {
     name: CompanyColumns.name,

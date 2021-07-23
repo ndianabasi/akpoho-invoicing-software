@@ -63,12 +63,13 @@ export default class CompaniesController {
           'companies.created_at',
           'companies.email',
           'companies.updated_at',
-          'companies.slug',
           'companies.type',
           'companies.website',
           'countries.name as country',
           'states.name as state',
-          'company_sizes.size as company_size'
+          'company_sizes.size as company_size',
+          'uploaded_files.url as logo_url',
+          'uploaded_files.formats as logo_formats'
         )
         .leftJoin('company_user', (query) =>
           query.on('company_user.company_id', '=', 'companies.id')
@@ -79,6 +80,7 @@ export default class CompaniesController {
         )
         .leftJoin('countries', (query) => query.on('countries.id', '=', 'companies.country_id'))
         .leftJoin('states', (query) => query.on('states.id', '=', 'companies.state_id'))
+        .leftJoin('uploaded_files', (query) => query.on('uploaded_files.id', '=', 'companies.logo'))
 
       if (sortBy) {
         subquery = subquery.orderBy(sortBy, descending === 'true' ? 'desc' : 'asc')
