@@ -81,20 +81,26 @@ export const getCurrentInvoiceQuotationData = computed(
         form.code = currentInvoiceQuotationDataNormalised.code;
 
         form.customerId = {
-          label: currentInvoiceQuotationDataNormalised.customer.customer_name,
-          value: currentInvoiceQuotationDataNormalised.customer.id,
+          label:
+            currentInvoiceQuotationDataNormalised?.customer?.customer_name ??
+            '',
+          value: currentInvoiceQuotationDataNormalised?.customer?.id ?? '',
         };
 
         form.customerBillingAddressId = {
           label:
-            currentInvoiceQuotationDataNormalised.billing_address.full_address,
-          value: currentInvoiceQuotationDataNormalised.billing_address.id,
+            currentInvoiceQuotationDataNormalised?.billing_address
+              ?.full_address ?? '',
+          value:
+            currentInvoiceQuotationDataNormalised?.billing_address?.id ?? '',
         };
 
         form.customerShippingAddressId = {
           label:
-            currentInvoiceQuotationDataNormalised.shipping_address.full_address,
-          value: currentInvoiceQuotationDataNormalised.shipping_address.id,
+            currentInvoiceQuotationDataNormalised?.shipping_address
+              ?.full_address ?? '',
+          value:
+            currentInvoiceQuotationDataNormalised?.shipping_address?.id ?? '',
         };
 
         form.introduction =

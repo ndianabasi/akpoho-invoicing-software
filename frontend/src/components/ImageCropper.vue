@@ -43,7 +43,8 @@
       class="cropper-wrapper"
       :style="{
         width: $q.screen.lt.md ? '90vw' : '900px',
-        maxWidth: $q.screen.lt.md ? '95vw' : '80vw',
+        maxWidth: $q.screen.lt.md ? '95vw' : '90vw',
+        maxHeight: '85vh',
       }"
     >
       <div class="row">
@@ -98,6 +99,38 @@
                 label="Zoom Out"
                 size="sm"
                 @click.prevent="zoomOut"
+              />
+              <q-btn
+                flat
+                color="primary"
+                icon="swap_horiz"
+                label="Flip Horizontal"
+                size="sm"
+                @click.prevent="flipX"
+              />
+              <q-btn
+                flat
+                color="primary"
+                icon="swap_vert"
+                label="Flip Vertical"
+                size="sm"
+                @click.prevent="flipY"
+              />
+              <q-btn
+                flat
+                color="primary"
+                icon="crop_free"
+                label="Free Crop"
+                size="sm"
+                @click.prevent="cropFree"
+              />
+              <q-btn
+                flat
+                color="primary"
+                icon="crop_square"
+                label="Square Crop"
+                size="sm"
+                @click.prevent="cropSquare"
               />
             </q-card-actions>
           </q-card-section>
@@ -238,6 +271,8 @@ export default defineComponent({
     const sourceRef: Ref<HTMLImageElement | null> = ref(null);
     const previewRef: Ref<HTMLImageElement | null> = ref(null);
     const $q = useQuasar();
+    const flipXState = ref(1);
+    const flipYState = ref(1);
 
     const maxFileSize = computed(() => {
       const size = fileSize(props.inputMaxFileSize, {
@@ -278,6 +313,28 @@ export default defineComponent({
       cropper.value?.zoom(-0.1);
     };
 
+    const flipX = function () {
+      flipXState.value *= -1;
+      cropper.value?.scaleX(flipXState.value);
+    };
+
+    const flipY = function () {
+      flipYState.value *= -1;
+      cropper.value?.scaleY(flipYState.value);
+    };
+
+    const cropFree = function () {
+      cropper.value?.setAspectRatio(NaN);
+    };
+
+    const cropSquare = function () {
+      cropper.value?.setAspectRatio(1);
+    };
+
+    const resetCropper = function () {
+      cropper.value?.reset();
+    };
+
     const setupCropper = function (file: File) {
       if (cropper.value) {
         cropper.value?.destroy();
@@ -301,9 +358,9 @@ export default defineComponent({
     const setupCropperInstance = function () {
       if (sourceRef.value) {
         cropper.value = new Cropper(sourceRef.value, {
-          aspectRatio: 1,
           autoCropArea: 1,
           crop: debouncedUpdatePreview,
+          movable: false,
         });
       }
     };
@@ -363,11 +420,6 @@ export default defineComponent({
       });
     };
 
-    const resetCropper = function () {
-      cropper.value = null;
-      previewCropped.value = null;
-    };
-
     const showRejectionDialog = function (
       event: Array<{ failedPropValidation: string; file: File }>
     ) {
@@ -408,6 +460,10 @@ export default defineComponent({
       rotateRight,
       zoomIn,
       zoomOut,
+      flipX,
+      flipY,
+      cropFree,
+      cropSquare,
       sourceRef,
       previewRef,
       finishCrop,
@@ -436,7 +492,7 @@ export default defineComponent({
   }
 
   .image-source {
-    max-height: 50vh;
+    max-height: 60vh;
   }
 
   /* .image-source .cropper-preview,
@@ -445,7 +501,7 @@ export default defineComponent({
   } */
 
   .cropper-container {
-    max-height: 50% !important;
+    max-height: 60% !important;
   }
 }
 </style>
