@@ -4,7 +4,7 @@ import { store } from '../store';
 
 export default class MultiFormatPicture {
   private rootUrl: string;
-  constructor(private imageBase: FileMultiFormats) {
+  constructor(private imageBase?: FileMultiFormats) {
     this.imageBase = imageBase;
     this.rootUrl = store.getters['getRootURL'] as string;
   }

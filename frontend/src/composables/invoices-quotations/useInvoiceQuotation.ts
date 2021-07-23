@@ -11,6 +11,7 @@ import {
 import { computed, ref } from 'vue';
 import { store } from '../../store';
 import { DateTime } from 'luxon';
+import MultiFormatPicture from 'src/helpers/MultiFormatPicture';
 
 export const currentInvoiceQuotation = computed({
   get: () =>
@@ -379,24 +380,6 @@ export const getCustomerInformation = function (
       : '';
   const documentNotes =
     data.notes && data.notes !== 'undefined' ? data.notes : '';
-  const documentCompany = {
-    name: data.company.name,
-    fullAddress: `${data.company?.address ?? ''}${
-      data.company?.city
-        ? ' ' + data.company?.city + `${data.company.state?.name ? ',' : ''}`
-        : ''
-    }${
-      data.company.state?.name
-        ? ' ' +
-          data.company.state?.name +
-          `${data.company.country?.name ? ',' : ''}`
-        : ''
-    }${
-      data.company.country?.name ? ' ' + data.company.country?.name : ''
-    }`.trim(),
-    phoneNumber: data.company?.phone_number,
-    email: data.company.email,
-  };
 
   return {
     isCorporateCustomer,
@@ -413,6 +396,33 @@ export const getCustomerInformation = function (
     documentTitle,
     documentIntroduction,
     documentNotes,
-    documentCompany,
   };
+};
+
+export const getCompanyInformation = function (
+  data: CurrentlyViewedInvoiceQuotation
+) {
+  const documentCompany = {
+    name: data.company.name,
+    logoInitials: data.company.name.slice(0, 3).toLocaleUpperCase(),
+    fullAddress: `${data.company?.address ?? ''}${
+      data.company?.city
+        ? ' ' + data.company?.city + `${data.company.state?.name ? ',' : ''}`
+        : ''
+    }${
+      data.company.state?.name
+        ? ' ' +
+          data.company.state?.name +
+          `${data.company.country?.name ? ',' : ''}`
+        : ''
+    }${
+      data.company.country?.name ? ' ' + data.company.country?.name : ''
+    }`.trim(),
+    phoneNumber: data.company?.phone_number,
+    email: data.company.email,
+    logoUrl: new MultiFormatPicture(data.company?.company_logo).imageUrls
+      ?.original,
+  };
+
+  return documentCompany;
 };

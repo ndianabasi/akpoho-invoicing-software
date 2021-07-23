@@ -988,5 +988,6 @@ export interface CurrentlyViewedInvoiceQuotation {
     name: string;
     phone_number?: string;
     state?: { name: string };
+    company_logo?: FileMultiFormats;
   };
 }

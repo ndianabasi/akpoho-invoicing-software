@@ -11,13 +11,22 @@
       <template #body-panel>
         <div class="row q-gutter-sm q-my-lg-md q-my-sm-sm company-logo">
           <div class="col items-center justify-center col-12 column">
-            <q-img
-              :src="companyImageUrl"
-              spinner-color="white"
-              style="height: 140px; max-width: 150px"
+            <img
+              v-if="companyInformation?.logoUrl"
+              :src="companyInformation?.logoUrl"
+              style="height: 100px"
             />
+            <q-avatar
+              v-else
+              square
+              size="100px"
+              font-size="82px"
+              color="text-deep-purple-8"
+              text-color="white"
+              >{{ companyInformation?.logoInitials }}</q-avatar
+            >
             <div class="text-h5 text-deep-purple-8 q-mt-sm">
-              {{ customerInformation.documentCompany.name }}
+              {{ companyInformation?.name }}
             </div>
           </div>
         </div>
@@ -171,18 +180,18 @@
           "
         >
           <div class="text-body2 text-center text-bold text-deep-purple-8">
-            {{ customerInformation.documentCompany.name }}
+            {{ companyInformation?.name }}
           </div>
           <div class="text-body2 text-center">
-            {{ customerInformation.documentCompany.fullAddress }}
+            {{ companyInformation?.fullAddress }}
           </div>
           <div class="text-body2 text-center">
-            <span v-if="customerInformation.documentCompany.email"
+            <span v-if="companyInformation.email"
               ><span class="text-bold">EMAIL:</span>&nbsp;
-              {{ customerInformation.documentCompany.email }} | </span
-            ><span v-if="customerInformation.documentCompany.phoneNumber"
+              {{ companyInformation?.email }} | </span
+            ><span v-if="companyInformation.phoneNumber"
               ><span class="text-bold">PHONE NUMBER:</span>&nbsp;
-              {{ customerInformation.documentCompany.phoneNumber }}</span
+              {{ companyInformation?.phoneNumber }}</span
             >
           </div>
         </div>
@@ -274,6 +283,7 @@ import {
   getCurrentInvoiceQuotationData,
   fullDate,
   getCustomerInformation,
+  getCompanyInformation,
 } from '../../composables/invoices-quotations/useInvoiceQuotation';
 import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
 
@@ -381,6 +391,10 @@ export default defineComponent({
       getCustomerInformation(currentInvoiceQuotation.value)
     );
 
+    const companyInformation = computed(() =>
+      getCompanyInformation(currentInvoiceQuotation.value)
+    );
+
     onBeforeMount(() => {
       stopFetchCurrentlyViewedInvoiceQuotation();
     });
@@ -402,6 +416,7 @@ export default defineComponent({
       ),
       documentDate: computed(() => fullDate(form.date)),
       customerInformation,
+      companyInformation,
     };
   },
 });

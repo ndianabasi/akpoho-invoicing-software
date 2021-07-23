@@ -228,6 +228,7 @@ export default class QuotationsController {
     await requestedInvoiceQuotation?.load('company', (companyQuery) => {
       companyQuery.preload('country')
       companyQuery.preload('state')
+      companyQuery.preload('companyLogo', (logoQuery) => logoQuery.select('url', 'formats'))
     })
     await requestedInvoiceQuotation?.load('shippingAddress', (addressQuery) => {
       addressQuery.preload('addressCountry', (subAddressQuery) =>
