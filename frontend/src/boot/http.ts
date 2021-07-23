@@ -178,34 +178,6 @@ export default boot(
         return Promise.reject(error);
       }
     );
-
-    router.beforeEach((to, _from, next) => {
-      const isLoggedIn = store.getters['auth/isLoggedIn'] as boolean;
-      if (to.matched.some((record) => record.meta.requiresAuth)) {
-        if (isLoggedIn) {
-          return next();
-        } else {
-          Notify.create({
-            type: 'negative',
-            message: 'You are not logged in.',
-            position: 'top',
-          });
-          return next({ name: 'Login' });
-        }
-      } else return next();
-    });
-
-    router.beforeEach((to, from, next) => {
-      const GET_USER_PERMISSION =
-        store.getters['permissions/GET_USER_PERMISSION'];
-      if (to.meta && !!to.meta.permission) {
-        if (GET_USER_PERMISSION(to.meta.permission)) {
-          return next();
-        } else return next(from);
-      } else {
-        return next();
-      }
-    });
   }
 );
 

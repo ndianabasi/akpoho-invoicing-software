@@ -36,6 +36,7 @@ module.exports = configure(function (/* ctx */) {
       'global-components',
       'addressbar-color',
       'EventBus',
+      'routerHooks',
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
