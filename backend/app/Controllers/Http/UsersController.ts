@@ -90,7 +90,9 @@ export default class UsersController {
               'users.updated_at',
               'user_profiles.first_name',
               'user_profiles.last_name',
-              'roles.name as role'
+              'roles.name as role',
+              'uploaded_files.url as profile_picture_url',
+              'uploaded_files.formats as profile_picture_formats'
             )
             .leftJoin('company_user', (query) => {
               query.on('company_user.user_id', '=', 'users.id')
@@ -101,6 +103,9 @@ export default class UsersController {
             .leftJoin('roles', (query) => {
               query.on('roles.id', '=', 'users.role_id')
             })
+            .leftJoin('uploaded_files', (query) =>
+              query.on('uploaded_files.id', '=', 'user_profiles.profile_picture')
+            )
             .where({ 'company_user.company_id': requestedCompany?.id })
 
           if (sortBy) {

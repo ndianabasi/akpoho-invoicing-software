@@ -201,6 +201,26 @@ export type CurrentlyViewedUser = {
   role: StringIDNameInterface;
 };
 
+export interface UsersIndexResultInterface {
+  account_activated_at: string | null;
+  created_at: string;
+  email: string;
+  email_verified_at: string | null;
+  first_name: string;
+  id: string;
+  is_account_activated: number;
+  is_email_verified: number;
+  last_login_time: null;
+  last_name: string;
+  lifetime_login: number;
+  login_status: number;
+  password_change_required: number;
+  role: ROLES_VALUES;
+  updated_at: string;
+  profile_picture_url: string | null;
+  profile_picture_formats: string | null;
+}
+
 export type CurrentlyViewedCompany = {
   id: string;
   name: string;

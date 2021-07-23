@@ -1,16 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { computed, watchEffect, onBeforeUnmount } from 'vue';
 import { store } from 'src/store';
-import { SelectionOption } from 'src/store/types';
+import {
+  FileMultiFormats,
+  SelectionOption,
+  UsersIndexResultInterface,
+} from 'src/store/types';
 import { TableRow } from '../../../types/table';
+import MultiFormatPicture from 'src/helpers/MultiFormatPicture';
 
 interface UserHeaders extends TableRow {
   name: UserColumns;
-  field: UserColumns;
+  field: UserColumns | ((row: UsersIndexResultInterface) => unknown);
 }
 
 enum UserColumns {
   id = 'id',
+  display_image = 'display_image',
   email = 'email',
   first_name = 'first_name',
   last_name = 'last_name',
@@ -52,6 +58,28 @@ const columns: Array<UserHeaders> = [
     field: UserColumns.id,
     filterable: true,
     filterInputType: 'text',
+  },
+  {
+    name: UserColumns.display_image,
+    required: true,
+    label: 'Profile Picture',
+    align: 'center',
+    sortable: false,
+    filterable: false,
+    field: (row: UsersIndexResultInterface) => row, // This becomes value for `format` property
+    format: (val: UsersIndexResultInterface): string | null => {
+      const imageBase: FileMultiFormats = {
+        url: val.profile_picture_url,
+        formats:
+          typeof val?.profile_picture_formats &&
+          val?.profile_picture_formats === 'string'
+            ? (JSON.parse(
+                val?.profile_picture_formats ?? ''
+              ) as FileMultiFormats['formats'])
+            : null,
+      };
+      return new MultiFormatPicture(imageBase).avatarImageUrl;
+    },
   },
   {
     name: UserColumns.first_name,
