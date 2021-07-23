@@ -20,8 +20,7 @@
               v-else
               square
               size="100px"
-              font-size="82px"
-              color="text-deep-purple-8"
+              color="deep-purple-8"
               text-color="white"
               >{{ companyInformation?.logoInitials }}</q-avatar
             >
