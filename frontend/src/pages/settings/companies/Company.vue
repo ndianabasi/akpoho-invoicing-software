@@ -96,7 +96,6 @@ import useDeleteResource from '../../../composables/useDeleteResource';
 import {
   CurrentlyViewedCompany,
   PERMISSION,
-  ResolvedProfilePictureUrls,
   TitleInfo,
 } from '../../../store/types';
 import { store } from '../../../store';
@@ -132,13 +131,6 @@ export default defineComponent({
     );
 
     let titleInfo: Ref<TitleInfo | null> = ref(null);
-
-    const companyLogo = computed(
-      () =>
-        store.getters[
-          'companies/GET_COMPANY_LOGO'
-        ] as ResolvedProfilePictureUrls
-    );
 
     watch(
       currentCompany,

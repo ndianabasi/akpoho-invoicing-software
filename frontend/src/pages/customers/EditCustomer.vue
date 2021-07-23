@@ -172,12 +172,9 @@ import {
   watchEffect,
   watch,
   computed,
-  unref,
   Ref,
   reactive,
 } from 'vue';
-import useVuelidate from '@vuelidate/core';
-import { email, helpers } from '@vuelidate/validators';
 import ViewCard from '../../components/ViewCard.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import { store } from '../../store';
@@ -417,7 +414,6 @@ export default defineComponent({
       handleSubmit,
       errors: formErrors,
       isSubmitting,
-      values,
     } = useForm({
       validationSchema: formSchema.value,
       initialValues: initialForm,

@@ -187,11 +187,9 @@ import ViewCard from '../../../components/ViewCard.vue';
 import useTitleInfo from '../../../composables/useTitleInfo';
 import useResourcePermissions from '../../../composables/useResourcePermissions';
 import {
-  SelectionOption,
   PERMISSION,
   TitleInfo,
   AttributeSetData,
-  ProductFormShape,
   FormSchema,
   SelectOption,
   ProductResultRowInterface,

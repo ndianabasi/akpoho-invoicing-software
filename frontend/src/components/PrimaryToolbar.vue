@@ -206,7 +206,6 @@ import { useRouter } from 'vue-router';
 import {
   UserProfileSummary,
   StringIDNameInterface,
-  ResolvedProfilePictureUrls,
 } from '../store/types/index';
 import { $dark } from '../composables/useDarkMode';
 
