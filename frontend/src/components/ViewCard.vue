@@ -29,42 +29,7 @@
                 <template
                   v-if="useTitlePanelMenu && !!titlePanelMenuData.length"
                 >
-                  <q-btn round flat icon="more_vert">
-                    <q-menu
-                      auto-close
-                      anchor="bottom right"
-                      self="top end"
-                      transition-show="flip-right"
-                      transition-hide="flip-left"
-                      class="title-panel-menu"
-                    >
-                      <q-list>
-                        <q-item
-                          v-for="{
-                            label,
-                            icon,
-                            type,
-                            action,
-                            routeObject,
-                          } in permittedTitlePanelMenuData"
-                          :key="'title_panel_menu_item:' + snakeCase(label)"
-                          v-ripple
-                          :clickable="type === 'click-action'"
-                          :to="
-                            type === 'router-navigation' ? routeObject : void 0
-                          "
-                          @click.prevent="
-                            type === 'click-action' ? action() : void 0
-                          "
-                        >
-                          <q-item-section>
-                            <q-btn flat round :icon="icon" />
-                          </q-item-section>
-                          <q-item-section>{{ label }}</q-item-section>
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
+                  <SnackMenu :menu-data="titlePanelMenuData" />
                 </template>
               </q-item-section>
             </q-item>
@@ -87,14 +52,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { TitleInfo, TitlePanelMenuData } from '../store/types';
-import { snakeCase } from 'lodash';
+import SnackMenu from './SnackMenu';
 
 export default defineComponent({
   name: 'ViewCard',
 
-  components: {},
+  components: { SnackMenu },
 
   props: {
     showSeparator: {
@@ -151,15 +116,8 @@ export default defineComponent({
     },
   },
 
-  setup(props) {
-    const permittedTitlePanelMenuData = computed(() =>
-      props.titlePanelMenuData.filter((item) => item.permitted)
-    );
-
-    return {
-      snakeCase,
-      permittedTitlePanelMenuData,
-    };
+  setup() {
+    return {};
   },
 });
 </script>
