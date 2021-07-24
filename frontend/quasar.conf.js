@@ -59,7 +59,7 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: require('dotenv').config().parsed,
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
 
       // transpile: false,
 
@@ -98,7 +98,7 @@ module.exports = configure(function (/* ctx */) {
           bodyClasses: true, // <<< add this
           notify: {
             /* look at QuasarConfOptions from the API card */
-            position: 'top-right',
+            position: 'top',
             progress: true,
             timeout: 7500,
             closeBtn: true,

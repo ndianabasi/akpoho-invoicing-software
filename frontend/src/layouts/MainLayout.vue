@@ -19,7 +19,11 @@
     <q-page-container class="AIS__page-container q-my-xl q-mx-sm-xs q-mx-lg-md">
       <akpoho-banners />
 
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component"></component>
+        </transition>
+      </router-view>
     </q-page-container>
 
     <q-footer v-if="$q.screen.lt.md" elevated class="footer">
