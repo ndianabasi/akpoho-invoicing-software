@@ -6,6 +6,8 @@
       show-avatar
       show-title-panel-side
       :loading="loading"
+      use-title-panel-menu
+      :title-panel-menu-data="titlePanelMenuData"
     >
       <template #body-panel>
         <q-tabs v-model="tab" align="justify" narrow-indicator class="q-mb-lg">
@@ -187,46 +189,6 @@
           </q-tab-panels>
         </div>
       </template>
-
-      <template #title-panel-side>
-        <q-btn flat icon="more_vert">
-          <q-menu
-            anchor="bottom right"
-            self="top end"
-            transition-show="flip-right"
-            transition-hide="flip-left"
-          >
-            <q-list>
-              <q-item
-                v-if="resourcePermissions.canEdit"
-                :to="{
-                  name: 'edit_customer',
-                  params: { customerId: customerId }, //customerId from route props
-                }"
-                exact
-              >
-                <q-item-section>
-                  <q-btn flat icon="edit" />
-                </q-item-section>
-                <q-item-section>Edit Customer</q-item-section>
-              </q-item>
-
-              <q-item
-                v-if="resourcePermissions.canList"
-                :to="{
-                  name: 'customers',
-                }"
-                exact
-              >
-                <q-item-section>
-                  <q-btn flat icon="view_list" />
-                </q-item-section>
-                <q-item-section>All Customers</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
-      </template>
     </view-card>
   </div>
 </template>
@@ -248,8 +210,15 @@ import ViewCard from '../../components/ViewCard.vue';
 import CustomerAddresses from '../../pages/customers/CustomerAddresses.vue';
 import useTitleInfo from '../../composables/useTitleInfo';
 import useResourcePermissions from '../../composables/useResourcePermissions';
-import { PERMISSION, CurrentlyViewedCustomer } from '../../store/types';
+import {
+  PERMISSION,
+  CurrentlyViewedCustomer,
+  TitlePanelMenuData,
+} from '../../store/types';
 import { store } from '../../store';
+import useDeleteResource from '../../composables/useDeleteResource';
+import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'ViewCustomer',
@@ -269,6 +238,8 @@ export default defineComponent({
 
   setup(props) {
     const loading = ref(false);
+    const router = useRouter();
+    const $q = useQuasar();
 
     const currentCustomer = computed(
       () =>
@@ -323,16 +294,76 @@ export default defineComponent({
       stopFetchCurrentlyViewedCustomer();
     });
 
+    const handleDeletion = async function () {
+      await useDeleteResource({
+        resource: 'customer',
+        resourceName: 'Customer',
+        payload: props.customerId,
+      })
+        .then(() => {
+          const postDeletionAction = {
+            routeName: 'customers',
+            routeParams: undefined,
+          };
+
+          void router.push({
+            name: postDeletionAction?.routeName,
+            params: postDeletionAction?.routeParams,
+          });
+        })
+        .catch((error) => {
+          $q.notify({
+            type: 'negative',
+            message: JSON.stringify(error),
+            timeout: 5000,
+            position: 'top',
+          });
+        });
+    };
+
+    const resourcePermissions = useResourcePermissions({
+      edit: PERMISSION.CAN_EDIT_CUSTOMERS,
+      list: PERMISSION.CAN_LIST_CUSTOMERS,
+      delete: PERMISSION.CAN_DELETE_CUSTOMERS,
+    });
+
+    const titlePanelMenuData = computed((): TitlePanelMenuData[] => {
+      return [
+        {
+          label: 'Edit Customer',
+          icon: 'edit',
+          type: 'router-navigation',
+          permitted: resourcePermissions?.canEdit ?? false,
+          routeObject: {
+            name: 'edit_customer',
+            params: { customerId: props.customerId },
+          },
+        },
+        {
+          label: 'Delete Customer',
+          icon: 'delete',
+          type: 'click-action',
+          permitted: resourcePermissions?.canDelete ?? false,
+          action: () => handleDeletion(),
+        },
+        {
+          label: 'All Customers',
+          icon: 'view_list',
+          type: 'router-navigation',
+          permitted: resourcePermissions?.canList ?? false,
+          routeObject: { name: 'customers' },
+        },
+      ];
+    });
+
     return {
       loading,
       customer: currentCustomer,
       tab: ref('customer_details'),
       titleInfo,
       corporateHasRep,
-      resourcePermissions: useResourcePermissions({
-        edit: PERMISSION.CAN_EDIT_CUSTOMERS,
-        list: PERMISSION.CAN_LIST_CUSTOMERS,
-      }),
+      resourcePermissions,
+      titlePanelMenuData,
     };
   },
 });

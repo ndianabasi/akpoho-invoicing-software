@@ -31,6 +31,7 @@
                 >
                   <q-btn round flat icon="more_vert">
                     <q-menu
+                      auto-close
                       anchor="bottom right"
                       self="top end"
                       transition-show="flip-right"

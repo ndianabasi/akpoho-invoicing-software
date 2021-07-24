@@ -6,6 +6,8 @@
       show-avatar
       show-title-panel-side
       :loading="loading"
+      use-title-panel-menu
+      :title-panel-menu-data="titlePanelMenuData"
     >
       <template #body-panel>
         <div class="q-gutter-y-sm">
@@ -22,55 +24,6 @@
             </q-item>
           </q-list>
         </div>
-      </template>
-
-      <template #title-panel-side>
-        <q-btn flat icon="more_vert">
-          <q-menu
-            anchor="bottom right"
-            self="top end"
-            transition-show="flip-right"
-            transition-hide="flip-left"
-          >
-            <q-list>
-              <q-item
-                v-if="resourcePermissions.canEdit"
-                :to="{
-                  name: 'edit_product',
-                  params: { productId: productId }, //productId from route props
-                }"
-              >
-                <q-item-section>
-                  <q-btn flat icon="edit" />
-                </q-item-section>
-                <q-item-section>Edit Product</q-item-section>
-              </q-item>
-
-              <q-item
-                v-if="resourcePermissions.canDelete"
-                clickable
-                @click.prevent="handleDeletion"
-              >
-                <q-item-section>
-                  <q-btn flat icon="delete" />
-                </q-item-section>
-                <q-item-section>Delete Product</q-item-section>
-              </q-item>
-
-              <q-item
-                v-if="resourcePermissions.canList"
-                :to="{
-                  name: 'all_products',
-                }"
-              >
-                <q-item-section>
-                  <q-btn flat icon="view_list" />
-                </q-item-section>
-                <q-item-section>All Products</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
       </template>
     </view-card>
   </div>
@@ -97,6 +50,7 @@ import {
   PERMISSION,
   ProductResultRowInterface,
   TitleInfo,
+  TitlePanelMenuData,
 } from '../../../store/types';
 import { store } from '../../../store';
 import { useRouter } from 'vue-router';
@@ -208,6 +162,41 @@ export default defineComponent({
         });
     };
 
+    const resourcePermissions = useResourcePermissions({
+      edit: PERMISSION.CAN_EDIT_INVENTORIES,
+      list: PERMISSION.CAN_LIST_INVENTORIES,
+      delete: PERMISSION.CAN_DELETE_INVENTORIES,
+    });
+
+    const titlePanelMenuData = computed((): TitlePanelMenuData[] => {
+      return [
+        {
+          label: 'Edit Product',
+          icon: 'edit',
+          type: 'router-navigation',
+          permitted: resourcePermissions?.canEdit ?? false,
+          routeObject: {
+            name: 'edit_product',
+            params: { productId: props.productId },
+          },
+        },
+        {
+          label: 'Delete Product',
+          icon: 'delete',
+          type: 'click-action',
+          permitted: resourcePermissions?.canDelete ?? false,
+          action: () => handleDeletion(),
+        },
+        {
+          label: 'All Products',
+          icon: 'view_list',
+          type: 'router-navigation',
+          permitted: resourcePermissions?.canList ?? false,
+          routeObject: { name: 'all_products' },
+        },
+      ];
+    });
+
     onBeforeMount(() => {
       stopFetchCurrentlyViewedProduct();
     });
@@ -216,13 +205,10 @@ export default defineComponent({
       loading,
       tab: ref('user_account'),
       titleInfo,
-      resourcePermissions: useResourcePermissions({
-        edit: PERMISSION.CAN_EDIT_INVENTORIES,
-        list: PERMISSION.CAN_LIST_INVENTORIES,
-        delete: PERMISSION.CAN_DELETE_INVENTORIES,
-      }),
+      resourcePermissions,
       handleDeletion,
       productProperties,
+      titlePanelMenuData,
     };
   },
 });
