@@ -508,3 +508,17 @@ input[type='number']::-webkit-outer-spin-button {
   padding-left: 0px;
   padding-right: 0px;
 }
+
+.title-panel-menu,
+.title-panel-side-container {
+  .q-item__section:not(:last-of-type) {
+    max-width: 3rem;
+  }
+  .q-btn {
+    width: 3rem;
+    .q-focus-helper {
+      display: none;
+      visibility: hidden;
+    }
+  }
+}

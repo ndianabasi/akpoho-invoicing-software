@@ -991,3 +991,12 @@ export interface CurrentlyViewedInvoiceQuotation {
     company_logo?: FileMultiFormats;
   };
 }
+
+export interface TitlePanelMenuData {
+  label: string;
+  icon: string;
+  type: 'router-navigation' | 'click-action';
+  permitted: boolean;
+  action?: unknown;
+  routeObject?: { name: string; params?: Record<string, string | number> };
+}

@@ -7,6 +7,8 @@
       show-title-panel-side
       card-container-classes="col-md-12 col-lg-10 col-xl-10 col-sm-12 col-xs-12 invoice-quotation-body"
       :loading="loading"
+      :title-panel-menu-data="titlePanelMenuData"
+      use-title-panel-menu
     >
       <template #body-panel>
         <div class="row q-gutter-sm q-my-lg-md q-my-sm-sm company-logo">
@@ -195,55 +197,6 @@
           </div>
         </div>
       </template>
-
-      <template #title-panel-side>
-        <q-btn flat icon="more_vert">
-          <q-menu
-            anchor="bottom right"
-            self="top end"
-            transition-show="flip-right"
-            transition-hide="flip-left"
-          >
-            <q-list>
-              <q-item
-                v-if="resourcePermissions.canEdit"
-                :to="{
-                  name: 'edit_quotation',
-                  params: { quotationId: quotationId }, //quotationId from route props
-                }"
-              >
-                <q-item-section>
-                  <q-btn flat icon="edit" />
-                </q-item-section>
-                <q-item-section>Edit Quotation</q-item-section>
-              </q-item>
-
-              <q-item
-                v-if="resourcePermissions.canDelete"
-                clickable
-                @click.prevent="handleDeletion"
-              >
-                <q-item-section>
-                  <q-btn flat icon="delete" />
-                </q-item-section>
-                <q-item-section>Delete Quotation</q-item-section>
-              </q-item>
-
-              <q-item
-                v-if="resourcePermissions.canList"
-                :to="{
-                  name: 'quotations',
-                }"
-              >
-                <q-item-section>
-                  <q-btn flat icon="view_list" />
-                </q-item-section>
-                <q-item-section>All Quotations</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
-      </template>
     </view-card>
   </div>
 </template>
@@ -272,6 +225,7 @@ import {
   PERMISSION,
   QuotationInvoiceFormShape,
   TitleInfo,
+  TitlePanelMenuData,
 } from '../../store/types';
 import { store } from '../../store';
 import { useRouter } from 'vue-router';
@@ -283,6 +237,7 @@ import {
   fullDate,
   getCustomerInformation,
   getCompanyInformation,
+  downloadInvoiceQuotation,
 } from '../../composables/invoices-quotations/useInvoiceQuotation';
 import itemsColumns from '../../components/data/table-definitions/quotation_invoice_items';
 
@@ -394,6 +349,50 @@ export default defineComponent({
       getCompanyInformation(currentInvoiceQuotation.value)
     );
 
+    const resourcePermissions = useResourcePermissions({
+      view: PERMISSION.CAN_VIEW_QUOTATIONS,
+      edit: PERMISSION.CAN_EDIT_QUOTATIONS,
+      list: PERMISSION.CAN_LIST_QUOTATIONS,
+      delete: PERMISSION.CAN_DELETE_QUOTATIONS,
+      new: PERMISSION.CAN_DELETE_QUOTATIONS,
+    });
+
+    const titlePanelMenuData = computed((): TitlePanelMenuData[] => {
+      return [
+        {
+          label: 'Edit Quotation',
+          icon: 'edit',
+          type: 'router-navigation',
+          permitted: resourcePermissions?.canEdit ?? false,
+          routeObject: {
+            name: 'edit_quotation',
+            params: { quotationId: props.quotationId },
+          },
+        },
+        {
+          label: 'Download Quotation',
+          icon: 'file_download',
+          type: 'click-action',
+          permitted: resourcePermissions?.canView ?? false,
+          action: () => downloadInvoiceQuotation(props.quotationId),
+        },
+        {
+          label: 'Delete Quotation',
+          icon: 'delete',
+          type: 'click-action',
+          permitted: resourcePermissions?.canDelete ?? false,
+          action: () => handleDeletion(),
+        },
+        {
+          label: 'All Quotations',
+          icon: 'view_list',
+          type: 'router-navigation',
+          permitted: resourcePermissions?.canList ?? false,
+          routeObject: { name: 'quotations' },
+        },
+      ];
+    });
+
     onBeforeMount(() => {
       stopFetchCurrentlyViewedInvoiceQuotation();
     });
@@ -401,13 +400,7 @@ export default defineComponent({
     return {
       tab: ref('user_account'),
       titleInfo,
-      resourcePermissions: useResourcePermissions({
-        edit: PERMISSION.CAN_EDIT_QUOTATIONS,
-        list: PERMISSION.CAN_LIST_QUOTATIONS,
-        delete: PERMISSION.CAN_DELETE_QUOTATIONS,
-        new: PERMISSION.CAN_DELETE_QUOTATIONS,
-      }),
-      handleDeletion,
+      resourcePermissions,
       loading,
       form,
       companyImageUrl: ref(
@@ -416,6 +409,8 @@ export default defineComponent({
       documentDate: computed(() => fullDate(form.date)),
       customerInformation,
       companyInformation,
+      downloadInvoiceQuotation,
+      titlePanelMenuData,
     };
   },
 });

@@ -432,3 +432,7 @@ export const getCompanyInformation = function (
 
   return documentCompany;
 };
+
+export const downloadInvoiceQuotation = function (id: string) {
+  console.log(id);
+};
