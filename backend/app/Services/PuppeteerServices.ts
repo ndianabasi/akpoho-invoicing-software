@@ -22,6 +22,11 @@ export default class PuppeteerServices {
 
       // 1. Create PDF from URL
       await page.goto(this.url)
+      await page.waitForNavigation({
+        timeout: 1 * 60 * 1000 /* 2 minute timeout */,
+        waitUntil:
+          'networkidle0' /* consider navigation to be finished when there are no more than 0 network connections for at least 500 ms */,
+      })
 
       // 2. Save a PDF
       const filePath = Application.tmpPath('gotedo.pdf')
