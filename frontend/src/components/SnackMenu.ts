@@ -39,36 +39,45 @@ export default defineComponent({
             },
             {
               default: () => [
-                h(
-                  QList,
-                  null,
-                  this.permittedMenuData.map(
-                    ({ label, icon, type, action, routeObject }) => {
-                      return h(
-                        QItem,
-                        {
-                          key: 'title_panel_menu_item:' + snakeCase(label),
-                          vRipple: true,
-                          clickable: true,
-                          to:
-                            type === 'router-navigation' ? routeObject : void 0,
-                          onClick: (event: MouseEvent | TouchEvent) => {
-                            event.preventDefault();
-                            type === 'click-action' && action
-                              ? action()
-                              : void 0;
+                h(QList, null, {
+                  default: () =>
+                    this.permittedMenuData.map(
+                      ({ label, icon, type, action, routeObject }) => {
+                        return h(
+                          QItem,
+                          {
+                            key: 'title_panel_menu_item:' + snakeCase(label),
+                            vRipple: true,
+                            clickable: true,
+                            to:
+                              type === 'router-navigation'
+                                ? routeObject
+                                : void 0,
+                            onClick: (event: MouseEvent | TouchEvent) => {
+                              event.preventDefault();
+                              type === 'click-action' && action
+                                ? action()
+                                : void 0;
+                            },
                           },
-                        },
-                        [
-                          h(QItemSection, null, [
-                            h(QBtn, { flat: true, round: true, icon: icon }),
-                          ]),
-                          h(QItemSection, null, label),
-                        ]
-                      );
-                    }
-                  )
-                ),
+                          {
+                            default: () => [
+                              h(QItemSection, null, {
+                                default: () => [
+                                  h(QBtn, {
+                                    flat: true,
+                                    round: true,
+                                    icon: icon,
+                                  }),
+                                ],
+                              }),
+                              h(QItemSection, null, { default: () => label }),
+                            ],
+                          }
+                        );
+                      }
+                    ),
+                }),
               ],
             }
           ),

@@ -84,7 +84,7 @@ export interface ResponseData {
   status?: number;
   statusText?: string;
   stack?: string;
-  data: ResponseData & PaginatedData;
+  data: ResponseData & PaginatedData & BlobPart;
   errors?: Array<{ rule: string; field: string; message: string }>;
 }
 
@@ -153,6 +153,7 @@ export interface HttpResponse extends AxiosResponse {
   message?: string;
   code?: string;
   stack?: string;
+  headers: Record<string, string>;
 }
 
 export interface HttpError extends AxiosError {
@@ -858,6 +859,8 @@ export type QuotationInvoiceFormShape = {
   useCustomSerialNumbers: boolean;
   useEditor: boolean;
 };
+
+export type InvoiceQuotationType = 'quotation' | 'invoice';
 
 export interface SelectNewValueCallback {
   (val: string, done: (fn?: () => void) => void): void;

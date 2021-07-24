@@ -3,6 +3,7 @@ import {
   CurrentlyViewedInvoiceQuotation,
   CustomerAddressShape,
   DiscountType,
+  InvoiceQuotationType,
   ProductNameType,
   QuotationInvoiceFormShape,
   QuotationInvoiceItemShape,
@@ -12,6 +13,8 @@ import { computed, ref } from 'vue';
 import { store } from '../../store';
 import { DateTime } from 'luxon';
 import MultiFormatPicture from 'src/helpers/MultiFormatPicture';
+import { snakeCase } from 'lodash';
+import useDownloadBinary from '../useDownloadBinary';
 
 export const currentInvoiceQuotation = computed({
   get: () =>
@@ -433,6 +436,20 @@ export const getCompanyInformation = function (
   return documentCompany;
 };
 
-export const downloadInvoiceQuotation = function (id: string) {
-  console.log(id);
+export const downloadInvoiceQuotation = async function ({
+  id,
+  type,
+  quotationData,
+}: {
+  id: string;
+  type: InvoiceQuotationType;
+  quotationData: CurrentlyViewedInvoiceQuotation;
+}) {
+  const fileName = `${snakeCase(quotationData.title)}_${quotationData.id}`;
+  await store
+    .dispatch('invoices_quotations/DOWNLOAD_INVOICE_QUOTATION', {
+      id,
+      queryString: { type },
+    })
+    .then((arrayBuffer) => useDownloadBinary(fileName, arrayBuffer));
 };

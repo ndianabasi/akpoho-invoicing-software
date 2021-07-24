@@ -222,6 +222,7 @@ import useResourcePermissions from '../../composables/useResourcePermissions';
 import useDeleteResource from '../../composables/useDeleteResource';
 import {
   CurrentlyViewedInvoiceQuotation,
+  InvoiceQuotationType,
   PERMISSION,
   QuotationInvoiceFormShape,
   TitleInfo,
@@ -256,7 +257,7 @@ export default defineComponent({
       default: '',
     },
     documentType: {
-      type: String as PropType<'quotation' | 'invoice'>,
+      type: String as PropType<InvoiceQuotationType>,
       required: false,
       default: 'quotation',
     },
@@ -374,7 +375,12 @@ export default defineComponent({
           icon: 'file_download',
           type: 'click-action',
           permitted: resourcePermissions?.canView ?? false,
-          action: () => downloadInvoiceQuotation(props.quotationId),
+          action: () =>
+            downloadInvoiceQuotation({
+              id: props.quotationId,
+              type: props.documentType,
+              quotationData: currentInvoiceQuotation.value,
+            }),
         },
         {
           label: 'Delete Quotation',

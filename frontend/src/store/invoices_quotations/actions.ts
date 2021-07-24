@@ -5,7 +5,12 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../index';
 import { InvoiceQuotationStateInterface /* Users */ } from './state';
 import { api as $http } from '../../boot/http';
-import { HttpError, HttpResponse, StringIDNameInterface } from '../types';
+import {
+  HttpError,
+  HttpResponse,
+  InvoiceQuotationType,
+  StringIDNameInterface,
+} from '../types';
 import { Notify } from 'quasar';
 
 const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
@@ -13,7 +18,7 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
     { rootGetters },
     payload: {
       form: Record<string, Record<string, unknown> | string | number | boolean>;
-      type: 'quotation' | 'invoice';
+      type: InvoiceQuotationType;
     }
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -60,7 +65,7 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
     payload: {
       form: Record<string, Record<string, unknown> | string | boolean | number>;
       id: string;
-      type: 'quotation' | 'invoice';
+      type: InvoiceQuotationType;
     }
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -120,6 +125,28 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
           commit('SET_CURRENTLY_VIEWED_INVOICE_QUOTATION', res.data.data);
 
           resolve(res.data);
+        });
+    });
+  },
+
+  async DOWNLOAD_INVOICE_QUOTATION(
+    { rootGetters },
+    { id, queryString }: { id: string; queryString: Record<string, string> }
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const currentCompany = rootGetters[
+      'auth/GET_CURRENT_COMPANY'
+    ] as StringIDNameInterface;
+
+    return new Promise(async (resolve) => {
+      await $http
+        .get(`${currentCompany.id}/invoices-quotations/${id}/download`, {
+          params: queryString,
+          responseType: 'arraybuffer',
+        })
+        .then((res: HttpResponse) => {
+          // Send to `useInvoiceQuotation` for download
+          return resolve(res.data.data);
         });
     });
   },
