@@ -84,7 +84,7 @@ export interface ResponseData {
   status?: number;
   statusText?: string;
   stack?: string;
-  data: ResponseData & PaginatedData & BlobPart;
+  data: ResponseData & PaginatedData & ArrayBuffer;
   errors?: Array<{ rule: string; field: string; message: string }>;
 }
 

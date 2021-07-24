@@ -451,5 +451,13 @@ export const downloadInvoiceQuotation = async function ({
       id,
       queryString: { type },
     })
-    .then((arrayBuffer) => useDownloadBinary(fileName, arrayBuffer));
+    .then(
+      ({
+        arrayBuffer,
+        contentType,
+      }: {
+        arrayBuffer: ArrayBuffer;
+        contentType: string;
+      }) => useDownloadBinary(fileName, arrayBuffer, contentType)
+    );
 };

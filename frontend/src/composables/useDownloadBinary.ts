@@ -1,5 +1,11 @@
-export default function (fileName: string, blob: Blob) {
+export default function (
+  fileName: string,
+  arrayBuffer: ArrayBuffer,
+  contentType: string
+) {
   try {
+    const blob = new Blob([arrayBuffer], { type: contentType });
+
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     if (link.download !== undefined) {

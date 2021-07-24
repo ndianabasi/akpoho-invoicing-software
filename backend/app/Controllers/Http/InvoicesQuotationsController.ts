@@ -3,6 +3,8 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import { sanitiseHTML } from 'App/Helpers/utils'
 import InvoiceQuotation from 'App/Models/InvoiceQuotation'
 import UnitOfMeasurement from 'App/Models/UnitOfMeasurement'
+import InvoiceQuotationServices from 'App/Services/InvoiceQuotationServices'
+import PuppeteerServices from 'App/Services/PuppeteerServices'
 import QuotationValidator from 'App/Validators/QuotationValidator'
 import isUUID from 'validator/lib/isUUID'
 
@@ -207,6 +209,10 @@ export default class QuotationsController {
 
       await newQuotation.related('items').createMany(preparedItems)
 
+      await new InvoiceQuotationServices({
+        invoiceQuotationModel: newQuotation,
+      }).clearCache()
+
       return response.created({ data: newQuotation?.id })
     } else return response.abort({ message: 'Company not found' })
   }
@@ -222,122 +228,11 @@ export default class QuotationsController {
       .with('InvoiceQuotationPolicy')
       .authorize('view', requestedInvoiceQuotation!, requestedCompany!)
 
-    await requestedInvoiceQuotation?.load('customer', (customerQuery) => {
-      customerQuery.preload('title', (titleQuery) => titleQuery.select('name'))
-    })
-    await requestedInvoiceQuotation?.load('company', (companyQuery) => {
-      companyQuery.preload('country')
-      companyQuery.preload('state')
-      companyQuery.preload('companyLogo', (logoQuery) => logoQuery.select('url', 'formats'))
-    })
-    await requestedInvoiceQuotation?.load('shippingAddress', (addressQuery) => {
-      addressQuery.preload('addressCountry', (subAddressQuery) =>
-        subAddressQuery.select('id', 'name')
-      )
-      addressQuery.preload('addressState', (subAddressQuery) =>
-        subAddressQuery.select('id', 'name')
-      )
-    })
-    await requestedInvoiceQuotation?.load('billingAddress', (addressQuery) => {
-      addressQuery.preload('addressCountry', (subAddressQuery) =>
-        subAddressQuery.select('id', 'name')
-      )
-      addressQuery.preload('addressState', (subAddressQuery) =>
-        subAddressQuery.select('id', 'name')
-      )
-    })
-    await requestedInvoiceQuotation?.load('items', (itemsQuery) => {
-      itemsQuery
-        .preload('collectionType')
-        .preload('files')
-        .preload('product')
-        .preload('unitOfMeasurement')
-    })
+    const invoiceQuotationDetails = await new InvoiceQuotationServices({
+      invoiceQuotationModel: requestedInvoiceQuotation,
+    }).getInvoiceQuotationFullDetails()
 
-    const serialisedInvoiceQuotation = requestedInvoiceQuotation?.serialize({
-      fields: {
-        omit: [
-          'customer_id',
-          'company_id',
-          'customer_billing_address',
-          'customer_shipping_address',
-        ],
-      },
-      relations: {
-        customer: {
-          fields: {
-            pick: [
-              'id',
-              'customer_name',
-              'is_corporate',
-              'corporate_has_rep',
-              'first_name',
-              'last_name',
-              'email',
-              'phone_number',
-              'company_name',
-              'company_phone',
-              'company_email',
-            ],
-          },
-        },
-        shipping_address: {
-          fields: { pick: ['id', 'full_address', 'street_address', 'city', 'postal_code'] },
-        },
-        billing_address: {
-          fields: { pick: ['id', 'full_address', 'street_address', 'city', 'postal_code'] },
-        },
-        items: {
-          fields: {
-            omit: [
-              'invoices_quotations_id',
-              'product_id',
-              'collection_type_id',
-              'unit_of_measurement_id',
-              'updated_at',
-              'created_at',
-            ],
-          },
-          relations: {
-            collectionType: {
-              fields: {
-                omit: ['created_at', 'updated_at'],
-              },
-            },
-            product: {
-              fields: {
-                omit: ['created_at', 'updated_at', 'product_type_id', 'attribute_set_id'],
-                pick: ['id', 'name'],
-              },
-            },
-            unitOfMeasurement: {
-              fields: {
-                omit: ['created_at', 'updated_at'],
-              },
-            },
-          },
-        },
-        company: {
-          fields: {
-            pick: ['name', 'email', 'phone_number', 'address', 'city'],
-          },
-          relations: {
-            country: {
-              fields: {
-                pick: ['name'],
-              },
-            },
-            state: {
-              fields: {
-                pick: ['name'],
-              },
-            },
-          },
-        },
-      },
-    })
-
-    return response.ok({ data: serialisedInvoiceQuotation })
+    return response.ok({ data: invoiceQuotationDetails })
   }
 
   public async update({
@@ -460,9 +355,32 @@ export default class QuotationsController {
 
       await requestedInvoiceQuotation.related('items').createMany(preparedItems)
 
+      await new InvoiceQuotationServices({
+        invoiceQuotationModel: requestedInvoiceQuotation,
+      }).clearCache()
+
       return response.created({ data: requestedInvoiceQuotation?.id })
     } else return response.abort({ message: 'Company not found' })
   }
 
   public async destroy({}: HttpContextContract) {}
+
+  public async download({
+    requestedInvoiceQuotation,
+    requestedCompany,
+    bouncer,
+  }: HttpContextContract) {
+    // Check authorisation
+    await bouncer
+      .with('InvoiceQuotationPolicy')
+      .authorize('view', requestedInvoiceQuotation!, requestedCompany!)
+
+    const invoiceQuotationDetails = await new InvoiceQuotationServices({
+      invoiceQuotationModel: requestedInvoiceQuotation,
+    }).getInvoiceQuotationFullDetails()
+
+    await new PuppeteerServices('https://gotedo.com')
+      .printAsPDF()
+      .catch((error) => console.error(error))
+  }
 }

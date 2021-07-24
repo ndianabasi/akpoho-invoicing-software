@@ -45,9 +45,9 @@ export default class UserServices {
     }
   }
 
-  public async getUserCompanies(): Promise<User['companies']> {
+  public async getUserCompanies(userModel?: User): Promise<User['companies']> {
     try {
-      const user = await this.getUserModel()
+      const user = userModel ? userModel : await this.getUserModel()
       await user.load('companies')
       return user.companies
     } catch (error) {
@@ -55,18 +55,18 @@ export default class UserServices {
     }
   }
 
-  public async getCompaniesCacheTags(): Promise<string[]> {
-    const companies = await this.getUserCompanies()
+  public async getCompaniesCacheTags(user?: User): Promise<string[]> {
+    const companies = await this.getUserCompanies(user)
 
     let companiesCacheTags: string[] = []
     let companiesUsersCacheTags: string[] = []
 
     if (companies?.length) {
       companiesCacheTags = companies?.map(
-        (com) => `${CACHE_TAGS.COMPANY_CACHE_TAG_PREFIX}:${com.id}`
+        (company) => `${CACHE_TAGS.COMPANY_CACHE_TAG_PREFIX}:${company.id}`
       )
       companiesUsersCacheTags = companies?.map(
-        (com) => `${CACHE_TAGS.COMPANY_USERS_CACHE_TAG_PREFIX}:${com.id}`
+        (company) => `${CACHE_TAGS.COMPANY_USERS_CACHE_TAG_PREFIX}:${company.id}`
       )
     }
 

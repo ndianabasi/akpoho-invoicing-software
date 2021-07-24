@@ -143,10 +143,14 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
         .get(`${currentCompany.id}/invoices-quotations/${id}/download`, {
           params: queryString,
           responseType: 'arraybuffer',
+          timeout: 5 * 60 * 1000, // 5 minutes
         })
         .then((res: HttpResponse) => {
           // Send to `useInvoiceQuotation` for download
-          return resolve(res.data.data);
+          return resolve({
+            arrayBuffer: res.data,
+            contentType: res.headers['content-type'],
+          });
         });
     });
   },

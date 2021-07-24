@@ -407,6 +407,7 @@ input[type='number']::-webkit-outer-spin-button {
 .invoice-quotation-view-table {
   width: 95%;
   thead {
+    -webkit-print-color-adjust: exact;
     background-color: $deep-purple-8;
     color: white;
     tr {
@@ -420,6 +421,7 @@ input[type='number']::-webkit-outer-spin-button {
 
   tbody {
     tr:nth-of-type(even):not(.bottom-row) {
+      -webkit-print-color-adjust: exact;
       background-color: $deep-purple-2;
       color: black;
     }
@@ -440,6 +442,7 @@ input[type='number']::-webkit-outer-spin-button {
     height: auto !important;
     &:nth-last-child(odd) {
       td:last-child {
+        -webkit-print-color-adjust: exact;
         background-color: $deep-purple-1;
         color: black;
       }
@@ -448,6 +451,7 @@ input[type='number']::-webkit-outer-spin-button {
     .total-qty-cell,
     .total-discount-cell,
     .subtotal-cell {
+      -webkit-print-color-adjust: exact;
       background-color: $deep-purple-5 !important;
       color: white !important;
     }

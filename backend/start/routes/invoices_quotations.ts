@@ -23,6 +23,10 @@ Route.group(() => {
     '/:company_id/invoices-quotations/:invoice_quotation_id',
     'InvoicesQuotationsController.show'
   ).middleware('findRequestedInvoiceQuotation')
+  Route.get(
+    '/:company_id/invoices-quotations/:invoice_quotation_id/download',
+    'InvoicesQuotationsController.download'
+  ).middleware('findRequestedInvoiceQuotation')
 })
   .prefix('/v1')
   .middleware('auth')
