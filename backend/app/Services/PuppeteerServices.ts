@@ -16,6 +16,8 @@ export default class PuppeteerServices {
   }
 
   public async printAsPDF() {
+    const ctx = HttpContext.get()
+
     try {
       const browser = await puppeteer.launch()
       const page = await browser.newPage()
@@ -40,16 +42,15 @@ export default class PuppeteerServices {
           margin: { left: '20px', right: '20px', top: '20px', bottom: '20px' },
         })
         .catch((error) => {
-          Logger.error('Error at PuppeteerServices.printAsPDF. %j', error)
+          Logger.error('Error at PuppeteerServices.printAsPDF: %j', error)
+          ctx?.response.internalServerError({ message: error })
         })
 
       await browser.close()
-
-      // 3. Return response from here, skipping the controller
-      const ctx = HttpContext.get()
       ctx?.response.download(filePath)
     } catch (error) {
-      Logger.error('Error at PuppeteerServices.printAsPDF. %j', error)
+      Logger.error('Error at PuppeteerServices.printAsPDF: %j', error)
+      ctx?.response.internalServerError({ message: error })
     }
   }
 }

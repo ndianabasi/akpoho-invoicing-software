@@ -10,16 +10,18 @@ import {
   RoundingType,
 } from 'src/types';
 import { computed, ref } from 'vue';
-import { useStore } from '../store';
+import { vuexStore } from 'src/store';
 import { DateTime } from 'luxon';
 import MultiFormatPicture from 'src/utils/MultiFormatPicture';
 
-const store = useStore();
+const $store = vuexStore;
 
 export const currentInvoiceQuotation = computed({
   get: () =>
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    store.getters['invoices_quotations/GET_CURRENTLY_VIEWED_INVOICE_QUOTATION'],
+    $store?.getters[
+      'invoices_quotations/GET_CURRENTLY_VIEWED_INVOICE_QUOTATION'
+    ],
   set: (value) => value,
 });
 
@@ -353,40 +355,42 @@ const getAddressObject = function (address: CustomerAddressShape) {
 export const getCustomerInformation = function (
   data: CurrentlyViewedInvoiceQuotation
 ) {
-  const isCorporateCustomer = data.customer.is_corporate;
+  const isCorporateCustomer = data?.customer?.is_corporate;
   const customerName = isCorporateCustomer
-    ? data.customer.company_name
-    : data.customer.customer_name;
-  const corporateCustomerHasRep = data.customer.corporate_has_rep;
-  const shippingAddress = getAddressObject(data.shipping_address);
-  const billingAddress = getAddressObject(data.billing_address);
+    ? data?.customer?.company_name
+    : data?.customer?.customer_name;
+  const corporateCustomerHasRep = data?.customer?.corporate_has_rep;
+  const shippingAddress = getAddressObject(data?.shipping_address);
+  const billingAddress = getAddressObject(data?.billing_address);
   const individualCustomerOrRepDetails = {
     name: !isCorporateCustomer
       ? customerName
-      : `${data.customer?.first_name ?? ''} ${data.customer?.last_name ?? ''}`,
-    email: data.customer?.email ?? '',
-    phoneNumber: data.customer?.phone_number ?? '',
-    customerHasTitle: !!data.customer?.title?.name,
-    title: data.customer?.title?.name ?? '',
+      : `${data?.customer?.first_name ?? ''} ${
+          data?.customer?.last_name ?? ''
+        }`,
+    email: data?.customer?.email ?? '',
+    phoneNumber: data?.customer?.phone_number ?? '',
+    customerHasTitle: !!data?.customer?.title?.name,
+    title: data?.customer?.title?.name ?? '',
   };
   const corporateCustomerDetails = {
-    name: data.customer?.company_name ?? '',
-    email: data.customer?.company_email ?? '',
-    phoneNumber: data.customer?.company_phone ?? '',
+    name: data?.customer?.company_name ?? '',
+    email: data?.customer?.company_email ?? '',
+    phoneNumber: data?.customer?.company_phone ?? '',
   };
   const isIndividualCustomerOrRepAvailable =
     (isCorporateCustomer && corporateCustomerHasRep) || !isCorporateCustomer;
-  const isBillingAddressAvailable = !!data.billing_address;
-  const isShippingAddressAvailable = !!data.shipping_address;
-  const customerTitle = data.customer?.title?.name ?? 'Sir/Madam';
+  const isBillingAddressAvailable = !!data?.billing_address;
+  const isShippingAddressAvailable = !!data?.shipping_address;
+  const customerTitle = data?.customer?.title?.name ?? 'Sir/Madam';
   const documentTitle =
-    data.title && data.title !== 'undefined' ? data.title : '';
+    data?.title && data?.title !== 'undefined' ? data?.title : '';
   const documentIntroduction =
-    data.introduction && data.introduction !== 'undefined'
-      ? data.introduction
+    data?.introduction && data?.introduction !== 'undefined'
+      ? data?.introduction
       : '';
   const documentNotes =
-    data.notes && data.notes !== 'undefined' ? data.notes : '';
+    data?.notes && data?.notes !== 'undefined' ? data?.notes : '';
 
   return {
     isCorporateCustomer,
@@ -410,24 +414,24 @@ export const getCompanyInformation = function (
   data: CurrentlyViewedInvoiceQuotation
 ) {
   const documentCompany = {
-    name: data.company.name,
-    logoInitials: data.company.name.slice(0, 3).toLocaleUpperCase(),
-    fullAddress: `${data.company?.address ?? ''}${
-      data.company?.city
-        ? ' ' + data.company?.city + `${data.company.state?.name ? ',' : ''}`
+    name: data?.company?.name,
+    logoInitials: data?.company?.name.slice(0, 3).toLocaleUpperCase(),
+    fullAddress: `${data?.company?.address ?? ''}${
+      data?.company?.city
+        ? ' ' + data?.company?.city + `${data?.company?.state?.name ? ',' : ''}`
         : ''
     }${
-      data.company.state?.name
+      data?.company?.state?.name
         ? ' ' +
-          data.company.state?.name +
-          `${data.company.country?.name ? ',' : ''}`
+          data?.company?.state?.name +
+          `${data?.company?.country?.name ? ',' : ''}`
         : ''
     }${
-      data.company.country?.name ? ' ' + data.company.country?.name : ''
+      data?.company?.country?.name ? ' ' + data?.company?.country?.name : ''
     }`.trim(),
-    phoneNumber: data.company?.phone_number,
-    email: data.company.email,
-    logoUrl: new MultiFormatPicture(data.company?.company_logo).imageUrls
+    phoneNumber: data?.company?.phone_number,
+    email: data?.company?.email,
+    logoUrl: new MultiFormatPicture(data?.company?.company_logo).imageUrls
       ?.original,
   };
 

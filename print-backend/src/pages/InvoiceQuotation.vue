@@ -256,12 +256,12 @@ export default defineComponent({
   },
 
   setup(/* props */) {
-    const store = useStore();
+    const $store = useStore();
     const form: QuotationInvoiceFormShape = {} as QuotationInvoiceFormShape;
 
     currentInvoiceQuotation.value = computed(
       () =>
-        store.getters[
+        $store?.getters[
           'invoices_quotations/GET_CURRENTLY_VIEWED_INVOICE_QUOTATION'
         ] as CurrentlyViewedInvoiceQuotation
     );

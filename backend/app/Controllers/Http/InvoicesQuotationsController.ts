@@ -223,8 +223,6 @@ export default class QuotationsController {
     requestedCompany,
     bouncer,
   }: HttpContextContract) {
-    console.log('running')
-
     // Check authorisation
     await bouncer
       .with('InvoiceQuotationPolicy')

@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { FileMultiFormats, ResolvedProfilePictureUrls } from 'src/types';
-import { useStore } from '../store';
+import { useStore } from 'src/store';
 
-const store = useStore();
+const $store = useStore();
 
 export default class MultiFormatPicture {
   private rootUrl: string;
   constructor(private imageBase?: FileMultiFormats) {
     this.imageBase = imageBase;
-    this.rootUrl = store.getters['getRootURL'] as string;
+    this.rootUrl = $store?.getters['getRootURL'] as string;
   }
 
   public get imageUrls(): ResolvedProfilePictureUrls | null {

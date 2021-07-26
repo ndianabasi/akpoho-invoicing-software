@@ -1,15 +1,16 @@
-import { store } from 'quasar/wrappers';
 import { InjectionKey } from 'vue';
 import {
   createStore,
   GetterTree,
   MutationTree,
+  Store,
   Store as VuexStore,
   useStore as vuexUseStore,
 } from 'vuex';
 
 import invoices_quotations from './invoices_quotations';
 import { InvoiceQuotationStateInterface } from './invoices_quotations/state';
+import { store } from 'quasar/wrappers';
 
 /*
  * If not building with SSR mode, you can
@@ -32,6 +33,14 @@ declare module '@vue/runtime-core' {
   }
 }
 
+declare module 'vuex' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  interface Store<S> {
+    provide<T>(name: string, service: T): void;
+    inject<T>(name: string): T | undefined;
+  }
+}
+
 // provide typings for `useStore` helper
 export const storeKey: InjectionKey<VuexStore<StateInterface>> =
   Symbol('vuex-key');
@@ -51,8 +60,10 @@ export interface StoreRootInterface {
 
 export type StoreState = RootState & StateInterface;
 
+let vuexStore: Store<StoreState>;
+
 export default store(function (/* { ssrContext } */) {
-  const Store = createStore<StoreState>({
+  vuexStore = createStore<StoreState>({
     /* state: function () {
       return {};
     }, */
@@ -66,9 +77,23 @@ export default store(function (/* { ssrContext } */) {
     strict: !!process.env.DEBUGGING,
   });
 
-  return Store;
+  // Vuex as a dependency injection container
+  const dependencies: Record<string, unknown> = {};
+  vuexStore.provide = function <T>(name: string, service: T) {
+    dependencies[name] = service;
+  };
+  vuexStore.inject = function <T>(name: string) {
+    if (name in dependencies) {
+      const service = dependencies[name];
+      return service as T;
+    }
+  };
+
+  return vuexStore;
 });
 
 export function useStore() {
   return vuexUseStore(storeKey);
 }
+
+export { vuexStore };
