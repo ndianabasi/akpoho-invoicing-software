@@ -24,11 +24,14 @@ export default class PuppeteerServices {
 
       // 1. Create PDF from URL
       await page.goto(this.url)
-      await page.waitForNavigation({
-        timeout: 1 * 60 * 1000 /* 2 minute timeout */,
-        waitUntil:
-          'networkidle0' /* consider navigation to be finished when there are no more than 0 network connections for at least 500 ms */,
-      })
+      /* await page
+        .waitForNavigation({
+          timeout: 1 * 60 * 1000, // 2 minute timeout
+          waitUntil: 'networkidle0', //consider navigation to be finished when there are no more than 0 network connections for at least 500 ms
+        })
+        .then(() => {
+          console.log('waitForNavigation done')
+        }) */
 
       // 2. Save a PDF
       const filePath = Application.tmpPath('gotedo.pdf')
@@ -38,6 +41,7 @@ export default class PuppeteerServices {
         .pdf({
           path: filePath,
           format: this.options.paperFormat,
+          scale: 0.8,
           printBackground: true,
           margin: { left: '20px', right: '20px', top: '20px', bottom: '20px' },
         })

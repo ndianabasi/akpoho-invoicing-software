@@ -377,7 +377,9 @@ export default class QuotationsController {
 
     const requestUrl = `http://localhost:8070/print-pages/invoices-quotations/${requestedInvoiceQuotation.id}/${requestedInvoiceQuotation.type}`
 
-    await new PuppeteerServices(requestUrl).printAsPDF().catch((error) => console.error(error))
+    await new PuppeteerServices(requestUrl, { paperFormat: 'a3' })
+      .printAsPDF()
+      .catch((error) => console.error(error))
   }
 
   public async print({ params, response }: HttpContextContract) {
