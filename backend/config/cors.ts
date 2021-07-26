@@ -44,13 +44,22 @@ const corsConfig: CorsConfig = {
   |                     one of the above values.
   |
   */
-  origin: [
-    'https://demo.akpoho.com',
-    'http://localhost:8070',
-    'http://127.0.0.1:8070',
-    'http://localhost:8090',
-    'http://127.0.0.1:8090',
-  ],
+  origin: (origin, ctx) => {
+    const isServerSidePrintRequest = ctx.request.url().includes('print-pages')
+    const allowedOriginsForPrintRequest = ['localhost:8070', '127.0.0.1:8070']
+
+    if (isServerSidePrintRequest) {
+      return allowedOriginsForPrintRequest.includes(origin)
+    }
+
+    return [
+      'https://demo.akpoho.com',
+      'http://localhost:8070',
+      'http://127.0.0.1:8070',
+      'http://localhost:8090',
+      'http://127.0.0.1:8090',
+    ]
+  },
 
   /*
   |--------------------------------------------------------------------------
