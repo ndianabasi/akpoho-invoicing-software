@@ -11,7 +11,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/PrintLayout.vue'),
     children: [
       {
-        path: 'invoices-quotations/:invoiceQuotationId',
+        path: 'invoices-quotations/:invoiceQuotationId/:documentType',
         component: () => import('pages/InvoiceQuotation.vue'),
       },
     ],

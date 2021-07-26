@@ -223,6 +223,8 @@ export default class QuotationsController {
     requestedCompany,
     bouncer,
   }: HttpContextContract) {
+    console.log('running')
+
     // Check authorisation
     await bouncer
       .with('InvoiceQuotationPolicy')
@@ -375,12 +377,20 @@ export default class QuotationsController {
       .with('InvoiceQuotationPolicy')
       .authorize('view', requestedInvoiceQuotation!, requestedCompany!)
 
+    const requestUrl = `http://localhost:8070/print-pages/invoices-quotations/${requestedInvoiceQuotation.id}/${requestedInvoiceQuotation.type}`
+
+    await new PuppeteerServices(requestUrl).printAsPDF().catch((error) => console.error(error))
+  }
+
+  public async print({ params, response }: HttpContextContract) {
+    // Get invoice/quotation id and type from params
+    const { invoice_quotation_id, type } = params
+
     const invoiceQuotationDetails = await new InvoiceQuotationServices({
-      invoiceQuotationModel: requestedInvoiceQuotation,
+      id: invoice_quotation_id,
+      type,
     }).getInvoiceQuotationFullDetails()
 
-    await new PuppeteerServices('https://gotedo.com')
-      .printAsPDF()
-      .catch((error) => console.error(error))
+    return response.ok({ data: invoiceQuotationDetails })
   }
 }

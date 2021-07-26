@@ -3,7 +3,7 @@
     <div
       :class="'col-md-12 col-lg-10 col-xl-10 col-sm-12 col-xs-12 invoice-quotation-body'"
     >
-      <q-card v-if="!loading" flat bordered class="no-border">
+      <q-card flat bordered class="no-border">
         <q-card-section>
           <div class="row q-gutter-sm q-my-lg-md q-my-sm-sm company-logo">
             <div class="col items-center justify-center col-12 column">
@@ -204,14 +204,97 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { defineComponent, ref, computed, PropType } from 'vue';
+import {
+  CurrentlyViewedInvoiceQuotation,
+  InvoiceQuotationType,
+  QuotationInvoiceFormShape,
+} from '../types';
+import { useStore } from '../store';
 import InvoiceQuotationTable from '../components/InvoiceQuotationTable.vue';
+import {
+  currentInvoiceQuotation,
+  getCurrentInvoiceQuotationData,
+  fullDate,
+  getCustomerInformation,
+  getCompanyInformation,
+} from '../composables/useInvoiceQuotation';
+import itemsColumns from '../components/data/table-definitions/quotation_invoice_items';
 
 export default defineComponent({
-  name: 'PageIndex',
-  components: { InvoiceQuotationTable },
-  setup() {
-    return {};
+  name: 'ViewInvoiceQuotation',
+
+  components: {
+    InvoiceQuotationTable,
+  },
+
+  props: {
+    quotationId: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    documentType: {
+      type: String as PropType<InvoiceQuotationType>,
+      required: false,
+      default: 'quotation',
+    },
+  },
+
+  preFetch({
+    store,
+    currentRoute /* previousRoute, redirect, ssrContext, urlPath, publicPath */,
+  }) {
+    return store.dispatch(
+      'invoices_quotations/FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION',
+      {
+        id: currentRoute.params.invoiceQuotationId,
+        type: currentRoute.params.documentType,
+      }
+    );
+  },
+
+  setup(/* props */) {
+    const store = useStore();
+    const form: QuotationInvoiceFormShape = {} as QuotationInvoiceFormShape;
+
+    currentInvoiceQuotation.value = computed(
+      () =>
+        store.getters[
+          'invoices_quotations/GET_CURRENTLY_VIEWED_INVOICE_QUOTATION'
+        ] as CurrentlyViewedInvoiceQuotation
+    );
+
+    const computedForm = getCurrentInvoiceQuotationData.value(
+      currentInvoiceQuotation.value,
+      itemsColumns
+    ) as Record<string, unknown>;
+
+    for (const key in computedForm) {
+      if (Object.prototype.hasOwnProperty.call(computedForm, key)) {
+        const item: unknown = computedForm[key];
+        form[key] = item;
+      }
+    }
+
+    const customerInformation = computed(() =>
+      getCustomerInformation(currentInvoiceQuotation.value)
+    );
+
+    const companyInformation = computed(() =>
+      getCompanyInformation(currentInvoiceQuotation.value)
+    );
+
+    return {
+      form,
+      companyImageUrl: ref(
+        `https://placeimg.com/500/300/nature?t=${Math.random()}`
+      ),
+      documentDate: computed(() => fullDate(form.date)),
+      customerInformation,
+      companyInformation,
+    };
   },
 });
 </script>

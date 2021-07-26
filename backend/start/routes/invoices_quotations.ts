@@ -32,3 +32,10 @@ Route.group(() => {
   .middleware('auth')
   .middleware('findAuthRole')
   .middleware('findRequestedCompany')
+
+Route.group(() => {
+  Route.get(
+    '/print-invoices-quotations/:invoice_quotation_id/:type',
+    'InvoicesQuotationsController.print'
+  )
+}).prefix('/print-pages')

@@ -44,7 +44,13 @@ const corsConfig: CorsConfig = {
   |                     one of the above values.
   |
   */
-  origin: true,
+  origin: [
+    'https://demo.akpoho.com',
+    'http://localhost:8070',
+    'http://127.0.0.1:8070',
+    'http://localhost:8090',
+    'http://127.0.0.1:8090',
+  ],
 
   /*
   |--------------------------------------------------------------------------

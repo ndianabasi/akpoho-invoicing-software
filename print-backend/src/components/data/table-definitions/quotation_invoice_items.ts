@@ -27,6 +27,8 @@ export interface QuotationInvoiceHeaders extends TableRow {
   min?: number;
   max?: number;
   autogrow?: boolean;
+  required?: boolean;
+  label: string;
 }
 
 enum Columns {

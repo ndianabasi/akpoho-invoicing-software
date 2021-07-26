@@ -1,3 +1,5 @@
+import { AxiosError, AxiosResponse } from 'axios';
+
 interface SelectOptionBase {
   label: string | undefined;
   icon?: string;
@@ -380,3 +382,50 @@ export interface ResolvedProfilePictureUrls {
   small: string | undefined;
   original: string | undefined;
 }
+
+export interface HttpResponse extends AxiosResponse {
+  data: ResponseData & string;
+  message?: string;
+  code?: string;
+  stack?: string;
+  headers: Record<string, string>;
+}
+
+export interface HttpError extends AxiosError {
+  response?: HttpResponse;
+}
+
+export interface IDNameInterface {
+  id: string | number | undefined | null;
+  name: string;
+}
+
+export interface StringIDNameInterface extends IDNameInterface {
+  id: string;
+}
+
+export interface ResponseData {
+  message?: string;
+  status?: number;
+  statusText?: string;
+  stack?: string;
+  data: ResponseData & PaginatedData & ArrayBuffer;
+  errors?: Array<{ rule: string; field: string; message: string }>;
+}
+
+export type PaginatedData = {
+  data?: DataRows;
+  meta: {
+    current_page: number;
+    first_page: number;
+    first_page_url: string;
+    last_page: number;
+    last_page_url: string;
+    next_page_url: string;
+    per_page: number;
+    previous_page_url: string;
+    total: number;
+  };
+};
+
+export type DataRows = Array<GenericTableData>;

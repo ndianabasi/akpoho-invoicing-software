@@ -8,8 +8,8 @@ import {
   useStore as vuexUseStore,
 } from 'vuex';
 
-// import example from './module-example'
-// import { ExampleStateInterface } from './module-example/state';
+import invoices_quotations from './invoices_quotations';
+import { InvoiceQuotationStateInterface } from './invoices_quotations/state';
 
 /*
  * If not building with SSR mode, you can
@@ -22,9 +22,7 @@ import {
 
 export interface StateInterface {
   // Define your own store structure, using submodules if needed
-  // example: ExampleStateInterface;
-  // Declared as unknown to avoid linting issue. Best to strongly type as per the line above.
-  example: unknown;
+  invoices_quotations: InvoiceQuotationStateInterface;
 }
 
 // provide typings for `this.$store`
@@ -60,7 +58,7 @@ export default store(function (/* { ssrContext } */) {
     }, */
     getters: {},
     modules: {
-      // example
+      invoices_quotations,
     },
 
     // enable strict mode (adds overhead!)
