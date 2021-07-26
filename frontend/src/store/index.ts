@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 //import { store } from 'quasar/wrappers';
+
 import {
   createStore,
   GetterTree,
@@ -67,9 +68,14 @@ import { InvoiceQuotationGetterInterface } from './invoices_quotations/getters';
 
 //import { createLogger } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
-
 import SecureLS from 'secure-ls';
-const ls = new SecureLS({ isCompression: false });
+
+let lsImport: SecureLS;
+if (!process.env.SERVER === true) {
+  void import('../boot/secure-ls').then(({ ls }) => {
+    lsImport = ls;
+  });
+}
 
 /*
  * If not building with SSR mode, you can
@@ -157,7 +163,7 @@ export function useStore() {
 
 let store: Store<StoreElements>;
 
-export default function () {
+export default function storeCallback(/* {ssrContext} */) {
   store = createStore<StoreElements>({
     strict: process.env.NODE_ENV !== 'production',
     state: function () {
@@ -240,18 +246,27 @@ export default function () {
       invoices_quotations,
     },
 
-    plugins:
-      process.env.NODE_ENV !== 'production'
-        ? [createPersistedState()]
-        : [
+    plugins: (() => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(process.env.SERVER);
+
+        if (!process.env.SERVER === true) {
+          return [createPersistedState()];
+        }
+      } else {
+        if (!process.env.SERVER === true) {
+          return [
             createPersistedState({
               storage: {
-                getItem: (key) => ls.get(key),
-                setItem: (key, value) => ls.set(key, value),
-                removeItem: (key) => ls.remove(key),
+                getItem: (key) => lsImport.get(key),
+                setItem: (key, value) => lsImport.set(key, value),
+                removeItem: (key) => lsImport.remove(key),
               },
             }),
-          ],
+          ];
+        }
+      }
+    })(),
   });
 
   return store;
