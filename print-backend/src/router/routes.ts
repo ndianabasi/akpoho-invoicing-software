@@ -6,6 +6,16 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [{ path: '', component: () => import('pages/Index.vue') }],
   },
+  {
+    path: '/print-pages/',
+    component: () => import('layouts/PrintLayout.vue'),
+    children: [
+      {
+        path: 'invoices-quotations/:invoiceQuotationId',
+        component: () => import('pages/InvoiceQuotation.vue'),
+      },
+    ],
+  },
 
   // Always leave this as last one,
   // but you can also remove it
