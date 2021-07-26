@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
 
@@ -13,9 +15,10 @@ declare module '@vue/runtime-core' {
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: 'http://127.0.0.1:4444/' });
+let api: AxiosInstance;
 
-export default boot(({ app }) => {
+export default boot(({ app, store }) => {
+  api = axios.create({ baseURL: store.getters.getRootURL });
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
   app.config.globalProperties.$axios = axios;

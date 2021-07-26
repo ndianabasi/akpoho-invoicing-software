@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { FileMultiFormats, ResolvedProfilePictureUrls } from 'src/types';
-import { useStore } from 'src/store';
+import { vuexStore } from 'src/store';
 
-const $store = useStore();
+const $store = vuexStore;
 
 export default class MultiFormatPicture {
   private rootUrl: string;

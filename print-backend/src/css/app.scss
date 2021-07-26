@@ -1,1 +1,279 @@
 // app global css in SCSS form
+.quotation-invoice-table {
+  &.scroll {
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
+
+  .q-field--with-bottom {
+    padding-bottom: unset;
+  }
+
+  table {
+    border: none !important;
+  }
+  thead,
+  tbody {
+    border: none !important;
+  }
+
+  .quotation-invoice-table-header {
+    border: none !important;
+    th {
+      border: none !important;
+    }
+  }
+  & ~ .q-table__bottom {
+    border: none !important;
+    justify-content: center;
+    margin-top: 1rem;
+    .q-table__control {
+      display: none !important;
+    }
+  }
+  tbody {
+    tr,
+    td {
+      border: none !important;
+      /* > label {
+        padding-bottom: 0 !important;
+      } */
+    }
+    .q-field__after {
+      font-size: 1rem;
+    }
+  }
+  .add-item-dropdown {
+    > .q-btn {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  .desc-column {
+    max-width: 350px;
+    min-width: 300px;
+    .q-field__native {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+  }
+
+  .product-id-column {
+    max-width: 400px;
+  }
+
+  .ghost-item {
+    opacity: 0.5;
+    background: $pink-1;
+  }
+
+  .qty-column {
+    :has(.composite-qty) {
+      width: 350px !important;
+      max-width: 350px;
+    }
+    :not(:has(.composite-qty)) {
+      width: 70px !important;
+      max-width: 70px;
+    }
+    > label,
+    .group-qty-input {
+      > .q-field__inner {
+        width: 60px !important;
+        max-width: 60px;
+      }
+    }
+  }
+
+  .serial-number-column {
+    .custom-serial-input {
+      width: 50px !important;
+      max-width: 50px;
+    }
+  }
+
+  .unit-discount-column {
+    :has(.discount-type-select-input) {
+      width: 250px !important;
+      max-width: 180px;
+    }
+    :not(:has(.discount-type-select-input)) {
+      width: 60px !important;
+      max-width: 60px;
+    }
+
+    > label,
+    .group-qty-input {
+      > .q-field__inner {
+        width: 60px !important;
+        max-width: 60px;
+      }
+    }
+  }
+
+  .group-qty-total {
+    width: 80px !important;
+    max-width: 80px;
+  }
+
+  .price-column {
+    width: 120px !important;
+    > label > .q-field__inner {
+      width: 100px !important;
+    }
+  }
+
+  .total-column,
+  .line-discount-column {
+    width: 110px !important;
+    max-width: 110px;
+    min-width: 100px;
+    > label > .q-field__inner {
+      width: 100px !important;
+      max-width: 100px;
+    }
+  }
+
+  .q-field--dense .q-field__control,
+  .q-field--dense .q-field__marginal {
+    height: unset;
+  }
+
+  .filled {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px 4px 0 0;
+    line-height: 18px;
+    min-height: 36px;
+    height: 40px;
+    padding-right: 0.75rem;
+  }
+
+  .bottom-row {
+    height: 48px !important;
+  }
+}
+
+.quotation-settings-accordion .before-select-label {
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.q-table__bottom--nodata {
+  margin-bottom: 5rem;
+
+  .message {
+    padding: 1rem 0;
+    background-color: $warning;
+    color: white;
+  }
+}
+
+.invoice-quotation-view-table {
+  width: 95%;
+  thead {
+    -webkit-print-color-adjust: exact;
+    background-color: $deep-purple-8;
+    color: white;
+    tr {
+      th {
+        line-height: 1.5rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+      }
+    }
+  }
+
+  tbody {
+    tr:nth-of-type(even):not(.bottom-row) {
+      -webkit-print-color-adjust: exact;
+      background-color: $deep-purple-2;
+      color: black;
+    }
+
+    tr,
+    td {
+      height: auto !important;
+      white-space: normal;
+
+      div {
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+      }
+    }
+  }
+
+  .bottom-row {
+    height: auto !important;
+    &:nth-last-child(odd) {
+      td:last-child {
+        -webkit-print-color-adjust: exact;
+        background-color: $deep-purple-1;
+        color: black;
+      }
+    }
+
+    .total-qty-cell,
+    .total-discount-cell,
+    .subtotal-cell {
+      -webkit-print-color-adjust: exact;
+      background-color: $deep-purple-5 !important;
+      color: white !important;
+    }
+
+    .bottom-rows-text,
+    .grand-total-cell {
+      font-weight: 500;
+    }
+
+    .grand-total-cell,
+    .subtotal-cell {
+      font-weight: 600;
+    }
+  }
+
+  .product-id-column {
+    min-width: 300px !important;
+  }
+
+  .desc-column {
+    min-width: 300px !important;
+  }
+
+  .qty-column {
+    :has(.composite-qty) {
+      width: 150px !important;
+    }
+    :not(:has(.composite-qty)) {
+      width: 75px !important;
+    }
+  }
+
+  .price-column,
+  .unit-discount-column {
+    width: auto !important;
+  }
+}
+
+.invoice-quotation-body {
+  .company-logo {
+    padding-bottom: 1rem;
+    border-bottom: solid 2px $deep-purple-8;
+  }
+  .footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: solid 2px $deep-purple-8;
+  }
+}
+
+.half-width {
+  width: 50% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.q-table__top .q-btn-group > .q-btn {
+  padding-left: 0px;
+  padding-right: 0px;
+}

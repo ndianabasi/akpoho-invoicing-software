@@ -67,7 +67,9 @@ export default store(function (/* { ssrContext } */) {
     /* state: function () {
       return {};
     }, */
-    getters: {},
+    getters: {
+      getRootURL: () => 'http://127.0.0.1:4444/',
+    },
     modules: {
       invoices_quotations,
     },
