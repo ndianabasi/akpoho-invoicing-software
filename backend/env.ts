@@ -59,4 +59,10 @@ export default Env.rules({
   // Mailjet
   MAILJET_API_KEY: Env.schema.string(),
   MAILJET_SECRET_KEY: Env.schema.string(),
+
+  // Print Server
+  PROD_PRINT_SERVER_HOST: Env.schema.string({ format: 'host' }),
+  PROD_PRINT_SERVER_PORT: Env.schema.number(),
+  DEV_PRINT_SERVER_HOST: Env.schema.string({ format: 'host' }),
+  DEV_PRINT_SERVER_PORT: Env.schema.number(),
 })

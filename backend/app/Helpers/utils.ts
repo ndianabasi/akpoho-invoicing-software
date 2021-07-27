@@ -119,3 +119,19 @@ export const sanitiseHTML: SanitiseHTML = function (input, config) {
 
   return sanitizeHtml(input, merge(config, defaultConfig))
 }
+
+export const getPrintServerBaseUrl = function () {
+  let host: string
+  let port: number
+  const NODE_ENV = Env.get('NODE_ENV')
+
+  if (NODE_ENV === 'production' || NODE_ENV === 'testing') {
+    host = Env.get('PROD_PRINT_SERVER_HOST')
+    port = Env.get('PROD_PRINT_SERVER_PORT')
+  } else {
+    host = Env.get('DEV_PRINT_SERVER_HOST')
+    port = Env.get('DEV_PRINT_SERVER_PORT')
+  }
+
+  return `http://${host}:${port}`
+}

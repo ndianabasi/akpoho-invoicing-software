@@ -49,6 +49,7 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
+      env: require('dotenv').config().parsed,
       vueRouterMode: 'history', // available values: 'hash', 'history'
 
       // transpile: false,
@@ -77,7 +78,7 @@ module.exports = configure(function (ctx) {
     // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
       https: false,
-      port: 8070,
+      port: process.env.DEV_SERVER_PORT,
       open: false, // opens browser window automatically
     },
 
@@ -110,7 +111,7 @@ module.exports = configure(function (ctx) {
       // manualStoreHydration: true,
       // manualPostHydrationTrigger: true,
 
-      prodPort: 3000, // The default port that the production server should use
+      prodPort: process.env.PRODUCTION_SERVER_PORT, // The default port that the production server should use
       // (gets superseded if process.env.PORT is specified at runtime)
 
       maxAge: 1000 * 60 * 60 * 24 * 30,

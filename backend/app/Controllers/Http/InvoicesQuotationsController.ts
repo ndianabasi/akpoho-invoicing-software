@@ -375,7 +375,7 @@ export default class QuotationsController {
       .with('InvoiceQuotationPolicy')
       .authorize('view', requestedInvoiceQuotation!, requestedCompany!)
 
-    const requestUrl = `http://localhost:8070/print-pages/invoices-quotations/${requestedInvoiceQuotation.id}/${requestedInvoiceQuotation.type}`
+    const requestUrl = `print-pages/invoices-quotations/${requestedInvoiceQuotation.id}/${requestedInvoiceQuotation.type}`
 
     await new PuppeteerServices(requestUrl, {
       paperFormat: 'a3',

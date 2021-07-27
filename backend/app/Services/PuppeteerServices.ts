@@ -4,21 +4,32 @@ import HttpContext from '@ioc:Adonis/Core/HttpContext'
 import Logger from '@ioc:Adonis/Core/Logger'
 import path from 'path'
 import createDirectory from 'App/Helpers/CreateDirectory'
+import { getPrintServerBaseUrl } from 'App/Helpers/utils'
 
 interface PrintOptions {
   paperFormat?: PaperFormat
   fileName: string
 }
 
+/**
+ * For Puppeteer-related tasks.
+ */
 export default class PuppeteerServices {
   private paperFormat: PaperFormat
   private fileName: string
+  private url: string
 
-  constructor(private url: string, options: PrintOptions) {
+  /**
+   * Initialise PuppeteerServices
+   * @param url The relative URL
+   * @param options Options object
+   */
+  constructor(url: string, options: PrintOptions) {
     this.paperFormat = options?.paperFormat ?? 'a4'
     if (!options.fileName) throw new Error('File name is required!')
     if (options.fileName.length < 2) throw new Error('File name must be at least 2 characters!')
     this.fileName = options.fileName
+    this.url = `${getPrintServerBaseUrl()}/${url}`
   }
 
   public async printAsPDF() {
