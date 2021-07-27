@@ -68,7 +68,19 @@ export default store(function (/* { ssrContext } */) {
       return {};
     }, */
     getters: {
-      getRootURL: () => 'http://127.0.0.1:4444/',
+      getRootURL: () => {
+        let host: string;
+        let port: number;
+
+        if (process.env.DEV) {
+          host = process.env.DEV_API_SERVER_HOST ?? '';
+          port = Number(process.env.DEV_API_SERVER_PORT);
+        } else {
+          host = process.env.PROD_API_SERVER_HOST ?? '';
+          port = Number(process.env.PROD_API_SERVER_PORT);
+        }
+        return `http://${host}:${port}/`;
+      },
     },
     modules: {
       invoices_quotations,
