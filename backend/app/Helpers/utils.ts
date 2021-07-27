@@ -135,3 +135,6 @@ export const getPrintServerBaseUrl = function () {
 
   return `http://${host}:${port}`
 }
+
+export const isProduction = Env.get('NODE_ENV') === 'production'
+export const isDevelopment = Env.get('NODE_ENV') === 'development'
