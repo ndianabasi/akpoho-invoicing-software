@@ -65,7 +65,6 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
     payload: {
       form: Record<string, Record<string, unknown> | string | boolean | number>;
       id: string;
-      type: InvoiceQuotationType;
     }
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -73,17 +72,13 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
       'auth/GET_CURRENT_COMPANY'
     ] as StringIDNameInterface;
 
-    const { form, id, type } = payload;
+    const { form, id } = payload;
 
     return new Promise(async (resolve, reject) => {
       await $http
-        .patch(
-          `${currentCompany.id}/invoices-quotations/${id}`,
-          {
-            ...(form as Record<string, unknown>),
-          },
-          { params: { type } }
-        )
+        .patch(`${currentCompany.id}/invoices-quotations/${id}`, {
+          ...(form as Record<string, unknown>),
+        })
         .then((res: HttpResponse) => {
           Notify.create({
             message: 'Quotation was successfully edited',
@@ -109,7 +104,7 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
 
   async FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION(
     { commit, rootGetters },
-    { id, queryString }: { id: string; queryString: Record<string, string> }
+    id: string
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const currentCompany = rootGetters[
@@ -118,9 +113,7 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
 
     return new Promise(async (resolve) => {
       await $http
-        .get(`${currentCompany.id}/invoices-quotations/${id}`, {
-          params: queryString,
-        })
+        .get(`${currentCompany.id}/invoices-quotations/${id}`)
         .then((res: HttpResponse) => {
           commit('SET_CURRENTLY_VIEWED_INVOICE_QUOTATION', res.data.data);
 
@@ -129,10 +122,7 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
     });
   },
 
-  async DOWNLOAD_INVOICE_QUOTATION(
-    { rootGetters },
-    { id, queryString }: { id: string; queryString: Record<string, string> }
-  ) {
+  async DOWNLOAD_INVOICE_QUOTATION({ rootGetters }, id: string) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const currentCompany = rootGetters[
       'auth/GET_CURRENT_COMPANY'
@@ -141,7 +131,6 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
     return new Promise(async (resolve) => {
       await $http
         .get(`${currentCompany.id}/invoices-quotations/${id}/download`, {
-          params: queryString,
           responseType: 'arraybuffer',
           timeout: 5 * 60 * 1000, // 5 minutes
         })
@@ -151,6 +140,24 @@ const actions: ActionTree<InvoiceQuotationStateInterface, StateInterface> = {
             arrayBuffer: res.data,
             contentType: res.headers['content-type'],
           });
+        });
+    });
+  },
+
+  async DELETE_INVOICE_QUOTATION({ rootGetters }, id: string) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const currentCompany = rootGetters[
+      'auth/GET_CURRENT_COMPANY'
+    ] as StringIDNameInterface;
+
+    return new Promise(async (resolve, reject) => {
+      await $http
+        .delete(`${currentCompany.id}/invoices-quotations/${id}`)
+        .then((res: HttpResponse) => {
+          return resolve(res.data.message);
+        })
+        .catch((error: HttpError) => {
+          return reject(error);
         });
     });
   },

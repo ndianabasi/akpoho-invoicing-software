@@ -23,6 +23,11 @@ Route.group(() => {
     '/:company_id/invoices-quotations/:invoice_quotation_id',
     'InvoicesQuotationsController.show'
   ).middleware('findRequestedInvoiceQuotation')
+  // Delete an invoice/quotation
+  Route.delete(
+    '/:company_id/invoices-quotations/:invoice_quotation_id',
+    'InvoicesQuotationsController.destroy'
+  ).middleware('findRequestedInvoiceQuotation')
   Route.get(
     '/:company_id/invoices-quotations/:invoice_quotation_id/download',
     'InvoicesQuotationsController.download'
@@ -33,6 +38,9 @@ Route.group(() => {
   .middleware('findAuthRole')
   .middleware('findRequestedCompany')
 
+/**
+ * Server-side printing routes
+ */
 Route.group(() => {
   Route.get(
     '/print-invoices-quotations/:invoice_quotation_id/:type',

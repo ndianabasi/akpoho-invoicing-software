@@ -3,7 +3,6 @@ import {
   CurrentlyViewedInvoiceQuotation,
   CustomerAddressShape,
   DiscountType,
-  InvoiceQuotationType,
   ProductNameType,
   QuotationInvoiceFormShape,
   QuotationInvoiceItemShape,
@@ -438,19 +437,14 @@ export const getCompanyInformation = function (
 
 export const downloadInvoiceQuotation = async function ({
   id,
-  type,
   quotationData,
 }: {
   id: string;
-  type: InvoiceQuotationType;
   quotationData: CurrentlyViewedInvoiceQuotation;
 }) {
   const fileName = `${snakeCase(quotationData.title)}_${quotationData.id}`;
   await store
-    .dispatch('invoices_quotations/DOWNLOAD_INVOICE_QUOTATION', {
-      id,
-      queryString: { type },
-    })
+    .dispatch('invoices_quotations/DOWNLOAD_INVOICE_QUOTATION', id)
     .then(
       ({
         arrayBuffer,

@@ -45,6 +45,7 @@ export default class QuotationsController {
       .select(
         'invoices_quotations.id',
         'invoices_quotations.title',
+        'invoices_quotations.type',
         'invoices_quotations.date',
         'invoices_quotations.tax_percentage',
         'invoices_quotations.simple_quantities',
@@ -363,7 +364,25 @@ export default class QuotationsController {
     } else return response.abort({ message: 'Company not found' })
   }
 
-  public async destroy({}: HttpContextContract) {}
+  public async destroy({
+    requestedInvoiceQuotation,
+    response,
+    requestedCompany,
+    bouncer,
+  }: HttpContextContract) {
+    await bouncer
+      .with('InvoiceQuotationPolicy')
+      .authorize('delete', requestedInvoiceQuotation!, requestedCompany!)
+
+    const type = requestedInvoiceQuotation.type
+
+    await requestedInvoiceQuotation.delete()
+
+    return response.created({
+      message: `${type === 'invoice' ? 'Invoice' : 'Quotation'} was deleted!`,
+      data: requestedInvoiceQuotation.id,
+    })
+  }
 
   public async download({
     requestedInvoiceQuotation,

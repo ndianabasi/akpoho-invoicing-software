@@ -272,13 +272,14 @@ export default defineComponent({
 
     const handleDeletion = async function () {
       await useDeleteResource({
-        resource: 'company',
-        resourceName: 'Company',
+        resource: props.documentType,
+        resourceName:
+          props.documentType === 'quotation' ? 'Quotation' : 'Invoice',
         payload: props.quotationId,
       })
         .then(() => {
           const postDeletionAction = {
-            routeName: 'all_invoices_quotations',
+            routeName: 'quotations',
             routeParams: undefined,
           };
 
@@ -303,10 +304,7 @@ export default defineComponent({
       void store
         .dispatch(
           'invoices_quotations/FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION',
-          {
-            id: props.quotationId,
-            queryString: { type: 'quotation' },
-          }
+          props.quotationId
         )
         .then(() => {
           currentInvoiceQuotation.value = unref(
@@ -378,7 +376,6 @@ export default defineComponent({
           action: () =>
             downloadInvoiceQuotation({
               id: props.quotationId,
-              type: props.documentType,
               quotationData: currentInvoiceQuotation.value,
             }),
         },

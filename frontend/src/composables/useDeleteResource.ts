@@ -49,6 +49,8 @@ export default function ({
           actionName = 'companies/DELETE_COMPANY';
         } else if (resource === 'customer') {
           actionName = 'customers/DELETE_CUSTOMER';
+        } else if (resource === 'invoice' || resource === 'quotation') {
+          actionName = 'invoices_quotations/DELETE_INVOICE_QUOTATION';
         } else {
           actionName = '';
           throw new Error('A valid resource is not specified');
@@ -57,12 +59,6 @@ export default function ({
         await store
           .dispatch(actionName, payload)
           .then((message: string) => {
-            // Show success message before dialog is hidden programmatically
-            deleteProgressDialog.update({
-              title: 'Success',
-              message: `${resourceName} was successfully deleted`,
-              progress: false,
-            });
             // Avoid screen flicker for quick operations
             setTimeout(() => {
               Notify.create({

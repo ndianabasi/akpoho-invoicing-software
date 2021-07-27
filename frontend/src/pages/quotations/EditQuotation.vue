@@ -947,10 +947,7 @@ export default defineComponent({
         void store
           .dispatch(
             'invoices_quotations/FETCH_CURRENTLY_VIEWED_INVOICE_QUOTATION',
-            {
-              id: props.quotationId,
-              queryString: { type: 'quotation' },
-            }
+            props.quotationId
           )
           .then(() => {
             currentInvoiceQuotation.value = unref(

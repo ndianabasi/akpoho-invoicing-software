@@ -464,7 +464,7 @@ export default defineComponent({
     },
     entityName: {
       type: String,
-      required: true,
+      required: false,
       default: 'Resource',
     },
     rowKey: {

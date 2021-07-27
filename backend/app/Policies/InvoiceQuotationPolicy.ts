@@ -64,4 +64,18 @@ export default class ProductPolicy extends BasePolicy {
       requestedCompany
     )
   }
+
+  public async delete(
+    user: User,
+    requestedInvoiceQuotation: InvoiceQuotation,
+    requestedCompany: Company
+  ) {
+    const resourcePermission = 'can_delete_quotations'
+    return await accessInvoicesQuotations(
+      resourcePermission,
+      user,
+      requestedInvoiceQuotation,
+      requestedCompany
+    )
+  }
 }

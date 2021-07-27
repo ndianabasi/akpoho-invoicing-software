@@ -7,8 +7,8 @@
     row-view-route-name="view_quotation"
     row-edit-route-name="edit_quotation"
     route-param="quotationId"
-    row-delete-action-type="quotations/DELETE_QUOTATION"
-    entity-name="Quotation"
+    row-delete-action-type="invoices_quotations/DELETE_INVOICE_QUOTATION"
+    entity-name="Document"
     table-data-fetch-end-point="invoices-quotations"
     is-company-specific
     show-new-route-button
