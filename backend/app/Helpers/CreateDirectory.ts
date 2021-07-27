@@ -6,28 +6,25 @@ import Logger from '@ioc:Adonis/Core/Logger'
 /**
  * A function to create and test a directory using nodejs' fs module
  *
- * @param {String} relativeDirPath The complete relative path from the CWD of the process to the directory to be created.
- * This should include the name of the directory as the last word
- *
+ * @param {String} dirPath The directory to be created. Could be absolute or relative path
  * @example createDirectory('parentDirName1/parentDirName2/finalDirname')
- *
  * @returns true | Error
  */
-const createDirectory = function (relativeDirPath: string) {
+const createDirectory = function (dirPath: string) {
   return new Promise((resolve, reject) => {
-    const fullDirPath = path.join(process.cwd(), relativeDirPath)
-    console.log(fullDirPath)
+    const isAbsolutePath = path.isAbsolute(dirPath)
+    const fullDirPath = isAbsolutePath ? dirPath : path.join(process.cwd(), dirPath)
     fs.promises
       .readdir(fullDirPath)
       .then(() => {
         Logger.info(
-          `Helpers/createDirectory.js -> createDirectory(): dir '${relativeDirPath}' already exists.`
+          `Helpers/createDirectory.js -> createDirectory(): dir '${dirPath}' already exists.`
         )
         resolve(true)
       })
       .catch((err) => {
         Logger.error(
-          `Helpers/createDirectory.js -> createDirectory(): Error while reading dir '${relativeDirPath}': %j.`,
+          `Helpers/createDirectory.js -> createDirectory(): Error while reading dir '${dirPath}': %j.`,
           err
         )
         Logger.info(
@@ -39,14 +36,14 @@ const createDirectory = function (relativeDirPath: string) {
           .mkdir(fullDirPath, { recursive: true })
           .then((data) => {
             Logger.info(
-              `Helpers/createDirectory.js -> createDirectory(): dir '${relativeDirPath}' is created: %j.`,
+              `Helpers/createDirectory.js -> createDirectory(): dir '${dirPath}' is created: %j.`,
               data
             )
             resolve(true)
           })
           .catch((err) => {
             Logger.error(
-              `Helpers/createDirectory.js -> createDirectory(): Error while creating dir '${relativeDirPath}': %j.`,
+              `Helpers/createDirectory.js -> createDirectory(): Error while creating dir '${dirPath}': %j.`,
               err
             )
             reject(err)
