@@ -70,12 +70,7 @@ import { InvoiceQuotationGetterInterface } from './invoices_quotations/getters';
 import createPersistedState from 'vuex-persistedstate';
 import SecureLS from 'secure-ls';
 
-let lsImport: SecureLS;
-if (!process.env.SERVER === true) {
-  void import('../boot/secure-ls').then(({ ls }) => {
-    lsImport = ls;
-  });
-}
+const ls = new SecureLS({ isCompression: false });
 
 /*
  * If not building with SSR mode, you can
@@ -246,27 +241,18 @@ export default function storeCallback(/* {ssrContext} */) {
       invoices_quotations,
     },
 
-    plugins: (() => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(process.env.SERVER);
-
-        if (!process.env.SERVER === true) {
-          return [createPersistedState()];
-        }
-      } else {
-        if (!process.env.SERVER === true) {
-          return [
+    plugins:
+      process.env.NODE_ENV !== 'production'
+        ? [createPersistedState()]
+        : [
             createPersistedState({
               storage: {
-                getItem: (key) => lsImport.get(key),
-                setItem: (key, value) => lsImport.set(key, value),
-                removeItem: (key) => lsImport.remove(key),
+                getItem: (key) => ls.get(key),
+                setItem: (key, value) => ls.set(key, value),
+                removeItem: (key) => ls.remove(key),
               },
             }),
-          ];
-        }
-      }
-    })(),
+          ],
   });
 
   return store;
