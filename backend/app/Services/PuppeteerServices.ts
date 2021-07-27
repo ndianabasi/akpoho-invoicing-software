@@ -4,7 +4,7 @@ import HttpContext from '@ioc:Adonis/Core/HttpContext'
 import Logger from '@ioc:Adonis/Core/Logger'
 import path from 'path'
 import createDirectory from 'App/Helpers/CreateDirectory'
-import { getPrintServerBaseUrl, isProduction } from 'App/Helpers/utils'
+import { getPrintServerBaseUrl /* isProduction */ } from 'App/Helpers/utils'
 
 interface PrintOptions {
   paperFormat?: PaperFormat
@@ -41,7 +41,7 @@ export default class PuppeteerServices {
     // 1. Create PDF from URL
     await page.goto(this.url)
 
-    if (isProduction) {
+    /* if (isProduction) {
       await page
         .waitForNavigation({
           timeout: 1 * 60 * 1000, // 2 minute timeout
@@ -50,7 +50,7 @@ export default class PuppeteerServices {
         .then(() => {
           console.log('waitForNavigation done')
         })
-    }
+    } */
 
     // 2. Save a PDF
     await this.prepareFilePath(this.fileName).then(async (filePath) => {

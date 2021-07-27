@@ -18,6 +18,8 @@ declare module '@vue/runtime-core' {
 let api: AxiosInstance;
 
 export default boot(({ app, store }) => {
+  console.log('From axios.js -> getRootURL: ', store.getters.getRootURL);
+
   api = axios.create({ baseURL: store.getters.getRootURL });
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
