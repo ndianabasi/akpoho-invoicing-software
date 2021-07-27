@@ -70,7 +70,7 @@ export default class PuppeteerServices {
         })
 
       await browser.close()
-      ctx?.response.download(filePath)
+      ctx?.response.attachment(filePath, this.fileName, 'attachment', true)
     })
   }
 
