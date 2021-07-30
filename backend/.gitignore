@@ -13,3 +13,4 @@ app/Helpers/ImageManipulationHelper.ts
 app/Helpers/UploadHelper.ts
 app/Controllers/Http/examples
 public/uploads/*
+./akpoho-api-server.config.js
