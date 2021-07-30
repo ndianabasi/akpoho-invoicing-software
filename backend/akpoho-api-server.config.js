@@ -3,6 +3,7 @@ module.exports = {
     {
       name: 'Akpoho_Demo_Api_Server',
       script: './build/server.js',
+      interpreter: 'node@14.17.3',
       watch: false,
       ignore_watch: ['public', 'private_uploads'],
       watch_options: {
