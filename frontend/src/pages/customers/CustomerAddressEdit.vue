@@ -287,6 +287,7 @@ export default defineComponent({
       },
     }));
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
 
     const processedForm = computed(() => {

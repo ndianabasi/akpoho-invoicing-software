@@ -205,7 +205,7 @@ export default defineComponent({
         },
         cancel: true,
         persistent: true,
-      }).onOk(async () => {
+      }).onOk(() => {
         const deleteProgressDialog = $q.dialog({
           title: 'Processing',
           message: 'Software at work!',
@@ -214,7 +214,7 @@ export default defineComponent({
           cancel: false,
           persistent: true,
         });
-        await store
+        void store
           .dispatch('customers/DELETE_CUSTOMER_ADDRESS', {
             customerId: props.customerId,
             customerAddressId: customerAddressId,

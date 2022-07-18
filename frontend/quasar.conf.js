@@ -9,7 +9,6 @@
 /* eslint-env node */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers');
-const { QSpinnerHourglass } = require('quasar');
 
 module.exports = configure(function (ctx) {
   return {
@@ -108,7 +107,7 @@ module.exports = configure(function (ctx) {
         loading: {
           message: 'Processing',
           delay: 400,
-          spinner: QSpinnerHourglass,
+          spinner: true,
           spinnerColor: 'deep-orange',
           spinnerSize: '3em',
           backgroundColor: 'grey-2',

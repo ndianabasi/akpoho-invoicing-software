@@ -75,6 +75,8 @@ module.exports = {
     chrome: true,
   },
 
+  ignorePatterns: ['.quasar/**'],
+
   // add your custom rules here
   rules: {
     'prefer-promise-reject-errors': 'off',
@@ -89,5 +91,6 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'vue/no-v-model-argument': 'off',
     'vue/no-multiple-template-root': 'off',
+    '@typescript-eslint/no-unsafe-return': 'off',
   },
 };
