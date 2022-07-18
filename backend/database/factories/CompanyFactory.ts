@@ -10,14 +10,14 @@ const CompanyFactory = Factory.define(Company, ({ faker }) => {
   const generatedCompany = {
     email: faker.internet.email(),
     name: companyName,
-    phone_number: faker.phone.phoneNumber(),
+    phone_number: faker.phone.number(),
     address: faker.address.streetAddress(true),
     is_approved: faker.datatype.boolean(),
     city: faker.address.city(),
     state: null,
     country: null,
     slug: slugify(companyName, { lower: true, strict: true }),
-    type: faker.random.arrayElement(['personal', 'corporate']) as CompanyType,
+    type: faker.helpers.arrayElement(['personal', 'corporate']) as CompanyType,
     website: faker.internet.url(),
   }
 

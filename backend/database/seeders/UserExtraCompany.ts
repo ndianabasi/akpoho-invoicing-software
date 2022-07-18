@@ -1,7 +1,7 @@
-import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
-import Company from 'App/Models/Company'
 import User from 'App/Models/User'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
+import Company from 'App/Models/Company'
+import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 
 type IDObject = { id: string }
 
@@ -23,7 +23,7 @@ export default class UserExtraCompanySeeder extends BaseSeeder {
       const user = allUsers[index]
       //console.log(user.companies.map((company) => company.id))
 
-      const twoRandomCompanies = faker.random.arrayElements(
+      const twoRandomCompanies = faker.helpers.arrayElements(
         flattenedCompaniesIDs.filter((company) =>
           user.companies.some((userCompany) => userCompany.id !== company)
         ),

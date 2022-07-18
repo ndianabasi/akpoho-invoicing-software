@@ -5,7 +5,7 @@ const UserProfileFactory = Factory.define(UserProfile, ({ faker }) => {
   const generatedProfile = {
     first_name: faker.name.firstName(),
     last_name: faker.name.lastName(),
-    phone_number: faker.phone.phoneNumber(),
+    phone_number: faker.phone.number(),
     address: faker.address.streetAddress(true),
     city: faker.address.city(),
   }

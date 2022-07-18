@@ -16,7 +16,7 @@ const ProductFactory = Factory.define(Product, async ({ faker }) => {
   const generatedProduct = {
     productTypeId: simpleProduct?.id ?? '',
     name: faker.commerce.productName(),
-    sku: `${faker.random.alpha({ upcase: true, count: 4 })}-${faker.datatype.number({
+    sku: `${faker.random.alpha({ casing: 'upper', count: 4 })}-${faker.datatype.number({
       max: 9999,
       min: 1234,
     })}`,
@@ -27,10 +27,10 @@ const ProductFactory = Factory.define(Product, async ({ faker }) => {
           min: 1,
         })
       : 0,
-    countryOfManufacture: faker.random.arrayElement(countryIds),
+    countryOfManufacture: faker.helpers.arrayElement(countryIds),
     isEnabled: true,
     productHasWeight,
-    stockStatus: faker.random.arrayElement(
+    stockStatus: faker.helpers.arrayElement(
       PRODUCT_STOCK_STATUS_OPTIONS
     ) as PRODUCT_STOCK_STATUS_TYPES,
     description: faker.commerce.productDescription(),
