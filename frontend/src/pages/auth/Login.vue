@@ -211,14 +211,10 @@ export default defineComponent({
 
     const isDemoMode = computed(() => process.env.DEMO_MODE === 'true');
 
-    const form = isDemoMode.value
-      ? reactive({
-          email: '',
-        })
-      : reactive({
-          email: '',
-          password: '',
-        });
+    const form = reactive({
+      email: '',
+      password: isDemoMode.value ? undefined : '',
+    });
 
     const rules = {
       email: {
@@ -243,6 +239,7 @@ export default defineComponent({
       },
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const form$: Ref<{ $invalid: boolean }> = useVuelidate(rules, form);
 
     async function handleLogin() {

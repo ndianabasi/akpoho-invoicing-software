@@ -753,7 +753,7 @@ export default defineComponent({
           },
           cancel: true,
           persistent: true,
-        }).onOk(async () => {
+        }).onOk(() => {
           const deleteProgressDialog = $q.dialog({
             title: 'In Progress',
             message: 'Software at work!',
@@ -762,7 +762,7 @@ export default defineComponent({
             cancel: false,
             persistent: true,
           });
-          await store
+          void store
             .dispatch(props.rowDeleteActionType, id)
             .then(() => {
               // Show success message before dialog is hidden programmatically

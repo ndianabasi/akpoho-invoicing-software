@@ -18,7 +18,7 @@ const mailConfig: MailConfig = {
   | a mailer
   |
   */
-  mailer: 'smtp',
+  mailer: Env.get('DEMO_MODE') === true ? 'mailHog' : Env.get('MAILER'),
 
   /*
   |--------------------------------------------------------------------------
@@ -44,11 +44,11 @@ const mailConfig: MailConfig = {
     */
     smtp: {
       driver: 'smtp',
-      host: Env.get('SMTP_HOST'),
-      port: Env.get('SMTP_PORT'),
+      host: Env.get('SMTP_HOST') || 'localhost',
+      port: Env.get('SMTP_PORT') || 587,
       auth: {
-        user: Env.get('SMTP_USERNAME'),
-        pass: Env.get('SMTP_PASSWORD'),
+        user: Env.get('SMTP_USERNAME') || '',
+        pass: Env.get('SMTP_PASSWORD') || '',
         type: 'login',
       },
     },
@@ -67,8 +67,8 @@ const mailConfig: MailConfig = {
     mailgun: {
       driver: 'mailgun',
       baseUrl: 'https://api.mailgun.net/v3',
-      key: Env.get('MAILGUN_API_KEY'),
-      domain: Env.get('MAILGUN_DOMAIN'),
+      key: Env.get('MAILGUN_API_KEY') || '',
+      domain: Env.get('MAILGUN_DOMAIN') || '',
     },
 
     /*
@@ -82,7 +82,21 @@ const mailConfig: MailConfig = {
     sparkpost: {
       driver: 'sparkpost',
       baseUrl: 'https://api.sparkpost.com/api/v1',
-      key: Env.get('SPARKPOST_API_KEY'),
+      key: Env.get('SPARKPOST_API_KEY') || '',
+    },
+    /*
+    |--------------------------------------------------------------------------
+    | MailHog (for local testing/trapping)
+    |--------------------------------------------------------------------------
+    |
+    | Uses SMTP protocol for sending email
+    |
+    */
+    mailHog: {
+      driver: 'smtp',
+      host: Env.get('SMTP_HOST') || 'localhost',
+      port: Env.get('SMTP_PORT') || 1025,
+      secure: false,
     },
 
     /*

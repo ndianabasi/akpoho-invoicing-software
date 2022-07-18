@@ -9,14 +9,14 @@ const CustomerFactory = Factory.define(Customer, ({ faker }) => {
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
     email: faker.internet.email(),
-    phoneNumber: faker.phone.phoneNumber(),
+    phoneNumber: faker.phone.number(),
     //address: faker.address.streetAddress(true),
   }
 
   const corporateCustomer = {
     companyName: faker.company.companyName(),
     companyEmail: faker.internet.email(),
-    companyPhone: faker.phone.phoneNumber(),
+    companyPhone: faker.phone.number(),
   }
 
   const customer =

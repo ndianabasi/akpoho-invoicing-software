@@ -13,5 +13,6 @@ declare module '@ioc:Adonis/Addons/Mail' {
     smtp: MailDrivers['smtp']
     mailgun: MailDrivers['mailgun']
     sparkpost: MailDrivers['sparkpost']
+    mailHog: MailDrivers['smtp']
   }
 }

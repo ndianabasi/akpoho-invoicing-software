@@ -12,6 +12,7 @@
 |
 */
 
+import { MailConfig } from '@ioc:Adonis/Addons/Mail'
 import Env from '@ioc:Adonis/Core/Env'
 
 export default Env.rules({
@@ -25,7 +26,7 @@ export default Env.rules({
   CACHE_VIEWS: Env.schema.boolean(),
   SESSION_DRIVER: Env.schema.string(),
   NODE_ENV: Env.schema.enum(['development', 'production', 'testing'] as const),
-  DEMO_MODE: Env.schema.boolean({ message: 'DEMO_TRUE variable should be a boolean' }),
+  DEMO_MODE: Env.schema.boolean({ message: 'DEMO_MODE variable should be a boolean' }),
 
   MYSQL_HOST: Env.schema.string({ format: 'host' }),
   MYSQL_PORT: Env.schema.number(),
@@ -43,26 +44,28 @@ export default Env.rules({
   APP_URL: Env.schema.string({ format: 'url' }),
   FRONTEND_URL: Env.schema.string({ format: 'url' }),
 
+  MAILER: Env.schema.enum<keyof MailConfig['mailers']>(['mailHog', 'mailgun', 'smtp', 'sparkpost']),
+
   // SMTP driver
-  SMTP_HOST: Env.schema.string({ format: 'host' }),
-  SMTP_PORT: Env.schema.number(),
-  SMTP_USERNAME: Env.schema.string(),
-  SMTP_PASSWORD: Env.schema.string(),
+  SMTP_HOST: Env.schema.string.optional({ format: 'host' }),
+  SMTP_PORT: Env.schema.number.optional(),
+  SMTP_USERNAME: Env.schema.string.optional(),
+  SMTP_PASSWORD: Env.schema.string.optional(),
 
   // Mailgun driver
-  MAILGUN_API_KEY: Env.schema.string(),
-  MAILGUN_DOMAIN: Env.schema.string(),
+  MAILGUN_API_KEY: Env.schema.string.optional(),
+  MAILGUN_DOMAIN: Env.schema.string.optional(),
 
   // Sparkpost
-  SPARKPOST_API_KEY: Env.schema.string(),
+  SPARKPOST_API_KEY: Env.schema.string.optional(),
 
   // Mailjet
-  MAILJET_API_KEY: Env.schema.string(),
-  MAILJET_SECRET_KEY: Env.schema.string(),
+  MAILJET_API_KEY: Env.schema.string.optional(),
+  MAILJET_SECRET_KEY: Env.schema.string.optional(),
 
   // Print Server
-  PROD_PRINT_SERVER_HOST: Env.schema.string({ format: 'host' }),
-  PROD_PRINT_SERVER_PORT: Env.schema.number(),
-  DEV_PRINT_SERVER_HOST: Env.schema.string({ format: 'host' }),
-  DEV_PRINT_SERVER_PORT: Env.schema.number(),
+  PROD_PRINT_SERVER_HOST: Env.schema.string.optional({ format: 'host' }),
+  PROD_PRINT_SERVER_PORT: Env.schema.number.optional(),
+  DEV_PRINT_SERVER_HOST: Env.schema.string.optional({ format: 'host' }),
+  DEV_PRINT_SERVER_PORT: Env.schema.number.optional(),
 })

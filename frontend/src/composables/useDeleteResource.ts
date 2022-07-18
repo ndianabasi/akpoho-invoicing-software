@@ -30,7 +30,7 @@ export default function ({
       },
       cancel: true,
       persistent: true,
-    }).onOk(async () => {
+    }).onOk(() => {
       const deleteProgressDialog = Dialog.create({
         title: 'In Progress',
         message: 'Software at work!',
@@ -56,7 +56,7 @@ export default function ({
           throw new Error('A valid resource is not specified');
         }
 
-        await store
+        void store
           .dispatch(actionName, payload)
           .then((message: string) => {
             // Avoid screen flicker for quick operations

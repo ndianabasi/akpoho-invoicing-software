@@ -57,27 +57,39 @@ export default class Products extends BaseSchema {
   }
 
   public async down() {
-    this.schema.dropTable(this.tableName)
-
-    this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().unique().index().notNullable()
-      table.uuid('product_type_id').nullable().index()
-      table.uuid('attribute_set_id').nullable().index()
-
-      table.timestamp('created_at', { useTz: true })
-      table.timestamp('updated_at', { useTz: true })
-
-      table
-        .foreign('product_type_id')
-        .references('product_types.id')
-        .onDelete('SET NULL')
-        .onUpdate('CASCADE')
-
-      table
-        .foreign('attribute_set_id')
-        .references('attribute_sets.id')
-        .onDelete('SET NULL')
-        .onUpdate('CASCADE')
+    this.schema.table(this.tableName, (table) => {
+      table.dropForeign('product_images')
+      table.dropForeign('country_of_manufacture')
+      table.dropColumns(
+        'name',
+        'slug',
+        'sku',
+        'price',
+        'is_enabled',
+        'visibility',
+        'stock_status',
+        'product_has_weight',
+        'description',
+        'short_description',
+        'product_images',
+        'weight',
+        'country_of_manufacture',
+        'active_from',
+        'active_to',
+        'meta_description',
+        'meta_keywords',
+        'meta_robots',
+        'meta_title',
+        'minimum_advertised_price',
+        'display_actual_price',
+        'product_new_from_date',
+        'product_new_to_date',
+        'seo_name',
+        'special_price',
+        'special_price_from_date',
+        'special_price_to_date',
+        'is_for_one_time_purchase'
+      )
     })
   }
 }

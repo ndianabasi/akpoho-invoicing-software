@@ -7,16 +7,16 @@ import State from 'App/Models/State'
 const CustomerAddressFactory = Factory.define(CustomerAddress, async ({ faker }) => {
   // Get array of country ids
   const countryIds = (await Country.all()).map((country) => country.id)
-  const country = faker.random.arrayElement(countryIds)
+  const country = faker.helpers.arrayElement(countryIds)
   // Get states in the country
   const stateIds = (await State.query().where('country_id', country)).map((state) => state.id)
-  const state = stateIds.length > 0 ? faker.random.arrayElement(stateIds) : null
+  const state = stateIds.length > 0 ? faker.helpers.arrayElement(stateIds) : null
 
   const generatedAddress = {
     street_address: faker.address.streetAddress(true),
     city: faker.address.city(),
     postal_code: faker.address.zipCode(),
-    address_type: faker.random.arrayElement(ADDRESS_TYPES),
+    address_type: faker.helpers.arrayElement(ADDRESS_TYPES),
     stateId: state,
     countryId: country,
   }

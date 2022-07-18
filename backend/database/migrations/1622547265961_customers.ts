@@ -21,9 +21,7 @@ export default class Customers extends BaseSchema {
     this.schema.alterTable(this.tableName, (table) => {
       table.dropForeign('customer_title_id')
       table.dropColumn('customer_title_id')
-
-      table.string('first_name', 50).notNullable().alter()
-      table.string('last_name', 50).notNullable().alter()
+      // No need to set `first_name` and `last_name` as `NOT NULL`
     })
   }
 }
