@@ -13945,8 +13945,8 @@ export default [
     capital: 'Bangkok',
     altSpellings: [
       'TH',
-      'Prathet',
-      'Thai',
+      'Prathet Thai',
+      'ประเทศไทย',
       'Kingdom of Thailand',
       'ราชอาณาจักรไทย',
       'Ratcha Anachak Thai',
